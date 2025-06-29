@@ -38,7 +38,7 @@ export const Elements: ElementTypes[] = [
         description: "Send a message to the user",
         icon: "💬",
         color: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-        triggerId: "SendMessageNode",
+        triggerId: "SendTextMessageNode",
       },
       {
         type: "photo",
@@ -46,6 +46,7 @@ export const Elements: ElementTypes[] = [
         description: "Send a photo to the user",
         icon: "🖼️",
         color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+        triggerId: "SendPhotoNode",
       },
       {
         type: "video",
@@ -53,6 +54,7 @@ export const Elements: ElementTypes[] = [
         description: "Send a video to the user",
         icon: "📹",
         color: "bg-red-500/10 text-red-400 border-red-500/20",
+        triggerId: "SendVideoNode",
       },
       {
         type: "audio",
@@ -60,6 +62,7 @@ export const Elements: ElementTypes[] = [
         description: "Send an audio file to the user",
         icon: "🎵",
         color: "bg-pink-500/10 text-pink-400 border-pink-500/20",
+        triggerId: "SendAudioNode",
       },
       {
         type: "file",
@@ -67,6 +70,7 @@ export const Elements: ElementTypes[] = [
         description: "Send a file to the user",
         icon: "📄",
         color: "bg-gray-500/10 text-gray-400 border-gray-500/20",
+        triggerId: "SendFileNode",
       },
     ],
   },

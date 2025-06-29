@@ -1,7 +1,17 @@
-import { SendMessageNode } from "./actions";
 import { TextTriggerNode } from "./triggers";
+import {
+  SendTextMessageNode,
+  SendPhotoNode,
+  SendVideoNode,
+  SendAudioNode,
+  SendFileNode,
+} from "./actions";
 
 export const CustomNodes = {
   TextTriggerNode,
-  SendMessageNode,
+  SendTextMessageNode,
+  SendPhotoNode,
+  SendVideoNode,
+  SendAudioNode,
+  SendFileNode,
 };
