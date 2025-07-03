@@ -1,38 +1,32 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import ReactFlow, {
-  addEdge,
   Background,
   Controls,
   MiniMap,
   useReactFlow,
-  useNodesState,
-  useEdgesState,
-  Node,
-  Edge,
   ReactFlowProvider,
-  Connection,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { ElementItemType } from "@/types/element-types";
 import { CustomNodes } from "./nodes";
-
-let id = 0;
-const getId = () => `node_${id++}`;
+import { useFlowStore } from "./store/flowStore"; // Store'ni import qilamiz
 
 function FlowchartInner() {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const { project } = useReactFlow();
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>([]);
-  const [selectedNodes, setSelectedNodes] = useState<Node[]>([]);
-
-  const onConnect = useCallback(
-    (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
-    []
-  );
+  // Zustand store'dan kerakli holat va action'larni olamiz
+  const {
+    nodes,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    addNode,
+    deleteSelectedElements,
+  } = useFlowStore();
 
   const onDrop = useCallback(
     (event: React.DragEvent) => {
@@ -47,16 +41,10 @@ function FlowchartInner() {
         y: event.clientY - (reactFlowBounds?.top || 0),
       });
 
-      const newNode: Node = {
-        id: getId(),
-        type: data.triggerId,
-        position,
-        data: data,
-      };
-
-      setNodes((nds) => nds.concat(newNode));
+      // Store'dagi action'ni chaqiramiz
+      addNode(data, position);
     },
-    [project]
+    [project, addNode]
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -64,45 +52,17 @@ function FlowchartInner() {
     event.dataTransfer.dropEffect = "copy";
   }, []);
 
-  const onSelectionChange = useCallback(({ nodes }: { nodes: Node[] }) => {
-    setSelectedNodes(nodes);
-  }, []);
-
-  // Delete selected nodes or edges with 'Delete' key
+  // Delete tugmasini bosishni eshitish
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Delete") {
-        setNodes((nds) => nds.filter((node) => !node.selected));
-        setEdges((eds) => eds.filter((edge) => !edge.selected));
+        deleteSelectedElements();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [setNodes, setEdges]);
-
-  const onNodeDrag = useCallback(
-    (event: React.MouseEvent, node: Node) => {
-      if (event.ctrlKey) {
-        setNodes((nds) =>
-          nds.map((n) => {
-            if (n.id === node.id) {
-              // Snapping to 10px grid
-              return {
-                ...n,
-                position: {
-                  x: Math.round(node.position.x / 10) * 10,
-                  y: Math.round(node.position.y / 10) * 10,
-                },
-              };
-            }
-            return n;
-          })
-        );
-      }
-    },
-    [setNodes]
-  );
+  }, [deleteSelectedElements]);
 
   return (
     <div
@@ -112,19 +72,17 @@ function FlowchartInner() {
       onDragOver={onDragOver}
     >
       <ReactFlow
-        onNodeDrag={onNodeDrag}
         nodes={nodes}
         edges={edges}
         onConnect={onConnect}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onSelectionChange={onSelectionChange}
         nodeTypes={CustomNodes}
         fitView
         panOnScroll
         selectionOnDrag
         multiSelectionKeyCode={["Shift"]}
-        deleteKeyCode={null} // Biz o'zimiz delete event qilyapmiz
+        deleteKeyCode={null}
       >
         <Background gap={24} color="#666" />
         <MiniMap />
@@ -134,6 +92,7 @@ function FlowchartInner() {
   );
 }
 
+// Bu qism o'zgarishsiz qoladi
 export default function Flowchart() {
   return (
     <ReactFlowProvider>

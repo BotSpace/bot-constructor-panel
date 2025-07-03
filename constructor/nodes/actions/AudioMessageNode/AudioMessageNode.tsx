@@ -1,9 +1,9 @@
-import React, { FC, useState } from "react";
+"use client";
+
+import { useState, memo } from "react";
 import { Handle, Position, NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { FiMusic, FiChevronUp, FiChevronDown } from "react-icons/fi";
-
-// shadcn/ui komponentlari
+import { FiMusic, FiChevronDown } from "react-icons/fi";
 import {
   Card,
   CardHeader,
@@ -22,44 +22,29 @@ import {
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { useFlowStore } from "@/constructor/store/flowStore";
+import { SendAudioNodeData, RecipientType, AudioSourceType } from "./types";
+import { ChevronDown } from "lucide-react";
 
-// TypeScript Tiplari
-type RecipientType = "sender" | "custom_id";
-type AudioSourceType = "file_id" | "url" | "upload";
-
-interface SendAudioNodeData {
-  recipientType: RecipientType;
-  chatId: string;
-  audioSourceType: AudioSourceType;
-  audioFileId: string;
-  audioUrl: string;
-  duration: number | "";
-  performer: string;
-  title: string;
-  caption: string;
-  disableNotification: boolean;
-  protectContent: boolean;
-}
-
-interface CustomNodeProps extends NodeProps {
-  data: SendAudioNodeData;
-}
-
-export const SendAudioNode: FC<CustomNodeProps> = ({ id, data }) => {
-  const [nodeData, setNodeData] = useState<SendAudioNodeData>(data);
+const SendAudioNodeComponent = ({
+  id,
+  data,
+  selected,
+}: NodeProps<SendAudioNodeData>) => {
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const handleDataChange = (field: keyof SendAudioNodeData, value: any) => {
-    setNodeData((prev) => ({ ...prev, [field]: value }));
+  const handleUpdate = (update: Partial<SendAudioNodeData>) => {
+    updateNodeData(id, update);
   };
 
-  const captionLength = nodeData.caption?.length || 0;
+  const captionLength = data.caption?.length || 0;
 
   return (
-    <Card className={cn("w-80 shadow-lg")}>
-      {/* ===== YENGI QOIDA: CHIQISH (SOURCE) TEPADA ===== */}
-      <Handle type="source" position={Position.Top} />
+    <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
+      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
 
       <CardHeader
         className="flex flex-row items-center justify-between space-y-0 p-3 cursor-pointer"
@@ -70,46 +55,50 @@ export const SendAudioNode: FC<CustomNodeProps> = ({ id, data }) => {
           Audio Yuborish
         </CardTitle>
         <div className="text-muted-foreground">
-          {isCollapsed ? <FiChevronDown /> : <FiChevronUp />}
+          {isCollapsed ? (
+            <ChevronDown />
+          ) : (
+            <ChevronDown className="rotate-180" />
+          )}
         </div>
       </CardHeader>
 
       {!isCollapsed && (
         <>
           <CardContent className="p-4 pt-0 flex flex-col gap-4">
-            {/* Qabul qiluvchi bo'limi */}
+            {/* Qabul qiluvchi */}
             <div className="grid gap-2">
               <Label>Qabul qiluvchi</Label>
               <ToggleGroup
                 type="single"
-                value={nodeData.recipientType}
+                value={data.recipientType}
                 onValueChange={(value: RecipientType) =>
-                  value && handleDataChange("recipientType", value)
+                  value && handleUpdate({ recipientType: value })
                 }
                 className="w-full grid grid-cols-2"
               >
                 <ToggleGroupItem value="sender">Yuboruvchiga</ToggleGroupItem>
                 <ToggleGroupItem value="custom_id">ID bo'yicha</ToggleGroupItem>
               </ToggleGroup>
-              {nodeData.recipientType === "custom_id" && (
+              {data.recipientType === "custom_id" && (
                 <Input
                   placeholder="Chat yoki foydalanuvchi ID"
-                  value={nodeData.chatId}
-                  onChange={(e) => handleDataChange("chatId", e.target.value)}
+                  value={data.chatId || ""}
+                  onChange={(e) => handleUpdate({ chatId: e.target.value })}
                 />
               )}
             </div>
 
-            {/* Audio manbasi bo'limi */}
+            {/* Audio manbasi */}
             <div className="grid gap-2">
-              <Label htmlFor={`audio-source-${id}`}>Audio manbasi</Label>
+              <Label>Audio manbasi</Label>
               <Select
-                value={nodeData.audioSourceType}
+                value={data.audioSourceType}
                 onValueChange={(value: AudioSourceType) =>
-                  handleDataChange("audioSourceType", value)
+                  handleUpdate({ audioSourceType: value })
                 }
               >
-                <SelectTrigger id={`audio-source-${id}`}>
+                <SelectTrigger>
                   <SelectValue placeholder="Manbani tanlang..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -118,59 +107,52 @@ export const SendAudioNode: FC<CustomNodeProps> = ({ id, data }) => {
                   <SelectItem value="upload">Kompyuterdan yuklash</SelectItem>
                 </SelectContent>
               </Select>
-              {nodeData.audioSourceType === "file_id" && (
+              {data.audioSourceType === "file_id" && (
                 <Input
                   placeholder="audio_fayl_idsi..."
-                  value={nodeData.audioFileId}
+                  value={data.audioFileId || ""}
                   onChange={(e) =>
-                    handleDataChange("audioFileId", e.target.value)
+                    handleUpdate({ audioFileId: e.target.value })
                   }
                 />
               )}
-              {nodeData.audioSourceType === "url" && (
+              {data.audioSourceType === "url" && (
                 <Input
                   placeholder="https://example.com/audio.mp3"
-                  value={nodeData.audioUrl}
-                  onChange={(e) => handleDataChange("audioUrl", e.target.value)}
+                  value={data.audioUrl || ""}
+                  onChange={(e) => handleUpdate({ audioUrl: e.target.value })}
                 />
               )}
             </div>
 
-            {/* Audio metadatalari bo'limi */}
+            {/* Audio metadatalari */}
             <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-2">
-                <Label htmlFor={`performer-${id}`}>Ijrochi</Label>
+                <Label>Ijrochi</Label>
                 <Input
-                  id={`performer-${id}`}
-                  placeholder="Masalan, Yulduz Usmonova"
-                  value={nodeData.performer}
-                  onChange={(e) =>
-                    handleDataChange("performer", e.target.value)
-                  }
+                  placeholder="Masalan, Yulduz U."
+                  value={data.performer || ""}
+                  onChange={(e) => handleUpdate({ performer: e.target.value })}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor={`title-${id}`}>Sarlavha</Label>
+                <Label>Sarlavha</Label>
                 <Input
-                  id={`title-${id}`}
                   placeholder="Masalan, Xasta bo'lma"
-                  value={nodeData.title}
-                  onChange={(e) => handleDataChange("title", e.target.value)}
+                  value={data.title || ""}
+                  onChange={(e) => handleUpdate({ title: e.target.value })}
                 />
               </div>
             </div>
 
-            {/* Izoh (Caption) bo'limi */}
+            {/* Caption */}
             <div className="grid gap-2">
-              <Label htmlFor={`caption-${id}`}>Izoh (Caption)</Label>
+              <Label>Izoh (Caption)</Label>
               <TextareaAutosize
-                id={`caption-${id}`}
-                className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-                minRows={2}
-                maxRows={8}
+                className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 placeholder="Audio uchun izoh..."
-                value={nodeData.caption}
-                onChange={(e) => handleDataChange("caption", e.target.value)}
+                value={data.caption || ""}
+                onChange={(e) => handleUpdate({ caption: e.target.value })}
                 maxLength={1024}
               />
               <div
@@ -184,15 +166,39 @@ export const SendAudioNode: FC<CustomNodeProps> = ({ id, data }) => {
                 {captionLength}/1024
               </div>
             </div>
+
+            {/* Qo'shimcha sozlamalar */}
+            <div className="flex items-center justify-between">
+              <Label htmlFor={`custom-thumb-${id}`} className="cursor-pointer">
+                Maxsus muqova
+              </Label>
+              <Switch
+                id={`custom-thumb-${id}`}
+                checked={!!data.hasCustomThumbnail}
+                onCheckedChange={(checked) =>
+                  handleUpdate({ hasCustomThumbnail: checked })
+                }
+              />
+            </div>
+            {data.hasCustomThumbnail && (
+              <Input
+                placeholder="Muqova uchun File ID"
+                value={data.thumbnailFileId || ""}
+                onChange={(e) =>
+                  handleUpdate({ thumbnailFileId: e.target.value })
+                }
+                className="animate-in fade-in-50"
+              />
+            )}
           </CardContent>
 
           <CardFooter className="flex justify-around">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`disable-notification-${id}`}
-                checked={nodeData.disableNotification}
+                checked={!!data.disableNotification}
                 onCheckedChange={(checked) =>
-                  handleDataChange("disableNotification", checked)
+                  handleUpdate({ disableNotification: !!checked })
                 }
               />
               <Label
@@ -205,9 +211,9 @@ export const SendAudioNode: FC<CustomNodeProps> = ({ id, data }) => {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`protect-content-${id}`}
-                checked={nodeData.protectContent}
+                checked={!!data.protectContent}
                 onCheckedChange={(checked) =>
-                  handleDataChange("protectContent", checked)
+                  handleUpdate({ protectContent: !!checked })
                 }
               />
               <Label
@@ -221,8 +227,13 @@ export const SendAudioNode: FC<CustomNodeProps> = ({ id, data }) => {
         </>
       )}
 
-      {/* ===== YENGI QOIDA: KIRISH (TARGET) PASTDA ===== */}
-      <Handle type="target" position={Position.Bottom} />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="!bg-teal-500"
+      />
     </Card>
   );
 };
+
+export const SendAudioNode = memo(SendAudioNodeComponent);

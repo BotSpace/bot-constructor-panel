@@ -27,7 +27,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "constructor/nodes/triggers/TriggerMessageNode/TriggerMessageNode.tsx"
+    "constructor/nodes/triggers/TriggerMessageNode/TriggerMessageNode.tsx",
+    "analis_project.js"
   ],
   "exclude": ["node_modules"]
 }

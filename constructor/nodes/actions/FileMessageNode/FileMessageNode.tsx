@@ -1,14 +1,9 @@
-import React, { FC, useState } from "react";
+"use client";
+
+import { useState, memo } from "react";
 import { Handle, Position, NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import {
-  FiFileText,
-  FiChevronUp,
-  FiChevronDown,
-  FiHelpCircle,
-} from "react-icons/fi";
-
-// shadcn/ui komponentlari
+import { FiFileText, FiChevronDown, FiHelpCircle } from "react-icons/fi";
 import {
   Card,
   CardHeader,
@@ -35,43 +30,27 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useFlowStore } from "@/constructor/store/flowStore";
+import { SendFileNodeData, RecipientType, FileSourceType } from "./types";
+import { ChevronDown } from "lucide-react";
 
-// TypeScript Tiplari
-type RecipientType = "sender" | "custom_id";
-type FileSourceType = "file_id" | "url" | "upload";
-
-interface SendFileNodeData {
-  recipientType: RecipientType;
-  chatId: string;
-  fileSourceType: FileSourceType;
-  fileId: string;
-  fileUrl: string;
-  hasCustomThumbnail: boolean;
-  thumbnailFileId: string;
-  caption: string;
-  disableContentTypeDetection: boolean;
-  disableNotification: boolean;
-  protectContent: boolean;
-}
-
-interface CustomNodeProps extends NodeProps {
-  data: SendFileNodeData;
-}
-
-export const SendFileNode: FC<CustomNodeProps> = ({ id, data }) => {
-  const [nodeData, setNodeData] = useState<SendFileNodeData>(data);
+const SendFileNodeComponent = ({
+  id,
+  data,
+  selected,
+}: NodeProps<SendFileNodeData>) => {
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const handleDataChange = (field: keyof SendFileNodeData, value: any) => {
-    setNodeData((prev) => ({ ...prev, [field]: value }));
+  const handleUpdate = (update: Partial<SendFileNodeData>) => {
+    updateNodeData(id, update);
   };
 
-  const captionLength = nodeData.caption?.length || 0;
+  const captionLength = data.caption?.length || 0;
 
   return (
-    <Card className={cn("w-80 shadow-lg")}>
-      {/* ===== YENGI QOIDA: CHIQISH (SOURCE) TEPADA ===== */}
-      <Handle type="source" position={Position.Top} />
+    <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
+      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
 
       <CardHeader
         className="flex flex-row items-center justify-between space-y-0 p-3 cursor-pointer"
@@ -82,46 +61,50 @@ export const SendFileNode: FC<CustomNodeProps> = ({ id, data }) => {
           Fayl Yuborish
         </CardTitle>
         <div className="text-muted-foreground">
-          {isCollapsed ? <FiChevronDown /> : <FiChevronUp />}
+          {isCollapsed ? (
+            <ChevronDown />
+          ) : (
+            <ChevronDown className="rotate-180" />
+          )}
         </div>
       </CardHeader>
 
       {!isCollapsed && (
         <>
           <CardContent className="p-4 pt-0 flex flex-col gap-4">
-            {/* Qabul qiluvchi bo'limi */}
+            {/* Qabul qiluvchi */}
             <div className="grid gap-2">
               <Label>Qabul qiluvchi</Label>
               <ToggleGroup
                 type="single"
-                value={nodeData.recipientType}
+                value={data.recipientType}
                 onValueChange={(value: RecipientType) =>
-                  value && handleDataChange("recipientType", value)
+                  value && handleUpdate({ recipientType: value })
                 }
                 className="w-full grid grid-cols-2"
               >
                 <ToggleGroupItem value="sender">Yuboruvchiga</ToggleGroupItem>
                 <ToggleGroupItem value="custom_id">ID bo'yicha</ToggleGroupItem>
               </ToggleGroup>
-              {nodeData.recipientType === "custom_id" && (
+              {data.recipientType === "custom_id" && (
                 <Input
                   placeholder="Chat yoki foydalanuvchi ID"
-                  value={nodeData.chatId}
-                  onChange={(e) => handleDataChange("chatId", e.target.value)}
+                  value={data.chatId || ""}
+                  onChange={(e) => handleUpdate({ chatId: e.target.value })}
                 />
               )}
             </div>
 
-            {/* Fayl manbasi bo'limi */}
+            {/* Fayl manbasi */}
             <div className="grid gap-2">
-              <Label htmlFor={`file-source-${id}`}>Fayl manbasi</Label>
+              <Label>Fayl manbasi</Label>
               <Select
-                value={nodeData.fileSourceType}
+                value={data.fileSourceType}
                 onValueChange={(value: FileSourceType) =>
-                  handleDataChange("fileSourceType", value)
+                  handleUpdate({ fileSourceType: value })
                 }
               >
-                <SelectTrigger id={`file-source-${id}`}>
+                <SelectTrigger>
                   <SelectValue placeholder="Manbani tanlang..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -130,23 +113,23 @@ export const SendFileNode: FC<CustomNodeProps> = ({ id, data }) => {
                   <SelectItem value="upload">Kompyuterdan yuklash</SelectItem>
                 </SelectContent>
               </Select>
-              {nodeData.fileSourceType === "file_id" && (
+              {data.fileSourceType === "file_id" && (
                 <Input
                   placeholder="fayl_idsi..."
-                  value={nodeData.fileId}
-                  onChange={(e) => handleDataChange("fileId", e.target.value)}
+                  value={data.fileId || ""}
+                  onChange={(e) => handleUpdate({ fileId: e.target.value })}
                 />
               )}
-              {nodeData.fileSourceType === "url" && (
+              {data.fileSourceType === "url" && (
                 <Input
                   placeholder="https://example.com/document.pdf"
-                  value={nodeData.fileUrl}
-                  onChange={(e) => handleDataChange("fileUrl", e.target.value)}
+                  value={data.fileUrl || ""}
+                  onChange={(e) => handleUpdate({ fileUrl: e.target.value })}
                 />
               )}
             </div>
 
-            {/* Maxsus muqova bo'limi */}
+            {/* Maxsus muqova */}
             <div className="flex items-center justify-between space-y-0 rounded-lg border p-3">
               <div className="space-y-0.5">
                 <Label htmlFor={`custom-thumb-${id}`}>Maxsus muqova</Label>
@@ -156,34 +139,31 @@ export const SendFileNode: FC<CustomNodeProps> = ({ id, data }) => {
               </div>
               <Switch
                 id={`custom-thumb-${id}`}
-                checked={nodeData.hasCustomThumbnail}
+                checked={!!data.hasCustomThumbnail}
                 onCheckedChange={(checked) =>
-                  handleDataChange("hasCustomThumbnail", checked)
+                  handleUpdate({ hasCustomThumbnail: checked })
                 }
               />
             </div>
-            {nodeData.hasCustomThumbnail && (
+            {data.hasCustomThumbnail && (
               <Input
                 placeholder="Muqova uchun File ID"
-                value={nodeData.thumbnailFileId}
+                value={data.thumbnailFileId || ""}
                 onChange={(e) =>
-                  handleDataChange("thumbnailFileId", e.target.value)
+                  handleUpdate({ thumbnailFileId: e.target.value })
                 }
                 className="animate-in fade-in-50"
               />
             )}
 
-            {/* Izoh (Caption) bo'limi */}
+            {/* Caption */}
             <div className="grid gap-2">
-              <Label htmlFor={`caption-${id}`}>Izoh (Caption)</Label>
+              <Label>Izoh (Caption)</Label>
               <TextareaAutosize
-                id={`caption-${id}`}
-                className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-                minRows={2}
-                maxRows={8}
+                className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 placeholder="Fayl uchun izoh..."
-                value={nodeData.caption}
-                onChange={(e) => handleDataChange("caption", e.target.value)}
+                value={data.caption || ""}
+                onChange={(e) => handleUpdate({ caption: e.target.value })}
                 maxLength={1024}
               />
               <div
@@ -203,9 +183,9 @@ export const SendFileNode: FC<CustomNodeProps> = ({ id, data }) => {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`disable-notification-${id}`}
-                checked={nodeData.disableNotification}
+                checked={!!data.disableNotification}
                 onCheckedChange={(checked) =>
-                  handleDataChange("disableNotification", checked)
+                  handleUpdate({ disableNotification: !!checked })
                 }
               />
               <Label
@@ -218,9 +198,9 @@ export const SendFileNode: FC<CustomNodeProps> = ({ id, data }) => {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`protect-content-${id}`}
-                checked={nodeData.protectContent}
+                checked={!!data.protectContent}
                 onCheckedChange={(checked) =>
-                  handleDataChange("protectContent", checked)
+                  handleUpdate({ protectContent: !!checked })
                 }
               />
               <Label
@@ -237,12 +217,11 @@ export const SendFileNode: FC<CustomNodeProps> = ({ id, data }) => {
                     <div className="flex items-center gap-2">
                       <Checkbox
                         id={`disable-mime-${id}`}
-                        checked={nodeData.disableContentTypeDetection}
+                        checked={!!data.disableContentTypeDetection}
                         onCheckedChange={(checked) =>
-                          handleDataChange(
-                            "disableContentTypeDetection",
-                            checked
-                          )
+                          handleUpdate({
+                            disableContentTypeDetection: !!checked,
+                          })
                         }
                       />
                       <Label
@@ -255,9 +234,7 @@ export const SendFileNode: FC<CustomNodeProps> = ({ id, data }) => {
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>
-                      Telegram fayl turini (rasm/video) aniqlashga urinmaydi.
-                    </p>
+                    <p>Telegram fayl turini aniqlashga urinmaydi.</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -266,8 +243,13 @@ export const SendFileNode: FC<CustomNodeProps> = ({ id, data }) => {
         </>
       )}
 
-      {/* ===== YENGI QOIDA: KIRISH (TARGET) PASTDA ===== */}
-      <Handle type="target" position={Position.Bottom} />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="!bg-teal-500"
+      />
     </Card>
   );
 };
+
+export const SendFileNode = memo(SendFileNodeComponent);

@@ -1,1 +1,1 @@
-export { TextTriggerNode } from "./MessageTrigger";
+export { MessageTriggerNode } from "./MessageTrigger";

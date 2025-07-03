@@ -1,12 +1,18 @@
-import { Button } from "@/components/ui/button";
-import React from "react";
+'use client'
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 type Props = {};
 
 export default function Page({}: Props) {
-  return (
-    <div>
-      <Button>Salom olam</Button>
-    </div>
-  );
+  
+  const route = useRouter()
+
+  useEffect(() => {
+    route.push('/constructor')
+  }, [])
+  
+  return null;
+
 }

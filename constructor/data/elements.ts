@@ -10,7 +10,7 @@ export const Elements: ElementTypes[] = [
         description: "Send a message to the user",
         icon: "💬",
         color: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-        triggerId: "TextTriggerNode",
+        triggerId: "MessageTriggerNode",
       },
       {
         type: "command",
@@ -18,7 +18,7 @@ export const Elements: ElementTypes[] = [
         description: "Execute a command",
         icon: "⌘",
         color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-        triggerId: "TextTriggerNode",
+        triggerId: "MessageTriggerNode",
       },
       {
         type: "button",

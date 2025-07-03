@@ -1,4 +1,4 @@
-import { TextTriggerNode } from "./triggers";
+import { MessageTriggerNode } from "./triggers";
 import {
   SendTextMessageNode,
   SendPhotoNode,
@@ -8,7 +8,7 @@ import {
 } from "./actions";
 
 export const CustomNodes = {
-  TextTriggerNode,
+  MessageTriggerNode,
   SendTextMessageNode,
   SendPhotoNode,
   SendVideoNode,

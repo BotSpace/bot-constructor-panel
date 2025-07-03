@@ -1,10 +1,18 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Handle, Position, type NodeProps } from "reactflow";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, memo } from "react";
+import { Handle, Position, NodeProps } from "reactflow";
+import TextareaAutosize from "react-textarea-autosize";
+import { MessageSquare, Settings, ChevronDown } from "lucide-react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -12,276 +20,185 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MessageSquare, User, Settings, ChevronDown } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
+import { useFlowStore } from "@/constructor/store/flowStore";
+import { SendTextMessageNodeData, RecipientType, ParseMode } from "./types";
 
-interface TextMessageNodeData {
-  recipientType: "sender" | "manual";
-  recipientId: string;
-  messageText: string;
-  parseMode: "HTML" | "MarkdownV2" | "Markdown";
-  isMuted: boolean;
-  isMinimized: boolean;
-}
-
-// React Flow uchun node component
-export function SendTextMessageNode({
+const SendTextMessageNodeComponent = ({
   id,
   data,
   selected,
-}: NodeProps<TextMessageNodeData>) {
-  const [nodeData, setNodeData] = useState<TextMessageNodeData>({
-    recipientType: data?.recipientType || "sender",
-    recipientId: data?.recipientId || "",
-    messageText: data?.messageText || "",
-    parseMode: data?.parseMode || "HTML",
-    isMuted: data?.isMuted || false,
-    isMinimized: data?.isMinimized || false,
-  });
+}: NodeProps<SendTextMessageNodeData>) => {
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const handleRecipientChange = useCallback((value: string) => {
-    setNodeData((prev) => ({ ...prev, recipientId: value }));
-  }, []);
+  const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
+    updateNodeData(id, update);
+  };
 
-  const handleMessageChange = useCallback((value: string) => {
-    setNodeData((prev) => ({ ...prev, messageText: value }));
-  }, []);
-
-  const handleParseModeChange = useCallback(
-    (value: "HTML" | "MarkdownV2" | "Markdown") => {
-      setNodeData((prev) => ({ ...prev, parseMode: value }));
-    },
-    []
-  );
-
-  const handleMuteChange = useCallback((checked: boolean) => {
-    setNodeData((prev) => ({ ...prev, isMuted: checked }));
-  }, []);
-
-  const handleRecipientTypeChange = useCallback(
-    (value: "sender" | "manual") => {
-      setNodeData((prev) => ({
-        ...prev,
-        recipientType: value,
-        recipientId: value === "sender" ? "" : prev.recipientId,
-      }));
-    },
-    []
-  );
-
-  const toggleMinimize = useCallback(() => {
-    setNodeData((prev) => ({ ...prev, isMinimized: !prev.isMinimized }));
-  }, []);
-
-  // Validation
-  const isRecipientValid =
-    nodeData.recipientType === "sender" ||
-    (nodeData.recipientType === "manual" &&
-      nodeData.recipientId.trim().length > 0);
-  const isMessageValid = nodeData.messageText.trim().length > 0;
-  const isNodeValid = isRecipientValid && isMessageValid;
+  const textLength = data.messageText?.length || 0;
+  const isNodeConfigured = !!(data.recipientType && data.messageText);
 
   return (
-    <div className="w-80">
-      {/* React Flow Handles */}
+    <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
+      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
 
-      <Handle
-        type="source"
-        position={Position.Top}
-        className="w-4 h-4 bg-green-500 border-2 hover:border-green-600 hover:bg-green-400 transition-colors"
-      />
-      <Card
-        className={`shadow-lg border-2 ${
-          selected
-            ? "border-blue-400 shadow-xl"
-            : isNodeValid
-            ? "border-green-200"
-            : "border-red-200"
-        } w-80`}
+      <CardHeader
+        className="flex flex-row items-center justify-between space-y-0 p-3 cursor-pointer"
+        onClick={() => setIsCollapsed(!isCollapsed)}
       >
-        <CardHeader>
-          <CardTitle
-            className={`flex items-center justify-between ${
-              isNodeValid ? "text-green-700" : "text-red-700"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5" />
-              <span className="text-sm font-medium">Matnli Xabar</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleMinimize}
-                className="p-1 h-auto"
-                title={nodeData.isMinimized ? "Kengaytirish" : "Kichraytirish"}
+        <CardTitle className="flex items-center gap-2 text-base font-semibold">
+          <MessageSquare className="text-primary" />
+          Matnli Xabar
+        </CardTitle>
+        <div className="flex items-center gap-2">
+          <div
+            className={cn(
+              "w-2 h-2 rounded-full transition-all",
+              isNodeConfigured ? "bg-green-500" : "bg-yellow-500"
+            )}
+          />
+          <div className="text-muted-foreground">
+            {isCollapsed ? (
+              <ChevronDown />
+            ) : (
+              <ChevronDown className="rotate-180" />
+            )}
+          </div>
+        </div>
+      </CardHeader>
+
+      {!isCollapsed && (
+        <>
+          <CardContent className="p-4 pt-0 flex flex-col gap-4">
+            {/* Qabul qiluvchi */}
+            <div className="grid gap-2">
+              <Label>Qabul qiluvchi</Label>
+              <ToggleGroup
+                type="single"
+                value={data.recipientType}
+                onValueChange={(value: RecipientType) =>
+                  value && handleUpdate({ recipientType: value })
+                }
+                className="w-full grid grid-cols-2"
               >
-                <ChevronDown
-                  className={cn(
-                    "h-3 w-3 transform transition-transform duration-200",
-                    nodeData.isMinimized ? "rotate-180" : "rotate-0"
-                  )}
-                />
-              </Button>
-            </div>
-          </CardTitle>
-        </CardHeader>
-
-        {!nodeData.isMinimized && (
-          <CardContent className="space-y-4 pt-4">
-            {/* Recipient Type & ID */}
-            <div className="space-y-3">
-              <Label className="flex items-center gap-2 text-sm font-medium">
-                <User className="w-4 h-4" />
-                Qabul qiluvchi
-                {!isRecipientValid && (
-                  <span className="text-red-500 text-xs">*</span>
-                )}
-              </Label>
-
-              <RadioGroup
-                value={nodeData.recipientType}
-                onValueChange={handleRecipientTypeChange}
-                className="flex flex-col space-y-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="sender" id={`sender-${id}`} />
-                  <Label
-                    htmlFor={`sender-${id}`}
-                    className="text-sm cursor-pointer"
-                  >
-                    Yuboruvchiga qaytarish
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="manual" id={`manual-${id}`} />
-                  <Label
-                    htmlFor={`manual-${id}`}
-                    className="text-sm cursor-pointer"
-                  >
-                    ID qo'lda kiritish
-                  </Label>
-                </div>
-              </RadioGroup>
-
-              {nodeData.recipientType === "manual" && (
+                <ToggleGroupItem value="sender">Yuboruvchiga</ToggleGroupItem>
+                <ToggleGroupItem value="custom_id">ID bo'yicha</ToggleGroupItem>
+              </ToggleGroup>
+              {data.recipientType === "custom_id" && (
                 <Input
-                  placeholder="@username, user_id yoki chat_id"
-                  value={nodeData.recipientId}
-                  onChange={(e) => handleRecipientChange(e.target.value)}
-                  className={`transition-colors ${
-                    isRecipientValid
-                      ? "border-green-300 focus:border-green-500"
-                      : "border-red-300 focus:border-red-500"
-                  }`}
+                  placeholder="Chat yoki foydalanuvchi ID"
+                  value={data.chatId || ""}
+                  onChange={(e) => handleUpdate({ chatId: e.target.value })}
                 />
               )}
             </div>
 
-            {/* Message Text */}
-            <div className="space-y-2">
-              <Label className="flex items-center justify-between text-sm font-medium">
-                <span>
-                  Xabar matni
-                  {!isMessageValid && (
-                    <span className="text-red-500 text-xs ml-1">*</span>
+            {/* Xabar matni */}
+            <div className="grid gap-2">
+              <div className="flex justify-between items-center">
+                <Label>Xabar matni</Label>
+                <span
+                  className={cn(
+                    "text-xs",
+                    textLength > 4096
+                      ? "text-destructive"
+                      : "text-muted-foreground"
                   )}
+                >
+                  {textLength}/4096
                 </span>
-                <span className="text-xs ">
-                  {nodeData.messageText.length}/4096
-                </span>
-              </Label>
-              <Textarea
+              </div>
+              <TextareaAutosize
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 placeholder="Bu yerga xabar matnini yozing..."
-                value={nodeData.messageText}
-                onChange={(e) => handleMessageChange(e.target.value)}
-                rows={4}
+                value={data.messageText || ""}
+                onChange={(e) => handleUpdate({ messageText: e.target.value })}
                 maxLength={4096}
-                className={`transition-colors resize-none ${
-                  isMessageValid
-                    ? "border-green-300 focus:border-green-500"
-                    : "border-red-300 focus:border-red-500"
-                }`}
               />
             </div>
 
-            {/* Settings */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2 text-sm font-medium">
-                  <Settings className="w-4 h-4" />
-                  Parse Mode
-                </Label>
-                <Select
-                  value={nodeData.parseMode}
-                  onValueChange={handleParseModeChange}
+            {/* Sozlamalar */}
+            <div className="grid gap-3">
+              <Label className="flex items-center gap-2">
+                <Settings className="w-4 h-4" /> Sozlamalar
+              </Label>
+              <Select
+                value={data.parseMode || "None"}
+                onValueChange={(value: ParseMode) =>
+                  handleUpdate({ parseMode: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Parse Mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="None">Oddiy matn</SelectItem>
+                  <SelectItem value="HTML">HTML</SelectItem>
+                  <SelectItem value="MarkdownV2">MarkdownV2</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id={`disable-preview-${id}`}
+                  checked={!!data.disableWebPagePreview}
+                  onCheckedChange={(checked) =>
+                    handleUpdate({ disableWebPagePreview: !!checked })
+                  }
+                />
+                <Label
+                  htmlFor={`disable-preview-${id}`}
+                  className="text-sm font-normal cursor-pointer"
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="HTML">HTML</SelectItem>
-                    <SelectItem value="MarkdownV2">Markdown V2</SelectItem>
-                    <SelectItem value="Markdown">Markdown</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Sozlamalar</Label>
-                <div className="flex items-center space-x-2 pt-1">
-                  <Checkbox
-                    checked={nodeData.isMuted}
-                    onCheckedChange={handleMuteChange}
-                  />
-                  <Label className="text-sm cursor-pointer">
-                    Ovozsiz yuborish
-                  </Label>
-                </div>
+                  Link uchun prevyuni o'chirish
+                </Label>
               </div>
             </div>
           </CardContent>
-        )}
-
-        {/* Minimized View */}
-        {nodeData.isMinimized && (
-          <CardContent className="pt-4 pb-4">
-            <div className="text-sm space-y-1">
-              <div className="flex items-center gap-2">
-                <User className="w-3 h-3" />
-                <span className="font-medium">
-                  {nodeData.recipientType === "sender" ? (
-                    <Badge variant="secondary" className="text-xs">
-                      Yuboruvchiga
-                    </Badge>
-                  ) : (
-                    nodeData.recipientId || (
-                      <span className=" italic">ID kiritilmagan</span>
-                    )
-                  )}
-                </span>
-              </div>
-              <div className="text-xs truncate">
-                {nodeData.messageText || (
-                  <span className="italic">Xabar matni kiritilmagan</span>
-                )}
-              </div>
+          <CardFooter className="flex justify-around">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`disable-notification-${id}`}
+                checked={!!data.disableNotification}
+                onCheckedChange={(checked) =>
+                  handleUpdate({ disableNotification: !!checked })
+                }
+              />
+              <Label
+                htmlFor={`disable-notification-${id}`}
+                className="text-sm font-normal cursor-pointer"
+              >
+                Ovozsiz
+              </Label>
             </div>
-          </CardContent>
-        )}
-      </Card>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`protect-content-${id}`}
+                checked={!!data.protectContent}
+                onCheckedChange={(checked) =>
+                  handleUpdate({ protectContent: !!checked })
+                }
+              />
+              <Label
+                htmlFor={`protect-content-${id}`}
+                className="text-sm font-normal cursor-pointer"
+              >
+                Himoyalangan
+              </Label>
+            </div>
+          </CardFooter>
+        </>
+      )}
 
       <Handle
-        type="target"
+        type="source"
         position={Position.Bottom}
-        className="w-4 h-4 bg-blue-500 border-2"
+        className="!bg-teal-500"
       />
-    </div>
+    </Card>
   );
-}
+};
+
+export const SendTextMessageNode = memo(SendTextMessageNodeComponent);
