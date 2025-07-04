@@ -1,3 +1,5 @@
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator/types";
+
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
  * 'sender' - xabarni yuborgan foydalanuvchining o'ziga.
@@ -32,4 +34,6 @@ export interface SendPhotoNodeData {
 
   disableNotification?: boolean; // Foydalanuvchiga ovozsiz xabar yuborish.
   protectContent?: boolean; // Xabarni nusxalash va saqlashni taqiqlash.
+
+  buttons?: ButtonConfig[][];
 }

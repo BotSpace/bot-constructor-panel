@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 import {
   Connection,
   Edge,
@@ -10,8 +10,8 @@ import {
   OnEdgesChange,
   applyNodeChanges,
   applyEdgeChanges,
-} from 'reactflow';
-import { ElementItemType } from '@/types/element-types'; // O'zingizning typingizni import qiling
+} from "reactflow";
+import { ElementItemType } from "@/types/element-types"; // O'zingizning typingizni import qiling
 
 let id = 0;
 const getId = () => `node_${id++}`;
@@ -50,14 +50,15 @@ export const useFlowStore = create<RFState>((set, get) => ({
       edges: addEdge(connection, get().edges),
     });
   },
-  
+
   // Yangi nodeni qo'shish
-  addNode: (data: ElementItemType, position: { x: number; y: number }) => {
+  addNode: (element: ElementItemType, position: { x: number; y: number }) => {
     const newNode: Node = {
-        id: getId(),
-        type: data.triggerId,
-        position,
-        data: data,
+      id: getId(),
+      type: element.triggerId, // triggerId bu node'ning turi
+      position,
+      // Xato: data: element -> To'g'ri: node uchun boshlang'ich ma'lumotlar
+      data: {}, // Yoki { recipientType: 'sender', messageText: '' } kabi default qiymatlar
     };
     set({ nodes: [...get().nodes, newNode] });
   },
@@ -75,16 +76,20 @@ export const useFlowStore = create<RFState>((set, get) => ({
       }),
     });
   },
-  
+
   // Tanlangan elementlarni o'chirish
   deleteSelectedElements: () => {
     const { nodes, edges } = get();
-    const selectedNodes = nodes.filter(node => node.selected).map(node => node.id);
-    const selectedEdges = edges.filter(edge => edge.selected).map(edge => edge.id);
+    const selectedNodes = nodes
+      .filter((node) => node.selected)
+      .map((node) => node.id);
+    const selectedEdges = edges
+      .filter((edge) => edge.selected)
+      .map((edge) => edge.id);
 
     set({
-      nodes: nodes.filter(node => !selectedNodes.includes(node.id)),
-      edges: edges.filter(edge => !selectedEdges.includes(edge.id)),
+      nodes: nodes.filter((node) => !selectedNodes.includes(node.id)),
+      edges: edges.filter((edge) => !selectedEdges.includes(edge.id)),
     });
-  }
+  },
 }));

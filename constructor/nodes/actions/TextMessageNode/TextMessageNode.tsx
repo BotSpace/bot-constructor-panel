@@ -1,30 +1,35 @@
-"use client";
+import { Handle, NodeProps, Position } from "reactflow";
 
-import { useState, memo } from "react";
-import { Handle, Position, NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { MessageSquare, Settings, ChevronDown } from "lucide-react";
+
+import { ParseMode, RecipientType, SendTextMessageNodeData } from "./types";
+import { useFlowStore } from "@/constructor/store/flowStore";
+import { memo, useState } from "react";
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator/types";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { ChevronDown, LayoutGrid, MessageSquare, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { ToggleGroup } from "@/components/ui/toggle-group";
+import { ToggleGroupItem } from "@radix-ui/react-toggle-group";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import {
-  Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
-import { useFlowStore } from "@/constructor/store/flowStore";
-import { SendTextMessageNodeData, RecipientType, ParseMode } from "./types";
+} from "@radix-ui/react-select";
+import { Checkbox } from "@radix-ui/react-checkbox";
+import { ButtonGenerator } from "@/constructor/components/ButtonGenerator";
+import { Button } from "@/components/ui/button";
 
 const SendTextMessageNodeComponent = ({
   id,
@@ -33,18 +38,22 @@ const SendTextMessageNodeComponent = ({
 }: NodeProps<SendTextMessageNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
+  // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
   const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
     updateNodeData(id, update);
   };
-
+  // ButtonGenerator'dan qaytgan natijani saqlash uchun maxsus funksiya
+  const handleSaveButtons = (buttons: ButtonConfig[][]) => {
+    updateNodeData(id, { buttons });
+  };
+  // UI'da ko'rsatish uchun hisob-kitoblar
   const textLength = data.messageText?.length || 0;
   const isNodeConfigured = !!(data.recipientType && data.messageText);
-
+  const buttonCount = data.buttons?.flat().length || 0; // Barcha tugmalar soni
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
       <Handle type="target" position={Position.Top} className="!bg-sky-500" />
-
+      Generated code
       <CardHeader
         className="flex flex-row items-center justify-between space-y-0 p-3 cursor-pointer"
         onClick={() => setIsCollapsed(!isCollapsed)}
@@ -54,11 +63,18 @@ const SendTextMessageNodeComponent = ({
           Matnli Xabar
         </CardTitle>
         <div className="flex items-center gap-2">
+          {buttonCount > 0 && (
+            <Badge variant="secondary" className="font-normal">
+              <LayoutGrid className="w-3 h-3 mr-1" />
+              {buttonCount}
+            </Badge>
+          )}
           <div
             className={cn(
               "w-2 h-2 rounded-full transition-all",
               isNodeConfigured ? "bg-green-500" : "bg-yellow-500"
             )}
+            title={isNodeConfigured ? "Sozlangan" : "Sozlanmagan"}
           />
           <div className="text-muted-foreground">
             {isCollapsed ? (
@@ -69,7 +85,6 @@ const SendTextMessageNodeComponent = ({
           </div>
         </div>
       </CardHeader>
-
       {!isCollapsed && (
         <>
           <CardContent className="p-4 pt-0 flex flex-col gap-4">
@@ -148,16 +163,14 @@ const SendTextMessageNodeComponent = ({
                     handleUpdate({ disableWebPagePreview: !!checked })
                   }
                 />
-                <Label
-                  htmlFor={`disable-preview-${id}`}
-                  className="text-sm font-normal cursor-pointer"
-                >
+                <Label className="text-sm font-normal cursor-pointer">
                   Link uchun prevyuni o'chirish
                 </Label>
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-around">
+
+          <CardFooter className="flex flex-wrap justify-around gap-4 pt-4 border-t">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`disable-notification-${id}`}
@@ -166,10 +179,7 @@ const SendTextMessageNodeComponent = ({
                   handleUpdate({ disableNotification: !!checked })
                 }
               />
-              <Label
-                htmlFor={`disable-notification-${id}`}
-                className="text-sm font-normal cursor-pointer"
-              >
+              <Label className="text-sm font-normal cursor-pointer">
                 Ovozsiz
               </Label>
             </div>
@@ -181,17 +191,34 @@ const SendTextMessageNodeComponent = ({
                   handleUpdate({ protectContent: !!checked })
                 }
               />
-              <Label
-                htmlFor={`protect-content-${id}`}
-                className="text-sm font-normal cursor-pointer"
-              >
+              <Label className="text-sm font-normal cursor-pointer">
                 Himoyalangan
               </Label>
             </div>
+
+            {/* BUTTON GENERATOR INTEGRATSIYASI */}
+            <ButtonGenerator
+              initialButtons={data.buttons}
+              onSave={handleSaveButtons}
+            >
+              <div className="relative w-full">
+                <Button variant="outline" className="w-full">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Buttons
+                </Button>
+                {buttonCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 rounded-full"
+                  >
+                    {buttonCount}
+                  </Badge>
+                )}
+              </div>
+            </ButtonGenerator>
           </CardFooter>
         </>
       )}
-
       <Handle
         type="source"
         position={Position.Bottom}

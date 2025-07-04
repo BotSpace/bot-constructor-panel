@@ -3,7 +3,7 @@
 import { useState, memo } from "react";
 import { Handle, Position, NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { FiVideo, FiChevronDown, FiHelpCircle } from "react-icons/fi";
+import { FiVideo, FiHelpCircle } from "react-icons/fi";
 import {
   Card,
   CardHeader,
@@ -34,6 +34,13 @@ import { useFlowStore } from "@/constructor/store/flowStore";
 import { SendVideoNodeData, RecipientType, VideoSourceType } from "./types";
 import { ChevronDown } from "lucide-react";
 
+// Andozamiz uchun yangi importlar
+import { LayoutGrid } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ButtonGenerator } from "@/constructor/components/ButtonGenerator";
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+
 const SendVideoNodeComponent = ({
   id,
   data,
@@ -46,7 +53,12 @@ const SendVideoNodeComponent = ({
     updateNodeData(id, update);
   };
 
+  const handleSaveButtons = (buttons: ButtonConfig[][]) => {
+    updateNodeData(id, { buttons });
+  };
+
   const captionLength = data.caption?.length || 0;
+  const buttonCount = data.buttons?.flat().length || 0;
 
   return (
     <Card className={cn("w-96 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -60,18 +72,28 @@ const SendVideoNodeComponent = ({
           <FiVideo className="text-primary" />
           Video Yuborish
         </CardTitle>
-        <div className="text-muted-foreground">
-          {isCollapsed ? (
-            <ChevronDown />
-          ) : (
-            <ChevronDown className="rotate-180" />
+        <div className="flex items-center gap-2">
+          {/* Node yopiq bo'lganda ham tugmalar sonini ko'rsatish uchun */}
+          {buttonCount > 0 && (
+            <Badge variant="secondary" className="font-normal">
+              <LayoutGrid className="w-3 h-3 mr-1" />
+              {buttonCount}
+            </Badge>
           )}
+          <div className="text-muted-foreground">
+            {isCollapsed ? (
+              <ChevronDown />
+            ) : (
+              <ChevronDown className="rotate-180" />
+            )}
+          </div>
         </div>
       </CardHeader>
 
       {!isCollapsed && (
         <>
           <CardContent className="p-4 pt-0 flex flex-col gap-5">
+            {/* ...boshqa barcha form maydonlari o'zgarishsiz qoladi... */}
             {/* Qabul qiluvchi */}
             <div className="grid gap-2">
               <Label>Qabul qiluvchi</Label>
@@ -233,7 +255,7 @@ const SendVideoNodeComponent = ({
             </div>
           </CardContent>
 
-          <CardFooter className="flex justify-around">
+          <CardFooter className="flex flex-wrap justify-around gap-4 pt-4 border-t">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`disable-notification-${id}`}
@@ -264,6 +286,27 @@ const SendVideoNodeComponent = ({
                 Himoyalangan
               </Label>
             </div>
+
+            {/* --- BUTTON GENERATOR INTEGRATSIYASI --- */}
+            <ButtonGenerator
+              initialButtons={data.buttons}
+              onSave={handleSaveButtons}
+            >
+              <div className="relative">
+                <Button variant="outline">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Buttons
+                </Button>
+                {buttonCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 rounded-full"
+                  >
+                    {buttonCount}
+                  </Badge>
+                )}
+              </div>
+            </ButtonGenerator>
           </CardFooter>
         </>
       )}

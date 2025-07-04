@@ -1,3 +1,5 @@
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
  */
@@ -33,4 +35,6 @@ export interface SendAudioNodeData {
   // Umumiy sozlamalar
   disableNotification?: boolean;
   protectContent?: boolean;
+
+  buttons?: ButtonConfig[][];
 }

@@ -1,6 +1,6 @@
-"use client"; // Agar Next.js App Router'da ishlatayotgan bo'lsangiz
+"use client";
 
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -17,30 +17,30 @@ import {
   Plus,
   CornerDownLeft,
   AlertCircle,
-  LayoutGrid, // Xabar uchun ikonka
 } from "lucide-react";
-import { cn } from "@/lib/utils"; // shadcn/ui utils fayli
-
+import { cn } from "@/lib/utils";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { ButtonConfig } from "./types";
 
-// Tugma konfiguratsiyasi uchun interfeys
-interface ButtonConfig {
-  id: string;
-  text: string;
-  type: "url" | "callback" | "reply" | "request_contact" | "request_location";
-  value?: string;
+interface ButtonGeneratorProps {
+  initialButtons?: ButtonConfig[][];
+  onSave: (buttons: ButtonConfig[][]) => void;
+  children: ReactNode;
 }
 
-// Qatordagi maksimal tugmalar soni uchun konstanta
 const MAX_BUTTONS_PER_ROW = 10;
 
-export function ButtonGenerator() {
+export function ButtonGenerator({
+  initialButtons = [[]],
+  onSave,
+  children,
+}: ButtonGeneratorProps) {
   const [isOpen, setIsOpen] = useState(false);
+  // Bu holatlarni dialog ochilganda tozalab turamiz
   const [buttons, setButtons] = useState<ButtonConfig[][]>([[]]);
   const [activeTab, setActiveTab] = useState("inline");
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(0);
-
   const [inlineText, setInlineText] = useState("");
   const [inlineActionType, setInlineActionType] = useState<"url" | "callback">(
     "url"
@@ -48,24 +48,45 @@ export function ButtonGenerator() {
   const [inlineActionValue, setInlineActionValue] = useState("");
   const [replyText, setReplyText] = useState("");
 
-  // Joriy tanlangan qator to'lganligini tekshirish uchun o'zgaruvchi
+  //
+  // --- XATO TUZATILGAN QISM ---
+  //
+  useEffect(() => {
+    // Effekt faqat dialog ochilganda (isOpen true bo'lganda) ishga tushadi.
+    if (isOpen) {
+      // Barcha holatlarni boshlang'ich qiymatga qaytaramiz.
+      // initialButtons'dan chuqur nusxa olamiz.
+      setButtons(JSON.parse(JSON.stringify(initialButtons || [[]])));
+      setSelectedRowIndex(0);
+      setInlineText("");
+      setInlineActionValue("");
+      setReplyText("");
+      setActiveTab("inline");
+    }
+    // Bog'liqliklar massividan `initialButtons` olib tashlandi.
+    // Endi bu effekt faqat `isOpen` holati o'zgarganda ishlaydi.
+  }, [isOpen]);
+  // --- XATO TUZATILGAN QISM TUGADI ---
+  //
+
   const isCurrentRowFull =
     selectedRowIndex !== null &&
     buttons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW;
+
+  // ... Qolgan barcha funksiyalar (handleAddButton, handleRemoveButton, va hokazo) o'zgarishsiz qoladi ...
 
   const handleAddButton = (
     type: "inline" | "reply" | "special",
     specialType?: "request_contact" | "request_location"
   ) => {
-    // Funksiya ichida qo'shimcha himoya tekshiruvi
     if (
       selectedRowIndex !== null &&
       buttons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW
     ) {
       alert(
-        `Bu qatorda maksimal tugmalar soniga (${MAX_BUTTONS_PER_ROW} ta) yetilgan. Iltimos, yangi qator yarating yoki mavjud tugmani o'chiring.`
+        `Bu qatorda maksimal tugmalar soniga (${MAX_BUTTONS_PER_ROW} ta) yetilgan.`
       );
-      return; // Funksiyadan chiqib ketish
+      return;
     }
 
     let newButton: ButtonConfig | null = null;
@@ -101,9 +122,7 @@ export function ButtonGenerator() {
     if (newButton) {
       setButtons((currentButtons) => {
         const updatedButtons = [...currentButtons];
-        if (updatedButtons.length === 0) {
-          updatedButtons.push([]);
-        }
+        if (updatedButtons.length === 0) updatedButtons.push([]);
 
         const targetIndex =
           selectedRowIndex !== null && selectedRowIndex < updatedButtons.length
@@ -148,27 +167,14 @@ export function ButtonGenerator() {
   };
 
   const handleOnOpenChange = (open: boolean) => {
-    if (!open) {
-      // Oyna yopilganda barcha holatlarni boshlang'ich holatga qaytarish
-      setButtons([[]]);
-      setSelectedRowIndex(0);
-      setInlineText("");
-      setInlineActionValue("");
-      setReplyText("");
-    }
     setIsOpen(open);
   };
 
   const handleSaveChanges = () => {
-    // Yakuniy `buttons` massivini serverga yuborish yoki boshqa logikani shu yerda bajarish mumkin
-    console.log(
-      "Yakuniy tugmalar strukturasi:",
-      JSON.stringify(buttons, null, 2)
-    );
-    alert(
-      "Tugmalar muvaffaqiyatli saqlandi! Natijani konsolda ko'rishingiz mumkin."
-    );
-    handleOnOpenChange(false); // Dialog oynasini yopish
+    const finalButtons = buttons.filter((row) => row.length > 0);
+    onSave(finalButtons);
+    alert("Tugmalar muvaffaqiyatli saqlandi!");
+    handleOnOpenChange(false);
   };
 
   const getIconForButton = (button: ButtonConfig): ReactNode => {
@@ -188,21 +194,20 @@ export function ButtonGenerator() {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOnOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <LayoutGrid className="mr-2 h-4 w-4" />
-          Buttons
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[90%] md:max-w-[80%] lg:max-w-[70%] h-[90vh] overflow-y-auto">
+        {/* ... JSX qismi o'zgarishsiz qoladi ... */}
         <VisuallyHidden>
-          <DialogTitle>Buttons</DialogTitle>
+          <DialogTitle>Tugmalarni Sozlash</DialogTitle>
         </VisuallyHidden>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-4">
-          {/* Chap taraf: sozlamalar */}
           <div className="md:col-span-4 flex flex-col gap-6 sticky top-0">
-            <Tabs defaultValue="inline" onValueChange={setActiveTab}>
+            <Tabs
+              defaultValue="inline"
+              onValueChange={setActiveTab}
+              value={activeTab}
+            >
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="inline">Inline Keyboard</TabsTrigger>
                 <TabsTrigger value="replay">Reply Keyboard</TabsTrigger>
@@ -314,7 +319,6 @@ export function ButtonGenerator() {
                 </div>
               </TabsContent>
             </Tabs>
-            {/* Agar joriy qator to'lgan bo'lsa, foydalanuvchiga xabar ko'rsatish */}
             {isCurrentRowFull && (
               <div className="p-3 bg-destructive/10 text-destructive border border-destructive/20 rounded-md text-sm flex items-start gap-2">
                 <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -325,8 +329,6 @@ export function ButtonGenerator() {
               </div>
             )}
           </div>
-
-          {/* O'ng taraf: tugmalar ko'rinishi */}
           <div className="md:col-span-8 flex flex-col gap-3 rounded-lg border bg-muted p-4 h-full w-full">
             <div className="flex justify-between items-center mb-2">
               <Label className="text-muted-foreground">
@@ -360,12 +362,12 @@ export function ButtonGenerator() {
                           className={cn(
                             "relative group overflow-hidden",
                             row.length === 1 && "flex-grow",
-                            row.length > 1 && `flex-1` // Teng bo'linish uchun
+                            row.length > 1 && `flex-1`
                           )}
                         >
                           <Button
                             variant="outline"
-                            className="pr-8 cursor-default w-full truncate" // Matn sig'masa qirqish
+                            className="pr-8 cursor-default w-full truncate"
                           >
                             {getIconForButton(button)}
                             <span className="truncate">{button.text}</span>
@@ -375,7 +377,7 @@ export function ButtonGenerator() {
                             size="icon"
                             className="absolute -top-2 -right-2 h-5 w-5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => {
-                              e.stopPropagation(); // Ota elementning onClick'ini chaqirmaslik uchun
+                              e.stopPropagation();
                               handleRemoveButton(rowIndex, button.id);
                             }}
                           >
@@ -392,7 +394,6 @@ export function ButtonGenerator() {
                       </div>
                     )}
                   </div>
-                  {/* Har bir qator limitga yetganda xabar ko'rsatish */}
                   {row.length >= MAX_BUTTONS_PER_ROW && (
                     <div className="flex items-center text-xs text-amber-600 dark:text-amber-500 mt-1.5 px-2">
                       <AlertCircle className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />

@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 7/3/2025, 11:15:46 PM
+Sana: 7/4/2025, 10:23:05 AM
 
 ## 📁 Fayl Strukturasi
 
@@ -48,7 +48,10 @@ constructor-next-js
 ├── components.json
 ├── constructor
 │   ├── components
-│   │   └── ButtonGenerator.tsx
+│   │   └── ButtonGenerator
+│   │       ├── ButtonGenerator.tsx
+│   │       ├── index.ts
+│   │       └── types.ts
 │   ├── constructor.tsx
 │   ├── data
 │   │   ├── elements.ts
@@ -101,12 +104,12 @@ constructor-next-js
 
 ## 📄 Muhim Fayllar Tarkibi (içidan: constructor)
 
-### 📄 constructor/components/ButtonGenerator.tsx
+### 📄 constructor/components/ButtonGenerator/ButtonGenerator.tsx
 
 ```tsx
-"use client"; // Agar Next.js App Router'da ishlatayotgan bo'lsangiz
+"use client";
 
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -123,30 +126,30 @@ import {
   Plus,
   CornerDownLeft,
   AlertCircle,
-  LayoutGrid, // Xabar uchun ikonka
 } from "lucide-react";
-import { cn } from "@/lib/utils"; // shadcn/ui utils fayli
-
+import { cn } from "@/lib/utils";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { ButtonConfig } from "./types";
 
-// Tugma konfiguratsiyasi uchun interfeys
-interface ButtonConfig {
-  id: string;
-  text: string;
-  type: "url" | "callback" | "reply" | "request_contact" | "request_location";
-  value?: string;
+interface ButtonGeneratorProps {
+  initialButtons?: ButtonConfig[][];
+  onSave: (buttons: ButtonConfig[][]) => void;
+  children: ReactNode;
 }
 
-// Qatordagi maksimal tugmalar soni uchun konstanta
 const MAX_BUTTONS_PER_ROW = 10;
 
-export function ButtonGenerator() {
+export function ButtonGenerator({
+  initialButtons = [[]],
+  onSave,
+  children,
+}: ButtonGeneratorProps) {
   const [isOpen, setIsOpen] = useState(false);
+  // Bu holatlarni dialog ochilganda tozalab turamiz
   const [buttons, setButtons] = useState<ButtonConfig[][]>([[]]);
   const [activeTab, setActiveTab] = useState("inline");
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(0);
-
   const [inlineText, setInlineText] = useState("");
   const [inlineActionType, setInlineActionType] = useState<"url" | "callback">(
     "url"
@@ -154,24 +157,45 @@ export function ButtonGenerator() {
   const [inlineActionValue, setInlineActionValue] = useState("");
   const [replyText, setReplyText] = useState("");
 
-  // Joriy tanlangan qator to'lganligini tekshirish uchun o'zgaruvchi
+  //
+  // --- XATO TUZATILGAN QISM ---
+  //
+  useEffect(() => {
+    // Effekt faqat dialog ochilganda (isOpen true bo'lganda) ishga tushadi.
+    if (isOpen) {
+      // Barcha holatlarni boshlang'ich qiymatga qaytaramiz.
+      // initialButtons'dan chuqur nusxa olamiz.
+      setButtons(JSON.parse(JSON.stringify(initialButtons || [[]])));
+      setSelectedRowIndex(0);
+      setInlineText("");
+      setInlineActionValue("");
+      setReplyText("");
+      setActiveTab("inline");
+    }
+    // Bog'liqliklar massividan `initialButtons` olib tashlandi.
+    // Endi bu effekt faqat `isOpen` holati o'zgarganda ishlaydi.
+  }, [isOpen]);
+  // --- XATO TUZATILGAN QISM TUGADI ---
+  //
+
   const isCurrentRowFull =
     selectedRowIndex !== null &&
     buttons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW;
+
+  // ... Qolgan barcha funksiyalar (handleAddButton, handleRemoveButton, va hokazo) o'zgarishsiz qoladi ...
 
   const handleAddButton = (
     type: "inline" | "reply" | "special",
     specialType?: "request_contact" | "request_location"
   ) => {
-    // Funksiya ichida qo'shimcha himoya tekshiruvi
     if (
       selectedRowIndex !== null &&
       buttons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW
     ) {
       alert(
-        `Bu qatorda maksimal tugmalar soniga (${MAX_BUTTONS_PER_ROW} ta) yetilgan. Iltimos, yangi qator yarating yoki mavjud tugmani o'chiring.`
+        `Bu qatorda maksimal tugmalar soniga (${MAX_BUTTONS_PER_ROW} ta) yetilgan.`
       );
-      return; // Funksiyadan chiqib ketish
+      return;
     }
 
     let newButton: ButtonConfig | null = null;
@@ -207,9 +231,7 @@ export function ButtonGenerator() {
     if (newButton) {
       setButtons((currentButtons) => {
         const updatedButtons = [...currentButtons];
-        if (updatedButtons.length === 0) {
-          updatedButtons.push([]);
-        }
+        if (updatedButtons.length === 0) updatedButtons.push([]);
 
         const targetIndex =
           selectedRowIndex !== null && selectedRowIndex < updatedButtons.length
@@ -254,27 +276,14 @@ export function ButtonGenerator() {
   };
 
   const handleOnOpenChange = (open: boolean) => {
-    if (!open) {
-      // Oyna yopilganda barcha holatlarni boshlang'ich holatga qaytarish
-      setButtons([[]]);
-      setSelectedRowIndex(0);
-      setInlineText("");
-      setInlineActionValue("");
-      setReplyText("");
-    }
     setIsOpen(open);
   };
 
   const handleSaveChanges = () => {
-    // Yakuniy `buttons` massivini serverga yuborish yoki boshqa logikani shu yerda bajarish mumkin
-    console.log(
-      "Yakuniy tugmalar strukturasi:",
-      JSON.stringify(buttons, null, 2)
-    );
-    alert(
-      "Tugmalar muvaffaqiyatli saqlandi! Natijani konsolda ko'rishingiz mumkin."
-    );
-    handleOnOpenChange(false); // Dialog oynasini yopish
+    const finalButtons = buttons.filter((row) => row.length > 0);
+    onSave(finalButtons);
+    alert("Tugmalar muvaffaqiyatli saqlandi!");
+    handleOnOpenChange(false);
   };
 
   const getIconForButton = (button: ButtonConfig): ReactNode => {
@@ -294,21 +303,20 @@ export function ButtonGenerator() {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOnOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <LayoutGrid className="mr-2 h-4 w-4" />
-          Buttons
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[90%] md:max-w-[80%] lg:max-w-[70%] h-[90vh] overflow-y-auto">
+        {/* ... JSX qismi o'zgarishsiz qoladi ... */}
         <VisuallyHidden>
-          <DialogTitle>Buttons</DialogTitle>
+          <DialogTitle>Tugmalarni Sozlash</DialogTitle>
         </VisuallyHidden>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-4">
-          {/* Chap taraf: sozlamalar */}
           <div className="md:col-span-4 flex flex-col gap-6 sticky top-0">
-            <Tabs defaultValue="inline" onValueChange={setActiveTab}>
+            <Tabs
+              defaultValue="inline"
+              onValueChange={setActiveTab}
+              value={activeTab}
+            >
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="inline">Inline Keyboard</TabsTrigger>
                 <TabsTrigger value="replay">Reply Keyboard</TabsTrigger>
@@ -420,7 +428,6 @@ export function ButtonGenerator() {
                 </div>
               </TabsContent>
             </Tabs>
-            {/* Agar joriy qator to'lgan bo'lsa, foydalanuvchiga xabar ko'rsatish */}
             {isCurrentRowFull && (
               <div className="p-3 bg-destructive/10 text-destructive border border-destructive/20 rounded-md text-sm flex items-start gap-2">
                 <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -431,8 +438,6 @@ export function ButtonGenerator() {
               </div>
             )}
           </div>
-
-          {/* O'ng taraf: tugmalar ko'rinishi */}
           <div className="md:col-span-8 flex flex-col gap-3 rounded-lg border bg-muted p-4 h-full w-full">
             <div className="flex justify-between items-center mb-2">
               <Label className="text-muted-foreground">
@@ -466,12 +471,12 @@ export function ButtonGenerator() {
                           className={cn(
                             "relative group overflow-hidden",
                             row.length === 1 && "flex-grow",
-                            row.length > 1 && `flex-1` // Teng bo'linish uchun
+                            row.length > 1 && `flex-1`
                           )}
                         >
                           <Button
                             variant="outline"
-                            className="pr-8 cursor-default w-full truncate" // Matn sig'masa qirqish
+                            className="pr-8 cursor-default w-full truncate"
                           >
                             {getIconForButton(button)}
                             <span className="truncate">{button.text}</span>
@@ -481,7 +486,7 @@ export function ButtonGenerator() {
                             size="icon"
                             className="absolute -top-2 -right-2 h-5 w-5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => {
-                              e.stopPropagation(); // Ota elementning onClick'ini chaqirmaslik uchun
+                              e.stopPropagation();
                               handleRemoveButton(rowIndex, button.id);
                             }}
                           >
@@ -498,7 +503,6 @@ export function ButtonGenerator() {
                       </div>
                     )}
                   </div>
-                  {/* Har bir qator limitga yetganda xabar ko'rsatish */}
                   {row.length >= MAX_BUTTONS_PER_ROW && (
                     <div className="flex items-center text-xs text-amber-600 dark:text-amber-500 mt-1.5 px-2">
                       <AlertCircle className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
@@ -518,6 +522,27 @@ export function ButtonGenerator() {
       </DialogContent>
     </Dialog>
   );
+}
+
+```
+
+### 📄 constructor/components/ButtonGenerator/index.ts
+
+```ts
+export * from "./ButtonGenerator";
+export * from "./types";
+
+```
+
+### 📄 constructor/components/ButtonGenerator/types.ts
+
+```ts
+// Tugma konfiguratsiyasi uchun interfeys
+export interface ButtonConfig {
+  id: string;
+  text: string;
+  type: "url" | "callback" | "reply" | "request_contact" | "request_location";
+  value?: string;
 }
 
 ```
@@ -812,7 +837,7 @@ export const MessageTypes = [
 import { useState, memo } from "react";
 import { Handle, Position, NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { FiMusic, FiChevronDown } from "react-icons/fi";
+import { FiMusic } from "react-icons/fi";
 import {
   Card,
   CardHeader,
@@ -837,6 +862,13 @@ import { useFlowStore } from "@/constructor/store/flowStore";
 import { SendAudioNodeData, RecipientType, AudioSourceType } from "./types";
 import { ChevronDown } from "lucide-react";
 
+// Bizning andozamiz uchun yangi importlar
+import { LayoutGrid } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ButtonGenerator } from "@/constructor/components/ButtonGenerator";
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+
 const SendAudioNodeComponent = ({
   id,
   data,
@@ -849,7 +881,14 @@ const SendAudioNodeComponent = ({
     updateNodeData(id, update);
   };
 
+  // ButtonGenerator uchun saqlash funksiyasi
+  const handleSaveButtons = (buttons: ButtonConfig[][]) => {
+    updateNodeData(id, { buttons });
+  };
+
   const captionLength = data.caption?.length || 0;
+  // UI uchun tugmalar sonini hisoblaymiz
+  const buttonCount = data.buttons?.flat().length || 0;
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -863,12 +902,21 @@ const SendAudioNodeComponent = ({
           <FiMusic className="text-primary" />
           Audio Yuborish
         </CardTitle>
-        <div className="text-muted-foreground">
-          {isCollapsed ? (
-            <ChevronDown />
-          ) : (
-            <ChevronDown className="rotate-180" />
+        <div className="flex items-center gap-2">
+          {/* Sarlavhadagi Badge */}
+          {buttonCount > 0 && (
+            <Badge variant="secondary" className="font-normal">
+              <LayoutGrid className="w-3 h-3 mr-1" />
+              {buttonCount}
+            </Badge>
           )}
+          <div className="text-muted-foreground">
+            {isCollapsed ? (
+              <ChevronDown />
+            ) : (
+              <ChevronDown className="rotate-180" />
+            )}
+          </div>
         </div>
       </CardHeader>
 
@@ -975,33 +1023,10 @@ const SendAudioNodeComponent = ({
                 {captionLength}/1024
               </div>
             </div>
-
-            {/* Qo'shimcha sozlamalar */}
-            <div className="flex items-center justify-between">
-              <Label htmlFor={`custom-thumb-${id}`} className="cursor-pointer">
-                Maxsus muqova
-              </Label>
-              <Switch
-                id={`custom-thumb-${id}`}
-                checked={!!data.hasCustomThumbnail}
-                onCheckedChange={(checked) =>
-                  handleUpdate({ hasCustomThumbnail: checked })
-                }
-              />
-            </div>
-            {data.hasCustomThumbnail && (
-              <Input
-                placeholder="Muqova uchun File ID"
-                value={data.thumbnailFileId || ""}
-                onChange={(e) =>
-                  handleUpdate({ thumbnailFileId: e.target.value })
-                }
-                className="animate-in fade-in-50"
-              />
-            )}
           </CardContent>
 
-          <CardFooter className="flex justify-around">
+          <CardFooter className="flex flex-wrap justify-around items-center gap-4 pt-4 border-t">
+            {/* Mavjud Checkbox'lar */}
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`disable-notification-${id}`}
@@ -1032,6 +1057,27 @@ const SendAudioNodeComponent = ({
                 Himoyalangan
               </Label>
             </div>
+
+            {/* --- BUTTON GENERATOR INTEGRATSIYASI --- */}
+            <ButtonGenerator
+              initialButtons={data.buttons}
+              onSave={handleSaveButtons}
+            >
+              <div className="relative">
+                <Button variant="outline">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Buttons
+                </Button>
+                {buttonCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 rounded-full"
+                  >
+                    {buttonCount}
+                  </Badge>
+                )}
+              </div>
+            </ButtonGenerator>
           </CardFooter>
         </>
       )}
@@ -1059,6 +1105,8 @@ export { SendAudioNode } from "./AudioMessageNode";
 ### 📄 constructor/nodes/actions/AudioMessageNode/types.ts
 
 ```ts
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
  */
@@ -1094,6 +1142,8 @@ export interface SendAudioNodeData {
   // Umumiy sozlamalar
   disableNotification?: boolean;
   protectContent?: boolean;
+
+  buttons?: ButtonConfig[][];
 }
 
 ```
@@ -1106,7 +1156,7 @@ export interface SendAudioNodeData {
 import { useState, memo } from "react";
 import { Handle, Position, NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { FiFileText, FiChevronDown, FiHelpCircle } from "react-icons/fi";
+import { FiFileText } from "react-icons/fi";
 import {
   Card,
   CardHeader,
@@ -1126,16 +1176,17 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/constructor/store/flowStore";
 import { SendFileNodeData, RecipientType, FileSourceType } from "./types";
 import { ChevronDown } from "lucide-react";
+
+// Bizning andoza uchun yangi importlar
+import { LayoutGrid } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ButtonGenerator } from "@/constructor/components/ButtonGenerator";
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
 
 const SendFileNodeComponent = ({
   id,
@@ -1149,7 +1200,14 @@ const SendFileNodeComponent = ({
     updateNodeData(id, update);
   };
 
+  // ButtonGenerator'dan qaytgan natijani saqlash uchun funksiya
+  const handleSaveButtons = (buttons: ButtonConfig[][]) => {
+    updateNodeData(id, { buttons });
+  };
+
   const captionLength = data.caption?.length || 0;
+  // Tugmalar sonini hisoblaymiz
+  const buttonCount = data.buttons?.flat().length || 0;
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -1163,12 +1221,21 @@ const SendFileNodeComponent = ({
           <FiFileText className="text-primary" />
           Fayl Yuborish
         </CardTitle>
-        <div className="text-muted-foreground">
-          {isCollapsed ? (
-            <ChevronDown />
-          ) : (
-            <ChevronDown className="rotate-180" />
+        <div className="flex items-center gap-2">
+          {/* Tugmalar sonini ko'rsatuvchi Badge */}
+          {buttonCount > 0 && (
+            <Badge variant="secondary" className="font-normal">
+              <LayoutGrid className="w-3 h-3 mr-1" />
+              {buttonCount}
+            </Badge>
           )}
+          <div className="text-muted-foreground">
+            {isCollapsed ? (
+              <ChevronDown />
+            ) : (
+              <ChevronDown className="rotate-180" />
+            )}
+          </div>
         </div>
       </CardHeader>
 
@@ -1282,7 +1349,7 @@ const SendFileNodeComponent = ({
             </div>
           </CardContent>
 
-          <CardFooter className="flex flex-wrap justify-around gap-y-4">
+          <CardFooter className="flex flex-wrap justify-around items-center gap-4 pt-4 border-t">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`disable-notification-${id}`}
@@ -1298,50 +1365,27 @@ const SendFileNodeComponent = ({
                 Ovozsiz
               </Label>
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id={`protect-content-${id}`}
-                checked={!!data.protectContent}
-                onCheckedChange={(checked) =>
-                  handleUpdate({ protectContent: !!checked })
-                }
-              />
-              <Label
-                htmlFor={`protect-content-${id}`}
-                className="text-sm font-normal cursor-pointer"
-              >
-                Himoyalangan
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <TooltipProvider delayDuration={100}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id={`disable-mime-${id}`}
-                        checked={!!data.disableContentTypeDetection}
-                        onCheckedChange={(checked) =>
-                          handleUpdate({
-                            disableContentTypeDetection: !!checked,
-                          })
-                        }
-                      />
-                      <Label
-                        htmlFor={`disable-mime-${id}`}
-                        className="text-sm font-normal cursor-pointer"
-                      >
-                        MIME-turini o'chirish
-                      </Label>
-                      <FiHelpCircle className="text-muted-foreground" />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Telegram fayl turini aniqlashga urinmaydi.</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+
+            {/* --- BUTTON GENERATOR INTEGRATSIYASI --- */}
+            <ButtonGenerator
+              initialButtons={data.buttons}
+              onSave={handleSaveButtons}
+            >
+              <div className="relative">
+                <Button variant="outline">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Buttons
+                </Button>
+                {buttonCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 rounded-full"
+                  >
+                    {buttonCount}
+                  </Badge>
+                )}
+              </div>
+            </ButtonGenerator>
           </CardFooter>
         </>
       )}
@@ -1357,6 +1401,262 @@ const SendFileNodeComponent = ({
 
 export const SendFileNode = memo(SendFileNodeComponent);
 
+// "use client";
+
+// import { useState, memo } from "react";
+// import { Handle, Position, NodeProps } from "reactflow";
+// import TextareaAutosize from "react-textarea-autosize";
+// import { FiFileText, FiChevronDown, FiHelpCircle } from "react-icons/fi";
+// import {
+//   Card,
+//   CardHeader,
+//   CardTitle,
+//   CardContent,
+//   CardFooter,
+// } from "@/components/ui/card";
+// import { Label } from "@/components/ui/label";
+// import { Input } from "@/components/ui/input";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
+// import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+// import { Checkbox } from "@/components/ui/checkbox";
+// import { Switch } from "@/components/ui/switch";
+// import {
+//   Tooltip,
+//   TooltipContent,
+//   TooltipProvider,
+//   TooltipTrigger,
+// } from "@/components/ui/tooltip";
+// import { cn } from "@/lib/utils";
+// import { useFlowStore } from "@/constructor/store/flowStore";
+// import { SendFileNodeData, RecipientType, FileSourceType } from "./types";
+// import { ChevronDown } from "lucide-react";
+
+// const SendFileNodeComponent = ({
+//   id,
+//   data,
+//   selected,
+// }: NodeProps<SendFileNodeData>) => {
+//   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+//   const [isCollapsed, setIsCollapsed] = useState(false);
+
+//   const handleUpdate = (update: Partial<SendFileNodeData>) => {
+//     updateNodeData(id, update);
+//   };
+
+//   const captionLength = data.caption?.length || 0;
+
+//   return (
+//     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
+//       <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+
+//       <CardHeader
+//         className="flex flex-row items-center justify-between space-y-0 p-3 cursor-pointer"
+//         onClick={() => setIsCollapsed(!isCollapsed)}
+//       >
+//         <CardTitle className="flex items-center gap-2 text-base font-semibold">
+//           <FiFileText className="text-primary" />
+//           Fayl Yuborish
+//         </CardTitle>
+//         <div className="text-muted-foreground">
+//           {isCollapsed ? (
+//             <ChevronDown />
+//           ) : (
+//             <ChevronDown className="rotate-180" />
+//           )}
+//         </div>
+//       </CardHeader>
+
+//       {!isCollapsed && (
+//         <>
+//           <CardContent className="p-4 pt-0 flex flex-col gap-4">
+//             {/* Qabul qiluvchi */}
+//             <div className="grid gap-2">
+//               <Label>Qabul qiluvchi</Label>
+//               <ToggleGroup
+//                 type="single"
+//                 value={data.recipientType}
+//                 onValueChange={(value: RecipientType) =>
+//                   value && handleUpdate({ recipientType: value })
+//                 }
+//                 className="w-full grid grid-cols-2"
+//               >
+//                 <ToggleGroupItem value="sender">Yuboruvchiga</ToggleGroupItem>
+//                 <ToggleGroupItem value="custom_id">ID bo'yicha</ToggleGroupItem>
+//               </ToggleGroup>
+//               {data.recipientType === "custom_id" && (
+//                 <Input
+//                   placeholder="Chat yoki foydalanuvchi ID"
+//                   value={data.chatId || ""}
+//                   onChange={(e) => handleUpdate({ chatId: e.target.value })}
+//                 />
+//               )}
+//             </div>
+
+//             {/* Fayl manbasi */}
+//             <div className="grid gap-2">
+//               <Label>Fayl manbasi</Label>
+//               <Select
+//                 value={data.fileSourceType}
+//                 onValueChange={(value: FileSourceType) =>
+//                   handleUpdate({ fileSourceType: value })
+//                 }
+//               >
+//                 <SelectTrigger>
+//                   <SelectValue placeholder="Manbani tanlang..." />
+//                 </SelectTrigger>
+//                 <SelectContent>
+//                   <SelectItem value="file_id">Mavjud File ID</SelectItem>
+//                   <SelectItem value="url">Internet (URL)</SelectItem>
+//                   <SelectItem value="upload">Kompyuterdan yuklash</SelectItem>
+//                 </SelectContent>
+//               </Select>
+//               {data.fileSourceType === "file_id" && (
+//                 <Input
+//                   placeholder="fayl_idsi..."
+//                   value={data.fileId || ""}
+//                   onChange={(e) => handleUpdate({ fileId: e.target.value })}
+//                 />
+//               )}
+//               {data.fileSourceType === "url" && (
+//                 <Input
+//                   placeholder="https://example.com/document.pdf"
+//                   value={data.fileUrl || ""}
+//                   onChange={(e) => handleUpdate({ fileUrl: e.target.value })}
+//                 />
+//               )}
+//             </div>
+
+//             {/* Maxsus muqova */}
+//             <div className="flex items-center justify-between space-y-0 rounded-lg border p-3">
+//               <div className="space-y-0.5">
+//                 <Label htmlFor={`custom-thumb-${id}`}>Maxsus muqova</Label>
+//                 <p className="text-xs text-muted-foreground">
+//                   Fayl uchun rasmli muqova.
+//                 </p>
+//               </div>
+//               <Switch
+//                 id={`custom-thumb-${id}`}
+//                 checked={!!data.hasCustomThumbnail}
+//                 onCheckedChange={(checked) =>
+//                   handleUpdate({ hasCustomThumbnail: checked })
+//                 }
+//               />
+//             </div>
+//             {data.hasCustomThumbnail && (
+//               <Input
+//                 placeholder="Muqova uchun File ID"
+//                 value={data.thumbnailFileId || ""}
+//                 onChange={(e) =>
+//                   handleUpdate({ thumbnailFileId: e.target.value })
+//                 }
+//                 className="animate-in fade-in-50"
+//               />
+//             )}
+
+//             {/* Caption */}
+//             <div className="grid gap-2">
+//               <Label>Izoh (Caption)</Label>
+//               <TextareaAutosize
+//                 className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+//                 placeholder="Fayl uchun izoh..."
+//                 value={data.caption || ""}
+//                 onChange={(e) => handleUpdate({ caption: e.target.value })}
+//                 maxLength={1024}
+//               />
+//               <div
+//                 className={cn(
+//                   "text-right text-xs",
+//                   captionLength > 1024
+//                     ? "text-destructive"
+//                     : "text-muted-foreground"
+//                 )}
+//               >
+//                 {captionLength}/1024
+//               </div>
+//             </div>
+//           </CardContent>
+
+//           <CardFooter className="flex flex-wrap justify-around gap-y-4">
+//             <div className="flex items-center space-x-2">
+//               <Checkbox
+//                 id={`disable-notification-${id}`}
+//                 checked={!!data.disableNotification}
+//                 onCheckedChange={(checked) =>
+//                   handleUpdate({ disableNotification: !!checked })
+//                 }
+//               />
+//               <Label
+//                 htmlFor={`disable-notification-${id}`}
+//                 className="text-sm font-normal cursor-pointer"
+//               >
+//                 Ovozsiz
+//               </Label>
+//             </div>
+//             <div className="flex items-center space-x-2">
+//               <Checkbox
+//                 id={`protect-content-${id}`}
+//                 checked={!!data.protectContent}
+//                 onCheckedChange={(checked) =>
+//                   handleUpdate({ protectContent: !!checked })
+//                 }
+//               />
+//               <Label
+//                 htmlFor={`protect-content-${id}`}
+//                 className="text-sm font-normal cursor-pointer"
+//               >
+//                 Himoyalangan
+//               </Label>
+//             </div>
+//             <div className="flex items-center space-x-2">
+//               <TooltipProvider delayDuration={100}>
+//                 <Tooltip>
+//                   <TooltipTrigger asChild>
+//                     <div className="flex items-center gap-2">
+//                       <Checkbox
+//                         id={`disable-mime-${id}`}
+//                         checked={!!data.disableContentTypeDetection}
+//                         onCheckedChange={(checked) =>
+//                           handleUpdate({
+//                             disableContentTypeDetection: !!checked,
+//                           })
+//                         }
+//                       />
+//                       <Label
+//                         htmlFor={`disable-mime-${id}`}
+//                         className="text-sm font-normal cursor-pointer"
+//                       >
+//                         MIME-turini o'chirish
+//                       </Label>
+//                       <FiHelpCircle className="text-muted-foreground" />
+//                     </div>
+//                   </TooltipTrigger>
+//                   <TooltipContent>
+//                     <p>Telegram fayl turini aniqlashga urinmaydi.</p>
+//                   </TooltipContent>
+//                 </Tooltip>
+//               </TooltipProvider>
+//             </div>
+//           </CardFooter>
+//         </>
+//       )}
+
+//       <Handle
+//         type="source"
+//         position={Position.Bottom}
+//         className="!bg-teal-500"
+//       />
+//     </Card>
+//   );
+// };
+
+// export const SendFileNode = memo(SendFileNodeComponent);
+
 ```
 
 ### 📄 constructor/nodes/actions/FileMessageNode/index.ts
@@ -1369,6 +1669,8 @@ export { SendFileNode } from "./FileMessageNode";
 ### 📄 constructor/nodes/actions/FileMessageNode/types.ts
 
 ```ts
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
  */
@@ -1402,6 +1704,8 @@ export interface SendFileNodeData {
   // Umumiy sozlamalar
   disableNotification?: boolean;
   protectContent?: boolean;
+
+  buttons?: ButtonConfig[][];
 }
 
 ```
@@ -1414,7 +1718,7 @@ export interface SendFileNodeData {
 import { useState, memo } from "react";
 import { Handle, Position, NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { FiCamera, FiChevronUp, FiChevronDown } from "react-icons/fi";
+import { FiCamera, FiChevronDown } from "react-icons/fi";
 import {
   Card,
   CardHeader,
@@ -1437,180 +1741,210 @@ import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/constructor/store/flowStore";
 import { SendPhotoNodeData, RecipientType, PhotoSourceType } from "./types";
 
+// Yaratgan andozamiz uchun kerakli importlar
+import { LayoutGrid, ChevronUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ButtonGenerator } from "@/constructor/components/ButtonGenerator";
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+
 const SendPhotoNodeComponent = ({
   id,
   data,
   selected,
 }: NodeProps<SendPhotoNodeData>) => {
-  // 1. Global store'dan `updateNodeData`'ni olamiz
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-
-  // 2. Faqat UI uchun `useState`
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // 3. Markazlashgan yangilash funksiyasi
   const handleUpdate = (update: Partial<SendPhotoNodeData>) => {
     updateNodeData(id, update);
   };
 
+  // ButtonGenerator'dan kelgan natijani saqlash uchun funksiya
+  const handleSaveButtons = (buttons: ButtonConfig[][]) => {
+    updateNodeData(id, { buttons });
+  };
+
   const captionLength = data.caption?.length || 0;
+  const buttonCount = data.buttons?.flat().length || 0;
 
   return (
-    <>
-      <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
-        {/* Kirish nuqtasi (Target) tepada */}
-        <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+    <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
+      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
 
-        <CardHeader
-          className="flex flex-row items-center justify-between space-y-0 p-3 cursor-pointer"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          <CardTitle className="flex items-center gap-2 text-base font-semibold">
-            <FiCamera className="text-primary" />
-            Rasm Yuborish
-          </CardTitle>
+      <CardHeader
+        className="flex flex-row items-center justify-between space-y-0 p-3 cursor-pointer"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
+        <CardTitle className="flex items-center gap-2 text-base font-semibold">
+          <FiCamera className="text-primary" />
+          Rasm Yuborish
+        </CardTitle>
+        <div className="flex items-center gap-2">
+          {/* Yopiq holatda tugmalar sonini ko'rsatuvchi Badge */}
+          {buttonCount > 0 && (
+            <Badge variant="secondary" className="font-normal">
+              <LayoutGrid className="w-3 h-3 mr-1" />
+              {buttonCount}
+            </Badge>
+          )}
           <div className="text-muted-foreground">
-            {isCollapsed ? <FiChevronDown /> : <FiChevronUp />}
+            {isCollapsed ? <FiChevronDown /> : <ChevronUp />}
           </div>
-        </CardHeader>
+        </div>
+      </CardHeader>
 
-        {!isCollapsed && (
-          <>
-            <CardContent className="p-4 pt-0 flex flex-col gap-4">
-              {/* Qabul qiluvchi */}
-              <div className="grid gap-2">
-                <Label>Qabul qiluvchi</Label>
-                <ToggleGroup
-                  type="single"
-                  // 4. `value`'ni `data`dan olamiz
-                  value={data.recipientType}
-                  // 5. O'zgarishni `handleUpdate` orqali jo'natamiz
-                  onValueChange={(value: RecipientType) =>
-                    value && handleUpdate({ recipientType: value })
-                  }
-                  className="w-full grid grid-cols-2"
-                >
-                  <ToggleGroupItem value="sender">Yuboruvchiga</ToggleGroupItem>
-                  <ToggleGroupItem value="custom_id">
-                    ID bo'yicha
-                  </ToggleGroupItem>
-                </ToggleGroup>
-                {data.recipientType === "custom_id" && (
-                  <Input
-                    placeholder="Chat yoki foydalanuvchi ID"
-                    value={data.chatId || ""}
-                    onChange={(e) => handleUpdate({ chatId: e.target.value })}
-                  />
-                )}
-              </div>
-
-              {/* Rasm manbasi */}
-              <div className="grid gap-2">
-                <Label>Rasm manbasi</Label>
-                <Select
-                  value={data.photoSourceType}
-                  onValueChange={(value: PhotoSourceType) =>
-                    handleUpdate({ photoSourceType: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Manbani tanlang..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="file_id">Mavjud File ID</SelectItem>
-                    <SelectItem value="url">Internet (URL)</SelectItem>
-                    <SelectItem value="upload">Kompyuterdan yuklash</SelectItem>
-                  </SelectContent>
-                </Select>
-                {data.photoSourceType === "file_id" && (
-                  <Input
-                    placeholder="rasm_fayl_idsi_bu_yerda..."
-                    value={data.photoFileId || ""}
-                    onChange={(e) =>
-                      handleUpdate({ photoFileId: e.target.value })
-                    }
-                  />
-                )}
-                {data.photoSourceType === "url" && (
-                  <Input
-                    placeholder="https://example.com/image.jpg"
-                    value={data.photoUrl || ""}
-                    onChange={(e) => handleUpdate({ photoUrl: e.target.value })}
-                  />
-                )}
-              </div>
-
-              {/* Rasm matni (Caption) */}
-              <div className="grid gap-2">
-                <Label>Rasm matni (Caption)</Label>
-                <TextareaAutosize
-                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  placeholder="Rasm uchun matn kiriting..."
-                  value={data.caption || ""}
-                  onChange={(e) => handleUpdate({ caption: e.target.value })}
-                  maxLength={1024}
+      {!isCollapsed && (
+        <>
+          <CardContent className="p-4 pt-0 flex flex-col gap-4">
+            {/* Qabul qiluvchi */}
+            <div className="grid gap-2">
+              <Label>Qabul qiluvchi</Label>
+              <ToggleGroup
+                type="single"
+                value={data.recipientType}
+                onValueChange={(value: RecipientType) =>
+                  value && handleUpdate({ recipientType: value })
+                }
+                className="w-full grid grid-cols-2"
+              >
+                <ToggleGroupItem value="sender">Yuboruvchiga</ToggleGroupItem>
+                <ToggleGroupItem value="custom_id">ID bo'yicha</ToggleGroupItem>
+              </ToggleGroup>
+              {data.recipientType === "custom_id" && (
+                <Input
+                  placeholder="Chat yoki foydalanuvchi ID"
+                  value={data.chatId || ""}
+                  onChange={(e) => handleUpdate({ chatId: e.target.value })}
                 />
-                <div
-                  className={cn(
-                    "text-right text-xs",
-                    captionLength > 1024
-                      ? "text-destructive"
-                      : "text-muted-foreground"
-                  )}
-                >
-                  {captionLength}/1024
-                </div>
-              </div>
+              )}
+            </div>
 
-              <div className="border-t border-border pt-4 mt-2"></div>
-            </CardContent>
-            <CardFooter className="flex justify-around">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={`disable-notification-${id}`}
-                  checked={!!data.disableNotification}
-                  onCheckedChange={(checked) =>
-                    handleUpdate({ disableNotification: !!checked })
+            {/* Rasm manbasi */}
+            <div className="grid gap-2">
+              <Label>Rasm manbasi</Label>
+              <Select
+                value={data.photoSourceType}
+                onValueChange={(value: PhotoSourceType) =>
+                  handleUpdate({ photoSourceType: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Manbani tanlang..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="file_id">Mavjud File ID</SelectItem>
+                  <SelectItem value="url">Internet (URL)</SelectItem>
+                  <SelectItem value="upload">Kompyuterdan yuklash</SelectItem>
+                </SelectContent>
+              </Select>
+              {data.photoSourceType === "file_id" && (
+                <Input
+                  placeholder="rasm_fayl_idsi_bu_yerda..."
+                  value={data.photoFileId || ""}
+                  onChange={(e) =>
+                    handleUpdate({ photoFileId: e.target.value })
                   }
                 />
-                <Label
-                  htmlFor={`disable-notification-${id}`}
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Ovozsiz
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={`protect-content-${id}`}
-                  checked={!!data.protectContent}
-                  onCheckedChange={(checked) =>
-                    handleUpdate({ protectContent: !!checked })
-                  }
+              )}
+              {data.photoSourceType === "url" && (
+                <Input
+                  placeholder="https://example.com/image.jpg"
+                  value={data.photoUrl || ""}
+                  onChange={(e) => handleUpdate({ photoUrl: e.target.value })}
                 />
-                <Label
-                  htmlFor={`protect-content-${id}`}
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Himoyalangan
-                </Label>
-              </div>
-            </CardFooter>
-          </>
-        )}
+              )}
+            </div>
 
-        {/* Chiqish nuqtasi (Source) pastda */}
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          className="!bg-teal-500"
-        />
-      </Card>
-    </>
+            {/* Rasm matni (Caption) */}
+            <div className="grid gap-2">
+              <Label>Rasm matni (Caption)</Label>
+              <TextareaAutosize
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                placeholder="Rasm uchun matn kiriting..."
+                value={data.caption || ""}
+                onChange={(e) => handleUpdate({ caption: e.target.value })}
+                maxLength={1024}
+              />
+              <div
+                className={cn(
+                  "text-right text-xs",
+                  captionLength > 1024
+                    ? "text-destructive"
+                    : "text-muted-foreground"
+                )}
+              >
+                {captionLength}/1024
+              </div>
+            </div>
+          </CardContent>
+
+          {/* CHECKBOX VA TUGMALAR UCHUN FOOTER */}
+          <CardFooter className="flex flex-wrap justify-around gap-4 pt-4 border-t">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`disable-notification-${id}`}
+                checked={!!data.disableNotification}
+                onCheckedChange={(checked) =>
+                  handleUpdate({ disableNotification: !!checked })
+                }
+              />
+              <Label
+                htmlFor={`disable-notification-${id}`}
+                className="text-sm font-normal cursor-pointer"
+              >
+                Ovozsiz
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`protect-content-${id}`}
+                checked={!!data.protectContent}
+                onCheckedChange={(checked) =>
+                  handleUpdate({ protectContent: !!checked })
+                }
+              />
+              <Label
+                htmlFor={`protect-content-${id}`}
+                className="text-sm font-normal cursor-pointer"
+              >
+                Himoyalangan
+              </Label>
+            </div>
+
+            {/* --- BUTTON GENERATOR INTEGRATSIYASI --- */}
+            <ButtonGenerator
+              initialButtons={data.buttons}
+              onSave={handleSaveButtons}
+            >
+              <div className="relative">
+                <Button variant="outline">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Buttons
+                </Button>
+                {buttonCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 rounded-full"
+                  >
+                    {buttonCount}
+                  </Badge>
+                )}
+              </div>
+            </ButtonGenerator>
+          </CardFooter>
+        </>
+      )}
+
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="!bg-teal-500"
+      />
+    </Card>
   );
 };
 
-// 6. Komponentni `memo` bilan o'rab eksport qilamiz
 export const SendPhotoNode = memo(SendPhotoNodeComponent);
 
 ```
@@ -1625,6 +1959,8 @@ export { SendPhotoNode } from "./PhotoMessageNode";
 ### 📄 constructor/nodes/actions/PhotoMessageNode/types.ts
 
 ```ts
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator/types";
+
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
  * 'sender' - xabarni yuborgan foydalanuvchining o'ziga.
@@ -1659,6 +1995,8 @@ export interface SendPhotoNodeData {
 
   disableNotification?: boolean; // Foydalanuvchiga ovozsiz xabar yuborish.
   protectContent?: boolean; // Xabarni nusxalash va saqlashni taqiqlash.
+
+  buttons?: ButtonConfig[][];
 }
 
 ```
@@ -1666,33 +2004,38 @@ export interface SendPhotoNodeData {
 ### 📄 constructor/nodes/actions/TextMessageNode/TextMessageNode.tsx
 
 ```tsx
-"use client";
+import { Handle, NodeProps, Position } from "reactflow";
 
-import { useState, memo } from "react";
-import { Handle, Position, NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { MessageSquare, Settings, ChevronDown } from "lucide-react";
+
+import { ParseMode, RecipientType, SendTextMessageNodeData } from "./types";
+import { useFlowStore } from "@/constructor/store/flowStore";
+import { memo, useState } from "react";
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator/types";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { ChevronDown, LayoutGrid, MessageSquare, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { ToggleGroup } from "@/components/ui/toggle-group";
+import { ToggleGroupItem } from "@radix-ui/react-toggle-group";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import {
-  Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
-import { useFlowStore } from "@/constructor/store/flowStore";
-import { SendTextMessageNodeData, RecipientType, ParseMode } from "./types";
+} from "@radix-ui/react-select";
+import { Checkbox } from "@radix-ui/react-checkbox";
+import { ButtonGenerator } from "@/constructor/components/ButtonGenerator";
+import { Button } from "@/components/ui/button";
 
 const SendTextMessageNodeComponent = ({
   id,
@@ -1701,18 +2044,22 @@ const SendTextMessageNodeComponent = ({
 }: NodeProps<SendTextMessageNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
+  // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
   const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
     updateNodeData(id, update);
   };
-
+  // ButtonGenerator'dan qaytgan natijani saqlash uchun maxsus funksiya
+  const handleSaveButtons = (buttons: ButtonConfig[][]) => {
+    updateNodeData(id, { buttons });
+  };
+  // UI'da ko'rsatish uchun hisob-kitoblar
   const textLength = data.messageText?.length || 0;
   const isNodeConfigured = !!(data.recipientType && data.messageText);
-
+  const buttonCount = data.buttons?.flat().length || 0; // Barcha tugmalar soni
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
       <Handle type="target" position={Position.Top} className="!bg-sky-500" />
-
+      Generated code
       <CardHeader
         className="flex flex-row items-center justify-between space-y-0 p-3 cursor-pointer"
         onClick={() => setIsCollapsed(!isCollapsed)}
@@ -1722,11 +2069,18 @@ const SendTextMessageNodeComponent = ({
           Matnli Xabar
         </CardTitle>
         <div className="flex items-center gap-2">
+          {buttonCount > 0 && (
+            <Badge variant="secondary" className="font-normal">
+              <LayoutGrid className="w-3 h-3 mr-1" />
+              {buttonCount}
+            </Badge>
+          )}
           <div
             className={cn(
               "w-2 h-2 rounded-full transition-all",
               isNodeConfigured ? "bg-green-500" : "bg-yellow-500"
             )}
+            title={isNodeConfigured ? "Sozlangan" : "Sozlanmagan"}
           />
           <div className="text-muted-foreground">
             {isCollapsed ? (
@@ -1737,7 +2091,6 @@ const SendTextMessageNodeComponent = ({
           </div>
         </div>
       </CardHeader>
-
       {!isCollapsed && (
         <>
           <CardContent className="p-4 pt-0 flex flex-col gap-4">
@@ -1816,16 +2169,14 @@ const SendTextMessageNodeComponent = ({
                     handleUpdate({ disableWebPagePreview: !!checked })
                   }
                 />
-                <Label
-                  htmlFor={`disable-preview-${id}`}
-                  className="text-sm font-normal cursor-pointer"
-                >
+                <Label className="text-sm font-normal cursor-pointer">
                   Link uchun prevyuni o'chirish
                 </Label>
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-around">
+
+          <CardFooter className="flex flex-wrap justify-around gap-4 pt-4 border-t">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`disable-notification-${id}`}
@@ -1834,10 +2185,7 @@ const SendTextMessageNodeComponent = ({
                   handleUpdate({ disableNotification: !!checked })
                 }
               />
-              <Label
-                htmlFor={`disable-notification-${id}`}
-                className="text-sm font-normal cursor-pointer"
-              >
+              <Label className="text-sm font-normal cursor-pointer">
                 Ovozsiz
               </Label>
             </div>
@@ -1849,17 +2197,34 @@ const SendTextMessageNodeComponent = ({
                   handleUpdate({ protectContent: !!checked })
                 }
               />
-              <Label
-                htmlFor={`protect-content-${id}`}
-                className="text-sm font-normal cursor-pointer"
-              >
+              <Label className="text-sm font-normal cursor-pointer">
                 Himoyalangan
               </Label>
             </div>
+
+            {/* BUTTON GENERATOR INTEGRATSIYASI */}
+            <ButtonGenerator
+              initialButtons={data.buttons}
+              onSave={handleSaveButtons}
+            >
+              <div className="relative w-full">
+                <Button variant="outline" className="w-full">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Buttons
+                </Button>
+                {buttonCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 rounded-full"
+                  >
+                    {buttonCount}
+                  </Badge>
+                )}
+              </div>
+            </ButtonGenerator>
           </CardFooter>
         </>
       )}
-
       <Handle
         type="source"
         position={Position.Bottom}
@@ -1883,6 +2248,8 @@ export { SendTextMessageNode } from "./TextMessageNode";
 ### 📄 constructor/nodes/actions/TextMessageNode/types.ts
 
 ```ts
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator/types";
+
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
  * 'sender' - xabarni yuborgan foydalanuvchining o'ziga.
@@ -1909,6 +2276,7 @@ export interface SendTextMessageNodeData {
   disableWebPagePreview?: boolean; // Xabardagi linklar uchun oldindan ko'rishni o'chirish.
   disableNotification?: boolean; // Foydalanuvchiga ovozsiz xabar yuborish.
   protectContent?: boolean; // Xabarni nusxalash va saqlashni taqiqlash.
+  buttons?: ButtonConfig[][];
 }
 
 ```
@@ -1921,7 +2289,7 @@ export interface SendTextMessageNodeData {
 import { useState, memo } from "react";
 import { Handle, Position, NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { FiVideo, FiChevronDown, FiHelpCircle } from "react-icons/fi";
+import { FiVideo, FiHelpCircle } from "react-icons/fi";
 import {
   Card,
   CardHeader,
@@ -1952,6 +2320,13 @@ import { useFlowStore } from "@/constructor/store/flowStore";
 import { SendVideoNodeData, RecipientType, VideoSourceType } from "./types";
 import { ChevronDown } from "lucide-react";
 
+// Andozamiz uchun yangi importlar
+import { LayoutGrid } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ButtonGenerator } from "@/constructor/components/ButtonGenerator";
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+
 const SendVideoNodeComponent = ({
   id,
   data,
@@ -1964,7 +2339,12 @@ const SendVideoNodeComponent = ({
     updateNodeData(id, update);
   };
 
+  const handleSaveButtons = (buttons: ButtonConfig[][]) => {
+    updateNodeData(id, { buttons });
+  };
+
   const captionLength = data.caption?.length || 0;
+  const buttonCount = data.buttons?.flat().length || 0;
 
   return (
     <Card className={cn("w-96 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -1978,18 +2358,28 @@ const SendVideoNodeComponent = ({
           <FiVideo className="text-primary" />
           Video Yuborish
         </CardTitle>
-        <div className="text-muted-foreground">
-          {isCollapsed ? (
-            <ChevronDown />
-          ) : (
-            <ChevronDown className="rotate-180" />
+        <div className="flex items-center gap-2">
+          {/* Node yopiq bo'lganda ham tugmalar sonini ko'rsatish uchun */}
+          {buttonCount > 0 && (
+            <Badge variant="secondary" className="font-normal">
+              <LayoutGrid className="w-3 h-3 mr-1" />
+              {buttonCount}
+            </Badge>
           )}
+          <div className="text-muted-foreground">
+            {isCollapsed ? (
+              <ChevronDown />
+            ) : (
+              <ChevronDown className="rotate-180" />
+            )}
+          </div>
         </div>
       </CardHeader>
 
       {!isCollapsed && (
         <>
           <CardContent className="p-4 pt-0 flex flex-col gap-5">
+            {/* ...boshqa barcha form maydonlari o'zgarishsiz qoladi... */}
             {/* Qabul qiluvchi */}
             <div className="grid gap-2">
               <Label>Qabul qiluvchi</Label>
@@ -2151,7 +2541,7 @@ const SendVideoNodeComponent = ({
             </div>
           </CardContent>
 
-          <CardFooter className="flex justify-around">
+          <CardFooter className="flex flex-wrap justify-around gap-4 pt-4 border-t">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`disable-notification-${id}`}
@@ -2182,6 +2572,27 @@ const SendVideoNodeComponent = ({
                 Himoyalangan
               </Label>
             </div>
+
+            {/* --- BUTTON GENERATOR INTEGRATSIYASI --- */}
+            <ButtonGenerator
+              initialButtons={data.buttons}
+              onSave={handleSaveButtons}
+            >
+              <div className="relative">
+                <Button variant="outline">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Buttons
+                </Button>
+                {buttonCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 rounded-full"
+                  >
+                    {buttonCount}
+                  </Badge>
+                )}
+              </div>
+            </ButtonGenerator>
           </CardFooter>
         </>
       )}
@@ -2209,6 +2620,8 @@ export { SendVideoNode } from "./VideMessageNode";
 ### 📄 constructor/nodes/actions/VideoMessageNode/types.ts
 
 ```ts
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
  */
@@ -2245,6 +2658,8 @@ export interface SendVideoNodeData {
   // Umumiy sozlamalar
   disableNotification?: boolean;
   protectContent?: boolean;
+
+  buttons?: ButtonConfig[][];
 }
 
 ```

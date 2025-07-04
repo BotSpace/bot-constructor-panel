@@ -3,7 +3,7 @@
 import { useState, memo } from "react";
 import { Handle, Position, NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { FiMusic, FiChevronDown } from "react-icons/fi";
+import { FiMusic } from "react-icons/fi";
 import {
   Card,
   CardHeader,
@@ -28,6 +28,13 @@ import { useFlowStore } from "@/constructor/store/flowStore";
 import { SendAudioNodeData, RecipientType, AudioSourceType } from "./types";
 import { ChevronDown } from "lucide-react";
 
+// Bizning andozamiz uchun yangi importlar
+import { LayoutGrid } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ButtonGenerator } from "@/constructor/components/ButtonGenerator";
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+
 const SendAudioNodeComponent = ({
   id,
   data,
@@ -40,7 +47,14 @@ const SendAudioNodeComponent = ({
     updateNodeData(id, update);
   };
 
+  // ButtonGenerator uchun saqlash funksiyasi
+  const handleSaveButtons = (buttons: ButtonConfig[][]) => {
+    updateNodeData(id, { buttons });
+  };
+
   const captionLength = data.caption?.length || 0;
+  // UI uchun tugmalar sonini hisoblaymiz
+  const buttonCount = data.buttons?.flat().length || 0;
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -54,12 +68,21 @@ const SendAudioNodeComponent = ({
           <FiMusic className="text-primary" />
           Audio Yuborish
         </CardTitle>
-        <div className="text-muted-foreground">
-          {isCollapsed ? (
-            <ChevronDown />
-          ) : (
-            <ChevronDown className="rotate-180" />
+        <div className="flex items-center gap-2">
+          {/* Sarlavhadagi Badge */}
+          {buttonCount > 0 && (
+            <Badge variant="secondary" className="font-normal">
+              <LayoutGrid className="w-3 h-3 mr-1" />
+              {buttonCount}
+            </Badge>
           )}
+          <div className="text-muted-foreground">
+            {isCollapsed ? (
+              <ChevronDown />
+            ) : (
+              <ChevronDown className="rotate-180" />
+            )}
+          </div>
         </div>
       </CardHeader>
 
@@ -166,33 +189,10 @@ const SendAudioNodeComponent = ({
                 {captionLength}/1024
               </div>
             </div>
-
-            {/* Qo'shimcha sozlamalar */}
-            <div className="flex items-center justify-between">
-              <Label htmlFor={`custom-thumb-${id}`} className="cursor-pointer">
-                Maxsus muqova
-              </Label>
-              <Switch
-                id={`custom-thumb-${id}`}
-                checked={!!data.hasCustomThumbnail}
-                onCheckedChange={(checked) =>
-                  handleUpdate({ hasCustomThumbnail: checked })
-                }
-              />
-            </div>
-            {data.hasCustomThumbnail && (
-              <Input
-                placeholder="Muqova uchun File ID"
-                value={data.thumbnailFileId || ""}
-                onChange={(e) =>
-                  handleUpdate({ thumbnailFileId: e.target.value })
-                }
-                className="animate-in fade-in-50"
-              />
-            )}
           </CardContent>
 
-          <CardFooter className="flex justify-around">
+          <CardFooter className="flex flex-wrap justify-around items-center gap-4 pt-4 border-t">
+            {/* Mavjud Checkbox'lar */}
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`disable-notification-${id}`}
@@ -223,6 +223,27 @@ const SendAudioNodeComponent = ({
                 Himoyalangan
               </Label>
             </div>
+
+            {/* --- BUTTON GENERATOR INTEGRATSIYASI --- */}
+            <ButtonGenerator
+              initialButtons={data.buttons}
+              onSave={handleSaveButtons}
+            >
+              <div className="relative">
+                <Button variant="outline">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Buttons
+                </Button>
+                {buttonCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 rounded-full"
+                  >
+                    {buttonCount}
+                  </Badge>
+                )}
+              </div>
+            </ButtonGenerator>
           </CardFooter>
         </>
       )}

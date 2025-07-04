@@ -1,3 +1,5 @@
+import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
  */
@@ -34,4 +36,6 @@ export interface SendVideoNodeData {
   // Umumiy sozlamalar
   disableNotification?: boolean;
   protectContent?: boolean;
+
+  buttons?: ButtonConfig[][];
 }

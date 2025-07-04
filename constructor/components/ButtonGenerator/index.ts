@@ -1,1 +1,2 @@
-export { ButtonGenerator } from "./ButtonGenerator";
+export * from "./ButtonGenerator";
+export * from "./types";
