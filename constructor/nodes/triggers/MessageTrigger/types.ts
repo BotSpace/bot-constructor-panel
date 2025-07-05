@@ -1,22 +1,21 @@
 // Murakkab context'lar uchun tiplar
 interface RadiusContext {
-  lat?: number | string;
-  lng?: number | string;
-  km?: number | string;
+  lat?: string; // Faqat string
+  lng?: string;
+  km?: string;
 }
 
 interface SizeContext {
-  min?: number | string;
-  max?: number | string;
+  min?: string; // Faqat string
+  max?: string;
 }
 
 // Bizning node saqlaydigan asosiy ma'lumotlar strukturasi
 export interface MessageTriggerNodeData {
-  // Bu maydonlar ixtiyoriy (`?`), chunki node dastlab bo'sh bo'lishi mumkin
-  type?: string; // 'text', 'location', 'document'
-  filter?: string; // 'contains', 'regex', 'radius'
+  type?: string;
+  filter?: string;
   context?: {
-    value?: string; // Umumiy qiymat uchun (matn, command, extension)
+    value?: string;
     radius?: RadiusContext;
     size?: SizeContext;
   };

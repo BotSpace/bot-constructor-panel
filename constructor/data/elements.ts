@@ -21,11 +21,29 @@ export const Elements: ElementTypes[] = [
         triggerId: "MessageTriggerNode",
       },
       {
-        type: "button",
-        name: "Button",
-        description: "Create a button for user interaction",
-        icon: "🔘",
-        color: "bg-green-500/10 text-green-400 border-green-500/20",
+        type: "reply_button",
+        name: "Reply Button",
+        description: "Oldingi qadamdagi reply tugmani ushlaydi",
+        icon: "↩️", // Yoki Lucide'dan icon
+        color: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+        triggerId: "ReplyButtonTriggerNode", // Bu nom muhim!
+      },
+      {
+        type: "callback_button",
+        name: "Callback Button",
+        description: "Oldingi qadamdagi aniq bir inline tugmani ushlaydi",
+        icon: "👆",
+        color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+        triggerId: "CallbackButtonTriggerNode",
+      },
+
+      {
+        type: "callback_query",
+        name: "Advanced Callback",
+        description: "Callback ma'lumotini filtrlab ushlaydi",
+        icon: "🕸️",
+        color: "bg-teal-500/10 text-teal-400 border-teal-500/20",
+        triggerId: "CallbackQueryTriggerNode",
       },
     ],
   },
@@ -83,14 +101,15 @@ export const Elements: ElementTypes[] = [
         description: "Run custom code for advanced logic",
         icon: "🖥️",
         color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+        triggerId: "CustomCodeNode",
       },
-      {
-        type: "condition",
-        name: "Condition",
-        description: "Add conditional logic to your flow",
-        icon: "🔀",
-        color: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-      },
+      // {
+      //   type: "condition",
+      //   name: "Condition",
+      //   description: "Add conditional logic to your flow",
+      //   icon: "🔀",
+      //   color: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+      // },
     ],
   },
 ];

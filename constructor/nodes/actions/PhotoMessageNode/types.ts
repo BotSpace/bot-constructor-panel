@@ -21,9 +21,10 @@ export type PhotoSourceType = "file_id" | "url" | "upload";
  */
 export interface SendPhotoNodeData {
   // Barcha maydonlar ixtiyoriy (`?`), chunki node yaratilganda ular bo'sh bo'lishi mumkin.
-
-  recipientType?: RecipientType;
-  chatId?: string; // `recipientType` 'custom_id' bo'lganda ishlatiladi.
+  recipients?: {
+    sendToSender: boolean;
+    additionalIds: string[];
+  };
 
   photoSourceType?: PhotoSourceType;
   photoFileId?: string; // `photoSourceType` 'file_id' bo'lganda ishlatiladi.

@@ -14,8 +14,10 @@ export type FileSourceType = "file_id" | "url" | "upload";
  * 'Send File' tugunining ma'lumotlar strukturasini belgilaydigan interfeys.
  */
 export interface SendFileNodeData {
-  recipientType?: RecipientType;
-  chatId?: string;
+  recipients?: {
+    sendToSender: boolean;
+    additionalIds: string[];
+  };
 
   fileSourceType?: FileSourceType;
   fileId?: string;

@@ -173,7 +173,6 @@ export function ButtonGenerator({
   const handleSaveChanges = () => {
     const finalButtons = buttons.filter((row) => row.length > 0);
     onSave(finalButtons);
-    alert("Tugmalar muvaffaqiyatli saqlandi!");
     handleOnOpenChange(false);
   };
 

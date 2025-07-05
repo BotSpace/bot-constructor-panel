@@ -1,4 +1,9 @@
+// Universal, ko'p ishlatiladigan filtrlar
+const anyFilter = [{ value: "any", label: "Har qanday" }];
+
+// Matnli ma'lumotlar uchun filtrlar
 export const textFilters = [
+  ...anyFilter, // "Har qanday"ni qo'shamiz
   { value: "equals", label: "Teng" },
   { value: "contains", label: "Ichida" },
   { value: "starts_with", label: "Boshlanadi" },
@@ -6,19 +11,29 @@ export const textFilters = [
   { value: "command", label: "Buyruq" },
 ];
 
+// Joylashuv uchun filtrlar
 export const locationFilters = [
-  { value: "any", label: "Har qanday" },
-  { value: "radius", label: "Radius" },
+  ...anyFilter,
+  { value: "radius", label: "Radius (ichida)" },
 ];
 
+// Fayllar (rasm, video, audio, hujjat) uchun filtrlar
 export const fileFilters = [
-  { value: "any", label: "Har qanday" },
-  { value: "extension", label: "Kengaytma" },
-  { value: "size", label: "Hajm" },
+  ...anyFilter,
+  { value: "size", label: "Hajm (MB)" },
 ];
 
+// Hujjatlar uchun maxsus qo'shimcha filtr
+export const documentFilters = [
+  ...fileFilters,
+  { value: "extension", label: "Kengaytmasi" },
+];
+
+// Barcha filtrlar to'plami
 export const Filters = {
   textFilters,
   locationFilters,
   fileFilters,
+  documentFilters,
+  anyFilter, // Faqat "Har qanday" kerak bo'lganda ishlatish uchun
 };

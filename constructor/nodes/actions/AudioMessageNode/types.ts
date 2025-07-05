@@ -14,8 +14,10 @@ export type AudioSourceType = "file_id" | "url" | "upload";
  * 'Send Audio' tugunining ma'lumotlar strukturasini belgilaydigan interfeys.
  */
 export interface SendAudioNodeData {
-  recipientType?: RecipientType;
-  chatId?: string;
+  recipients?: {
+    sendToSender: boolean;
+    additionalIds: string[];
+  };
 
   audioSourceType?: AudioSourceType;
   audioFileId?: string;

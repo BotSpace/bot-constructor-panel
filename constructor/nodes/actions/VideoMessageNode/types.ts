@@ -14,8 +14,10 @@ export type VideoSourceType = "file_id" | "url" | "upload";
  * 'Send Video' tugunining ma'lumotlar strukturasini belgilaydigan interfeys.
  */
 export interface SendVideoNodeData {
-  recipientType?: RecipientType;
-  chatId?: string;
+  recipients?: {
+    sendToSender: boolean;
+    additionalIds: string[];
+  };
 
   videoSourceType?: VideoSourceType;
   videoFileId?: string;

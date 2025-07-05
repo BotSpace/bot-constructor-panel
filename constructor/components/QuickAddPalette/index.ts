@@ -1,0 +1,1 @@
+export { QuickAddPalette } from "./QuickAddPalette";

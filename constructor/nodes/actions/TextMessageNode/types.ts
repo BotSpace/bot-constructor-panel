@@ -17,8 +17,13 @@ export type ParseMode = "HTML" | "MarkdownV2" | "None";
  * React Flow'dagi `data` propining tipi.
  */
 export interface SendTextMessageNodeData {
-  recipientType?: RecipientType;
-  chatId?: string; // `recipientType` 'custom_id' bo'lganda ishlatiladi.
+  /** Yuboruvchidan tashqari qo'shimcha oluvchi ID'lar ro'yxati */
+  recipients?: {
+    /** Xabar yuboruvchining o'ziga yuborilsinmi? (standart: true) */
+    sendToSender: boolean;
+    /** Qo'shimcha ID'lar ro'yxati */
+    additionalIds: string[];
+  };
 
   messageText?: string; // Yuboriladigan xabar matni (4096 belgacha).
   parseMode?: ParseMode;

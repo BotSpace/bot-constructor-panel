@@ -8,9 +8,11 @@ import {
   Phone,
   User,
   Video,
+  MessagesSquare,
 } from "lucide-react";
 
 export const MessageTypes = [
+  { value: "any", label: "Har qanday xabar", icon: MessagesSquare },
   { value: "text", label: "Matn", icon: MessageCircle },
   { value: "location", label: "Joylashuv", icon: MapPin },
   { value: "contact", label: "Kontakt", icon: User },

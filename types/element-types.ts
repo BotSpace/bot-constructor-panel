@@ -15,13 +15,16 @@ export interface ElementItemType {
     | "sticker"
     | "file"
     | "code"
-    | "condition";
+    | "condition"
+    | "reply_button"
+    | "callback_button"
+    | "callback_query";
 
   name: string;
   description: string;
   icon: string;
   color: string;
-  triggerId?: keyof typeof CustomNodes; // Optional, used for triggers
+  triggerId: keyof typeof CustomNodes; // Optional, used for triggers
 }
 
 export interface ElementTypes {
