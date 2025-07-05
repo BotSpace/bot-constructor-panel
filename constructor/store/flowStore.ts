@@ -47,6 +47,8 @@ type Clipboard = {
 export type RFState = {
   nodes: Node[];
   edges: Edge[];
+  initialState: { nodes: Node[]; edges: Edge[] } | null;
+
   clipboard: Clipboard | null;
   isCtrlPressed: boolean;
   onNodesChange: OnNodesChange;
@@ -61,6 +63,9 @@ export type RFState = {
   paste: (position: { x: number; y: number }) => void;
   duplicateSelection: () => void;
   setCtrlPressed: (isPressed: boolean) => void; // <-- YANGI FUNKSIYA TIPI
+  saveFlow: () => Promise<void>;
+
+  loadFlow: () => Promise<void>;
 };
 
 export const useFlowStore = create<RFState>((set, get) => ({
@@ -68,6 +73,7 @@ export const useFlowStore = create<RFState>((set, get) => ({
   edges: [],
   clipboard: null,
   isCtrlPressed: false,
+  initialState: null, // Boshlang'ich qiymat null
 
   // React Flow kutubxonasi uchun majburiy handler'lar
 
@@ -268,5 +274,51 @@ export const useFlowStore = create<RFState>((set, get) => ({
 
   setCtrlPressed: (isPressed: boolean) => {
     set({ isCtrlPressed: isPressed });
+  },
+
+  saveFlow: async () => {
+    const { nodes, edges } = get(); // Store'dan joriy holatni olamiz
+    const flowData = { nodes, edges };
+
+    const response = await fetch("/api/flow/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(flowData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      // Muvaffaqiyatsiz bo'lsa, xatolik beramiz
+      throw new Error(
+        errorData.message || "Faylni saqlashda xatolik yuz berdi."
+      );
+    }
+  },
+
+  loadFlow: async () => {
+    try {
+      const response = await fetch("/api/flow/load");
+      if (!response.ok) {
+        throw new Error("Could not fetch initial flow state.");
+      }
+      const data = await response.json();
+
+      // Store'ni yuklangan ma'lumotlar bilan to'ldiramiz
+      set({
+        nodes: data.nodes || [],
+        edges: data.edges || [],
+        initialState: data, // Buni solishtirish uchun saqlab qo'yamiz
+      });
+    } catch (error) {
+      console.error("Failed to load flow:", error);
+      // Xatolik yuz bersa, bo'sh holat bilan ishni boshlaymiz
+      set({
+        nodes: [],
+        edges: [],
+        initialState: { nodes: [], edges: [] },
+      });
+    }
   },
 }));

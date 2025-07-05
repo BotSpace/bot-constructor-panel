@@ -1,0 +1,658 @@
+{
+  "nodes": [
+    {
+      "id": "dndnode_3",
+      "type": "MessageTriggerNode",
+      "position": {
+        "x": 998.758500144829,
+        "y": 2131.389457003139
+      },
+      "data": {
+        "type": "text",
+        "filter": "command",
+        "context": {
+          "value": "/start"
+        },
+        "messageText": "Familyangizni kiriting"
+      },
+      "width": 400,
+      "height": 530,
+      "selected": false,
+      "dragging": false,
+      "positionAbsolute": {
+        "x": 998.758500144829,
+        "y": 2131.389457003139
+      }
+    },
+    {
+      "id": "dndnode_4",
+      "type": "SendTextMessageNode",
+      "position": {
+        "x": 1010,
+        "y": 2740
+      },
+      "data": {
+        "recipients": {
+          "sendToSender": true,
+          "additionalIds": []
+        },
+        "messageText": "Assalomu Alekum tz sotib qoch kursi botiga xush kelibsiz",
+        "parseMode": "None",
+        "buttons": [
+          [
+            {
+              "id": "btn-1751742748572",
+              "text": "ro'yxatdan o'tish",
+              "type": "reply"
+            }
+          ]
+        ]
+      },
+      "width": 400,
+      "height": 257,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 1009.8796938244038,
+        "y": 2742.502822902669
+      },
+      "dragging": false
+    },
+    {
+      "id": "dndnode_7",
+      "type": "ReplyButtonTriggerNode",
+      "position": {
+        "x": -131.9586988059396,
+        "y": 1789.9701225187594
+      },
+      "data": {
+        "selectedButtons": [
+          "ro'yxatdan o'tish",
+          "Ro'yxatdan o'tish"
+        ]
+      },
+      "width": 320,
+      "height": 169,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -131.9586988059396,
+        "y": 1789.9701225187594
+      },
+      "dragging": false
+    },
+    {
+      "id": "dndnode_8",
+      "type": "SendTextMessageNode",
+      "position": {
+        "x": -178.5446818842657,
+        "y": 2068.0242645371136
+      },
+      "data": {
+        "recipients": {
+          "sendToSender": true,
+          "additionalIds": []
+        },
+        "messageText": "Iltmos telefon raqamingizni yuboring",
+        "parseMode": "None",
+        "buttons": [
+          [
+            {
+              "id": "btn-1751742833106",
+              "text": "📱 Kontakt",
+              "type": "request_contact"
+            }
+          ]
+        ]
+      },
+      "width": 400,
+      "height": 530,
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "dndnode_9",
+      "type": "ReplyButtonTriggerNode",
+      "position": {
+        "x": -132.5348985878946,
+        "y": 2673.0858638282957
+      },
+      "data": {
+        "selectedButtons": [
+          "📱 Kontakt"
+        ]
+      },
+      "width": 320,
+      "height": 169,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -132.5348985878946,
+        "y": 2673.0858638282957
+      },
+      "dragging": false
+    },
+    {
+      "id": "dndnode_10",
+      "type": "SendTextMessageNode",
+      "position": {
+        "x": -124.86660137183269,
+        "y": 3005.1815444286262
+      },
+      "data": {
+        "recipients": {
+          "sendToSender": true,
+          "additionalIds": []
+        },
+        "messageText": "Iltimos joylashuvingizni kiriting",
+        "parseMode": "None",
+        "buttons": [
+          [
+            {
+              "id": "btn-1751742892939",
+              "text": "📍 Lokatsiya",
+              "type": "request_location"
+            }
+          ]
+        ]
+      },
+      "width": 400,
+      "height": 530,
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "dndnode_11",
+      "type": "ReplyButtonTriggerNode",
+      "position": {
+        "x": -89.64036079749326,
+        "y": 3599.3322878980885
+      },
+      "data": {
+        "selectedButtons": [
+          "📍 Lokatsiya"
+        ]
+      },
+      "width": 320,
+      "height": 169,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -89.64036079749326,
+        "y": 3599.3322878980885
+      },
+      "dragging": false
+    },
+    {
+      "id": "dndnode_12",
+      "type": "SendTextMessageNode",
+      "position": {
+        "x": -128.94038402981028,
+        "y": 3827.4042188972226
+      },
+      "data": {
+        "recipients": {
+          "sendToSender": true,
+          "additionalIds": []
+        },
+        "messageText": "Uylanganmisiz",
+        "parseMode": "None",
+        "buttons": [
+          [
+            {
+              "id": "btn-1751742928047",
+              "text": "Ha",
+              "type": "reply"
+            },
+            {
+              "id": "btn-1751742931953",
+              "text": "Yo'q",
+              "type": "reply"
+            }
+          ]
+        ]
+      },
+      "width": 400,
+      "height": 530,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -128.94038402981028,
+        "y": 3827.4042188972226
+      },
+      "dragging": false
+    },
+    {
+      "id": "dndnode_13",
+      "type": "ReplyButtonTriggerNode",
+      "position": {
+        "x": -513.2058287419962,
+        "y": 4424.763473819695
+      },
+      "data": {
+        "selectedButtons": [
+          "Ha"
+        ]
+      },
+      "width": 320,
+      "height": 193,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -513.2058287419962,
+        "y": 4424.763473819695
+      },
+      "dragging": false
+    },
+    {
+      "id": "dndnode_14",
+      "type": "SendTextMessageNode",
+      "position": {
+        "x": -572.2941872663575,
+        "y": 4803.744634422446
+      },
+      "data": {
+        "recipients": {
+          "sendToSender": true,
+          "additionalIds": []
+        },
+        "messageText": "Bo'ydoq emasligingizdan hursandman",
+        "parseMode": "None"
+      },
+      "width": 400,
+      "height": 530,
+      "selected": false,
+      "dragging": false,
+      "positionAbsolute": {
+        "x": -572.2941872663575,
+        "y": 4803.744634422446
+      }
+    },
+    {
+      "id": "dndnode_15",
+      "type": "SendTextMessageNode",
+      "position": {
+        "x": -187.4868458599613,
+        "y": 5406.399058369585
+      },
+      "data": {
+        "recipients": {
+          "sendToSender": true,
+          "additionalIds": []
+        },
+        "messageText": "Ma'lumotlaringizni adminga jo'natdim tez orada bog'lanam",
+        "parseMode": "None"
+      },
+      "width": 400,
+      "height": 530,
+      "selected": false,
+      "dragging": false,
+      "positionAbsolute": {
+        "x": -187.4868458599613,
+        "y": 5406.399058369585
+      }
+    },
+    {
+      "id": "dndnode_19",
+      "type": "ReplyButtonTriggerNode",
+      "position": {
+        "x": 281.62243925130485,
+        "y": 4419.879161017825
+      },
+      "data": {
+        "selectedButtons": [
+          "Yo'q"
+        ]
+      },
+      "width": 320,
+      "height": 193,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 281.62243925130485,
+        "y": 4419.879161017825
+      },
+      "dragging": false
+    },
+    {
+      "id": "dndnode_21",
+      "type": "SendTextMessageNode",
+      "position": {
+        "x": 210.32820993866676,
+        "y": 4735.013105403038
+      },
+      "data": {
+        "recipients": {
+          "sendToSender": true,
+          "additionalIds": []
+        },
+        "messageText": "Siz uchun afsusdaman tezro uylaning",
+        "parseMode": "None"
+      },
+      "width": 400,
+      "height": 530,
+      "selected": false,
+      "dragging": false,
+      "positionAbsolute": {
+        "x": 210.32820993866676,
+        "y": 4735.013105403038
+      }
+    },
+    {
+      "id": "dndnode_0",
+      "type": "MessageTriggerNode",
+      "position": {
+        "x": -157.74199782446624,
+        "y": 688.3148655163712
+      },
+      "data": {
+        "type": "text",
+        "filter": "command",
+        "context": {
+          "value": "/start"
+        }
+      },
+      "width": 400,
+      "height": 327,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -157.74199782446624,
+        "y": 688.3148655163712
+      },
+      "dragging": false
+    },
+    {
+      "id": "dndnode_1",
+      "type": "SendTextMessageNode",
+      "position": {
+        "x": -163.6358458176362,
+        "y": 1111.8844250813556
+      },
+      "data": {
+        "recipients": {
+          "sendToSender": true,
+          "additionalIds": []
+        },
+        "messageText": "Salom kazzob botga xush kelibsiz",
+        "parseMode": "None",
+        "buttons": [
+          [
+            {
+              "id": "btn-1751751011182",
+              "text": "Ro'yxatdan o'tish",
+              "type": "reply"
+            }
+          ]
+        ]
+      },
+      "width": 400,
+      "height": 530,
+      "selected": false,
+      "dragging": false,
+      "positionAbsolute": {
+        "x": -163.6358458176362,
+        "y": 1111.8844250813556
+      }
+    },
+    {
+      "id": "dndnode_2",
+      "type": "MessageTriggerNode",
+      "position": {
+        "x": 996.1053977677254,
+        "y": 1800.954390725774
+      },
+      "data": {
+        "type": "text",
+        "filter": "any",
+        "context": {}
+      },
+      "width": 400,
+      "height": 257,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 996.1053977677254,
+        "y": 1800.954390725774
+      },
+      "dragging": false
+    },
+    {
+      "id": "dndnode_3",
+      "type": "SendTextMessageNode",
+      "position": {
+        "x": 998.758500144829,
+        "y": 2131.389457003139
+      },
+      "data": {
+        "recipients": {
+          "sendToSender": true,
+          "additionalIds": []
+        },
+        "messageText": "Familyangizni kiriting",
+        "parseMode": "None"
+      },
+      "width": 400,
+      "height": 530,
+      "selected": false,
+      "dragging": false,
+      "positionAbsolute": {
+        "x": 998.758500144829,
+        "y": 2131.389457003139
+      }
+    },
+    {
+      "id": "dndnode_4",
+      "type": "MessageTriggerNode",
+      "position": {
+        "x": 1010,
+        "y": 2740
+      },
+      "data": {
+        "type": "text",
+        "filter": "any",
+        "context": {}
+      },
+      "width": 400,
+      "height": 257,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 1009.8796938244038,
+        "y": 2742.502822902669
+      },
+      "dragging": false
+    },
+    {
+      "id": "dndnode_5",
+      "type": "SendTextMessageNode",
+      "position": {
+        "x": 1035.462702710271,
+        "y": 3132.6810748558128
+      },
+      "data": {
+        "recipients": {
+          "sendToSender": true,
+          "additionalIds": []
+        },
+        "messageText": "Adminga yuborildi",
+        "parseMode": "None"
+      },
+      "width": 400,
+      "height": 530,
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "dndnode_0",
+      "type": "MessageTriggerNode",
+      "position": {
+        "x": -157.74199782446624,
+        "y": 688.3148655163712
+      },
+      "data": {
+        "type": "text",
+        "filter": "command",
+        "context": {
+          "value": "/start"
+        }
+      },
+      "width": 400,
+      "height": 327,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -157.74199782446624,
+        "y": 688.3148655163712
+      },
+      "dragging": false
+    },
+    {
+      "id": "dndnode_1",
+      "type": "SendTextMessageNode",
+      "position": {
+        "x": -163.6358458176362,
+        "y": 1111.8844250813556
+      },
+      "data": {
+        "recipients": {
+          "sendToSender": true,
+          "additionalIds": []
+        },
+        "messageText": "Salom kazzob botga xush kelibsiz",
+        "parseMode": "None",
+        "buttons": [
+          [
+            {
+              "id": "btn-1751751011182",
+              "text": "Ro'yxatdan o'tish",
+              "type": "reply"
+            }
+          ]
+        ]
+      },
+      "width": 400,
+      "height": 530,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -163.6358458176362,
+        "y": 1111.8844250813556
+      },
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "source": "dndnode_3",
+      "sourceHandle": "out",
+      "target": "dndnode_4",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_3out-dndnode_4"
+    },
+    {
+      "source": "dndnode_7",
+      "sourceHandle": null,
+      "target": "dndnode_8",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_7-dndnode_8"
+    },
+    {
+      "source": "dndnode_8",
+      "sourceHandle": null,
+      "target": "dndnode_9",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_8-dndnode_9"
+    },
+    {
+      "source": "dndnode_9",
+      "sourceHandle": null,
+      "target": "dndnode_10",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_9-dndnode_10"
+    },
+    {
+      "source": "dndnode_10",
+      "sourceHandle": null,
+      "target": "dndnode_11",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_10-dndnode_11"
+    },
+    {
+      "source": "dndnode_11",
+      "sourceHandle": null,
+      "target": "dndnode_12",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_11-dndnode_12"
+    },
+    {
+      "source": "dndnode_12",
+      "sourceHandle": null,
+      "target": "dndnode_13",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_12-dndnode_13",
+      "selected": false
+    },
+    {
+      "source": "dndnode_13",
+      "sourceHandle": null,
+      "target": "dndnode_14",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_13-dndnode_14",
+      "selected": false
+    },
+    {
+      "source": "dndnode_14",
+      "sourceHandle": null,
+      "target": "dndnode_15",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_14-dndnode_15",
+      "selected": false
+    },
+    {
+      "source": "dndnode_12",
+      "sourceHandle": null,
+      "target": "dndnode_19",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_12-dndnode_19"
+    },
+    {
+      "source": "dndnode_19",
+      "sourceHandle": null,
+      "target": "dndnode_21",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_19-dndnode_21"
+    },
+    {
+      "source": "dndnode_21",
+      "sourceHandle": null,
+      "target": "dndnode_15",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_21-dndnode_15"
+    },
+    {
+      "source": "dndnode_3",
+      "sourceHandle": null,
+      "target": "dndnode_4",
+      "targetHandle": "in",
+      "id": "reactflow__edge-dndnode_3-dndnode_4",
+      "selected": false
+    },
+    {
+      "source": "dndnode_2",
+      "sourceHandle": "out",
+      "target": "dndnode_3",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_2out-dndnode_3"
+    },
+    {
+      "source": "dndnode_4",
+      "sourceHandle": "out",
+      "target": "dndnode_5",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_4out-dndnode_5"
+    },
+    {
+      "source": "dndnode_0",
+      "sourceHandle": "out",
+      "target": "dndnode_1",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_0out-dndnode_1"
+    },
+    {
+      "source": "dndnode_1",
+      "sourceHandle": null,
+      "target": "dndnode_7",
+      "targetHandle": null,
+      "id": "reactflow__edge-dndnode_1-dndnode_7"
+    }
+  ]
+}

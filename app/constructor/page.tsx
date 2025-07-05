@@ -9,6 +9,8 @@ import Constructor from "@/constructor/constructor";
 import { Elements } from "@/constructor/data/elements";
 import { ConstructorPageHeader } from "./components/header";
 
+import LogViewer from "./components/LogViewer";
+
 export default function Page() {
   // 1. Qidiruv matnini saqlash uchun state
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,12 +46,12 @@ export default function Page() {
     }).filter(Boolean); // null qiymatlarni massivdan olib tashlaymiz
   }, [searchTerm]); // `searchTerm` o'zgargandagina qayta ishlaydi
 
-  // 4. Ctrl + L shortcut'ini sozlash uchun useEffect
+  // 4. Ctrl + S shortcut'ini sozlash uchun useEffect
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // `event.metaKey` - bu Mac'dagi Command tugmasi
       // `event.ctrlKey` - bu Windows/Linux'dagi Control tugmasi
-      if ((event.ctrlKey || event.metaKey) && event.key === "l") {
+      if ((event.ctrlKey || event.metaKey) && event.key === "s") {
         event.preventDefault(); // Brauzerning standart harakatini (masalan, address bar'ga fokus) bekor qilamiz
         searchInputRef.current?.focus(); // Input maydoniga fokus qilamiz
       }
@@ -71,16 +73,16 @@ export default function Page() {
 
       <div className="flex">
         {/* Components Panel */}
-        <ScrollArea className="h-[calc(100vh-56px)] flex flex-col w-72 border-r border-white/[0.08]">
+        <ScrollArea className="relative h-[calc(100vh-56px)] flex flex-col w-72 border-r border-white/[0.08]">
           {/* Panel Header */}
-          <div className="border-b border-white/[0.08] p-4">
+          <div className="border-b border-white/[0.08] p-4 sticky top-0 bg-background">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
               <Input
                 // Ref'ni inputga bog'laymiz
                 ref={searchInputRef}
-                placeholder="Search components... (Ctrl+L)" // Foydalanuvchiga ishora
+                placeholder="Search components... (Ctrl+S)" // Foydalanuvchiga ishora
                 className="h-8 pl-9 text-sm placeholder:text-slate-400 focus-visible:border-white/20 focus-visible:ring-0"
                 // State'ni yangilaymiz
                 value={searchTerm}
@@ -152,11 +154,11 @@ export default function Page() {
             )}
           </div>
         </ScrollArea>
-
         {/* Main Canvas Area */}
         <main className="flex-1 flex flex-col">
           <Constructor />
         </main>
+        <LogViewer />
       </div>
     </div>
   );

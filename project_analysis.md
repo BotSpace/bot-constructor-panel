@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 7/5/2025, 5:08:45 PM
+Sana: 7/6/2025, 1:04:14 AM
 
 ## 📁 Fayl Strukturasi
 
@@ -10,8 +10,34 @@ constructor-next-js
 ├── README.md
 ├── analis_project.js
 ├── app
+│   ├── api
+│   │   ├── bot
+│   │   │   ├── restart
+│   │   │   │   └── route.ts
+│   │   │   ├── run
+│   │   │   │   └── route.ts
+│   │   │   ├── state.ts
+│   │   │   ├── status
+│   │   │   │   └── route.ts
+│   │   │   └── stop
+│   │   │       └── route.ts
+│   │   └── flow
+│   │       ├── load
+│   │       │   └── route.ts
+│   │       └── save
+│   │           └── route.ts
 │   ├── constructor
 │   │   ├── components
+│   │   │   ├── LogViewer
+│   │   │   │   ├── Header.tsx
+│   │   │   │   ├── LogLine.tsx
+│   │   │   │   ├── LogList.tsx
+│   │   │   │   ├── OpenButton.tsx
+│   │   │   │   ├── ResizeHandler.tsx
+│   │   │   │   ├── index.tsx
+│   │   │   │   └── types.ts
+│   │   │   ├── _LogViewer.tsx
+│   │   │   ├── actions.tsx
 │   │   │   ├── header.tsx
 │   │   │   └── index.ts
 │   │   └── page.tsx
@@ -62,7 +88,8 @@ constructor-next-js
 │   │   ├── elements.ts
 │   │   ├── filters.ts
 │   │   ├── index.ts
-│   │   └── messages.ts
+│   │   ├── messages.ts
+│   │   └── themes.ts
 │   ├── nodes
 │   │   ├── actions
 │   │   │   ├── AudioMessageNode
@@ -131,10 +158,14 @@ constructor-next-js
 │   ├── store
 │   │   └── flowStore.ts
 │   └── types
+├── hooks
+│   └── useWebSocketLogs.ts
 ├── lib
 │   └── utils.ts
+├── log-server.mjs
 ├── next-env.d.ts
 ├── next.config.ts
+├── nodes.json
 ├── package.json
 ├── postcss.config.mjs
 ├── tsconfig.json
@@ -690,10 +721,6 @@ import { CustomNodes } from "./nodes";
 import { useFlowStore } from "./store/flowStore";
 import { QuickAddPalette } from "./components";
 
-// Command Palette (Ctrl+Space) uchun QuickAddPalette komponentini
-// alohida faylda yaratishni tavsiya qilaman, lekin hozircha shu yerda
-// tasvirlab beraman.
-
 function FlowchartInner() {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const { project, screenToFlowPosition } = useReactFlow();
@@ -753,9 +780,22 @@ function FlowchartInner() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // KLAVIATURA HODISALARINI TINGLASH UCHUN KENGAYTIRILGAN useEffect
+  // KLAVIATURA HODISALARINI FAQAT REACTFLOW KONTEYNERIDA TINGLASH
   useEffect(() => {
+    const containerElement = reactFlowWrapper.current;
+    if (!containerElement) return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Agar matn maydonida bo'lsa, klaviatura hodisalarini bekor qilish
+      const target = event.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
       if (event.key === "Control") {
         setCtrlPressed(true);
       }
@@ -777,7 +817,11 @@ function FlowchartInner() {
         event.preventDefault();
         duplicateSelection();
       } else if (event.key === "Delete" || event.key === "Backspace") {
+        event.preventDefault();
         deleteSelectedElements();
+      } else if (ctrlOrCmd && event.key === " ") {
+        event.preventDefault();
+        setIsPaletteOpen(true);
       }
     };
 
@@ -794,14 +838,18 @@ function FlowchartInner() {
       setCtrlPressed(false);
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    window.addEventListener("blur", handleBlur); // Oyna fokusni yo'qotganda
+    // Konteynerga fokus qilish uchun tabIndex qo'shish
+    containerElement.setAttribute("tabIndex", "0");
+
+    // Konteynerda klaviatura hodisalarini tinglash
+    containerElement.addEventListener("keydown", handleKeyDown);
+    containerElement.addEventListener("keyup", handleKeyUp);
+    containerElement.addEventListener("blur", handleBlur);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-      window.removeEventListener("blur", handleBlur);
+      containerElement.removeEventListener("keydown", handleKeyDown);
+      containerElement.removeEventListener("keyup", handleKeyUp);
+      containerElement.removeEventListener("blur", handleBlur);
     };
   }, [
     selectAll,
@@ -814,12 +862,39 @@ function FlowchartInner() {
     setCtrlPressed,
   ]);
 
+  // Konteynerga bosilganda fokus qilish (faqat bo'sh joyga bosilganda)
+  const handleContainerClick = (event: React.MouseEvent) => {
+    // Agar input, textarea yoki contentEditable elementga bosilgan bo'lsa, fokus o'tkazmaslik
+    const target = event.target as HTMLElement;
+    if (
+      target.tagName === "INPUT" ||
+      target.tagName === "TEXTAREA" ||
+      target.isContentEditable ||
+      target.closest("input") ||
+      target.closest("textarea") ||
+      target.closest("[contenteditable]")
+    ) {
+      return;
+    }
+
+    // Faqat ReactFlow background yoki asosiy konteynerga bosilganda fokus qilish
+    if (
+      target.classList.contains("react-flow__pane") ||
+      target.classList.contains("react-flow__background") ||
+      event.target === reactFlowWrapper.current
+    ) {
+      reactFlowWrapper.current?.focus();
+    }
+  };
+
   return (
     <div
       ref={reactFlowWrapper}
-      className="w-full h-[calc(100vh-56px)]"
+      className="w-full h-[calc(100vh-56px)] outline-none"
       onDrop={onDrop}
       onDragOver={onDragOver}
+      onMouseDown={handleContainerClick}
+      style={{ outline: "none" }} // Fokus ko'rsatkichini olib tashlash
     >
       <ReactFlow
         nodes={nodes}
@@ -1065,6 +1140,34 @@ export const MessageTypes = [
   { value: "audio", label: "Audio", icon: Music },
   { value: "sticker", label: "Stiker", icon: Archive },
 ];
+
+```
+
+### 📄 constructor/data/themes.ts
+
+```ts
+export const themes = {
+  dark: {
+    bg: "bg-gray-900",
+    header: "bg-gray-800 border-gray-700",
+    text: "text-gray-300",
+    prompt: "text-gray-500",
+    error: "text-red-400",
+    info: "text-blue-400",
+    warn: "text-yellow-400",
+  },
+  light: {
+    bg: "bg-white",
+    header: "bg-gray-100 border-gray-200",
+    text: "text-gray-800",
+    prompt: "text-gray-400",
+    error: "text-red-600",
+    info: "text-blue-600",
+    warn: "text-yellow-600",
+  },
+};
+
+export type ThemeName = keyof typeof themes;
 
 ```
 
@@ -4220,6 +4323,8 @@ type Clipboard = {
 export type RFState = {
   nodes: Node[];
   edges: Edge[];
+  initialState: { nodes: Node[]; edges: Edge[] } | null;
+
   clipboard: Clipboard | null;
   isCtrlPressed: boolean;
   onNodesChange: OnNodesChange;
@@ -4234,6 +4339,9 @@ export type RFState = {
   paste: (position: { x: number; y: number }) => void;
   duplicateSelection: () => void;
   setCtrlPressed: (isPressed: boolean) => void; // <-- YANGI FUNKSIYA TIPI
+  saveFlow: () => Promise<void>;
+
+  loadFlow: () => Promise<void>;
 };
 
 export const useFlowStore = create<RFState>((set, get) => ({
@@ -4241,6 +4349,7 @@ export const useFlowStore = create<RFState>((set, get) => ({
   edges: [],
   clipboard: null,
   isCtrlPressed: false,
+  initialState: null, // Boshlang'ich qiymat null
 
   // React Flow kutubxonasi uchun majburiy handler'lar
 
@@ -4441,6 +4550,52 @@ export const useFlowStore = create<RFState>((set, get) => ({
 
   setCtrlPressed: (isPressed: boolean) => {
     set({ isCtrlPressed: isPressed });
+  },
+
+  saveFlow: async () => {
+    const { nodes, edges } = get(); // Store'dan joriy holatni olamiz
+    const flowData = { nodes, edges };
+
+    const response = await fetch("/api/flow/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(flowData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      // Muvaffaqiyatsiz bo'lsa, xatolik beramiz
+      throw new Error(
+        errorData.message || "Faylni saqlashda xatolik yuz berdi."
+      );
+    }
+  },
+
+  loadFlow: async () => {
+    try {
+      const response = await fetch("/api/flow/load");
+      if (!response.ok) {
+        throw new Error("Could not fetch initial flow state.");
+      }
+      const data = await response.json();
+
+      // Store'ni yuklangan ma'lumotlar bilan to'ldiramiz
+      set({
+        nodes: data.nodes || [],
+        edges: data.edges || [],
+        initialState: data, // Buni solishtirish uchun saqlab qo'yamiz
+      });
+    } catch (error) {
+      console.error("Failed to load flow:", error);
+      // Xatolik yuz bersa, bo'sh holat bilan ishni boshlaymiz
+      set({
+        nodes: [],
+        edges: [],
+        initialState: { nodes: [], edges: [] },
+      });
+    }
   },
 }));
 

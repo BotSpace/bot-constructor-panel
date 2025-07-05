@@ -15,10 +15,6 @@ import { CustomNodes } from "./nodes";
 import { useFlowStore } from "./store/flowStore";
 import { QuickAddPalette } from "./components";
 
-// Command Palette (Ctrl+Space) uchun QuickAddPalette komponentini
-// alohida faylda yaratishni tavsiya qilaman, lekin hozircha shu yerda
-// tasvirlab beraman.
-
 function FlowchartInner() {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const { project, screenToFlowPosition } = useReactFlow();
@@ -78,9 +74,22 @@ function FlowchartInner() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // KLAVIATURA HODISALARINI TINGLASH UCHUN KENGAYTIRILGAN useEffect
+  // KLAVIATURA HODISALARINI FAQAT REACTFLOW KONTEYNERIDA TINGLASH
   useEffect(() => {
+    const containerElement = reactFlowWrapper.current;
+    if (!containerElement) return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Agar matn maydonida bo'lsa, klaviatura hodisalarini bekor qilish
+      const target = event.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
       if (event.key === "Control") {
         setCtrlPressed(true);
       }
@@ -102,7 +111,11 @@ function FlowchartInner() {
         event.preventDefault();
         duplicateSelection();
       } else if (event.key === "Delete" || event.key === "Backspace") {
+        event.preventDefault();
         deleteSelectedElements();
+      } else if (ctrlOrCmd && event.key === " ") {
+        event.preventDefault();
+        setIsPaletteOpen(true);
       }
     };
 
@@ -119,14 +132,18 @@ function FlowchartInner() {
       setCtrlPressed(false);
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    window.addEventListener("blur", handleBlur); // Oyna fokusni yo'qotganda
+    // Konteynerga fokus qilish uchun tabIndex qo'shish
+    containerElement.setAttribute("tabIndex", "0");
+
+    // Konteynerda klaviatura hodisalarini tinglash
+    containerElement.addEventListener("keydown", handleKeyDown);
+    containerElement.addEventListener("keyup", handleKeyUp);
+    containerElement.addEventListener("blur", handleBlur);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-      window.removeEventListener("blur", handleBlur);
+      containerElement.removeEventListener("keydown", handleKeyDown);
+      containerElement.removeEventListener("keyup", handleKeyUp);
+      containerElement.removeEventListener("blur", handleBlur);
     };
   }, [
     selectAll,
@@ -139,12 +156,39 @@ function FlowchartInner() {
     setCtrlPressed,
   ]);
 
+  // Konteynerga bosilganda fokus qilish (faqat bo'sh joyga bosilganda)
+  const handleContainerClick = (event: React.MouseEvent) => {
+    // Agar input, textarea yoki contentEditable elementga bosilgan bo'lsa, fokus o'tkazmaslik
+    const target = event.target as HTMLElement;
+    if (
+      target.tagName === "INPUT" ||
+      target.tagName === "TEXTAREA" ||
+      target.isContentEditable ||
+      target.closest("input") ||
+      target.closest("textarea") ||
+      target.closest("[contenteditable]")
+    ) {
+      return;
+    }
+
+    // Faqat ReactFlow background yoki asosiy konteynerga bosilganda fokus qilish
+    if (
+      target.classList.contains("react-flow__pane") ||
+      target.classList.contains("react-flow__background") ||
+      event.target === reactFlowWrapper.current
+    ) {
+      reactFlowWrapper.current?.focus();
+    }
+  };
+
   return (
     <div
       ref={reactFlowWrapper}
-      className="w-full h-[calc(100vh-56px)]"
+      className="w-full h-[calc(100vh-56px)] outline-none"
       onDrop={onDrop}
       onDragOver={onDragOver}
+      onMouseDown={handleContainerClick}
+      style={{ outline: "none" }} // Fokus ko'rsatkichini olib tashlash
     >
       <ReactFlow
         nodes={nodes}
@@ -158,6 +202,8 @@ function FlowchartInner() {
         selectionOnDrag
         multiSelectionKeyCode={["Shift"]}
         deleteKeyCode={null} // O'zimizning handler'imizni ishlatamiz
+        minZoom={0.1} // Minimal yaqinlashtirishni 10% gacha tushirish
+        maxZoom={2} // Maksimal yaqinlashtirishni 400% gacha ko'tarish
       >
         <Background gap={24} color="#666" />
         <MiniMap />
