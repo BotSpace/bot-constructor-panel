@@ -1,4 +1,4 @@
-// FAYL: app/constructor/components/actions.tsx
+// FAYL: app/constructor/components/HeaderActions.tsx
 
 "use client";
 
@@ -16,11 +16,9 @@ import {
 import { Play, Square, RotateCcw, Loader2, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Bot statusi uchun tiplar
 type BotStatus = "running" | "stopped";
 type UIStatus = BotStatus | "loading" | "error";
 
-// Status indikatori uchun konfiguratsiya
 const statusConfig: Record<UIStatus, { label: string; color: string }> = {
   loading: { label: "Tekshirilmoqda...", color: "bg-gray-500" },
   running: { label: "Ishlamoqda", color: "bg-green-500" },
@@ -31,8 +29,8 @@ const statusConfig: Record<UIStatus, { label: string; color: string }> = {
 export default function HeaderActions() {
   const [botStatus, setBotStatus] = useState<UIStatus>("loading");
   const [isActionInProgress, setIsActionInProgress] = useState(false);
+  const [isRecentlySaved, setIsRecentlySaved] = useState(false);
 
-  // Zustand Store'dan barcha kerakli holat va funksiyalarni olamiz
   const { nodes, edges, initialState, loadFlow, saveFlow } = useFlowStore(
     (state) => ({
       nodes: state.nodes,
@@ -43,13 +41,9 @@ export default function HeaderActions() {
     })
   );
 
-  // Joriy flowchart holati saqlangan holatdan farq qilishini tekshiradigan memoized funksiya.
-  // Bu keraksiz qayta hisoblashlarning oldini oladi.
   const hasUnsavedChanges = useMemo(() => {
-    if (!initialState) return false; // Agar boshlang'ich holat yuklanmagan bo'lsa
+    if (!initialState) return false;
 
-    // Elementlarning tartibi o'zgarganda yolg'on o'zgarishni aniqlamaslik uchun
-    // massivlarni ID bo'yicha saralab, keyin string'ga o'giramiz.
     const sortNodes = (n: any[]) =>
       [...n].sort((a, b) => a.id.localeCompare(b.id));
     const sortEdges = (e: any[]) =>
@@ -67,7 +61,6 @@ export default function HeaderActions() {
     return currentStateString !== initialStateString;
   }, [nodes, edges, initialState]);
 
-  // Botning joriy holatini serverdan olib keladigan funksiya
   const fetchBotStatus = useCallback(async () => {
     try {
       const response = await fetch("/api/bot/status");
@@ -79,18 +72,13 @@ export default function HeaderActions() {
     }
   }, []);
 
-  // Komponent ilk marta render bo'lganda:
-  // 1. Flowchart'ning saqlangan holatini yuklaymiz.
-  // 2. Botning statusini darhol tekshiramiz.
-  // 3. Har 5 soniyada bot statusini tekshirib turishni yo'lga qo'yamiz.
   useEffect(() => {
     loadFlow();
     fetchBotStatus();
     const intervalId = setInterval(fetchBotStatus, 5000);
-    return () => clearInterval(intervalId); // Komponent yo'q bo'lganda intervalni tozalaymiz
+    return () => clearInterval(intervalId);
   }, [loadFlow, fetchBotStatus]);
 
-  // Barcha API so'rovlarini bajaruvchi markaziy funksiya
   const handleApiCall = useCallback(
     async (endpoint: string) => {
       setIsActionInProgress(true);
@@ -102,12 +90,11 @@ export default function HeaderActions() {
             errorData.message || "API so'rovida noma'lum xatolik"
           );
         }
-        // Statusni yangilash uchun biroz kutamiz
         await new Promise((res) => setTimeout(res, 1000));
         await fetchBotStatus();
       } catch (error) {
-        await fetchBotStatus(); // Xatolikdan keyin ham statusni aniqlaymiz
-        throw error; // Xatoni `toast.promise` ushlab olishi uchun uzatamiz
+        await fetchBotStatus();
+        throw error;
       } finally {
         setIsActionInProgress(false);
       }
@@ -115,7 +102,6 @@ export default function HeaderActions() {
     [fetchBotStatus]
   );
 
-  // Tugmalar uchun alohida handler'lar
   const handleRun = () => {
     toast.promise(handleApiCall("/api/bot/run"), {
       loading: "Bot ishga tushirilmoqda...",
@@ -134,12 +120,12 @@ export default function HeaderActions() {
 
   const handleSaveAndRestart = () => {
     const actionPromise = async () => {
-      await saveFlow(); // 1. O'zgarishlarni saqlaymiz
-      await handleApiCall("/api/bot/restart"); // 2. Botni qayta ishga tushiramiz
+      await saveFlow();
+      await handleApiCall("/api/bot/restart");
     };
 
     toast.promise(actionPromise(), {
-      loading: "Sxema saqlanmoqda va bot qayta ishga tushirilmoqda...",
+      loading: "Saqlanmoqda va bot qayta ishga tushirilmoqda...",
       success: "Muvaffaqiyatli saqlandi va qayta ishga tushirildi!",
       error: (err: Error) => `Xatolik: ${err.message}`,
     });
@@ -147,8 +133,12 @@ export default function HeaderActions() {
 
   const handleSaveFlow = () => {
     toast.promise(saveFlow(), {
-      loading: "Sxema saqlanmoqda...",
-      success: "Muvaffaqiyatli saqlandi!",
+      loading: "Saqlanmoqda...",
+      success: () => {
+        setIsRecentlySaved(true);
+        setTimeout(() => setIsRecentlySaved(false), 2000);
+        return "Muvaffaqiyatli saqlandi!";
+      },
       error: (err: Error) => `Xatolik: ${err.message}`,
     });
   };
@@ -199,11 +189,12 @@ export default function HeaderActions() {
           <TooltipTrigger asChild>
             <Button
               onClick={handleSaveAndRestart}
-              variant="outline"
+              variant={hasUnsavedChanges ? "default" : "outline"}
               size="sm"
               disabled={
                 !hasUnsavedChanges || !isBotRunning || isActionInProgress
               }
+              className="relative"
             >
               <div className="flex items-center gap-2">
                 {isActionInProgress && isBotRunning ? (
@@ -212,41 +203,42 @@ export default function HeaderActions() {
                   <RotateCcw className="h-4 w-4" />
                 )}
                 <span>Restart & Save</span>
-                {hasUnsavedChanges && !isActionInProgress && (
-                  <Badge
-                    variant="destructive"
-                    className="animate-in fade-in-50"
-                  >
-                    Unsaved
-                  </Badge>
-                )}
               </div>
+
+              {hasUnsavedChanges && !isActionInProgress && (
+                <span className="absolute top-0 right-0 -mt-1 -mr-1 h-2 w-2 rounded-full bg-red-500 animate-ping" />
+              )}
             </Button>
           </TooltipTrigger>
           <TooltipContent>
             {hasUnsavedChanges ? (
-              <p>
-                Saqlanmagan o'zgarishlarni faylga yozish va botni qayta ishga
-                tushirish.
-              </p>
+              <p>O'zgarishlarni saqlash va botni qayta ishga tushirish.</p>
             ) : (
-              <p>Saqlanmagan o'zgarishlar yo'q.</p>
+              <p>Saqlanmagan o'zgarishlar mavjud emas.</p>
             )}
           </TooltipContent>
         </Tooltip>
 
-        {/* Stop Tugmasi */}
+        {/* Save Tugmasi */}
         <Button
           onClick={handleSaveFlow}
-          variant="outline"
+          variant={hasUnsavedChanges ? "default" : "outline"}
           size="sm"
-          disabled={!hasUnsavedChanges}
+          disabled={!hasUnsavedChanges || isActionInProgress}
+          className="relative"
         >
-          <Save className="mr-2 h-4 w-4" /> Save
+          {isActionInProgress ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : isRecentlySaved ? (
+            <span className="text-green-600 font-semibold">Saved</span>
+          ) : (
+            <>
+              <Save className="mr-2 h-4 w-4" /> Save
+            </>
+          )}
+
           {hasUnsavedChanges && !isActionInProgress && (
-            <Badge variant="destructive" className="animate-in fade-in-50">
-              Unsaved
-            </Badge>
+            <span className="absolute top-0 right-0 -mt-1 -mr-1 h-2 w-2 rounded-full bg-red-500 animate-ping" />
           )}
         </Button>
       </div>
