@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { spawn } from "child_process";
 import { getProcessState, saveProcess, clearProcessFile } from "../state";
+import axios from "axios";
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,11 +31,26 @@ export async function POST(req: NextRequest) {
     const pythonProjectPath = "/home/kumo/workspace/dvijok";
     // ----------------------------------------------------
 
+    const ngrok = await axios.get("http://localhost:3000/api/ngrok/start");
+
+    if (ngrok.status !== 200) {
+      throw new Error("Failed to start ngrok.");
+    }
+
     const child = spawn(
       pythonExecutable,
-      ["-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"],
-      { cwd: pythonProjectPath, detached: true, stdio: "ignore" }
+      ["-m", "uvicorn", "app.main:app", "--reload"],
+      {
+        cwd: pythonProjectPath,
+        detached: true,
+        stdio: ["ignore", "pipe", "pipe"],
+        env: {
+          ...process.env,
+          BASE_WEBHOOK_URL: ngrok.data.url,
+        },
+      }
     );
+
     child.unref();
 
     if (!child.pid) {

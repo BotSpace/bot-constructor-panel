@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { spawn } from "child_process";
 import { getProcessState, saveProcess } from "../state";
 import WebSocket from "ws";
+import axios from "axios";
 
 // WebSocket client'ni bir marta yaratib, qayta ishlatamiz
 let wsClient: WebSocket | null = null;
@@ -43,18 +44,27 @@ export async function POST(req: NextRequest) {
     const pythonExecutable = "/home/kumo/workspace/dvijok/.venv/bin/python";
     const pythonProjectPath = "/home/kumo/workspace/dvijok";
 
+    const ngrok = await axios.get("http://localhost:3000/api/ngrok/start");
+
+    if (ngrok.status !== 200) {
+      throw new Error("Failed to start ngrok.");
+    }
+
     // MUHIM: `stdio`'ni `ignore`'dan o'zgartiramiz, chunki bizga loglar kerak!
     const child = spawn(
       pythonExecutable,
-      // "main:app" o'rniga "app.main:app" ishlatamiz.
-      // --reload'ni olib tashlaymiz, chunki jarayonni o'zimiz boshqaramiz.
-      ["-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"],
+      ["-m", "uvicorn", "app.main:app", "--reload"],
       {
         cwd: pythonProjectPath,
         detached: true,
         stdio: ["ignore", "pipe", "pipe"],
+        env: {
+          ...process.env,
+          BASE_WEBHOOK_URL: ngrok.data.url,
+        },
       }
     );
+
     child.stdout.on("data", (data) => {
       const logMessage = data.toString();
       console.log(`[Python stdout]: ${logMessage}`);

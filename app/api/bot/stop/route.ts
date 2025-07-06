@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getProcessState, clearProcessFile } from "../state";
+import axios from "axios";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,8 +10,14 @@ export async function POST(req: NextRequest) {
     if (currentState.status === "stopped") {
       return NextResponse.json(
         { message: "Server is not running." },
-        { status: 400 }
+        { status: 200 }
       );
+    }
+
+    const ngrok = await axios.post("http://localhost:3000/api/ngrok/stop");
+
+    if (ngrok.status !== 200) {
+      throw new Error("Failed to stop ngrok.");
     }
 
     if (currentState.pid) {
