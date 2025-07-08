@@ -1,10 +1,4 @@
-import {
-  Edge,
-  Node,
-  OnConnect,
-  OnEdgesChange,
-  OnNodesChange,
-} from "reactflow";
+import { Edge, Node, OnConnect, OnEdgesChange, OnNodesChange } from "reactflow";
 import { ElementItemType } from "@/types/element-types";
 
 // React Flow asosiy holati uchun slice tipi
@@ -29,7 +23,10 @@ export interface ClipboardSlice {
 
 // Umumiy, yuqori darajadagi amallar
 export interface Actions {
-  addNode: (element: ElementItemType, position: { x: number; y: number }) => void;
+  addNode: (
+    element: ElementItemType,
+    position: { x: number; y: number }
+  ) => void;
   saveFlow: () => Promise<void>;
   loadFlow: () => Promise<void>;
 }
@@ -37,7 +34,9 @@ export interface Actions {
 // Barcha qismlarni birlashtirgan yakuniy store tipi
 export interface FlowStoreState extends FlowSlice, ClipboardSlice, Actions {
   // UI holatlari
+  initialState: { nodes: Node[]; edges: Edge[] } | null;
   isDirty: boolean;
   isLoading: boolean;
-  setDirty: (isDirty: boolean) => void;
+  isCtrlPressed: boolean;
+  setCtrlPressed: (isPressed: boolean) => void;
 }

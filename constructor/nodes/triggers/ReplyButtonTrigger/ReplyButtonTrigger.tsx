@@ -1,17 +1,21 @@
+"use client";
+
 import { memo, useMemo } from "react";
-import { Handle, NodeProps, Position, useNodes, useEdges } from "reactflow";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { NodeProps, useNodes, useEdges } from "reactflow";
+import { useFlowStore } from "@/constructor/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ReplyButtonTriggerData } from "./types";
-import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
 import { AlertCircle, CornerDownLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SourceHandler, TargetHandler } from "../../components";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { KeyboardConfig } from "../../actions/TextMessageNode/types";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
+// --- O'ZGARTIRISH: `keyboard` ixtiyoriy qilindi, xatolikdan saqlanish uchun ---
 interface NodeWithButtonsData {
-  buttons?: ButtonConfig[][];
+  keyboard?: KeyboardConfig;
 }
 
 const ReplyButtonTriggerNodeComponent = ({
@@ -23,59 +27,52 @@ const ReplyButtonTriggerNodeComponent = ({
   const nodes = useNodes();
   const edges = useEdges();
 
+  // --- O'ZGARTIRISH: Mantiq to'liq yangilandi va soddalashtirildi ---
   const availableReplyButtons = useMemo(() => {
-    console.log("--- Trigger re-calculating ---"); // Har safar hisoblaganda ko'ramiz
-
     const incomingEdge = edges.find((edge) => edge.target === id);
-    console.log("Incoming edge:", incomingEdge); // Ulanishni topdimi?
-
     if (!incomingEdge) return [];
 
     const parentNode = nodes.find((node) => node.id === incomingEdge.source);
-    console.log("Parent node:", parentNode); // Ota-onani topdimi?
-
     if (!parentNode) return [];
 
     const parentNodeData = parentNode.data as NodeWithButtonsData;
-    console.log("Parent node DATA:", parentNodeData); // Ota-onaning ma'lumotlari qanday?
+    // Ota-ona node'da `keyboard` yoki `keyboard.reply` bo'lmasa, bo'sh massiv qaytaramiz
+    if (!parentNodeData.keyboard || !parentNodeData.keyboard.reply) {
+      return [];
+    }
 
-    const parentButtons = parentNodeData.buttons || [];
-    console.log("Buttons from parent:", parentButtons); // Tugmalar massivi qanday?
+    // 1. Ota-onaning `reply` tugmalarini olamiz (bu 2D massiv)
+    const replyButtonRows = parentNodeData.keyboard.reply;
 
-    const filteredButtons = parentButtons.flat().filter((button) => {
-      // HAR BIR TUGMANI FILTERDAN OLDIN TEKSHIRAMIZ
-      console.log("TUGMANI TEKSHIRISH:", button);
-      // return button.type === "reply";
-      switch (button.type) {
-        case "request_contact":
-        case "request_location":
-        case "reply":
-          return true;
-        default:
-          return false;
-      }
-    });
+    // 2. Massivni bir o'lchamli qilamiz (`.flat()`)
+    // 3. Faqat "Reply Keyboard" uchun mo'ljallangan tugmalarni filterlaymiz
+    const allReplyButtons = replyButtonRows
+      .flat()
+      .filter(
+        (button) =>
+          button.type === "reply" ||
+          button.type === "request_contact" ||
+          button.type === "request_location"
+      );
 
-    return filteredButtons;
+    return allReplyButtons;
   }, [nodes, edges, id]);
 
-  const handleSelectionChange = (buttonText: string, checked: boolean) => {
-    const currentSelection = data.selectedButtons || [];
-    let newSelection: string[];
+  const handleSelectionChange = (selectedButtonId: string) => {
+    // Tanlangan ID bo'yicha to'liq tugma obyektini topamiz
+    const selectedButtonObject = availableReplyButtons.find(
+      (btn) => btn.id === selectedButtonId
+    );
 
-    if (checked) {
-      newSelection = [...currentSelection, buttonText];
-    } else {
-      newSelection = currentSelection.filter((text) => text !== buttonText);
-    }
-    updateNodeData(id, { selectedButtons: newSelection });
+    // Va shu obyektni state'ga yozamiz
+    updateNodeData(id, { selectedButton: selectedButtonObject });
   };
 
-  const isConfigured = (data.selectedButtons?.length ?? 0) > 0;
+  const isConfigured = !!data.selectedButton;
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-base">
@@ -94,27 +91,31 @@ const ReplyButtonTriggerNodeComponent = ({
 
       <CardContent className="flex flex-col gap-3">
         {availableReplyButtons.length > 0 ? (
-          <div className="space-y-2 p-3 bg-muted/50 rounded-md border">
+          <div className="space-y-3">
             <Label className="text-xs text-muted-foreground">
-              Qaysi tugmalar ushlansin?
+              Qaysi tugma ushlansin?
             </Label>
-            {availableReplyButtons.map((button) => (
-              <div key={button.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`${id}-${button.id}`}
-                  checked={data.selectedButtons?.includes(button.text)}
-                  onCheckedChange={(checked) =>
-                    handleSelectionChange(button.text, !!checked)
-                  }
-                />
-                <Label
-                  htmlFor={`${id}-${button.id}`}
-                  className="font-normal cursor-pointer"
-                >
-                  {button.text}
-                </Label>
-              </div>
-            ))}
+
+            <RadioGroup
+              value={data.selectedButton?.id} // Tanlangan tugmaning ID'sini `value` sifatida beramiz
+              onValueChange={handleSelectionChange} // O'zgarish bo'lganda handler'ni chaqiramiz
+            >
+              {availableReplyButtons.map((button) => (
+                <div className="flex items-center gap-3" key={button.id}>
+                  <RadioGroupItem
+                    className="cursor-pointer"
+                    value={button.id}
+                    id={`r-${button.id}`}
+                  />
+                  <Label
+                    htmlFor={`r-${button.id}`}
+                    className="font-normal cursor-pointer"
+                  >
+                    {button.text}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
           </div>
         ) : (
           <div className="p-3 text-center text-sm text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-md flex items-center gap-2">
@@ -125,12 +126,7 @@ const ReplyButtonTriggerNodeComponent = ({
           </div>
         )}
       </CardContent>
-
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };

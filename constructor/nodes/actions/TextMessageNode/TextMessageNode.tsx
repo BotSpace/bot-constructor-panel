@@ -3,7 +3,7 @@ import { Handle, NodeProps, Position } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { ParseMode, SendTextMessageNodeData } from "./types";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { memo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LetterText, Settings } from "lucide-react";
@@ -20,6 +20,7 @@ import { Checkbox } from "@radix-ui/react-checkbox";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const SendTextMessageNodeComponent = ({
   id,
@@ -35,14 +36,20 @@ const SendTextMessageNodeComponent = ({
 
   // UI'da ko'rsatish uchun hisob-kitoblar
   const textLength = data.messageText?.length || 0;
+  // Tugmalar sonini yangi `keyboard` strukturasidan hisoblaymiz
+  const buttonCount =
+    (data.keyboard?.active === "inline"
+      ? data.keyboard?.inline
+      : data.keyboard?.reply
+    )?.flat().length || 0;
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <NodeHeader
         icon={<LetterText className="text-primary" />}
         title="Xabar yuborish"
-        buttonCount={data.buttons?.flat().length || 0}
+        buttonCount={buttonCount}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -116,18 +123,14 @@ const SendTextMessageNodeComponent = ({
 
           <NodeFooter
             nodeId={id}
-            buttons={data.buttons}
+            keyboard={data.keyboard}
             disableNotification={data.disableNotification}
             protectContent={data.protectContent}
             onUpdate={handleUpdate}
           />
         </>
       )}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };

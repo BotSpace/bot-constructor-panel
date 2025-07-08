@@ -9,14 +9,16 @@ import {
   ButtonConfig,
 } from "@/constructor/components/ButtonGenerator";
 
+import { KeyboardConfig } from "../TextMessageNode/types";
+
 interface NodeFooterProps {
   nodeId: string;
-  buttons?: ButtonConfig[][];
+  keyboard?: KeyboardConfig;
   disableNotification?: boolean;
   protectContent?: boolean;
   onUpdate: (
     update: Partial<{
-      buttons: ButtonConfig[][];
+      keyboard: KeyboardConfig;
       disableNotification: boolean;
       protectContent: boolean;
     }>
@@ -25,15 +27,17 @@ interface NodeFooterProps {
 
 export const NodeFooter = ({
   nodeId,
-  buttons,
+  keyboard,
   disableNotification,
   protectContent,
   onUpdate,
 }: NodeFooterProps) => {
-  const buttonCount = buttons?.flat().length || 0;
+  const buttonCount =
+    (keyboard?.active === "inline" ? keyboard?.inline : keyboard?.reply)?.flat()
+      .length || 0;
 
-  const handleSaveButtons = (newButtons: ButtonConfig[][]) => {
-    onUpdate({ buttons: newButtons });
+  const handleKeyboardUpdate = (newKeyboard: KeyboardConfig) => {
+    onUpdate({ keyboard: newKeyboard });
   };
 
   return (
@@ -71,7 +75,7 @@ export const NodeFooter = ({
         </div>
       </div>
 
-      <ButtonGenerator initialButtons={buttons} onSave={handleSaveButtons}>
+      <ButtonGenerator initialKeyboard={keyboard} onSave={handleKeyboardUpdate}>
         <div className="relative w-full">
           <Button variant="outline" className="w-full">
             <LayoutGrid className="mr-2 h-4 w-4" />

@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 7/6/2025, 1:04:14 AM
+Sana: 7/7/2025, 10:45:38 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -21,10 +21,16 @@ constructor-next-js
 │   │   │   │   └── route.ts
 │   │   │   └── stop
 │   │   │       └── route.ts
-│   │   └── flow
-│   │       ├── load
+│   │   ├── flow
+│   │   │   ├── load
+│   │   │   │   └── route.ts
+│   │   │   └── save
+│   │   │       └── route.ts
+│   │   └── ngrok
+│   │       ├── start
 │   │       │   └── route.ts
-│   │       └── save
+│   │       ├── state.ts
+│   │       └── stop
 │   │           └── route.ts
 │   ├── constructor
 │   │   ├── components
@@ -36,7 +42,6 @@ constructor-next-js
 │   │   │   │   ├── ResizeHandler.tsx
 │   │   │   │   ├── index.tsx
 │   │   │   │   └── types.ts
-│   │   │   ├── _LogViewer.tsx
 │   │   │   ├── actions.tsx
 │   │   │   ├── header.tsx
 │   │   │   └── index.ts
@@ -65,6 +70,7 @@ constructor-next-js
 │       ├── scroll-area.tsx
 │       ├── select.tsx
 │       ├── separator.tsx
+│       ├── slider.tsx
 │       ├── sonner.tsx
 │       ├── switch.tsx
 │       ├── tabs.tsx
@@ -117,6 +123,14 @@ constructor-next-js
 │   │   │       ├── NodeFooter.tsx
 │   │   │       ├── NodeHeader.tsx
 │   │   │       └── RecipientSelector.tsx
+│   │   ├── components
+│   │   │   ├── index.ts
+│   │   │   └── shared
+│   │   │       ├── ReactFlowHandlers
+│   │   │       │   ├── SourceHandler.tsx
+│   │   │       │   ├── TargetHandler.tsx
+│   │   │       │   └── index.ts
+│   │   │       └── index.ts
 │   │   ├── custom
 │   │   │   ├── CustomCodeNode
 │   │   │   │   ├── CodeEditorDialog.tsx
@@ -156,7 +170,11 @@ constructor-next-js
 │   │       ├── index.ts
 │   │       └── shared
 │   ├── store
-│   │   └── flowStore.ts
+│   │   ├── actions.ts
+│   │   ├── clipboardSlice.ts
+│   │   ├── flowSlice.ts
+│   │   ├── index.ts
+│   │   └── types.ts
 │   └── types
 ├── hooks
 │   └── useWebSocketLogs.ts
@@ -168,9 +186,11 @@ constructor-next-js
 ├── nodes.json
 ├── package.json
 ├── postcss.config.mjs
+├── test.txt
 ├── tsconfig.json
-└── types
-    └── element-types.ts
+├── types
+│   └── element-types.ts
+└── worklist.md
 ```
 
 ## 📄 Muhim Fayllar Tarkibi (içidan: constructor)
@@ -202,24 +222,25 @@ import { cn } from "@/lib/utils";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { ButtonConfig } from "./types";
+import { KeyboardConfig } from "@/constructor/nodes/actions/TextMessageNode/types";
 
 interface ButtonGeneratorProps {
-  initialButtons?: ButtonConfig[][];
-  onSave: (buttons: ButtonConfig[][]) => void;
+  initialKeyboard?: KeyboardConfig;
+  onSave: (keyboard: KeyboardConfig) => void;
   children: ReactNode;
 }
 
 const MAX_BUTTONS_PER_ROW = 10;
 
 export function ButtonGenerator({
-  initialButtons = [[]],
+  initialKeyboard,
   onSave,
   children,
 }: ButtonGeneratorProps) {
   const [isOpen, setIsOpen] = useState(false);
-  // Bu holatlarni dialog ochilganda tozalab turamiz
-  const [buttons, setButtons] = useState<ButtonConfig[][]>([[]]);
-  const [activeTab, setActiveTab] = useState("inline");
+  const [inlineButtons, setInlineButtons] = useState<ButtonConfig[][]>([[]]);
+  const [replyButtons, setReplyButtons] = useState<ButtonConfig[][]>([[]]);
+  const [activeTab, setActiveTab] = useState<"inline" | "reply">("inline");
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(0);
   const [inlineText, setInlineText] = useState("");
   const [inlineActionType, setInlineActionType] = useState<"url" | "callback">(
@@ -228,40 +249,39 @@ export function ButtonGenerator({
   const [inlineActionValue, setInlineActionValue] = useState("");
   const [replyText, setReplyText] = useState("");
 
-  //
-  // --- XATO TUZATILGAN QISM ---
-  //
   useEffect(() => {
-    // Effekt faqat dialog ochilganda (isOpen true bo'lganda) ishga tushadi.
     if (isOpen) {
-      // Barcha holatlarni boshlang'ich qiymatga qaytaramiz.
-      // initialButtons'dan chuqur nusxa olamiz.
-      setButtons(JSON.parse(JSON.stringify(initialButtons || [[]])));
+      const initialInline = initialKeyboard?.inline || [[]];
+      const initialReply = initialKeyboard?.reply || [[]];
+      const initialActiveTab = initialKeyboard?.active || "inline";
+
+      setInlineButtons(JSON.parse(JSON.stringify(initialInline)));
+      setReplyButtons(JSON.parse(JSON.stringify(initialReply)));
+      setActiveTab(initialActiveTab);
+
       setSelectedRowIndex(0);
       setInlineText("");
       setInlineActionValue("");
       setReplyText("");
-      setActiveTab("inline");
     }
-    // Bog'liqliklar massividan `initialButtons` olib tashlandi.
-    // Endi bu effekt faqat `isOpen` holati o'zgarganda ishlaydi.
-  }, [isOpen]);
-  // --- XATO TUZATILGAN QISM TUGADI ---
-  //
+  }, [isOpen, initialKeyboard]);
+
+  const isInlineTab = activeTab === "inline";
+  const currentButtons = isInlineTab ? inlineButtons : replyButtons;
+  const setCurrentButtons = isInlineTab ? setInlineButtons : setReplyButtons;
 
   const isCurrentRowFull =
     selectedRowIndex !== null &&
-    buttons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW;
+    currentButtons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW;
 
-  // ... Qolgan barcha funksiyalar (handleAddButton, handleRemoveButton, va hokazo) o'zgarishsiz qoladi ...
-
+  // ... handleAddButton, handleRemoveButton, handleAddRow, handleOnOpenChange funksiyalari o'zgarishsiz qoladi ...
   const handleAddButton = (
     type: "inline" | "reply" | "special",
     specialType?: "request_contact" | "request_location"
   ) => {
     if (
-      selectedRowIndex !== null &&
-      buttons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW
+      selectedRowIndex === null ||
+      currentButtons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW
     ) {
       alert(
         `Bu qatorda maksimal tugmalar soniga (${MAX_BUTTONS_PER_ROW} ta) yetilgan.`
@@ -300,8 +320,8 @@ export function ButtonGenerator({
     }
 
     if (newButton) {
-      setButtons((currentButtons) => {
-        const updatedButtons = [...currentButtons];
+      setCurrentButtons((current) => {
+        const updatedButtons = [...current];
         if (updatedButtons.length === 0) updatedButtons.push([]);
 
         const targetIndex =
@@ -309,7 +329,10 @@ export function ButtonGenerator({
             ? selectedRowIndex
             : updatedButtons.length - 1;
 
-        const targetRow = [...updatedButtons[targetIndex], newButton];
+        const targetRow = [
+          ...updatedButtons[targetIndex],
+          newButton as ButtonConfig,
+        ];
         updatedButtons[targetIndex] = targetRow;
         return updatedButtons;
       });
@@ -317,33 +340,34 @@ export function ButtonGenerator({
   };
 
   const handleAddRow = () => {
-    const newRowIndex = buttons.length;
-    setButtons([...buttons, []]);
+    const newRowIndex = currentButtons.length;
+    setCurrentButtons([...currentButtons, []]);
     setSelectedRowIndex(newRowIndex);
   };
 
   const handleRemoveButton = (rowIndex: number, buttonId: string) => {
-    const newButtons = buttons
-      .map((row, rIdx) => {
-        if (rIdx === rowIndex) {
-          return row.filter((button) => button.id !== buttonId);
-        }
-        return row;
-      })
-      .filter(
-        (row) => row.length > 0 || (row.length === 0 && buttons.length === 1)
-      );
+    setCurrentButtons((current) => {
+      const newButtons = current
+        .map((row, rIdx) => {
+          if (rIdx === rowIndex) {
+            return row.filter((button) => button.id !== buttonId);
+          }
+          return row;
+        })
+        .filter(
+          (row) => row.length > 0 || (row.length === 0 && current.length === 1)
+        );
 
-    if (newButtons.length === 0) {
-      setButtons([[]]);
-      setSelectedRowIndex(0);
-    } else {
-      setButtons(newButtons);
-    }
+      if (newButtons.length === 0) {
+        if (selectedRowIndex !== 0) setSelectedRowIndex(0);
+        return [[]];
+      }
 
-    if (selectedRowIndex !== null && selectedRowIndex >= newButtons.length) {
-      setSelectedRowIndex(newButtons.length > 0 ? newButtons.length - 1 : 0);
-    }
+      if (selectedRowIndex !== null && selectedRowIndex >= newButtons.length) {
+        setSelectedRowIndex(newButtons.length > 0 ? newButtons.length - 1 : 0);
+      }
+      return newButtons;
+    });
   };
 
   const handleOnOpenChange = (open: boolean) => {
@@ -351,11 +375,18 @@ export function ButtonGenerator({
   };
 
   const handleSaveChanges = () => {
-    const finalButtons = buttons.filter((row) => row.length > 0);
-    onSave(finalButtons);
+    const finalInline = inlineButtons.filter((row) => row.length > 0);
+    const finalReply = replyButtons.filter((row) => row.length > 0);
+
+    onSave({
+      active: activeTab,
+      inline: finalInline,
+      reply: finalReply,
+    });
     handleOnOpenChange(false);
   };
 
+  // --- TUZATISH: Ikonkani qaytaruvchi funksiya qo'shildi ---
   const getIconForButton = (button: ButtonConfig): ReactNode => {
     switch (button.type) {
       case "url":
@@ -367,6 +398,7 @@ export function ButtonGenerator({
       case "request_location":
         return <MapPin className="mr-2 h-4 w-4" />;
       default:
+        // 'reply' tugmalari uchun ikonka yo'q
         return null;
     }
   };
@@ -375,7 +407,6 @@ export function ButtonGenerator({
     <Dialog open={isOpen} onOpenChange={handleOnOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[90%] md:max-w-[80%] lg:max-w-[70%] h-[90vh] overflow-y-auto">
-        {/* ... JSX qismi o'zgarishsiz qoladi ... */}
         <VisuallyHidden>
           <DialogTitle>Tugmalarni Sozlash</DialogTitle>
         </VisuallyHidden>
@@ -384,12 +415,15 @@ export function ButtonGenerator({
           <div className="md:col-span-4 flex flex-col gap-6 sticky top-0">
             <Tabs
               defaultValue="inline"
-              onValueChange={setActiveTab}
+              onValueChange={(value) =>
+                setActiveTab(value as "inline" | "reply")
+              }
               value={activeTab}
             >
+              {/* ... Tabs va TabsContent qismi o'zgarishsiz qoladi ... */}
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="inline">Inline Keyboard</TabsTrigger>
-                <TabsTrigger value="replay">Reply Keyboard</TabsTrigger>
+                <TabsTrigger value="reply">Reply Keyboard</TabsTrigger>
               </TabsList>
               <TabsContent value="inline" className="mt-4 space-y-4">
                 <div>
@@ -446,7 +480,7 @@ export function ButtonGenerator({
                   <PlusCircle className="mr-2 h-4 w-4" /> Inline Tugma Qo'shish
                 </Button>
               </TabsContent>
-              <TabsContent value="replay" className="mt-4 space-y-4">
+              <TabsContent value="reply" className="mt-4 space-y-4">
                 <div>
                   <Label htmlFor="reply-text">Tugma matni</Label>
                   <Input
@@ -518,7 +552,7 @@ export function ButtonGenerator({
               </Button>
             </div>
             <div className="flex flex-col gap-2 flex-grow min-h-[200px] bg-background/50 p-2 rounded-md">
-              {buttons.map((row, rowIndex) => (
+              {currentButtons.map((row, rowIndex) => (
                 <div key={rowIndex}>
                   <div
                     className={cn(
@@ -548,6 +582,7 @@ export function ButtonGenerator({
                             variant="outline"
                             className="pr-8 cursor-default w-full truncate"
                           >
+                            {/* --- TUZATISH: Ikonka funksiyasi chaqirildi --- */}
                             {getIconForButton(button)}
                             <span className="truncate">{button.text}</span>
                           </Button>
@@ -713,12 +748,11 @@ import ReactFlow, {
   MiniMap,
   useReactFlow,
   ReactFlowProvider,
-  Node,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { ElementItemType } from "@/types/element-types";
 import { CustomNodes } from "./nodes";
-import { useFlowStore } from "./store/flowStore";
+import { useFlowStore } from "./store";
 import { QuickAddPalette } from "./components";
 
 function FlowchartInner() {
@@ -897,17 +931,19 @@ function FlowchartInner() {
       style={{ outline: "none" }} // Fokus ko'rsatkichini olib tashlash
     >
       <ReactFlow
+        nodeTypes={CustomNodes}
         nodes={nodes}
         edges={edges}
         onConnect={onConnect}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        nodeTypes={CustomNodes}
         fitView
         panOnScroll
         selectionOnDrag
         multiSelectionKeyCode={["Shift"]}
         deleteKeyCode={null} // O'zimizning handler'imizni ishlatamiz
+        minZoom={0.1} // Minimal yaqinlashtirishni 10% gacha tushirish
+        maxZoom={2} // Maksimal yaqinlashtirishni 400% gacha ko'tarish
       >
         <Background gap={24} color="#666" />
         <MiniMap />
@@ -1146,27 +1182,34 @@ export const MessageTypes = [
 ### 📄 constructor/data/themes.ts
 
 ```ts
+// FAYL: constructor/data/themes.ts
+
 export const themes = {
   dark: {
-    bg: "bg-gray-900",
-    header: "bg-gray-800 border-gray-700",
+    name: "dark",
+    bg: "bg-black/80 backdrop-blur-sm",
+    header: "bg-gray-900/80 border-gray-700/50",
     text: "text-gray-300",
     prompt: "text-gray-500",
     error: "text-red-400",
-    info: "text-blue-400",
+    info: "text-sky-400",
     warn: "text-yellow-400",
+    system: "text-fuchsia-400",
   },
   light: {
-    bg: "bg-white",
-    header: "bg-gray-100 border-gray-200",
+    name: "light",
+    bg: "bg-white/80 backdrop-blur-sm",
+    header: "bg-gray-50/80 border-gray-200",
     text: "text-gray-800",
     prompt: "text-gray-400",
     error: "text-red-600",
-    info: "text-blue-600",
+    info: "text-sky-600",
     warn: "text-yellow-600",
+    system: "text-fuchsia-600",
   },
 };
 
+export type Theme = typeof themes.dark;
 export type ThemeName = keyof typeof themes;
 
 ```
@@ -1191,7 +1234,7 @@ import {
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { SendAudioNodeData, RecipientType, AudioSourceType } from "./types";
 
 import { FiMusic } from "react-icons/fi";
@@ -1200,6 +1243,7 @@ import { FiMusic } from "react-icons/fi";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const SendAudioNodeComponent = ({
   id,
@@ -1214,15 +1258,20 @@ const SendAudioNodeComponent = ({
   };
 
   const captionLength = data.caption?.length || 0;
+  const buttonCount =
+    (data.keyboard?.active === "inline"
+      ? data.keyboard?.inline
+      : data.keyboard?.reply
+    )?.flat().length || 0;
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <NodeHeader
         icon={<FiMusic className="text-primary" />}
         title="Audio yuborish"
-        buttonCount={data.buttons?.flat().length || 0}
+        buttonCount={buttonCount}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -1316,7 +1365,7 @@ const SendAudioNodeComponent = ({
 
             <NodeFooter
               nodeId={id}
-              buttons={data.buttons}
+              keyboard={data.keyboard}
               disableNotification={data.disableNotification}
               protectContent={data.protectContent}
               onUpdate={handleUpdate}
@@ -1325,11 +1374,7 @@ const SendAudioNodeComponent = ({
         </>
       )}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };
@@ -1349,6 +1394,7 @@ export { SendAudioNode } from "./AudioMessageNode";
 
 ```ts
 import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+import { KeyboardConfig } from "../TextMessageNode/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -1388,7 +1434,7 @@ export interface SendAudioNodeData {
   disableNotification?: boolean;
   protectContent?: boolean;
 
-  buttons?: ButtonConfig[][];
+  keyboard?: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
 }
 
 ```
@@ -1414,13 +1460,14 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { SendFileNodeData, RecipientType, FileSourceType } from "./types";
 
 import { NodeFooter } from "../shared/NodeFooter";
 import { NodeHeader } from "../shared/NodeHeader";
 import { FileText } from "lucide-react";
 import { RecipientsManager } from "../shared/RecipientSelector";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const SendFileNodeComponent = ({
   id,
@@ -1435,15 +1482,20 @@ const SendFileNodeComponent = ({
   };
 
   const captionLength = data.caption?.length || 0;
+  const buttonCount =
+    (data.keyboard?.active === "inline"
+      ? data.keyboard?.inline
+      : data.keyboard?.reply
+    )?.flat().length || 0;
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <NodeHeader
         icon={<FileText className="text-primary" />}
         title="Xabar yuborish"
-        buttonCount={data.buttons?.flat().length || 0}
+        buttonCount={buttonCount}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -1543,7 +1595,7 @@ const SendFileNodeComponent = ({
 
           <NodeFooter
             nodeId={id}
-            buttons={data.buttons}
+            keyboard={data.keyboard}
             disableNotification={data.disableNotification}
             protectContent={data.protectContent}
             onUpdate={handleUpdate}
@@ -1551,11 +1603,7 @@ const SendFileNodeComponent = ({
         </>
       )}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };
@@ -1575,6 +1623,7 @@ export { SendFileNode } from "./FileMessageNode";
 
 ```ts
 import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+import { KeyboardConfig } from "../TextMessageNode/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -1612,7 +1661,7 @@ export interface SendFileNodeData {
   disableNotification?: boolean;
   protectContent?: boolean;
 
-  buttons?: ButtonConfig[][];
+  keyboard?: KeyboardConfig;
 }
 
 ```
@@ -1635,16 +1684,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
-import { useFlowStore } from "@/constructor/store/flowStore";
-import { SendPhotoNodeData, RecipientType, PhotoSourceType } from "./types";
+import { useFlowStore } from "@/constructor/store";
+import { SendPhotoNodeData, PhotoSourceType } from "./types";
 
 // Yaratgan andozamiz uchun kerakli importlar
 import { Camera } from "lucide-react";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const SendPhotoNodeComponent = ({
   id,
@@ -1659,15 +1708,20 @@ const SendPhotoNodeComponent = ({
   };
 
   const captionLength = data.caption?.length || 0;
+  const buttonCount =
+    (data.keyboard?.active === "inline"
+      ? data.keyboard?.inline
+      : data.keyboard?.reply
+    )?.flat().length || 0;
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <NodeHeader
         icon={<Camera className="text-primary" />}
         title="Rasm Yuborish"
-        buttonCount={data.buttons?.flat().length || 0}
+        buttonCount={buttonCount}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -1742,7 +1796,7 @@ const SendPhotoNodeComponent = ({
 
           <NodeFooter
             nodeId={id}
-            buttons={data.buttons}
+            keyboard={data.keyboard}
             disableNotification={data.disableNotification}
             protectContent={data.protectContent}
             onUpdate={handleUpdate}
@@ -1750,11 +1804,7 @@ const SendPhotoNodeComponent = ({
         </>
       )}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };
@@ -1774,6 +1824,7 @@ export { SendPhotoNode } from "./PhotoMessageNode";
 
 ```ts
 import { ButtonConfig } from "@/constructor/components/ButtonGenerator/types";
+import { KeyboardConfig } from "../TextMessageNode/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -1811,7 +1862,7 @@ export interface SendPhotoNodeData {
   disableNotification?: boolean; // Foydalanuvchiga ovozsiz xabar yuborish.
   protectContent?: boolean; // Xabarni nusxalash va saqlashni taqiqlash.
 
-  buttons?: ButtonConfig[][];
+  keyboard?: KeyboardConfig;
 }
 
 ```
@@ -1824,7 +1875,7 @@ import { Handle, NodeProps, Position } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { ParseMode, SendTextMessageNodeData } from "./types";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { memo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LetterText, Settings } from "lucide-react";
@@ -1841,6 +1892,7 @@ import { Checkbox } from "@radix-ui/react-checkbox";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const SendTextMessageNodeComponent = ({
   id,
@@ -1856,14 +1908,20 @@ const SendTextMessageNodeComponent = ({
 
   // UI'da ko'rsatish uchun hisob-kitoblar
   const textLength = data.messageText?.length || 0;
+  // Tugmalar sonini yangi `keyboard` strukturasidan hisoblaymiz
+  const buttonCount =
+    (data.keyboard?.active === "inline"
+      ? data.keyboard?.inline
+      : data.keyboard?.reply
+    )?.flat().length || 0;
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <NodeHeader
         icon={<LetterText className="text-primary" />}
         title="Xabar yuborish"
-        buttonCount={data.buttons?.flat().length || 0}
+        buttonCount={buttonCount}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -1937,18 +1995,14 @@ const SendTextMessageNodeComponent = ({
 
           <NodeFooter
             nodeId={id}
-            buttons={data.buttons}
+            keyboard={data.keyboard}
             disableNotification={data.disableNotification}
             protectContent={data.protectContent}
             onUpdate={handleUpdate}
           />
         </>
       )}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };
@@ -1969,38 +2023,30 @@ export { SendTextMessageNode } from "./TextMessageNode";
 ```ts
 import { ButtonConfig } from "@/constructor/components/ButtonGenerator/types";
 
-/**
- * Foydalanuvchi kimga yuborilishini aniqlaydi.
- * 'sender' - xabarni yuborgan foydalanuvchining o'ziga.
- * 'custom_id' - aniq bir chat yoki foydalanuvchi ID'siga.
- */
-export type RecipientType = "sender" | "custom_id";
+export type KeyboardType = "inline" | "reply";
 
-/**
- * Xabar matnini qanday formatda yuborishni belgilaydi.
- */
+// --- Yengi qo'shiladigan struktura ---
+export interface KeyboardConfig {
+  active: KeyboardType;
+  inline: ButtonConfig[][];
+  reply: ButtonConfig[][];
+}
+
 export type ParseMode = "HTML" | "MarkdownV2" | "None";
 
-/**
- * 'Send Text Message' tugunining ma'lumotlar strukturasini belgilaydigan interfeys.
- * React Flow'dagi `data` propining tipi.
- */
 export interface SendTextMessageNodeData {
-  /** Yuboruvchidan tashqari qo'shimcha oluvchi ID'lar ro'yxati */
   recipients?: {
-    /** Xabar yuboruvchining o'ziga yuborilsinmi? (standart: true) */
     sendToSender: boolean;
-    /** Qo'shimcha ID'lar ro'yxati */
     additionalIds: string[];
   };
-
-  messageText?: string; // Yuboriladigan xabar matni (4096 belgacha).
+  messageText?: string;
   parseMode?: ParseMode;
+  disableWebPagePreview?: boolean;
+  disableNotification?: boolean;
+  protectContent?: boolean;
 
-  disableWebPagePreview?: boolean; // Xabardagi linklar uchun oldindan ko'rishni o'chirish.
-  disableNotification?: boolean; // Foydalanuvchiga ovozsiz xabar yuborish.
-  protectContent?: boolean; // Xabarni nusxalash va saqlashni taqiqlash.
-  buttons?: ButtonConfig[][];
+  // `buttons` va `keyboardType` o'rniga bitta obyekt keladi
+  keyboard?: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
 }
 
 ```
@@ -2011,7 +2057,7 @@ export interface SendTextMessageNodeData {
 "use client";
 
 import { useState, memo } from "react";
-import { Handle, Position, NodeProps } from "reactflow";
+import { NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
 import { FiHelpCircle } from "react-icons/fi";
 import { Card, CardContent } from "@/components/ui/card";
@@ -2024,7 +2070,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Switch } from "@/components/ui/switch";
 import {
   Tooltip,
@@ -2033,7 +2078,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { SendVideoNodeData, RecipientType, VideoSourceType } from "./types";
 import { Video } from "lucide-react";
 
@@ -2041,6 +2086,7 @@ import { Video } from "lucide-react";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const SendVideoNodeComponent = ({
   id,
@@ -2056,14 +2102,20 @@ const SendVideoNodeComponent = ({
 
   const captionLength = data.caption?.length || 0;
 
+  const buttonCount =
+    (data.keyboard?.active === "inline"
+      ? data.keyboard?.inline
+      : data.keyboard?.reply
+    )?.flat().length || 0;
+
   return (
     <Card className={cn("w-96 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <NodeHeader
         icon={<Video className="text-primary" />}
         title="video Yuborish"
-        buttonCount={data.buttons?.flat().length || 0}
+        buttonCount={buttonCount}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -2216,7 +2268,7 @@ const SendVideoNodeComponent = ({
 
           <NodeFooter
             nodeId={id}
-            buttons={data.buttons}
+            keyboard={data.keyboard}
             disableNotification={data.disableNotification}
             protectContent={data.protectContent}
             onUpdate={handleUpdate}
@@ -2224,11 +2276,7 @@ const SendVideoNodeComponent = ({
         </>
       )}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };
@@ -2248,6 +2296,7 @@ export { SendVideoNode } from "./VideMessageNode";
 
 ```ts
 import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+import { KeyboardConfig } from "../TextMessageNode/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -2288,7 +2337,7 @@ export interface SendVideoNodeData {
   disableNotification?: boolean;
   protectContent?: boolean;
 
-  buttons?: ButtonConfig[][];
+  keyboard?: KeyboardConfig;
 }
 
 ```
@@ -2318,14 +2367,16 @@ import {
   ButtonConfig,
 } from "@/constructor/components/ButtonGenerator";
 
+import { KeyboardConfig } from "../TextMessageNode/types";
+
 interface NodeFooterProps {
   nodeId: string;
-  buttons?: ButtonConfig[][];
+  keyboard?: KeyboardConfig;
   disableNotification?: boolean;
   protectContent?: boolean;
   onUpdate: (
     update: Partial<{
-      buttons: ButtonConfig[][];
+      keyboard: KeyboardConfig;
       disableNotification: boolean;
       protectContent: boolean;
     }>
@@ -2334,15 +2385,17 @@ interface NodeFooterProps {
 
 export const NodeFooter = ({
   nodeId,
-  buttons,
+  keyboard,
   disableNotification,
   protectContent,
   onUpdate,
 }: NodeFooterProps) => {
-  const buttonCount = buttons?.flat().length || 0;
+  const buttonCount =
+    (keyboard?.active === "inline" ? keyboard?.inline : keyboard?.reply)?.flat()
+      .length || 0;
 
-  const handleSaveButtons = (newButtons: ButtonConfig[][]) => {
-    onUpdate({ buttons: newButtons });
+  const handleKeyboardUpdate = (newKeyboard: KeyboardConfig) => {
+    onUpdate({ keyboard: newKeyboard });
   };
 
   return (
@@ -2380,7 +2433,7 @@ export const NodeFooter = ({
         </div>
       </div>
 
-      <ButtonGenerator initialButtons={buttons} onSave={handleSaveButtons}>
+      <ButtonGenerator initialKeyboard={keyboard} onSave={handleKeyboardUpdate}>
         <div className="relative w-full">
           <Button variant="outline" className="w-full">
             <LayoutGrid className="mr-2 h-4 w-4" />
@@ -2646,6 +2699,80 @@ export const RecipientsManager = ({
 
 ```
 
+### 📄 constructor/nodes/components/index.ts
+
+```ts
+export * from "./shared";
+
+```
+
+### 📄 constructor/nodes/components/shared/ReactFlowHandlers/SourceHandler.tsx
+
+```tsx
+import React from "react";
+
+import { PlusIcon } from "lucide-react";
+import { Handle, Position } from "reactflow";
+
+type Props = {};
+
+export function SourceHandler({}: Props) {
+  return (
+    <>
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="!w-4 !h-4 !bg-blue-500 flex items-center justify-center"
+      >
+        <PlusIcon size={12} className="w-2 h-2 text-white" />
+      </Handle>
+    </>
+  );
+}
+
+```
+
+### 📄 constructor/nodes/components/shared/ReactFlowHandlers/TargetHandler.tsx
+
+```tsx
+import React from "react";
+
+import { CircleDot } from "lucide-react";
+import { Handle, Position } from "reactflow";
+
+type Props = {};
+
+export function TargetHandler({}: Props) {
+  return (
+    <>
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="!w-4 !h-4 !bg-blue-500 flex items-center justify-center"
+      >
+        <CircleDot size={12} className="w-2 h-2 text-white" />
+      </Handle>
+    </>
+  );
+}
+
+```
+
+### 📄 constructor/nodes/components/shared/ReactFlowHandlers/index.ts
+
+```ts
+export * from "./SourceHandler";
+export * from "./TargetHandler";
+
+```
+
+### 📄 constructor/nodes/components/shared/index.ts
+
+```ts
+export * from "./ReactFlowHandlers";
+
+```
+
 ### 📄 constructor/nodes/custom/CustomCodeNode/CodeEditorDialog.tsx
 
 ```tsx
@@ -2819,12 +2946,13 @@ export const CodeEditorDialog = ({
 ```tsx
 import { memo, useState } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Code2, PenLine } from "lucide-react";
 import { CodeEditorDialog } from "./CodeEditorDialog";
 import { NodeHeader } from "@/constructor/nodes/actions/shared/NodeHeader"; // <-- Bizning umumiy sarlavha
+import { SourceHandler, TargetHandler } from "../../components";
 
 interface CustomCodeNodeData {
   pythonCode?: string;
@@ -2869,7 +2997,7 @@ const CustomCodeNodeComponent = ({
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <NodeHeader
         icon={<Code2 className="text-yellow-400" />}
@@ -2899,11 +3027,7 @@ const CustomCodeNodeComponent = ({
         </CardContent>
       )}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };
@@ -3244,6 +3368,7 @@ import {
 } from "./triggers";
 
 import { CustomCodeNode } from "./custom";
+
 export const CustomNodes = {
   ReplyButtonTriggerNode,
   MessageTriggerNode,
@@ -3264,7 +3389,7 @@ export const CustomNodes = {
 ```tsx
 import { memo, useMemo } from "react";
 import { Handle, NodeProps, Position, useNodes, useEdges } from "reactflow";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -3272,6 +3397,7 @@ import { CallbackButtonTriggerData } from "./types";
 import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
 import { AlertCircle, Zap } from "lucide-react"; // Ikonkani o'zgartirdik
 import { cn } from "@/lib/utils";
+import { SourceHandler, TargetHandler } from "../../components";
 
 interface NodeWithButtonsData {
   buttons?: ButtonConfig[][];
@@ -3321,7 +3447,7 @@ const CallbackButtonTriggerNodeComponent = ({
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-base">
@@ -3378,11 +3504,7 @@ const CallbackButtonTriggerNodeComponent = ({
         )}
       </CardContent>
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };
@@ -3415,7 +3537,7 @@ export interface CallbackButtonTriggerData {
 ```tsx
 import { memo, useMemo } from "react";
 import { Handle, NodeProps, Position, useEdges } from "reactflow";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { CallbackQueryTriggerData } from "./types";
 import {
   Card,
@@ -3430,6 +3552,7 @@ import { ValueInput } from "@/constructor/nodes/triggers/MessageTrigger/componen
 import { ConstructorData } from "@/constructor/data";
 import { MousePointerClick } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const CallbackQueryTriggerNodeComponent = ({
   id,
@@ -3464,7 +3587,7 @@ const CallbackQueryTriggerNodeComponent = ({
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
       {/* Ulanish uchun handle doim mavjud bo'ladi */}
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <CardHeader className="pb-2">
         {" "}
@@ -3514,11 +3637,7 @@ const CallbackQueryTriggerNodeComponent = ({
         )}
       </CardContent>
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };
@@ -3550,8 +3669,8 @@ export interface CallbackQueryTriggerData {
 
 ```tsx
 import { memo, useMemo, useState } from "react";
-import { Handle, NodeProps, Position } from "reactflow";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { NodeProps } from "reactflow";
+import { useFlowStore } from "@/constructor/store";
 import { MessageTriggerNodeData } from "./types";
 import { getFiltersForType } from "./utils";
 
@@ -3562,6 +3681,7 @@ import { TriggerHeader } from "./components/TriggerHeader";
 import { TypeSelector } from "./components/TypeSelector";
 import { FilterSelector } from "./components/FilterSelector";
 import { ParameterInput } from "./components/ParameterInput";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const MessageTriggerNodeComponent = ({
   id,
@@ -3608,12 +3728,7 @@ const MessageTriggerNodeComponent = ({
         selected ? "ring-2 ring-blue-500/80" : ""
       }`}
     >
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="in"
-        className="!bg-sky-500"
-      />
+      <TargetHandler />
 
       <TriggerHeader
         isExpanded={isExpanded}
@@ -3656,12 +3771,7 @@ const MessageTriggerNodeComponent = ({
         </CardContent>
       )}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="out"
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };
@@ -4102,20 +4212,24 @@ export const getFiltersForType = (type?: string) => {
 ### 📄 constructor/nodes/triggers/ReplyButtonTrigger/ReplyButtonTrigger.tsx
 
 ```tsx
+"use client";
+
 import { memo, useMemo } from "react";
-import { Handle, NodeProps, Position, useNodes, useEdges } from "reactflow";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { NodeProps, useNodes, useEdges } from "reactflow";
+import { useFlowStore } from "@/constructor/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ReplyButtonTriggerData } from "./types";
-import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
 import { AlertCircle, CornerDownLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SourceHandler, TargetHandler } from "../../components";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { KeyboardConfig } from "../../actions/TextMessageNode/types";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
+// --- O'ZGARTIRISH: `keyboard` ixtiyoriy qilindi, xatolikdan saqlanish uchun ---
 interface NodeWithButtonsData {
-  buttons?: ButtonConfig[][];
+  keyboard?: KeyboardConfig;
 }
 
 const ReplyButtonTriggerNodeComponent = ({
@@ -4127,59 +4241,52 @@ const ReplyButtonTriggerNodeComponent = ({
   const nodes = useNodes();
   const edges = useEdges();
 
+  // --- O'ZGARTIRISH: Mantiq to'liq yangilandi va soddalashtirildi ---
   const availableReplyButtons = useMemo(() => {
-    console.log("--- Trigger re-calculating ---"); // Har safar hisoblaganda ko'ramiz
-
     const incomingEdge = edges.find((edge) => edge.target === id);
-    console.log("Incoming edge:", incomingEdge); // Ulanishni topdimi?
-
     if (!incomingEdge) return [];
 
     const parentNode = nodes.find((node) => node.id === incomingEdge.source);
-    console.log("Parent node:", parentNode); // Ota-onani topdimi?
-
     if (!parentNode) return [];
 
     const parentNodeData = parentNode.data as NodeWithButtonsData;
-    console.log("Parent node DATA:", parentNodeData); // Ota-onaning ma'lumotlari qanday?
+    // Ota-ona node'da `keyboard` yoki `keyboard.reply` bo'lmasa, bo'sh massiv qaytaramiz
+    if (!parentNodeData.keyboard || !parentNodeData.keyboard.reply) {
+      return [];
+    }
 
-    const parentButtons = parentNodeData.buttons || [];
-    console.log("Buttons from parent:", parentButtons); // Tugmalar massivi qanday?
+    // 1. Ota-onaning `reply` tugmalarini olamiz (bu 2D massiv)
+    const replyButtonRows = parentNodeData.keyboard.reply;
 
-    const filteredButtons = parentButtons.flat().filter((button) => {
-      // HAR BIR TUGMANI FILTERDAN OLDIN TEKSHIRAMIZ
-      console.log("TUGMANI TEKSHIRISH:", button);
-      // return button.type === "reply";
-      switch (button.type) {
-        case "request_contact":
-        case "request_location":
-        case "reply":
-          return true;
-        default:
-          return false;
-      }
-    });
+    // 2. Massivni bir o'lchamli qilamiz (`.flat()`)
+    // 3. Faqat "Reply Keyboard" uchun mo'ljallangan tugmalarni filterlaymiz
+    const allReplyButtons = replyButtonRows
+      .flat()
+      .filter(
+        (button) =>
+          button.type === "reply" ||
+          button.type === "request_contact" ||
+          button.type === "request_location"
+      );
 
-    return filteredButtons;
+    return allReplyButtons;
   }, [nodes, edges, id]);
 
-  const handleSelectionChange = (buttonText: string, checked: boolean) => {
-    const currentSelection = data.selectedButtons || [];
-    let newSelection: string[];
+  const handleSelectionChange = (selectedButtonId: string) => {
+    // Tanlangan ID bo'yicha to'liq tugma obyektini topamiz
+    const selectedButtonObject = availableReplyButtons.find(
+      (btn) => btn.id === selectedButtonId
+    );
 
-    if (checked) {
-      newSelection = [...currentSelection, buttonText];
-    } else {
-      newSelection = currentSelection.filter((text) => text !== buttonText);
-    }
-    updateNodeData(id, { selectedButtons: newSelection });
+    // Va shu obyektni state'ga yozamiz
+    updateNodeData(id, { selectedButton: selectedButtonObject });
   };
 
-  const isConfigured = (data.selectedButtons?.length ?? 0) > 0;
+  const isConfigured = !!data.selectedButton;
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-base">
@@ -4198,27 +4305,31 @@ const ReplyButtonTriggerNodeComponent = ({
 
       <CardContent className="flex flex-col gap-3">
         {availableReplyButtons.length > 0 ? (
-          <div className="space-y-2 p-3 bg-muted/50 rounded-md border">
+          <div className="space-y-3">
             <Label className="text-xs text-muted-foreground">
-              Qaysi tugmalar ushlansin?
+              Qaysi tugma ushlansin?
             </Label>
-            {availableReplyButtons.map((button) => (
-              <div key={button.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`${id}-${button.id}`}
-                  checked={data.selectedButtons?.includes(button.text)}
-                  onCheckedChange={(checked) =>
-                    handleSelectionChange(button.text, !!checked)
-                  }
-                />
-                <Label
-                  htmlFor={`${id}-${button.id}`}
-                  className="font-normal cursor-pointer"
-                >
-                  {button.text}
-                </Label>
-              </div>
-            ))}
+
+            <RadioGroup
+              value={data.selectedButton?.id} // Tanlangan tugmaning ID'sini `value` sifatida beramiz
+              onValueChange={handleSelectionChange} // O'zgarish bo'lganda handler'ni chaqiramiz
+            >
+              {availableReplyButtons.map((button) => (
+                <div className="flex items-center gap-3" key={button.id}>
+                  <RadioGroupItem
+                    className="cursor-pointer"
+                    value={button.id}
+                    id={`r-${button.id}`}
+                  />
+                  <Label
+                    htmlFor={`r-${button.id}`}
+                    className="font-normal cursor-pointer"
+                  >
+                    {button.text}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
           </div>
         ) : (
           <div className="p-3 text-center text-sm text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-md flex items-center gap-2">
@@ -4229,12 +4340,7 @@ const ReplyButtonTriggerNodeComponent = ({
           </div>
         )}
       </CardContent>
-
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };
@@ -4253,10 +4359,11 @@ export { ReplyButtonTriggerNode } from "./ReplyButtonTrigger";
 ### 📄 constructor/nodes/triggers/ReplyButtonTrigger/types.ts
 
 ```ts
-// Bu node qanday ma'lumotlarni saqlashini belgilaydi
+import { ButtonConfig } from "@/constructor/components";
+
 export interface ReplyButtonTriggerData {
-  /** Foydalanuvchi tanlagan reply-tugmalarining matnlari ro'yxati */
-  selectedButtons?: string[];
+  // `selectedButtons` (ko'plik) o'rniga `selectedButton` (birlik)
+  selectedButton?: ButtonConfig;
 }
 
 ```
@@ -4271,94 +4378,280 @@ export { CallbackQueryTriggerNode } from "./CallbackQueryTrigger";
 
 ```
 
-### 📄 constructor/store/flowStore.ts
+### 📄 constructor/store/actions.ts
 
 ```ts
-import { create } from "zustand";
-import {
-  Connection,
-  Edge,
-  EdgeChange,
-  Node,
-  NodeChange,
-  addEdge,
-  OnNodesChange,
-  OnEdgesChange,
-  applyNodeChanges,
-  applyEdgeChanges,
-} from "reactflow";
-import { ElementItemType } from "@/types/element-types";
+import { StateCreator } from "zustand";
+import { toast } from "sonner";
+import { Node } from "reactflow";
+import { FlowStoreState, Actions } from "./types";
 
-// Bu funksiya sizda mavjud bo'lishi kerak
+// Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: string) => {
+  const baseMessageData = {
+    recipients: { sendToSender: true, additionalIds: [] },
+    keyboard: {
+      active: "inline",
+      inline: [],
+      reply: [],
+    },
+  };
+
   switch (nodeType) {
     case "SendTextMessageNode":
       return {
-        recipients: { sendToSender: true, additionalIds: [] },
-        messageText: "",
+        ...baseMessageData,
+        messageText: "Yangi xabar",
         parseMode: "None",
       };
     case "SendPhotoNode":
-      return {
-        recipients: { sendToSender: true, additionalIds: [] },
-        photoSourceType: "url",
-        caption: "",
-      };
-    // ... boshqa node'lar uchun ham
+      return { ...baseMessageData, photoSourceType: "url", caption: "" };
+    case "SendVideoNode":
+      return { ...baseMessageData, videoSourceType: "url", caption: "" };
+    case "SendAudioNode":
+      return { ...baseMessageData, audioSourceType: "url", caption: "" };
+    case "SendFileNode":
+      return { ...baseMessageData, fileSourceType: "url", caption: "" };
+    case "CustomCodeNode":
+      return {}; // Custom code uchun alohida sozlamalar
     default:
       return {};
   }
 };
 
-let id = 0;
-// Mavjud nodelar sonidan kelib chiqib ID berish xatoliklarni kamaytiradi
-const getId = () => `dndnode_${id++}`;
+let nodeIdCounter = 0;
+const generateNodeId = () => `dndnode_${Date.now()}_${nodeIdCounter++}`;
 
-// Nusxalangan elementlarni vaqtincha saqlash uchun tip
-type Clipboard = {
-  nodes: Node[];
-  edges: Edge[];
-};
+export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
+  set,
+  get
+) => ({
+  addNode: (element, position) => {
+    const newNode: Node = {
+      id: generateNodeId(),
+      type: element.triggerId,
+      position,
+      data: getDefaultNodeData(element.triggerId || ""),
+    };
+    set({ nodes: [...get().nodes, newNode], isDirty: true });
+  },
 
-export type RFState = {
-  nodes: Node[];
-  edges: Edge[];
-  initialState: { nodes: Node[]; edges: Edge[] } | null;
+  saveFlow: async () => {
+    const { nodes, edges } = get();
+    set({ isLoading: true });
+    toast.loading("Saqlanmoqda...");
 
-  clipboard: Clipboard | null;
-  isCtrlPressed: boolean;
-  onNodesChange: OnNodesChange;
-  onEdgesChange: OnEdgesChange;
-  onConnect: (connection: Connection) => void;
-  addNode: (data: ElementItemType, position: { x: number; y: number }) => void;
-  updateNodeData: (nodeId: string, newData: any) => void;
-  deleteSelectedElements: () => void;
-  // --- BARCHA YANGI FUNKSIYALARNING TIPLARI ---
-  selectAll: () => void;
-  copySelection: () => void;
-  paste: (position: { x: number; y: number }) => void;
-  duplicateSelection: () => void;
-  setCtrlPressed: (isPressed: boolean) => void; // <-- YANGI FUNKSIYA TIPI
-  saveFlow: () => Promise<void>;
+    try {
+      const flowData = { nodes, edges };
+      const response = await fetch("/api/flow/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(flowData),
+      });
 
-  loadFlow: () => Promise<void>;
-};
+      if (!response.ok) {
+        throw new Error("Serverda saqlashda xatolik.");
+      }
 
-export const useFlowStore = create<RFState>((set, get) => ({
+      toast.dismiss();
+      toast.success("Sxema muvaffaqiyatli saqlandi!");
+      set({
+        isDirty: false, // O'zgarishlar saqlandi
+        initialState: { nodes, edges }, // Boshlang'ich holatni yangilaymiz
+      });
+    } catch (error) {
+      console.error("Saqlashda xatolik:", error);
+      // Xatolikni yuqoriga uzatamiz, toast.promise uni ushlab oladi
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  loadFlow: async () => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch("/api/flow/load");
+      if (!response.ok) throw new Error("Sxemani yuklab bo'lmadi.");
+      const data = await response.json();
+
+      if (data.nodes && data.nodes.length > 0) {
+        const maxId = Math.max(
+          ...data.nodes.map((n: Node) => {
+            const parts = n.id.split("_");
+            return parts.length > 1 ? parseInt(parts[parts.length - 1], 10) : 0;
+          })
+        );
+        nodeIdCounter = data.nodes.length;
+      }
+
+      // === MUHIM O'ZGARISH ===
+      // Yuklangandan so'ng, ham joriy, ham boshlang'ich holatni o'rnatamiz.
+      set({
+        nodes: data.nodes || [],
+        edges: data.edges || [],
+        isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
+        initialState: { nodes: data.nodes || [], edges: data.edges || [] },
+      });
+    } catch (error) {
+      console.error("Yuklashda xatolik:", error);
+      toast.error("Sxemani yuklashda xatolik yuz berdi.");
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+});
+
+```
+
+### 📄 constructor/store/clipboardSlice.ts
+
+```ts
+import { StateCreator } from "zustand";
+import { FlowStoreState, ClipboardSlice } from "./types";
+
+let idOffset = 0;
+const getId = () => `dndnode_${Date.now()}_${idOffset++}`;
+
+export const createClipboardSlice: StateCreator<
+  FlowStoreState,
+  [],
+  [],
+  ClipboardSlice
+> = (set, get) => ({
+  clipboard: null,
+  copySelection: () => {
+    const { nodes, edges } = get();
+    const selectedNodes = nodes.filter((n) => n.selected);
+    if (selectedNodes.length === 0) {
+      set({ clipboard: null });
+      return;
+    }
+
+    const selectedNodeIds = selectedNodes.map((n) => n.id);
+    const selectedEdges = edges.filter(
+      (e) =>
+        selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target)
+    );
+
+    set({ clipboard: { nodes: selectedNodes, edges: selectedEdges } });
+  },
+  paste: (position) => {
+    const clipboard = get().clipboard;
+    if (!clipboard || clipboard.nodes.length === 0) return;
+
+    const { nodes, edges } = get();
+    const oldToNewIdMap = new Map<string, string>();
+
+    const firstNode = clipboard.nodes[0];
+    const offsetX = position.x - firstNode.position.x;
+    const offsetY = position.y - firstNode.position.y;
+
+    const newNodes = clipboard.nodes.map((node) => {
+      const newNodeId = getId();
+      oldToNewIdMap.set(node.id, newNodeId);
+      return {
+        ...node,
+        id: newNodeId,
+        selected: false,
+        position: {
+          x: node.position.x + offsetX,
+          y: node.position.y + offsetY,
+        },
+        data: { ...node.data },
+      };
+    });
+
+    const newEdges = clipboard.edges.map((edge) => ({
+      ...edge,
+      id: `edge-${oldToNewIdMap.get(edge.source)!}-${oldToNewIdMap.get(
+        edge.target
+      )!}`,
+      source: oldToNewIdMap.get(edge.source)!,
+      target: oldToNewIdMap.get(edge.target)!,
+    }));
+
+    set({
+      nodes: [...nodes.map((n) => ({ ...n, selected: false })), ...newNodes],
+      edges: [...edges, ...newEdges],
+      isDirty: true,
+    });
+  },
+  duplicateSelection: () => {
+    const { nodes, edges } = get();
+    const selectedNodes = nodes.filter((n) => n.selected);
+    if (selectedNodes.length === 0) return;
+
+    const oldToNewIdMap = new Map<string, string>();
+
+    const newNodes = selectedNodes.map((node) => {
+      const newNodeId = getId();
+      oldToNewIdMap.set(node.id, newNodeId);
+      return {
+        ...node,
+        id: newNodeId,
+        selected: true,
+        position: { x: node.position.x + 30, y: node.position.y + 30 },
+        data: { ...node.data },
+      };
+    });
+
+    const selectedNodeIds = selectedNodes.map((n) => n.id);
+    const relevantEdges = edges.filter(
+      (e) =>
+        selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target)
+    );
+
+    const newEdges = relevantEdges.map((edge) => ({
+      ...edge,
+      id: `edge-${oldToNewIdMap.get(edge.source)!}-${oldToNewIdMap.get(
+        edge.target
+      )!}`,
+      source: oldToNewIdMap.get(edge.source)!,
+      target: oldToNewIdMap.get(edge.target)!,
+    }));
+
+    set({
+      nodes: [...nodes.map((n) => ({ ...n, selected: false })), ...newNodes],
+      edges: [...get().edges, ...newEdges],
+      isDirty: true,
+    });
+  },
+});
+
+```
+
+### 📄 constructor/store/flowSlice.ts
+
+```ts
+// constructor/store/flowSlice.ts
+
+import { StateCreator } from "zustand";
+import {
+  applyEdgeChanges,
+  applyNodeChanges,
+  addEdge,
+  NodeChange,
+} from "reactflow";
+import { FlowStoreState, FlowSlice } from "./types";
+
+export const createFlowSlice: StateCreator<
+  FlowStoreState,
+  [],
+  [],
+  FlowSlice
+> = (set, get) => ({
   nodes: [],
   edges: [],
-  clipboard: null,
-  isCtrlPressed: false,
-  initialState: null, // Boshlang'ich qiymat null
 
-  // React Flow kutubxonasi uchun majburiy handler'lar
-
+  // --- Yaxshilangan onNodesChange ---
   onNodesChange: (changes: NodeChange[]) => {
-    const { isCtrlPressed } = get();
+    const { isCtrlPressed } = get(); // Asosiy store'dan holatni olamiz
     const gridSize = 10; // 10px'lik to'r
 
+    // Har bir o'zgarishni tekshirib chiqamiz
     const updatedChanges = changes.map((change) => {
-      // Agar Ctrl bosilgan bo'lsa, node siljiyotgan bo'lsa va bu pozitsiya o'zgarishi bo'lsa
+      // Agar Ctrl bosilgan, node siljiyotgan va bu pozitsiya o'zgarishi bo'lsa
       if (
         isCtrlPressed &&
         change.type === "position" &&
@@ -4379,31 +4672,28 @@ export const useFlowStore = create<RFState>((set, get) => ({
     });
 
     set({
-      // O'zgartirilgan 'updatedChanges' ni qo'llaymiz
+      // Yangilangan o'zgarishlarni qo'llaymiz
       nodes: applyNodeChanges(updatedChanges, get().nodes),
+      isDirty: true,
     });
   },
+  // --- onNodesChange tugadi ---
 
-  onEdgesChange: (changes: EdgeChange[]) => {
+  onEdgesChange: (changes) => {
     set({
       edges: applyEdgeChanges(changes, get().edges),
+      isDirty: true,
     });
   },
-  onConnect: (connection: Connection) => {
+  onConnect: (connection) => {
+    // Bu funksiya endi index.ts da override qilinadi,
+    // lekin slice ichida standart versiyasi bo'lgani yaxshi.
     set({
       edges: addEdge(connection, get().edges),
+      isDirty: true,
     });
   },
-  addNode: (element: ElementItemType, position: { x: number; y: number }) => {
-    const newNode: Node = {
-      id: getId(),
-      type: element.triggerId,
-      position,
-      data: getDefaultNodeData(element.triggerId || ""),
-    };
-    set({ nodes: [...get().nodes, newNode] });
-  },
-  updateNodeData: (nodeId: string, newData: any) => {
+  updateNodeData: (nodeId, newData) => {
     set({
       nodes: get().nodes.map((node) => {
         if (node.id === nodeId) {
@@ -4411,193 +4701,127 @@ export const useFlowStore = create<RFState>((set, get) => ({
         }
         return node;
       }),
+      isDirty: true,
     });
   },
 
   deleteSelectedElements: () => {
     const { nodes, edges } = get();
-    const selectedNodes = nodes
-      .filter((node) => node.selected)
-      .map((node) => node.id);
-    const selectedEdges = edges
-      .filter((edge) => edge.selected)
-      .map((edge) => edge.id);
+    const selectedNodeIds = nodes.filter((n) => n.selected).map((n) => n.id);
 
     set({
-      nodes: nodes.filter((node) => !selectedNodes.includes(node.id)),
+      nodes: nodes.filter((node) => !node.selected),
       edges: edges.filter(
-        (edge) =>
-          !selectedEdges.includes(edge.id) &&
-          !selectedNodes.includes(edge.source) &&
-          !selectedNodes.includes(edge.target)
+        (e) =>
+          !selectedNodeIds.includes(e.source) &&
+          !selectedNodeIds.includes(e.target)
       ),
+      isDirty: true,
     });
   },
-
-  /** Barcha elementlarni tanlash */
   selectAll: () => {
     set({
-      nodes: get().nodes.map((node) => ({ ...node, selected: true })),
-      edges: get().edges.map((edge) => ({ ...edge, selected: true })),
+      nodes: get().nodes.map((n) => ({ ...n, selected: true })),
+      edges: get().edges.map((e) => ({ ...e, selected: true })),
     });
   },
+});
 
-  /** Tanlangan elementlarni nusxa buferiga saqlash */
-  copySelection: () => {
-    const { nodes, edges } = get();
-    // Faqat tanlangan node'larni olamiz
-    const selectedNodes = nodes.filter((node) => node.selected);
-    if (selectedNodes.length === 0) {
-      set({ clipboard: null });
-      return;
-    }
+```
 
-    const selectedNodeIds = selectedNodes.map((n) => n.id);
-    // Faqat tanlangan node'lar orasidagi ulanishlarni olamiz
-    const selectedEdges = edges.filter(
-      (e) =>
-        selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target)
-    );
+### 📄 constructor/store/index.ts
 
-    set({ clipboard: { nodes: selectedNodes, edges: selectedEdges } });
-  },
+```ts
+// constructor/store/index.ts
 
-  /** Nusxa buferidagi elementlarni ish maydoniga qo'yish */
-  paste: (position: { x: number; y: number }) => {
-    const clipboard = get().clipboard;
-    if (!clipboard || clipboard.nodes.length === 0) return;
+import { create } from "zustand";
+import { FlowStoreState } from "./types";
+import { createFlowSlice } from "./flowSlice";
+import { createClipboardSlice } from "./clipboardSlice";
+import { createActions } from "./actions";
+import { Connection, addEdge } from "reactflow";
 
-    const { nodes, edges } = get();
-    const oldToNewIdMap = new Map<string, string>();
+// `...a` o'rniga to'g'ridan-to'g'ri `(set, get)` ishlatish kodni tushunarliroq qiladi.
+// Keling, shu usulga o'tamiz.
+export const useFlowStore = create<FlowStoreState>()((set, get) => {
+  return {
+    initialState: null, // Boshlang'ich qiymat null
 
-    // Nusxalangan nodelarning birinchisini topamiz
-    const firstNode = clipboard.nodes[0];
-    const offsetX = position.x - firstNode.position.x;
-    const offsetY = position.y - firstNode.position.y;
+    // UI holatlari uchun boshlang'ich qiymatlar
+    isDirty: false,
+    isLoading: false,
 
-    const newNodes = clipboard.nodes.map((node) => {
-      const newNodeId = getId();
-      oldToNewIdMap.set(node.id, newNodeId);
+    isCtrlPressed: false, // Boshlang'ich holat
+    setCtrlPressed: (isPressed) => set({ isCtrlPressed: isPressed }),
 
-      return {
-        ...node,
-        id: newNodeId,
-        selected: false,
-        position: {
-          x: node.position.x + offsetX,
-          y: node.position.y + offsetY,
-        },
-        data: { ...node.data }, // Chuqur nusxalash
+    // Barcha slice'larni birlashtiramiz
+    // Har bir slice'ga (set, get) ni uzatamiz
+    ...createFlowSlice(set, get, {} as any),
+    ...createClipboardSlice(set, get, {} as any),
+    ...createActions(set, get, {} as any),
+
+    onConnect: (connection: Connection) => {
+      const newEdge = {
+        ...connection,
+        type: "smoothstep",
+        animated: true,
       };
-    });
 
-    const newEdges = clipboard.edges.map((edge) => ({
-      ...edge,
-      id: `reactflow__edge-${oldToNewIdMap.get(
-        edge.source
-      )!}-${oldToNewIdMap.get(edge.target)!}`,
-      source: oldToNewIdMap.get(edge.source)!,
-      target: oldToNewIdMap.get(edge.target)!,
-    }));
-
-    set({
-      nodes: [...nodes.map((n) => ({ ...n, selected: false })), ...newNodes],
-      edges: [...edges, ...newEdges],
-    });
-  },
-
-  /** Tanlangan elementlardan dublikat yaratish */
-  duplicateSelection: () => {
-    const { nodes, edges } = get();
-    const selectedNodes = nodes.filter((node) => node.selected);
-    if (selectedNodes.length === 0) return;
-
-    const oldToNewIdMap = new Map<string, string>();
-
-    const newNodes = selectedNodes.map((node) => {
-      const newNodeId = getId();
-      oldToNewIdMap.set(node.id, newNodeId);
-      return {
-        ...node,
-        id: newNodeId,
-        selected: true, // Dublikat qilinganlarni tanlangan holatda qoldiramiz
-        position: { x: node.position.x + 30, y: node.position.y + 30 },
-        data: { ...node.data }, // Chuqur nusxalash
-      };
-    });
-
-    const selectedNodeIds = selectedNodes.map((n) => n.id);
-    const relevantEdges = edges.filter(
-      (e) =>
-        selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target)
-    );
-
-    const newEdges = relevantEdges.map((edge) => ({
-      ...edge,
-      id: `reactflow__edge-${oldToNewIdMap.get(
-        edge.source
-      )!}-${oldToNewIdMap.get(edge.target)!}`,
-      source: oldToNewIdMap.get(edge.source)!,
-      target: oldToNewIdMap.get(edge.target)!,
-    }));
-
-    set({
-      // Eskilarini tanlanmagan holatga o'tkazamiz
-      nodes: [...nodes.map((n) => ({ ...n, selected: false })), ...newNodes],
-      edges: [...get().edges, ...newEdges],
-    });
-  },
-
-  setCtrlPressed: (isPressed: boolean) => {
-    set({ isCtrlPressed: isPressed });
-  },
-
-  saveFlow: async () => {
-    const { nodes, edges } = get(); // Store'dan joriy holatni olamiz
-    const flowData = { nodes, edges };
-
-    const response = await fetch("/api/flow/save", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(flowData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      // Muvaffaqiyatsiz bo'lsa, xatolik beramiz
-      throw new Error(
-        errorData.message || "Faylni saqlashda xatolik yuz berdi."
-      );
-    }
-  },
-
-  loadFlow: async () => {
-    try {
-      const response = await fetch("/api/flow/load");
-      if (!response.ok) {
-        throw new Error("Could not fetch initial flow state.");
-      }
-      const data = await response.json();
-
-      // Store'ni yuklangan ma'lumotlar bilan to'ldiramiz
       set({
-        nodes: data.nodes || [],
-        edges: data.edges || [],
-        initialState: data, // Buni solishtirish uchun saqlab qo'yamiz
+        edges: addEdge(newEdge, get().edges),
+        isDirty: true,
       });
-    } catch (error) {
-      console.error("Failed to load flow:", error);
-      // Xatolik yuz bersa, bo'sh holat bilan ishni boshlaymiz
-      set({
-        nodes: [],
-        edges: [],
-        initialState: { nodes: [], edges: [] },
-      });
-    }
-  },
-}));
+    },
+  };
+});
+
+```
+
+### 📄 constructor/store/types.ts
+
+```ts
+import { Edge, Node, OnConnect, OnEdgesChange, OnNodesChange } from "reactflow";
+import { ElementItemType } from "@/types/element-types";
+
+// React Flow asosiy holati uchun slice tipi
+export interface FlowSlice {
+  nodes: Node[];
+  edges: Edge[];
+  onNodesChange: OnNodesChange;
+  onEdgesChange: OnEdgesChange;
+  onConnect: OnConnect;
+  updateNodeData: (nodeId: string, newData: any) => void;
+  deleteSelectedElements: () => void;
+  selectAll: () => void;
+}
+
+// Clipboard (nusxa olish) uchun slice tipi
+export interface ClipboardSlice {
+  clipboard: { nodes: Node[]; edges: Edge[] } | null;
+  copySelection: () => void;
+  paste: (position: { x: number; y: number }) => void;
+  duplicateSelection: () => void;
+}
+
+// Umumiy, yuqori darajadagi amallar
+export interface Actions {
+  addNode: (
+    element: ElementItemType,
+    position: { x: number; y: number }
+  ) => void;
+  saveFlow: () => Promise<void>;
+  loadFlow: () => Promise<void>;
+}
+
+// Barcha qismlarni birlashtirgan yakuniy store tipi
+export interface FlowStoreState extends FlowSlice, ClipboardSlice, Actions {
+  // UI holatlari
+  initialState: { nodes: Node[]; edges: Edge[] } | null;
+  isDirty: boolean;
+  isLoading: boolean;
+  isCtrlPressed: boolean;
+  setCtrlPressed: (isPressed: boolean) => void;
+}
 
 ```
 

@@ -1,4 +1,5 @@
 import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
+import { KeyboardConfig } from "../TextMessageNode/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -36,5 +37,5 @@ export interface SendFileNodeData {
   disableNotification?: boolean;
   protectContent?: boolean;
 
-  buttons?: ButtonConfig[][];
+  keyboard?: KeyboardConfig;
 }

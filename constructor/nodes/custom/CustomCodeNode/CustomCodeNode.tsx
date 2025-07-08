@@ -1,11 +1,12 @@
 import { memo, useState } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Code2, PenLine } from "lucide-react";
 import { CodeEditorDialog } from "./CodeEditorDialog";
 import { NodeHeader } from "@/constructor/nodes/actions/shared/NodeHeader"; // <-- Bizning umumiy sarlavha
+import { SourceHandler, TargetHandler } from "../../components";
 
 interface CustomCodeNodeData {
   pythonCode?: string;
@@ -50,7 +51,7 @@ const CustomCodeNodeComponent = ({
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <NodeHeader
         icon={<Code2 className="text-yellow-400" />}
@@ -64,7 +65,6 @@ const CustomCodeNodeComponent = ({
           <CodeEditorDialog
             initialCode={data.pythonCode || DEFAULT_CODE}
             onSave={handleSaveCode}
-            // === TUZATISH SHU YERDA ===
             contextType={"message"}
           >
             <div className="flex flex-col items-center justify-center text-center p-4 border border-dashed rounded-lg hover:bg-muted cursor-pointer transition-colors">
@@ -80,11 +80,7 @@ const CustomCodeNodeComponent = ({
         </CardContent>
       )}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };

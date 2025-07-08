@@ -13,16 +13,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
-import { useFlowStore } from "@/constructor/store/flowStore";
-import { SendPhotoNodeData, RecipientType, PhotoSourceType } from "./types";
+import { useFlowStore } from "@/constructor/store";
+import { SendPhotoNodeData, PhotoSourceType } from "./types";
 
 // Yaratgan andozamiz uchun kerakli importlar
 import { Camera } from "lucide-react";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const SendPhotoNodeComponent = ({
   id,
@@ -37,15 +37,20 @@ const SendPhotoNodeComponent = ({
   };
 
   const captionLength = data.caption?.length || 0;
+  const buttonCount =
+    (data.keyboard?.active === "inline"
+      ? data.keyboard?.inline
+      : data.keyboard?.reply
+    )?.flat().length || 0;
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <NodeHeader
         icon={<Camera className="text-primary" />}
         title="Rasm Yuborish"
-        buttonCount={data.buttons?.flat().length || 0}
+        buttonCount={buttonCount}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -60,23 +65,26 @@ const SendPhotoNodeComponent = ({
             />
 
             {/* Rasm manbasi */}
-            <div className="grid gap-2">
+            <div className="flex flex-col gap-2">
               <Label>Rasm manbasi</Label>
-              <Select
-                value={data.photoSourceType}
-                onValueChange={(value: PhotoSourceType) =>
-                  handleUpdate({ photoSourceType: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Manbani tanlang..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="file_id">Mavjud File ID</SelectItem>
-                  <SelectItem value="url">Internet (URL)</SelectItem>
-                  <SelectItem value="upload">Kompyuterdan yuklash</SelectItem>
-                </SelectContent>
-              </Select>
+
+              <div className="">
+                <Select
+                  value={data.photoSourceType}
+                  onValueChange={(value: PhotoSourceType) =>
+                    handleUpdate({ photoSourceType: value })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Manbani tanlang..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="file_id">Mavjud File ID</SelectItem>
+                    <SelectItem value="url">Internet (URL)</SelectItem>
+                    <SelectItem value="upload">Kompyuterdan yuklash</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               {data.photoSourceType === "file_id" && (
                 <Input
                   placeholder="rasm_fayl_idsi_bu_yerda..."
@@ -120,7 +128,7 @@ const SendPhotoNodeComponent = ({
 
           <NodeFooter
             nodeId={id}
-            buttons={data.buttons}
+            keyboard={data.keyboard}
             disableNotification={data.disableNotification}
             protectContent={data.protectContent}
             onUpdate={handleUpdate}
@@ -128,11 +136,7 @@ const SendPhotoNodeComponent = ({
         </>
       )}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };

@@ -88,7 +88,7 @@ export const LogViewerHeader = ({
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Yopish (Ctrl + L)</p>
+          <p>Yopish (Ctrl + `)</p>
         </TooltipContent>
       </Tooltip>
     </div>

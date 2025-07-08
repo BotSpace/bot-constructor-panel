@@ -22,24 +22,25 @@ import { cn } from "@/lib/utils";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { ButtonConfig } from "./types";
+import { KeyboardConfig } from "@/constructor/nodes/actions/TextMessageNode/types";
 
 interface ButtonGeneratorProps {
-  initialButtons?: ButtonConfig[][];
-  onSave: (buttons: ButtonConfig[][]) => void;
+  initialKeyboard?: KeyboardConfig;
+  onSave: (keyboard: KeyboardConfig) => void;
   children: ReactNode;
 }
 
 const MAX_BUTTONS_PER_ROW = 10;
 
 export function ButtonGenerator({
-  initialButtons = [[]],
+  initialKeyboard,
   onSave,
   children,
 }: ButtonGeneratorProps) {
   const [isOpen, setIsOpen] = useState(false);
-  // Bu holatlarni dialog ochilganda tozalab turamiz
-  const [buttons, setButtons] = useState<ButtonConfig[][]>([[]]);
-  const [activeTab, setActiveTab] = useState("inline");
+  const [inlineButtons, setInlineButtons] = useState<ButtonConfig[][]>([[]]);
+  const [replyButtons, setReplyButtons] = useState<ButtonConfig[][]>([[]]);
+  const [activeTab, setActiveTab] = useState<"inline" | "reply">("inline");
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(0);
   const [inlineText, setInlineText] = useState("");
   const [inlineActionType, setInlineActionType] = useState<"url" | "callback">(
@@ -48,40 +49,39 @@ export function ButtonGenerator({
   const [inlineActionValue, setInlineActionValue] = useState("");
   const [replyText, setReplyText] = useState("");
 
-  //
-  // --- XATO TUZATILGAN QISM ---
-  //
   useEffect(() => {
-    // Effekt faqat dialog ochilganda (isOpen true bo'lganda) ishga tushadi.
     if (isOpen) {
-      // Barcha holatlarni boshlang'ich qiymatga qaytaramiz.
-      // initialButtons'dan chuqur nusxa olamiz.
-      setButtons(JSON.parse(JSON.stringify(initialButtons || [[]])));
+      const initialInline = initialKeyboard?.inline || [[]];
+      const initialReply = initialKeyboard?.reply || [[]];
+      const initialActiveTab = initialKeyboard?.active || "inline";
+
+      setInlineButtons(JSON.parse(JSON.stringify(initialInline)));
+      setReplyButtons(JSON.parse(JSON.stringify(initialReply)));
+      setActiveTab(initialActiveTab);
+
       setSelectedRowIndex(0);
       setInlineText("");
       setInlineActionValue("");
       setReplyText("");
-      setActiveTab("inline");
     }
-    // Bog'liqliklar massividan `initialButtons` olib tashlandi.
-    // Endi bu effekt faqat `isOpen` holati o'zgarganda ishlaydi.
-  }, [isOpen]);
-  // --- XATO TUZATILGAN QISM TUGADI ---
-  //
+  }, [isOpen, initialKeyboard]);
+
+  const isInlineTab = activeTab === "inline";
+  const currentButtons = isInlineTab ? inlineButtons : replyButtons;
+  const setCurrentButtons = isInlineTab ? setInlineButtons : setReplyButtons;
 
   const isCurrentRowFull =
     selectedRowIndex !== null &&
-    buttons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW;
+    currentButtons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW;
 
-  // ... Qolgan barcha funksiyalar (handleAddButton, handleRemoveButton, va hokazo) o'zgarishsiz qoladi ...
-
+  // ... handleAddButton, handleRemoveButton, handleAddRow, handleOnOpenChange funksiyalari o'zgarishsiz qoladi ...
   const handleAddButton = (
     type: "inline" | "reply" | "special",
     specialType?: "request_contact" | "request_location"
   ) => {
     if (
-      selectedRowIndex !== null &&
-      buttons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW
+      selectedRowIndex === null ||
+      currentButtons[selectedRowIndex]?.length >= MAX_BUTTONS_PER_ROW
     ) {
       alert(
         `Bu qatorda maksimal tugmalar soniga (${MAX_BUTTONS_PER_ROW} ta) yetilgan.`
@@ -120,8 +120,8 @@ export function ButtonGenerator({
     }
 
     if (newButton) {
-      setButtons((currentButtons) => {
-        const updatedButtons = [...currentButtons];
+      setCurrentButtons((current) => {
+        const updatedButtons = [...current];
         if (updatedButtons.length === 0) updatedButtons.push([]);
 
         const targetIndex =
@@ -129,7 +129,10 @@ export function ButtonGenerator({
             ? selectedRowIndex
             : updatedButtons.length - 1;
 
-        const targetRow = [...updatedButtons[targetIndex], newButton];
+        const targetRow = [
+          ...updatedButtons[targetIndex],
+          newButton as ButtonConfig,
+        ];
         updatedButtons[targetIndex] = targetRow;
         return updatedButtons;
       });
@@ -137,33 +140,34 @@ export function ButtonGenerator({
   };
 
   const handleAddRow = () => {
-    const newRowIndex = buttons.length;
-    setButtons([...buttons, []]);
+    const newRowIndex = currentButtons.length;
+    setCurrentButtons([...currentButtons, []]);
     setSelectedRowIndex(newRowIndex);
   };
 
   const handleRemoveButton = (rowIndex: number, buttonId: string) => {
-    const newButtons = buttons
-      .map((row, rIdx) => {
-        if (rIdx === rowIndex) {
-          return row.filter((button) => button.id !== buttonId);
-        }
-        return row;
-      })
-      .filter(
-        (row) => row.length > 0 || (row.length === 0 && buttons.length === 1)
-      );
+    setCurrentButtons((current) => {
+      const newButtons = current
+        .map((row, rIdx) => {
+          if (rIdx === rowIndex) {
+            return row.filter((button) => button.id !== buttonId);
+          }
+          return row;
+        })
+        .filter(
+          (row) => row.length > 0 || (row.length === 0 && current.length === 1)
+        );
 
-    if (newButtons.length === 0) {
-      setButtons([[]]);
-      setSelectedRowIndex(0);
-    } else {
-      setButtons(newButtons);
-    }
+      if (newButtons.length === 0) {
+        if (selectedRowIndex !== 0) setSelectedRowIndex(0);
+        return [[]];
+      }
 
-    if (selectedRowIndex !== null && selectedRowIndex >= newButtons.length) {
-      setSelectedRowIndex(newButtons.length > 0 ? newButtons.length - 1 : 0);
-    }
+      if (selectedRowIndex !== null && selectedRowIndex >= newButtons.length) {
+        setSelectedRowIndex(newButtons.length > 0 ? newButtons.length - 1 : 0);
+      }
+      return newButtons;
+    });
   };
 
   const handleOnOpenChange = (open: boolean) => {
@@ -171,11 +175,18 @@ export function ButtonGenerator({
   };
 
   const handleSaveChanges = () => {
-    const finalButtons = buttons.filter((row) => row.length > 0);
-    onSave(finalButtons);
+    const finalInline = inlineButtons.filter((row) => row.length > 0);
+    const finalReply = replyButtons.filter((row) => row.length > 0);
+
+    onSave({
+      active: activeTab,
+      inline: finalInline,
+      reply: finalReply,
+    });
     handleOnOpenChange(false);
   };
 
+  // --- TUZATISH: Ikonkani qaytaruvchi funksiya qo'shildi ---
   const getIconForButton = (button: ButtonConfig): ReactNode => {
     switch (button.type) {
       case "url":
@@ -187,6 +198,7 @@ export function ButtonGenerator({
       case "request_location":
         return <MapPin className="mr-2 h-4 w-4" />;
       default:
+        // 'reply' tugmalari uchun ikonka yo'q
         return null;
     }
   };
@@ -195,7 +207,6 @@ export function ButtonGenerator({
     <Dialog open={isOpen} onOpenChange={handleOnOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[90%] md:max-w-[80%] lg:max-w-[70%] h-[90vh] overflow-y-auto">
-        {/* ... JSX qismi o'zgarishsiz qoladi ... */}
         <VisuallyHidden>
           <DialogTitle>Tugmalarni Sozlash</DialogTitle>
         </VisuallyHidden>
@@ -204,12 +215,15 @@ export function ButtonGenerator({
           <div className="md:col-span-4 flex flex-col gap-6 sticky top-0">
             <Tabs
               defaultValue="inline"
-              onValueChange={setActiveTab}
+              onValueChange={(value) =>
+                setActiveTab(value as "inline" | "reply")
+              }
               value={activeTab}
             >
+              {/* ... Tabs va TabsContent qismi o'zgarishsiz qoladi ... */}
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="inline">Inline Keyboard</TabsTrigger>
-                <TabsTrigger value="replay">Reply Keyboard</TabsTrigger>
+                <TabsTrigger value="reply">Reply Keyboard</TabsTrigger>
               </TabsList>
               <TabsContent value="inline" className="mt-4 space-y-4">
                 <div>
@@ -266,7 +280,7 @@ export function ButtonGenerator({
                   <PlusCircle className="mr-2 h-4 w-4" /> Inline Tugma Qo'shish
                 </Button>
               </TabsContent>
-              <TabsContent value="replay" className="mt-4 space-y-4">
+              <TabsContent value="reply" className="mt-4 space-y-4">
                 <div>
                   <Label htmlFor="reply-text">Tugma matni</Label>
                   <Input
@@ -338,7 +352,7 @@ export function ButtonGenerator({
               </Button>
             </div>
             <div className="flex flex-col gap-2 flex-grow min-h-[200px] bg-background/50 p-2 rounded-md">
-              {buttons.map((row, rowIndex) => (
+              {currentButtons.map((row, rowIndex) => (
                 <div key={rowIndex}>
                   <div
                     className={cn(
@@ -368,6 +382,7 @@ export function ButtonGenerator({
                             variant="outline"
                             className="pr-8 cursor-default w-full truncate"
                           >
+                            {/* --- TUZATISH: Ikonka funksiyasi chaqirildi --- */}
                             {getIconForButton(button)}
                             <span className="truncate">{button.text}</span>
                           </Button>

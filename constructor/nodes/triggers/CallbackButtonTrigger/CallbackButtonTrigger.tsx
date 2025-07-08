@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { Handle, NodeProps, Position, useNodes, useEdges } from "reactflow";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { CallbackButtonTriggerData } from "./types";
 import { ButtonConfig } from "@/constructor/components/ButtonGenerator";
 import { AlertCircle, Zap } from "lucide-react"; // Ikonkani o'zgartirdik
 import { cn } from "@/lib/utils";
+import { SourceHandler, TargetHandler } from "../../components";
 
 interface NodeWithButtonsData {
   buttons?: ButtonConfig[][];
@@ -57,7 +58,7 @@ const CallbackButtonTriggerNodeComponent = ({
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-base">
@@ -114,11 +115,7 @@ const CallbackButtonTriggerNodeComponent = ({
         )}
       </CardContent>
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };

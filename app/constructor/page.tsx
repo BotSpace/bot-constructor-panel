@@ -46,12 +46,12 @@ export default function Page() {
     }).filter(Boolean); // null qiymatlarni massivdan olib tashlaymiz
   }, [searchTerm]); // `searchTerm` o'zgargandagina qayta ishlaydi
 
-  // 4. Ctrl + S shortcut'ini sozlash uchun useEffect
+  // 4. Ctrl + K shortcut'ini sozlash uchun useEffect
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // `event.metaKey` - bu Mac'dagi Command tugmasi
       // `event.ctrlKey` - bu Windows/Linux'dagi Control tugmasi
-      if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      if ((event.ctrlKey || event.metaKey) && event.key === "k") {
         event.preventDefault(); // Brauzerning standart harakatini (masalan, address bar'ga fokus) bekor qilamiz
         searchInputRef.current?.focus(); // Input maydoniga fokus qilamiz
       }
@@ -82,7 +82,7 @@ export default function Page() {
               <Input
                 // Ref'ni inputga bog'laymiz
                 ref={searchInputRef}
-                placeholder="Search components... (Ctrl+S)" // Foydalanuvchiga ishora
+                placeholder="Search components... (Ctrl+K)" // Foydalanuvchiga ishora
                 className="h-8 pl-9 text-sm placeholder:text-slate-400 focus-visible:border-white/20 focus-visible:ring-0"
                 // State'ni yangilaymiz
                 value={searchTerm}

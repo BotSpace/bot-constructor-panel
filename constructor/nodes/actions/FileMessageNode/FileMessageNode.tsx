@@ -16,13 +16,14 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { SendFileNodeData, RecipientType, FileSourceType } from "./types";
 
 import { NodeFooter } from "../shared/NodeFooter";
 import { NodeHeader } from "../shared/NodeHeader";
 import { FileText } from "lucide-react";
 import { RecipientsManager } from "../shared/RecipientSelector";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const SendFileNodeComponent = ({
   id,
@@ -37,15 +38,20 @@ const SendFileNodeComponent = ({
   };
 
   const captionLength = data.caption?.length || 0;
+  const buttonCount =
+    (data.keyboard?.active === "inline"
+      ? data.keyboard?.inline
+      : data.keyboard?.reply
+    )?.flat().length || 0;
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <NodeHeader
         icon={<FileText className="text-primary" />}
         title="Xabar yuborish"
-        buttonCount={data.buttons?.flat().length || 0}
+        buttonCount={buttonCount}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -145,7 +151,7 @@ const SendFileNodeComponent = ({
 
           <NodeFooter
             nodeId={id}
-            buttons={data.buttons}
+            keyboard={data.keyboard}
             disableNotification={data.disableNotification}
             protectContent={data.protectContent}
             onUpdate={handleUpdate}
@@ -153,11 +159,7 @@ const SendFileNodeComponent = ({
         </>
       )}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };

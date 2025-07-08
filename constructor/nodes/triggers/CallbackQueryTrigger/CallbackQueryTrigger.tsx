@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { Handle, NodeProps, Position, useEdges } from "reactflow";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { CallbackQueryTriggerData } from "./types";
 import {
   Card,
@@ -15,6 +15,7 @@ import { ValueInput } from "@/constructor/nodes/triggers/MessageTrigger/componen
 import { ConstructorData } from "@/constructor/data";
 import { MousePointerClick } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const CallbackQueryTriggerNodeComponent = ({
   id,
@@ -49,7 +50,7 @@ const CallbackQueryTriggerNodeComponent = ({
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
       {/* Ulanish uchun handle doim mavjud bo'ladi */}
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <CardHeader className="pb-2">
         {" "}
@@ -99,11 +100,7 @@ const CallbackQueryTriggerNodeComponent = ({
         )}
       </CardContent>
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };
