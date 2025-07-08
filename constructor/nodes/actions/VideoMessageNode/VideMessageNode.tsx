@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, memo } from "react";
-import { Handle, Position, NodeProps } from "reactflow";
+import { NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
 import { FiHelpCircle } from "react-icons/fi";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Switch } from "@/components/ui/switch";
 import {
   Tooltip,
@@ -23,7 +22,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { useFlowStore } from "@/constructor/store";
 import { SendVideoNodeData, RecipientType, VideoSourceType } from "./types";
 import { Video } from "lucide-react";
 
@@ -31,6 +30,7 @@ import { Video } from "lucide-react";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const SendVideoNodeComponent = ({
   id,
@@ -46,14 +46,20 @@ const SendVideoNodeComponent = ({
 
   const captionLength = data.caption?.length || 0;
 
+  const buttonCount =
+    (data.keyboard?.active === "inline"
+      ? data.keyboard?.inline
+      : data.keyboard?.reply
+    )?.flat().length || 0;
+
   return (
     <Card className={cn("w-96 shadow-lg", selected && "ring-2 ring-primary")}>
-      <Handle type="target" position={Position.Top} className="!bg-sky-500" />
+      <TargetHandler />
 
       <NodeHeader
         icon={<Video className="text-primary" />}
         title="video Yuborish"
-        buttonCount={data.buttons?.flat().length || 0}
+        buttonCount={buttonCount}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -206,7 +212,7 @@ const SendVideoNodeComponent = ({
 
           <NodeFooter
             nodeId={id}
-            buttons={data.buttons}
+            keyboard={data.keyboard}
             disableNotification={data.disableNotification}
             protectContent={data.protectContent}
             onUpdate={handleUpdate}
@@ -214,11 +220,7 @@ const SendVideoNodeComponent = ({
         </>
       )}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };

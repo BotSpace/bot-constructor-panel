@@ -42,15 +42,22 @@ export const createClipboardSlice: StateCreator<
       const newNodeId = getId();
       oldToNewIdMap.set(node.id, newNodeId);
       return {
-        ...node, id: newNodeId, selected: false,
-        position: { x: node.position.x + offsetX, y: node.position.y + offsetY },
+        ...node,
+        id: newNodeId,
+        selected: false,
+        position: {
+          x: node.position.x + offsetX,
+          y: node.position.y + offsetY,
+        },
         data: { ...node.data },
       };
     });
 
     const newEdges = clipboard.edges.map((edge) => ({
       ...edge,
-      id: `edge-${oldToNewIdMap.get(edge.source)!}-${oldToNewIdMap.get(edge.target)!}`,
+      id: `edge-${oldToNewIdMap.get(edge.source)!}-${oldToNewIdMap.get(
+        edge.target
+      )!}`,
       source: oldToNewIdMap.get(edge.source)!,
       target: oldToNewIdMap.get(edge.target)!,
     }));
@@ -72,7 +79,9 @@ export const createClipboardSlice: StateCreator<
       const newNodeId = getId();
       oldToNewIdMap.set(node.id, newNodeId);
       return {
-        ...node, id: newNodeId, selected: true,
+        ...node,
+        id: newNodeId,
+        selected: true,
         position: { x: node.position.x + 30, y: node.position.y + 30 },
         data: { ...node.data },
       };
@@ -80,12 +89,15 @@ export const createClipboardSlice: StateCreator<
 
     const selectedNodeIds = selectedNodes.map((n) => n.id);
     const relevantEdges = edges.filter(
-      (e) => selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target)
+      (e) =>
+        selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target)
     );
 
     const newEdges = relevantEdges.map((edge) => ({
       ...edge,
-      id: `edge-${oldToNewIdMap.get(edge.source)!}-${oldToNewIdMap.get(edge.target)!}`,
+      id: `edge-${oldToNewIdMap.get(edge.source)!}-${oldToNewIdMap.get(
+        edge.target
+      )!}`,
       source: oldToNewIdMap.get(edge.source)!,
       target: oldToNewIdMap.get(edge.target)!,
     }));
@@ -95,5 +107,5 @@ export const createClipboardSlice: StateCreator<
       edges: [...get().edges, ...newEdges],
       isDirty: true,
     });
-  }
+  },
 });

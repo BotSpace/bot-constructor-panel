@@ -32,7 +32,7 @@ export default function LogViewer() {
     // Klaviatura bosilganda chaqiriladigan funksiya
     const handleKeyDown = (e: KeyboardEvent) => {
       // Agar 'Ctrl' va '`' (backtick) tugmalari birga bosilsa...
-      if (e.ctrlKey && e.key === "l") {
+      if (e.ctrlKey && e.code === "Backquote") {
         e.preventDefault(); // Brauzerning standart harakatini bekor qilamiz
         // `isVisible` holatini teskarisiga o'zgartiramiz (toggle)
         setIsVisible((prevIsVisible) => !prevIsVisible);

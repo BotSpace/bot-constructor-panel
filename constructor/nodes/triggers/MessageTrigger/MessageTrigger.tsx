@@ -1,6 +1,6 @@
 import { memo, useMemo, useState } from "react";
-import { Handle, NodeProps, Position } from "reactflow";
-import { useFlowStore } from "@/constructor/store/flowStore";
+import { NodeProps } from "reactflow";
+import { useFlowStore } from "@/constructor/store";
 import { MessageTriggerNodeData } from "./types";
 import { getFiltersForType } from "./utils";
 
@@ -11,6 +11,7 @@ import { TriggerHeader } from "./components/TriggerHeader";
 import { TypeSelector } from "./components/TypeSelector";
 import { FilterSelector } from "./components/FilterSelector";
 import { ParameterInput } from "./components/ParameterInput";
+import { SourceHandler, TargetHandler } from "../../components";
 
 const MessageTriggerNodeComponent = ({
   id,
@@ -57,12 +58,7 @@ const MessageTriggerNodeComponent = ({
         selected ? "ring-2 ring-blue-500/80" : ""
       }`}
     >
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="in"
-        className="!bg-sky-500"
-      />
+      <TargetHandler />
 
       <TriggerHeader
         isExpanded={isExpanded}
@@ -105,12 +101,7 @@ const MessageTriggerNodeComponent = ({
         </CardContent>
       )}
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="out"
-        className="!bg-teal-500"
-      />
+      <SourceHandler />
     </Card>
   );
 };

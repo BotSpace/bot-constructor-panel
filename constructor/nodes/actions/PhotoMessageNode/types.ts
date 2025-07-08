@@ -1,4 +1,5 @@
 import { ButtonConfig } from "@/constructor/components/ButtonGenerator/types";
+import { KeyboardConfig } from "../TextMessageNode/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -36,5 +37,5 @@ export interface SendPhotoNodeData {
   disableNotification?: boolean; // Foydalanuvchiga ovozsiz xabar yuborish.
   protectContent?: boolean; // Xabarni nusxalash va saqlashni taqiqlash.
 
-  buttons?: ButtonConfig[][];
+  keyboard?: KeyboardConfig;
 }

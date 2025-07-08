@@ -7,12 +7,11 @@ import ReactFlow, {
   MiniMap,
   useReactFlow,
   ReactFlowProvider,
-  Node,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { ElementItemType } from "@/types/element-types";
 import { CustomNodes } from "./nodes";
-import { useFlowStore } from "./store/flowStore";
+import { useFlowStore } from "./store";
 import { QuickAddPalette } from "./components";
 
 function FlowchartInner() {
@@ -191,12 +190,12 @@ function FlowchartInner() {
       style={{ outline: "none" }} // Fokus ko'rsatkichini olib tashlash
     >
       <ReactFlow
+        nodeTypes={CustomNodes}
         nodes={nodes}
         edges={edges}
         onConnect={onConnect}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        nodeTypes={CustomNodes}
         fitView
         panOnScroll
         selectionOnDrag

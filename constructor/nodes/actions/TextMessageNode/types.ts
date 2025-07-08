@@ -1,35 +1,27 @@
 import { ButtonConfig } from "@/constructor/components/ButtonGenerator/types";
 
-/**
- * Foydalanuvchi kimga yuborilishini aniqlaydi.
- * 'sender' - xabarni yuborgan foydalanuvchining o'ziga.
- * 'custom_id' - aniq bir chat yoki foydalanuvchi ID'siga.
- */
-export type RecipientType = "sender" | "custom_id";
+export type KeyboardType = "inline" | "reply";
 
-/**
- * Xabar matnini qanday formatda yuborishni belgilaydi.
- */
+// --- Yengi qo'shiladigan struktura ---
+export interface KeyboardConfig {
+  active: KeyboardType;
+  inline: ButtonConfig[][];
+  reply: ButtonConfig[][];
+}
+
 export type ParseMode = "HTML" | "MarkdownV2" | "None";
 
-/**
- * 'Send Text Message' tugunining ma'lumotlar strukturasini belgilaydigan interfeys.
- * React Flow'dagi `data` propining tipi.
- */
 export interface SendTextMessageNodeData {
-  /** Yuboruvchidan tashqari qo'shimcha oluvchi ID'lar ro'yxati */
   recipients?: {
-    /** Xabar yuboruvchining o'ziga yuborilsinmi? (standart: true) */
     sendToSender: boolean;
-    /** Qo'shimcha ID'lar ro'yxati */
     additionalIds: string[];
   };
-
-  messageText?: string; // Yuboriladigan xabar matni (4096 belgacha).
+  messageText?: string;
   parseMode?: ParseMode;
+  disableWebPagePreview?: boolean;
+  disableNotification?: boolean;
+  protectContent?: boolean;
 
-  disableWebPagePreview?: boolean; // Xabardagi linklar uchun oldindan ko'rishni o'chirish.
-  disableNotification?: boolean; // Foydalanuvchiga ovozsiz xabar yuborish.
-  protectContent?: boolean; // Xabarni nusxalash va saqlashni taqiqlash.
-  buttons?: ButtonConfig[][];
+  // `buttons` va `keyboardType` o'rniga bitta obyekt keladi
+  keyboard?: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
 }

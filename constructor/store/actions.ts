@@ -16,7 +16,11 @@ const getDefaultNodeData = (nodeType: string) => {
 
   switch (nodeType) {
     case "SendTextMessageNode":
-      return { ...baseMessageData, messageText: "Yangi xabar", parseMode: "None" };
+      return {
+        ...baseMessageData,
+        messageText: "Yangi xabar",
+        parseMode: "None",
+      };
     case "SendPhotoNode":
       return { ...baseMessageData, photoSourceType: "url", caption: "" };
     case "SendVideoNode":
@@ -35,13 +39,10 @@ const getDefaultNodeData = (nodeType: string) => {
 let nodeIdCounter = 0;
 const generateNodeId = () => `dndnode_${Date.now()}_${nodeIdCounter++}`;
 
-
-export const createActions: StateCreator<
-  FlowStoreState,
-  [],
-  [],
-  Actions
-> = (set, get) => ({
+export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
+  set,
+  get
+) => ({
   addNode: (element, position) => {
     const newNode: Node = {
       id: generateNodeId(),
@@ -71,11 +72,14 @@ export const createActions: StateCreator<
 
       toast.dismiss();
       toast.success("Sxema muvaffaqiyatli saqlandi!");
-      set({ isDirty: false });
+      set({
+        isDirty: false, // O'zgarishlar saqlandi
+        initialState: { nodes, edges }, // Boshlang'ich holatni yangilaymiz
+      });
     } catch (error) {
       console.error("Saqlashda xatolik:", error);
-      toast.dismiss();
-      toast.error("Saqlashda xatolik yuz berdi.");
+      // Xatolikni yuqoriga uzatamiz, toast.promise uni ushlab oladi
+      throw error;
     } finally {
       set({ isLoading: false });
     }
@@ -83,27 +87,31 @@ export const createActions: StateCreator<
 
   loadFlow: async () => {
     set({ isLoading: true });
-    toast.loading("Sxema yuklanmoqda...");
     try {
       const response = await fetch("/api/flow/load");
       if (!response.ok) throw new Error("Sxemani yuklab bo'lmadi.");
       const data = await response.json();
 
-      // ID counter'ni mavjud nodelardan kelib chiqib o'rnatamiz
       if (data.nodes && data.nodes.length > 0) {
-        const maxId = Math.max(...data.nodes.map((n: Node) => {
-          const parts = n.id.split('_');
-          return parts.length > 1 ? parseInt(parts[1], 10) : 0;
-        }));
+        const maxId = Math.max(
+          ...data.nodes.map((n: Node) => {
+            const parts = n.id.split("_");
+            return parts.length > 1 ? parseInt(parts[parts.length - 1], 10) : 0;
+          })
+        );
         nodeIdCounter = data.nodes.length;
       }
 
-      set({ nodes: data.nodes || [], edges: data.edges || [], isDirty: false });
-      toast.dismiss();
-      toast.success("Sxema yuklandi.");
+      // === MUHIM O'ZGARISH ===
+      // Yuklangandan so'ng, ham joriy, ham boshlang'ich holatni o'rnatamiz.
+      set({
+        nodes: data.nodes || [],
+        edges: data.edges || [],
+        isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
+        initialState: { nodes: data.nodes || [], edges: data.edges || [] },
+      });
     } catch (error) {
       console.error("Yuklashda xatolik:", error);
-      toast.dismiss();
       toast.error("Sxemani yuklashda xatolik yuz berdi.");
     } finally {
       set({ isLoading: false });

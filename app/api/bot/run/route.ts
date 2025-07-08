@@ -53,7 +53,16 @@ export async function POST(req: NextRequest) {
     // MUHIM: `stdio`'ni `ignore`'dan o'zgartiramiz, chunki bizga loglar kerak!
     const child = spawn(
       pythonExecutable,
-      ["-m", "uvicorn", "app.main:app", "--reload"],
+      [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--reload",
+        "--reload-dir",
+        "/home/kumo/workspace/dvijok",
+        "--port",
+        "8000",
+      ],
       {
         cwd: pythonProjectPath,
         detached: true,

@@ -1,15 +1,15 @@
 {
   "nodes": [
     {
-      "id": "dndnode_2",
+      "id": "dndnode_1751915696893_4",
       "type": "MessageTriggerNode",
       "position": {
-        "x": -2815.397641645295,
-        "y": 102.1058790142591
+        "x": 322.14643343347046,
+        "y": 3220.6082164574586
       },
       "data": {
         "type": "text",
-        "filter": "command",
+        "filter": "regex",
         "context": {
           "value": "/start"
         }
@@ -18,105 +18,85 @@
       "height": 327,
       "selected": false,
       "positionAbsolute": {
-        "x": -2815.397641645295,
-        "y": 102.1058790142591
+        "x": 322.14643343347046,
+        "y": 3220.6082164574586
       },
       "dragging": false
     },
     {
-      "id": "dndnode_3",
+      "id": "dndnode_1751915725420_5",
       "type": "SendTextMessageNode",
       "position": {
-        "x": -2869.9939476697327,
-        "y": 504.1630235112208
+        "x": 332.0911753027031,
+        "y": 3621.1372774248075
       },
       "data": {
         "recipients": {
           "sendToSender": true,
           "additionalIds": []
         },
-        "messageText": "Salom okas",
-        "parseMode": "None"
-      },
-      "width": 400,
-      "height": 530,
-      "selected": false,
-      "positionAbsolute": {
-        "x": -2869.9939476697327,
-        "y": 504.1630235112208
-      },
-      "dragging": false
-    },
-    {
-      "id": "dndnode_4",
-      "type": "SendTextMessageNode",
-      "position": {
-        "x": -2877.6079665440075,
-        "y": 1183.176495502087
-      },
-      "data": {
-        "recipients": {
-          "sendToSender": true,
-          "additionalIds": []
+        "keyboard": {
+          "active": "inline",
+          "inline": [
+            [
+              {
+                "id": "btn-1751915766276",
+                "text": "Ayol",
+                "type": "callback",
+                "value": "ayol"
+              },
+              {
+                "id": "btn-1751915774941",
+                "text": "Erkak",
+                "type": "callback",
+                "value": "erkak"
+              }
+            ]
+          ],
+          "reply": []
         },
-        "messageText": "buttoni bos",
-        "parseMode": "None"
-      },
-      "width": 400,
-      "height": 530,
-      "selected": false,
-      "positionAbsolute": {
-        "x": -2877.6079665440075,
-        "y": 1183.176495502087
-      },
-      "dragging": false
-    },
-    {
-      "id": "dndnode_7",
-      "type": "SendTextMessageNode",
-      "position": {
-        "x": -2849.8623144634366,
-        "y": 1869.0255876350116
-      },
-      "data": {
-        "recipients": {
-          "sendToSender": true,
-          "additionalIds": []
-        },
-        "messageText": "Nimadur deng",
+        "messageText": "bot to'g'ri ishlashi uchun Iltimos Jinsingizni tanlang",
         "parseMode": "None"
       },
       "width": 400,
       "height": 530,
       "selected": true,
       "positionAbsolute": {
-        "x": -2849.8623144634366,
-        "y": 1869.0255876350116
+        "x": 332.0911753027031,
+        "y": 3621.1372774248075
       },
       "dragging": false
+    },
+    {
+      "id": "dndnode_1751915901798_6",
+      "type": "CallbackButtonTriggerNode",
+      "position": {
+        "x": 75.20665248121468,
+        "y": 4232.012368521811
+      },
+      "data": {},
+      "width": 320,
+      "height": 189
     }
   ],
   "edges": [
     {
-      "source": "dndnode_2",
-      "sourceHandle": "out",
-      "target": "dndnode_3",
+      "source": "dndnode_1751915696893_4",
+      "sourceHandle": null,
+      "target": "dndnode_1751915725420_5",
       "targetHandle": null,
-      "id": "reactflow__edge-dndnode_2out-dndnode_3"
+      "type": "smoothstep",
+      "animated": true,
+      "id": "reactflow__edge-dndnode_1751915696893_4-dndnode_1751915725420_5"
     },
     {
-      "source": "dndnode_3",
+      "source": "dndnode_1751915725420_5",
       "sourceHandle": null,
-      "target": "dndnode_4",
+      "target": "dndnode_1751915901798_6",
       "targetHandle": null,
-      "id": "reactflow__edge-dndnode_3-dndnode_4"
-    },
-    {
-      "source": "dndnode_4",
-      "sourceHandle": null,
-      "target": "dndnode_7",
-      "targetHandle": null,
-      "id": "reactflow__edge-dndnode_4-dndnode_7"
+      "type": "smoothstep",
+      "animated": true,
+      "id": "reactflow__edge-dndnode_1751915725420_5-dndnode_1751915901798_6"
     }
   ]
 }
