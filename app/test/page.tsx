@@ -1,94 +1,68 @@
 "use client";
 
-import React, { useState } from "react";
-import dynamic from "next/dynamic";
-import Head from "next/head";
+import React from "react";
+import ReactFlow, { MiniMap, Controls, Background } from "reactflow";
 
-const DynamicPythonEditor = dynamic(() => import("@/components/editor"), {
-  ssr: false,
-  loading: () => <p>Editorni yuklash...</p>,
-});
+// CSS faylini ulashni unutmang
+import "reactflow/dist/style.css";
 
-// Aiogram uchun boshlang'ich kod
-const initialCode = `import asyncio
-import logging
-from aiogram import Bot, Dispatcher, Router, F
-from aiogram.types import Message
-from aiogram.filters import CommandStart
+// 1. Tugunlarni (Bloklarni) aniqlash
+const initialNodes = [
+  {
+    id: "1",
+    data: { label: "Process (Yuqoridagi)" },
+    position: { x: 100, y: 50 },
+    style: {
+      background: "#90caf9",
+      color: "#000",
+      borderRadius: "15px",
+      width: 200,
+      height: 100,
+    },
+  },
+  {
+    id: "2",
+    data: { label: "Process (Pastdagi)" },
+    position: { x: 100, y: 250 },
+    style: {
+      background: "#90caf9",
+      color: "#000",
+      borderRadius: "15px",
+      width: 200,
+      height: 100,
+    },
+  },
+];
 
-# Bot tokenini bu yerga yozing
-# API_TOKEN = "SIZNING_BOT_TOKENINGIZ"
+// 2. Chiziqni (Strelkani) aniqlash
+const initialEdges = [
+  {
+    id: "e2-1",
+    source: "2", // Pastdagi blokdan (id: '2')
+    target: "1", // Yuqoridagi blokka (id: '1')
 
-# Router yaratamiz
-router = Router()
+    // MUHIM: Chiziq turini belgilash
+    type: "smoothstep", // yoki 'step' ni sinab ko'ring
 
-@router.message(CommandStart())
-async def cmd_start(message: Message):
-    """
-    Bu handler /start komandasini ushlaydi
-    """
-    await message.answer(f"Salom, {message.from_user.full_name}!")
+    // MUHIM: Strelka uchini qo'shish
+    markerEnd: {
+      type: "arrowclosed",
+    },
 
-@router.message(F.text.lower() == "salom")
-async def greet_user(message: Message):
-    await message.reply("Vaalaykum assalom!")
+    // Chiziq qayerdan chiqib, qayerga kirishini aniqlash (ixtiyoriy, lekin aylanma yo'l uchun kerak)
+    sourceHandle: "top", // 2-blokning yuqorisidan chiqsin
+    targetHandle: "top", // 1-blokning yuqorisiga kirsin
+  },
+];
 
-async def main():
-    # bot = Bot(token=API_TOKEN)
-    dp = Dispatcher()
-    dp.include_router(router)
-
-    # await bot.delete_webhook(drop_pending_updates=True)
-    # await dp.start_polling(bot)
-    print("Bot ishlashga tayyor (polling boshlanmadi)")
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    asyncio.run(main())
-`;
-
-export default function HomePage() {
-  const [code, setCode] = useState(initialCode);
-
+function FlowDiagram() {
   return (
-    <div style={{ fontFamily: "sans-serif" }}>
-      <Head>
-        <title>Aiogram Python Editor</title>
-      </Head>
-      <main style={{ padding: "20px" }}>
-        <h1>Aiogram 3.x uchun Python Code Editor</h1>
-        <p>
-          Endi Aiogram 3.2+ kutubxonasi uchun IntelliSense qo'shildi!
-          <b>`aiogram_`, `@router`, `F.`</b> kabi so'zlarni yozib ko'ring.
-        </p>
-
-        <div
-          style={{
-            border: "1px solid #333",
-            marginTop: "20px",
-            borderRadius: "8px",
-            overflow: "hidden",
-          }}
-        >
-          <DynamicPythonEditor initialCode={code} onCodeChange={setCode} />
-        </div>
-
-        <div style={{ marginTop: "20px" }}>
-          <h2>Hozirgi kod:</h2>
-          <pre
-            style={{
-              backgroundColor: "#1e1e1e",
-              color: "#d4d4d4",
-              padding: "15px",
-              borderRadius: "5px",
-              whiteSpace: "pre-wrap",
-              wordWrap: "break-word",
-            }}
-          >
-            {code}
-          </pre>
-        </div>
-      </main>
+    <div style={{ width: "100vw", height: "100vh" }}>
+      <ReactFlow nodes={initialNodes} edges={initialEdges} fitView>
+        <Controls />
+      </ReactFlow>
     </div>
   );
 }
+
+export default FlowDiagram;

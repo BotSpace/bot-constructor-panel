@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react"; // Kerakli hook'larni import qilamiz
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Constructor from "@/constructor/constructor";
 import { Elements } from "@/constructor/data/elements";
@@ -143,15 +142,6 @@ export default function Page() {
                 Hech narsa topilmadi.
               </div>
             )}
-
-            {/* Load More (agar qidiruv bo'sh bo'lsa ko'rsatiladi) */}
-            {!searchTerm && (
-              <div className="mt-4 flex items-center justify-center">
-                <Button variant="ghost" size="sm" className="h-8 text-xs">
-                  Load more components
-                </Button>
-              </div>
-            )}
           </div>
         </ScrollArea>
         {/* Main Canvas Area */}
@@ -163,4 +153,3 @@ export default function Page() {
     </div>
   );
 }
-1;

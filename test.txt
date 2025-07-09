@@ -1,7 +1,0 @@
-[ /start ] -> [ dndnode_1 (Asosiy Menyu + 3 ta tugma) ]
-                  |
-                  +-----> [ dndnode_2 (Kontakt Trigger) ] -> [ dndnode_3 (Kontakt javobi) ] --+
-                  |                                                                           |
-                  +-----> [ dndnode_4 (Lokatsiya Trigger) ] -> [ dndnode_5 (Lokatsiya javobi) ] --+--> (Qs'LANISH)
-                  |                                                                           |
-                  +-----> [ dndnode_6 (Meni bos Trigger) ] -> [ dndnode_7 (Meni bos javobi) ] --+

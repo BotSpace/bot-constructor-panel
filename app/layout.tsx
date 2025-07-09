@@ -4,6 +4,13 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
+import { Fira_Code } from "next/font/google";
+
+export const firaCode = Fira_Code({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

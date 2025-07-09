@@ -29,8 +29,20 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     onConnect: (connection: Connection) => {
       const newEdge = {
         ...connection,
-        type: "smoothstep",
-        animated: true,
+        type: "smart-edge", // Bizning maxsus chizig'imiz
+        // Rasmga mos stil
+        style: {
+          strokeWidth: 1.5,
+          stroke: "#495057", // To'q kulrang
+        },
+        // Strelka uchini ham chiziq rangiga moslaymiz
+        markerEnd: {
+          type: "arrowclosed",
+          width: 20,
+          height: 20,
+          color: "#495057", // To'q kulrang
+        },
+        animated: false,
       };
 
       set({

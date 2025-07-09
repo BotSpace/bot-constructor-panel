@@ -103,6 +103,14 @@ export const Elements: ElementTypes[] = [
         color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
         triggerId: "CustomCodeNode",
       },
+      {
+        type: "audio",
+        name: "Waypoint",
+        description: "Chiziq yo'nalishini boshqarish uchun yordamchi nuqta",
+        icon: "📍", // Yoki boshqa ikonka
+        color: "bg-gray-500/10 text-gray-400 border-gray-500/20",
+        triggerId: "HelperNode",
+      },
       // {
       //   type: "condition",
       //   name: "Condition",

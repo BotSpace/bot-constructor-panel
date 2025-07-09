@@ -13,6 +13,7 @@ import { ElementItemType } from "@/types/element-types";
 import { CustomNodes } from "./nodes";
 import { useFlowStore } from "./store";
 import { QuickAddPalette } from "./components";
+import { CustomEdge } from "./edges";
 
 function FlowchartInner() {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
@@ -191,6 +192,7 @@ function FlowchartInner() {
     >
       <ReactFlow
         nodeTypes={CustomNodes}
+        edgeTypes={CustomEdge}
         nodes={nodes}
         edges={edges}
         onConnect={onConnect}

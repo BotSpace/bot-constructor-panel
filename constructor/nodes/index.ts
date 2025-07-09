@@ -12,6 +12,8 @@ import {
   CallbackQueryTriggerNode,
 } from "./triggers";
 
+import { HelperNode } from "./custom/HelperNode";
+
 import { CustomCodeNode } from "./custom";
 
 export const CustomNodes = {
@@ -25,4 +27,5 @@ export const CustomNodes = {
   SendAudioNode,
   SendFileNode,
   CustomCodeNode,
+  HelperNode,
 };
