@@ -4,12 +4,12 @@ import React, { useRef } from "react";
 import { Editor } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 
-interface PythonEditorProps {
+interface MonoPythonEditorProps {
   initialCode: string;
   onCodeChange: (code: string) => void;
 }
 
-const PythonEditor: React.FC<PythonEditorProps> = ({
+const MonoPythonEditor: React.FC<MonoPythonEditorProps> = ({
   initialCode,
   onCodeChange,
 }) => {
@@ -159,14 +159,16 @@ const PythonEditor: React.FC<PythonEditorProps> = ({
       onChange={handleEditorChange}
       onMount={handleEditorDidMount}
       options={{
+        fontFamily: "'Fira Code', monospace", // Fira Code shriftini belgilaymiz
+        fontLigatures: true, // Ligaturalarni yoqamiz
         fontSize: 16,
         minimap: { enabled: true },
         contextmenu: true,
         wordWrap: "on",
-        tabSize: 4, // Python uchun standart
+        tabSize: 4,
       }}
     />
   );
 };
 
-export default PythonEditor;
+export default MonoPythonEditor;

@@ -1,25 +1,20 @@
 import { useState, useEffect } from "react";
-import Editor, { OnMount } from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Save,
-  Zap,
   HelpCircle,
   Bot,
   MessageSquare,
   Braces,
 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 import { CodeExecutionContext } from "./types";
-import { setupPythonEditor } from "./editor.setup"; // Modular config
+import EditorController from "@/constructor/components/editor/editor";
 
 interface CodeEditorDialogProps {
   initialCode: string;
@@ -76,7 +71,6 @@ export const CodeEditorDialog = ({
   initialCode,
   onSave,
   children,
-  contextType,
 }: CodeEditorDialogProps) => {
   const [code, setCode] = useState(initialCode);
   const [isOpen, setIsOpen] = useState(false);
@@ -92,54 +86,11 @@ export const CodeEditorDialog = ({
     setIsOpen(false);
   };
 
-  const handleEditorMount: OnMount = (editor, monaco) => {
-    // Python muharririni konfiguratsiya qilish
-    const disposables = setupPythonEditor(monaco, contextType);
-
-    // Ctrl/Cmd + S bosilganda saqlash
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, handleSave);
-    editor.focus();
-
-    // Editor yopilganda tozalash
-    return () => {
-      disposables.forEach((d) => d.dispose());
-    };
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[90%] w-full h-[90vh] flex flex-col p-0 gap-0">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="flex items-center gap-2">
-            <Zap className="text-yellow-400" />
-            Maxsus Python Kodi
-          </DialogTitle>
-        </DialogHeader>
-        <Separator />
-        <div className="flex-grow flex h-full overflow-hidden">
-          <div className="flex-1 h-full">
-            <Editor
-              height="100%"
-              language="python"
-              theme="vs-dark"
-              value={code}
-              onChange={(value) => setCode(value || "")}
-              onMount={handleEditorMount}
-              options={{
-                fontSize: 14,
-                fontFamily: "Fira Code, monospace",
-                wordWrap: "on",
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                tabSize: 4,
-                automaticLayout: true,
-              }}
-            />
-          </div>
-          <ContextInfoPanel />
-        </div>
-        <Separator />
+      <DialogContent className="sm:max-w-[90%] w-full h-[90vh] flex flex-col gap-0">
+        <EditorController initialCode={code} onCodeChange={setCode} />
         <DialogFooter className="p-4 bg-background/95 backdrop-blur-sm">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <HelpCircle className="h-4 w-4" />

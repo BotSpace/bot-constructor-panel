@@ -54,9 +54,13 @@ const MessageTriggerNodeComponent = ({
 
   return (
     <Card
-      className={`w-100 rounded-lg shadow-md bg-gray-800 border-gray-700 ${
-        selected ? "ring-2 ring-blue-500/80" : ""
+      className={`w-80 rounded-lg shadow-xl bg-[#212529] border-2 ${
+        selected ? "border-sky-500/80" : "border-gray-600/50"
       }`}
+
+      // className={`w-100 rounded-lg shadow-md bg-gray-800 border-gray-700 ${
+      //   selected ? "ring-2 ring-blue-500/80" : ""
+      // }`}
     >
       <TargetHandler />
 

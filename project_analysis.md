@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 7/7/2025, 10:45:38 PM
+Sana: 7/9/2025, 4:05:23 AM
 
 ## 📁 Fayl Strukturasi
 
@@ -12,8 +12,6 @@ constructor-next-js
 ├── app
 │   ├── api
 │   │   ├── bot
-│   │   │   ├── restart
-│   │   │   │   └── route.ts
 │   │   │   ├── run
 │   │   │   │   └── route.ts
 │   │   │   ├── state.ts
@@ -49,9 +47,7 @@ constructor-next-js
 │   ├── favicon.ico
 │   ├── globals.css
 │   ├── layout.tsx
-│   ├── page.tsx
-│   └── test
-│       └── page.tsx
+│   └── page.tsx
 ├── components
 │   ├── theme
 │   │   ├── theme-provider.tsx
@@ -88,6 +84,9 @@ constructor-next-js
 │   │   ├── QuickAddPalette
 │   │   │   ├── QuickAddPalette.tsx
 │   │   │   └── index.ts
+│   │   ├── editor
+│   │   │   ├── editor.tsx
+│   │   │   └── mono-editor.tsx
 │   │   └── index.ts
 │   ├── constructor.tsx
 │   ├── data
@@ -96,6 +95,11 @@ constructor-next-js
 │   │   ├── index.ts
 │   │   ├── messages.ts
 │   │   └── themes.ts
+│   ├── edges
+│   │   ├── SmartEdge.tsx
+│   │   └── index.ts
+│   ├── lib
+│   │   └── geometry.ts
 │   ├── nodes
 │   │   ├── actions
 │   │   │   ├── AudioMessageNode
@@ -138,6 +142,7 @@ constructor-next-js
 │   │   │   │   ├── editor.setup.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
+│   │   │   ├── HelperNode.tsx
 │   │   │   └── index.ts
 │   │   ├── index.ts
 │   │   └── triggers
@@ -186,7 +191,6 @@ constructor-next-js
 ├── nodes.json
 ├── package.json
 ├── postcss.config.mjs
-├── test.txt
 ├── tsconfig.json
 ├── types
 │   └── element-types.ts
@@ -728,6 +732,266 @@ export { QuickAddPalette } from "./QuickAddPalette";
 
 ```
 
+### 📄 constructor/components/editor/editor.tsx
+
+```tsx
+"use client";
+
+import React from "react";
+import dynamic from "next/dynamic";
+
+const DynamicPythonEditor = dynamic(() => import("./mono-editor"), {
+  ssr: false,
+  loading: () => <p>Editorni yuklash...</p>,
+});
+
+// Aiogram uchun boshlang'ich kod
+const initialCode = `await message.answer(f"Salom, {message.from_user.full_name}!")`;
+
+type EditorControllerProps = {
+  initialCode: string;
+  onCodeChange: (code: string) => void;
+};
+
+export default function EditorController({
+  initialCode,
+  onCodeChange,
+}: EditorControllerProps) {
+  const defString = [
+    {
+      text: "async def",
+      color: "text-[#518DC7]",
+    },
+    {
+      text: " myCustomFunction",
+      color: "text-white",
+    },
+    {
+      text: "(",
+      color: "text-[#ffd700]",
+    },
+    {
+      text: "message:",
+      color: "text-white",
+    },
+    {
+      text: " types.Message",
+      color: "text-[#518DC7]",
+    },
+
+    {
+      text: ")",
+      color: "text-[#ffd700]",
+    },
+  ];
+
+  return (
+    <div
+      style={{
+        border: "1px solid #333",
+        marginTop: "20px",
+        borderRadius: "8px",
+        overflow: "hidden",
+        background: "#1E1E1E",
+      }}
+    >
+      <div className="pl-[75px]">
+        {defString.map((item, index) => (
+          <span key={index} className={`${item.color} editorText`}>
+            {item.text}
+          </span>
+        ))}
+      </div>
+      <DynamicPythonEditor
+        initialCode={initialCode}
+        onCodeChange={onCodeChange}
+      />
+    </div>
+  );
+}
+
+```
+
+### 📄 constructor/components/editor/mono-editor.tsx
+
+```tsx
+"use client";
+
+import React, { useRef } from "react";
+import { Editor } from "@monaco-editor/react";
+import type { editor } from "monaco-editor";
+
+interface MonoPythonEditorProps {
+  initialCode: string;
+  onCodeChange: (code: string) => void;
+}
+
+const MonoPythonEditor: React.FC<MonoPythonEditorProps> = ({
+  initialCode,
+  onCodeChange,
+}) => {
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<any>(null);
+
+  function handleEditorDidMount(
+    editor: editor.IStandaloneCodeEditor,
+    monaco: any
+  ) {
+    editorRef.current = editor;
+    monacoRef.current = monaco;
+
+    monaco.languages.registerCompletionItemProvider("python", {
+      provideCompletionItems: (model: any, position: any) => {
+        // Avvalgi takliflar
+        const baseSuggestions = [
+          {
+            label: 'if __name__ == "__main__"',
+            kind: monaco.languages.CompletionItemKind.Snippet,
+            insertText: 'if __name__ == "__main__":\n    asyncio.run(main())',
+            documentation: "Standard Python async entry point.",
+          },
+          // ... boshqa umumiy takliflar
+        ];
+
+        // --- AIOGRAM UCHUN MAXSUS TAKLIFLAR ---
+        const aiogramSuggestions = [
+          // Imports
+          {
+            label: "aiogram_imports",
+            kind: monaco.languages.CompletionItemKind.Snippet,
+            insertText: [
+              "import asyncio",
+              "import logging",
+              "from aiogram import Bot, Dispatcher, Router, F",
+              "from aiogram.types import Message",
+              "from aiogram.filters import CommandStart",
+            ].join("\n"),
+            documentation: "Aiogram 3.x uchun asosiy importlar",
+          },
+          // Bot va Dispatcher yaratish
+          {
+            label: "bot_setup",
+            kind: monaco.languages.CompletionItemKind.Snippet,
+            insertText:
+              'bot = Bot(token="${1:YOUR_BOT_TOKEN}")\ndp = Dispatcher()',
+            documentation: "Bot va Dispatcher obyektlarini yaratish",
+          },
+          // To'liq bot shabloni
+          {
+            label: "aiogram_boilerplate",
+            kind: monaco.languages.CompletionItemKind.Snippet,
+            insertText: [
+              "import asyncio",
+              "import logging",
+              "from aiogram import Bot, Dispatcher, Router, F",
+              "from aiogram.types import Message",
+              "from aiogram.filters import CommandStart",
+              "",
+              "# Bot tokenini bu yerga yozing",
+              'API_TOKEN = "${1:YOUR_BOT_TOKEN}"',
+              "",
+              "# Router yaratamiz",
+              "router = Router()",
+              "",
+              "@router.message(CommandStart())",
+              "async def cmd_start(message: Message):",
+              '    await message.answer("Salom!")',
+              "",
+              "async def main():",
+              "    bot = Bot(token=API_TOKEN)",
+              "    dp = Dispatcher()",
+              "    dp.include_router(router)",
+              "",
+              "    # Eski webhookni o'chirish (ixtiyoriy)",
+              "    await bot.delete_webhook(drop_pending_updates=True)",
+              "    await dp.start_polling(bot)",
+              "",
+              'if __name__ == "__main__":',
+              "    logging.basicConfig(level=logging.INFO)",
+              "    asyncio.run(main())",
+            ].join("\n"),
+            documentation: "Aiogram 3.x uchun to'liq ishchi shablon",
+          },
+          // Handlerlar
+          {
+            label: "@router.message",
+            kind: monaco.languages.CompletionItemKind.Snippet,
+            insertText: [
+              "@router.message(${1:F.text})",
+              "async def message_handler(message: Message):",
+              '    await message.answer("${2:Javob matni}")',
+            ].join("\n"),
+            documentation: "Yangi xabarlar uchun handler (message handler)",
+          },
+          {
+            label: "@router.callback_query",
+            kind: monaco.languages.CompletionItemKind.Snippet,
+            insertText: [
+              '@router.callback_query(${1:F.data == "my_callback"})',
+              "async def callback_handler(callback_query: CallbackQuery):",
+              "    await callback_query.answer()",
+              '    await callback_query.message.edit_text("${2:Yangi matn}")',
+            ].join("\n"),
+            documentation: "Callback query uchun handler (inline tugmalar)",
+          },
+          // Magic Filter
+          {
+            label: "F.text",
+            kind: monaco.languages.CompletionItemKind.Property,
+            insertText: "F.text",
+            documentation: "Xabar matnini filterlash (Magic Filter)",
+          },
+          {
+            label: "F.data",
+            kind: monaco.languages.CompletionItemKind.Property,
+            insertText: "F.data",
+            documentation: "Callback ma'lumotini filterlash (Magic Filter)",
+          },
+          // Boshqa foydali narsalar
+          {
+            label: "message.answer",
+            kind: monaco.languages.CompletionItemKind.Method,
+            insertText: 'await message.answer("${1:Text}")',
+            documentation: "Xabarga javob yuborish",
+          },
+        ];
+
+        return { suggestions: [...baseSuggestions, ...aiogramSuggestions] };
+      },
+    });
+  }
+
+  function handleEditorChange(value: string | undefined) {
+    if (value !== undefined) {
+      onCodeChange(value);
+    }
+  }
+
+  return (
+    <Editor
+      height="80vh"
+      language="python"
+      theme="vs-dark"
+      defaultValue={initialCode}
+      onChange={handleEditorChange}
+      onMount={handleEditorDidMount}
+      options={{
+        fontFamily: "'Fira Code', monospace", // Fira Code shriftini belgilaymiz
+        fontLigatures: true, // Ligaturalarni yoqamiz
+        fontSize: 16,
+        minimap: { enabled: true },
+        contextmenu: true,
+        wordWrap: "on",
+        tabSize: 4,
+      }}
+    />
+  );
+};
+
+export default MonoPythonEditor;
+
+```
+
 ### 📄 constructor/components/index.ts
 
 ```ts
@@ -754,6 +1018,7 @@ import { ElementItemType } from "@/types/element-types";
 import { CustomNodes } from "./nodes";
 import { useFlowStore } from "./store";
 import { QuickAddPalette } from "./components";
+import { CustomEdge } from "./edges";
 
 function FlowchartInner() {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
@@ -932,6 +1197,7 @@ function FlowchartInner() {
     >
       <ReactFlow
         nodeTypes={CustomNodes}
+        edgeTypes={CustomEdge}
         nodes={nodes}
         edges={edges}
         onConnect={onConnect}
@@ -1077,6 +1343,14 @@ export const Elements: ElementTypes[] = [
         color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
         triggerId: "CustomCodeNode",
       },
+      {
+        type: "audio",
+        name: "Waypoint",
+        description: "Chiziq yo'nalishini boshqarish uchun yordamchi nuqta",
+        icon: "📍", // Yoki boshqa ikonka
+        color: "bg-gray-500/10 text-gray-400 border-gray-500/20",
+        triggerId: "HelperNode",
+      },
       // {
       //   type: "condition",
       //   name: "Condition",
@@ -1211,6 +1485,282 @@ export const themes = {
 
 export type Theme = typeof themes.dark;
 export type ThemeName = keyof typeof themes;
+
+```
+
+### 📄 constructor/edges/SmartEdge.tsx
+
+```tsx
+// Fayl: constructor/edges/SmartEdge.tsx
+
+import React from "react";
+import {
+  BaseEdge,
+  EdgeProps,
+  getSmoothStepPath,
+  Position,
+  useNodes,
+  Node,
+} from "reactflow";
+import { getObstacleNodes } from "../lib/geometry";
+
+// Yordamchi funksiya: Nodelar guruhining umumiy chegarasini hisoblaydi
+const getNodesBoundingBox = (
+  nodes: Node[],
+  padding: number = 0
+): { minX: number; maxX: number; minY: number; maxY: number } => {
+  if (nodes.length === 0) return { minX: 0, maxX: 0, minY: 0, maxY: 0 };
+  return nodes.reduce(
+    (box, node) => {
+      const x = node.positionAbsolute?.x ?? node.position.x;
+      const y = node.positionAbsolute?.y ?? node.position.y;
+      const width = node.width ?? 0;
+      const height = node.height ?? 0;
+      return {
+        minX: Math.min(box.minX, x - padding),
+        maxX: Math.max(box.maxX, x + width + padding),
+        minY: Math.min(box.minY, y - padding),
+        maxY: Math.max(box.maxY, y + height + padding),
+      };
+    },
+    { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity }
+  );
+};
+
+const SmartEdge = (props: EdgeProps) => {
+  const {
+    id,
+    source,
+    target,
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+    markerEnd,
+    style,
+  } = props;
+
+  const allNodes = useNodes();
+  const sourceNode = allNodes.find((n) => n.id === source);
+  const targetNode = allNodes.find((n) => n.id === target);
+  const otherNodes = allNodes.filter((n) => n.id !== source && n.id !== target);
+
+  // Agar nodelar hali yuklanmagan bo'lsa, hech narsa chizmaymiz
+  if (!sourceNode || !targetNode) {
+    return null;
+  }
+
+  const isLoopback = sourceNode.position.y > targetNode.position.y;
+  const edgePath = getSmartPath(
+    props,
+    sourceNode,
+    targetNode,
+    otherNodes,
+    isLoopback
+  );
+
+  return (
+    <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} style={style} />
+  );
+};
+
+// ASOSIY MANTIQ: Yo'lni hisoblaydigan markaziy funksiya
+function getSmartPath(
+  props: EdgeProps,
+  sourceNode: Node,
+  targetNode: Node,
+  otherNodes: Node[],
+  isLoopback: boolean
+): string {
+  const { sourceX, sourceY, targetX, targetY } = props;
+  const obstacles = getObstacleNodes(
+    { x: sourceX, y: sourceY },
+    { x: targetX, y: targetY },
+    otherNodes
+  );
+
+  const OFFSET = 35; // Nodedan chiqish masofasi
+  const PADDING = 25; // To'siq atrofidagi xavfsizlik maydoni
+
+  // 1-QOIDA: "TESKARI ALOQA" (pastdan yuqoriga ulanish)
+  if (isLoopback) {
+    const diagramBBox = getNodesBoundingBox(otherNodes, PADDING * 2);
+    const nodesCenterX = (sourceNode.position.x + targetNode.position.x) / 2;
+    const diagramCenterX = (diagramBBox.minX + diagramBBox.maxX) / 2;
+
+    const loopSide = nodesCenterX < diagramCenterX ? "left" : "right";
+    const loopX =
+      loopSide === "left"
+        ? diagramBBox.minX - PADDING * 1.5
+        : diagramBBox.maxX + PADDING * 1.5;
+
+    // To'g'ri burchakli, lekin silliq yo'l
+    return `M ${sourceX},${sourceY} L ${sourceX},${
+      sourceY + OFFSET
+    } L ${loopX},${sourceY + OFFSET} L ${loopX},${
+      targetY - OFFSET
+    } L ${targetX},${targetY - OFFSET} L ${targetX},${targetY}`;
+  }
+
+  // 2-QOIDA: TO'SIQNI AYLANIB O'TISH (o'rtada boshqa node bor)
+  if (obstacles.length > 0) {
+    const obstaclesBBox = getNodesBoundingBox(obstacles, PADDING);
+    const midY = (sourceY + targetY) / 2;
+
+    // To'siqni tepadan yoki pastdan aylanib o'tishni aniqlash
+    // Agar to'siq o'rtadan yuqorida bo'lsa, pastdan aylanib o'tamiz
+    if (obstaclesBBox.minY < midY && obstaclesBBox.maxY > midY) {
+      const detourY =
+        sourceNode.position.y > targetNode.position.y
+          ? obstaclesBBox.maxY
+          : obstaclesBBox.minY;
+      return `M ${sourceX},${sourceY} L ${sourceX},${detourY} L ${targetX},${detourY} L ${targetX},${targetY}`;
+    }
+  }
+
+  // 3-QOIDA: O'Z-O'ZIGA ULANGAN KICHIK YOY
+  if (source === target) {
+    return `M ${sourceX},${sourceY} C ${sourceX - OFFSET * 2},${
+      sourceY - OFFSET * 2
+    } ${sourceX + OFFSET * 2},${sourceY - OFFSET * 2} ${sourceX},${sourceY}`;
+  }
+
+  // 4-QOIDA: ODDIY SILLIQ ULANISH (yo'l bo'sh)
+  const [path] = getSmoothStepPath(props);
+  return path;
+}
+
+export default SmartEdge;
+
+```
+
+### 📄 constructor/edges/index.ts
+
+```ts
+// Mavjud `export const CustomEdge = {};` qatorini o'chiring va o'rniga buni yozing:
+
+import SmartEdge from "./SmartEdge";
+
+export const CustomEdge = {
+  // Yangi edge turiga nom beramiz
+  "smart-edge": SmartEdge,
+};
+
+```
+
+### 📄 constructor/lib/geometry.ts
+
+```ts
+import { Node, XYPosition } from "reactflow";
+
+// To'rtburchak (Bounding Box) uchun interfeys
+interface BBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Ikki nuqta orasidagi chiziq segmenti to'rtburchak bilan kesishadimi yoki yo'qligini tekshiradi.
+ * @param p1 Chiziqning boshlang'ich nuqtasi {x, y}
+ * @param p2 Chiziqning tugash nuqtasi {x, y}
+ * @param rect To'rtburchakning BBox'i {x, y, width, height}
+ * @returns Kesishsa `true`, aks holda `false`
+ */
+export function lineIntersectsRect(
+  p1: { x: number; y: number },
+  p2: { x: number; y: number },
+  rect: BBox
+): boolean {
+  // To'rtburchakning chegaralarini aniqlaymiz
+  const left = rect.x;
+  const right = rect.x + rect.width;
+  const top = rect.y;
+  const bottom = rect.y + rect.height;
+
+  // Har bir tomon bilan kesishishni tekshirib chiqamiz
+  const intersects = (
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    x3: number,
+    y3: number,
+    x4: number,
+    y4: number
+  ): boolean => {
+    const den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    if (den === 0) return false; // Parallel chiziqlar
+
+    const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+    const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
+
+    return t > 0 && t < 1 && u > 0 && u < 1;
+  };
+
+  // Har bir tomon bilan tekshirish
+  if (intersects(p1.x, p1.y, p2.x, p2.y, left, top, right, top)) return true; // Yuqori tomon
+  if (intersects(p1.x, p1.y, p2.x, p2.y, right, top, right, bottom))
+    return true; // O'ng tomon
+  if (intersects(p1.x, p1.y, p2.x, p2.y, right, bottom, left, bottom))
+    return true; // Pastki tomon
+  if (intersects(p1.x, p1.y, p2.x, p2.y, left, bottom, left, top)) return true; // Chap tomon
+
+  return false;
+}
+
+// --- YANGI FUNKSIYA ---
+/**
+ * Chiziq yo'lidagi to'siq bo'lgan nodelarni topadi.
+ * @param sourcePos - Boshlang'ich nuqta
+ * @param targetPos - Manzil nuqtasi
+ * @param nodes - Barcha nodelar ro'yxati
+ * @param padding - Nodelar atrofidagi xavfsizlik maydoni (bufer)
+ * @returns To'siq bo'lgan nodelar massivi
+ */
+export const getObstacleNodes = (
+  sourcePos: XYPosition,
+  targetPos: XYPosition,
+  nodes: Node[],
+  padding = 20 // Nodelarni aylanib o'tish uchun qo'shimcha joy
+): Node[] => {
+  const obstacles: Node[] = [];
+
+  const minX = Math.min(sourcePos.x, targetPos.x);
+  const maxX = Math.max(sourcePos.x, targetPos.x);
+  const minY = Math.min(sourcePos.y, targetPos.y);
+  const maxY = Math.max(sourcePos.y, targetPos.y);
+
+  for (const node of nodes) {
+    if (!node.width || !node.height || !node.position) {
+      continue;
+    }
+    const nodeBBox: BBox = {
+      x: node.position.x - padding,
+      y: node.position.y - padding,
+      width: node.width + padding * 2,
+      height: node.height + padding * 2,
+    };
+
+    // Agar node chiziq koridorida bo'lmasa, uni o'tkazib yuboramiz
+    if (
+      nodeBBox.x + nodeBBox.width < minX ||
+      nodeBBox.x > maxX ||
+      nodeBBox.y + nodeBBox.height < minY ||
+      nodeBBox.y > maxY
+    ) {
+      continue;
+    }
+
+    // Agar chiziq nodening o'zi bilan kesishsa, uni to'siq deb hisoblaymiz
+    if (lineIntersectsRect(sourcePos, targetPos, nodeBBox)) {
+      obstacles.push(node);
+    }
+  }
+
+  return obstacles;
+};
 
 ```
 
@@ -1736,23 +2286,26 @@ const SendPhotoNodeComponent = ({
             />
 
             {/* Rasm manbasi */}
-            <div className="grid gap-2">
+            <div className="flex flex-col gap-2">
               <Label>Rasm manbasi</Label>
-              <Select
-                value={data.photoSourceType}
-                onValueChange={(value: PhotoSourceType) =>
-                  handleUpdate({ photoSourceType: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Manbani tanlang..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="file_id">Mavjud File ID</SelectItem>
-                  <SelectItem value="url">Internet (URL)</SelectItem>
-                  <SelectItem value="upload">Kompyuterdan yuklash</SelectItem>
-                </SelectContent>
-              </Select>
+
+              <div className="">
+                <Select
+                  value={data.photoSourceType}
+                  onValueChange={(value: PhotoSourceType) =>
+                    handleUpdate({ photoSourceType: value })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Manbani tanlang..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="file_id">Mavjud File ID</SelectItem>
+                    <SelectItem value="url">Internet (URL)</SelectItem>
+                    <SelectItem value="upload">Kompyuterdan yuklash</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               {data.photoSourceType === "file_id" && (
                 <Input
                   placeholder="rasm_fayl_idsi_bu_yerda..."
@@ -2710,23 +3263,18 @@ export * from "./shared";
 
 ```tsx
 import React from "react";
-
 import { PlusIcon } from "lucide-react";
 import { Handle, Position } from "reactflow";
 
-type Props = {};
-
-export function SourceHandler({}: Props) {
+export function SourceHandler() {
   return (
-    <>
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!w-4 !h-4 !bg-blue-500 flex items-center justify-center"
-      >
-        <PlusIcon size={12} className="w-2 h-2 text-white" />
-      </Handle>
-    </>
+    <Handle
+      type="source"
+      position={Position.Bottom}
+      className="!w-4 !h-4 !bg-sky-500 !border-2 !border-gray-800 flex items-center justify-center"
+    >
+      <PlusIcon size={12} className="w-2 h-2 text-white" />
+    </Handle>
   );
 }
 
@@ -2736,23 +3284,18 @@ export function SourceHandler({}: Props) {
 
 ```tsx
 import React from "react";
-
 import { CircleDot } from "lucide-react";
 import { Handle, Position } from "reactflow";
 
-type Props = {};
-
-export function TargetHandler({}: Props) {
+export function TargetHandler() {
   return (
-    <>
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="!w-4 !h-4 !bg-blue-500 flex items-center justify-center"
-      >
-        <CircleDot size={12} className="w-2 h-2 text-white" />
-      </Handle>
-    </>
+    <Handle
+      type="target"
+      position={Position.Top}
+      className="!w-4 !h-4 !bg-sky-500 !border-2 !border-gray-800 flex items-center justify-center"
+    >
+      <CircleDot size={12} className="w-2 h-2 text-white" />
+    </Handle>
   );
 }
 
@@ -2777,27 +3320,22 @@ export * from "./ReactFlowHandlers";
 
 ```tsx
 import { useState, useEffect } from "react";
-import Editor, { OnMount } from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Save,
-  Zap,
   HelpCircle,
   Bot,
   MessageSquare,
   Braces,
 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 import { CodeExecutionContext } from "./types";
-import { setupPythonEditor } from "./editor.setup"; // Modular config
+import EditorController from "@/constructor/components/editor/editor";
 
 interface CodeEditorDialogProps {
   initialCode: string;
@@ -2854,7 +3392,6 @@ export const CodeEditorDialog = ({
   initialCode,
   onSave,
   children,
-  contextType,
 }: CodeEditorDialogProps) => {
   const [code, setCode] = useState(initialCode);
   const [isOpen, setIsOpen] = useState(false);
@@ -2870,54 +3407,11 @@ export const CodeEditorDialog = ({
     setIsOpen(false);
   };
 
-  const handleEditorMount: OnMount = (editor, monaco) => {
-    // Python muharririni konfiguratsiya qilish
-    const disposables = setupPythonEditor(monaco, contextType);
-
-    // Ctrl/Cmd + S bosilganda saqlash
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, handleSave);
-    editor.focus();
-
-    // Editor yopilganda tozalash
-    return () => {
-      disposables.forEach((d) => d.dispose());
-    };
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[90%] w-full h-[90vh] flex flex-col p-0 gap-0">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="flex items-center gap-2">
-            <Zap className="text-yellow-400" />
-            Maxsus Python Kodi
-          </DialogTitle>
-        </DialogHeader>
-        <Separator />
-        <div className="flex-grow flex h-full overflow-hidden">
-          <div className="flex-1 h-full">
-            <Editor
-              height="100%"
-              language="python"
-              theme="vs-dark"
-              value={code}
-              onChange={(value) => setCode(value || "")}
-              onMount={handleEditorMount}
-              options={{
-                fontSize: 14,
-                fontFamily: "Fira Code, monospace",
-                wordWrap: "on",
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                tabSize: 4,
-                automaticLayout: true,
-              }}
-            />
-          </div>
-          <ContextInfoPanel />
-        </div>
-        <Separator />
+      <DialogContent className="sm:max-w-[90%] w-full h-[90vh] flex flex-col gap-0">
+        <EditorController initialCode={code} onCodeChange={setCode} />
         <DialogFooter className="p-4 bg-background/95 backdrop-blur-sm">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <HelpCircle className="h-4 w-4" />
@@ -3011,7 +3505,6 @@ const CustomCodeNodeComponent = ({
           <CodeEditorDialog
             initialCode={data.pythonCode || DEFAULT_CODE}
             onSave={handleSaveCode}
-            // === TUZATISH SHU YERDA ===
             contextType={"message"}
           >
             <div className="flex flex-col items-center justify-center text-center p-4 border border-dashed rounded-lg hover:bg-muted cursor-pointer transition-colors">
@@ -3343,6 +3836,34 @@ export interface CustomCodeNodeData {
 
 ```
 
+### 📄 constructor/nodes/custom/HelperNode.tsx
+
+```tsx
+import { memo } from "react";
+import { NodeProps } from "reactflow";
+import { cn } from "@/lib/utils";
+
+// Bu node hech qanday data qabul qilmaydi
+const HelperNodeComponent = ({ selected }: NodeProps) => {
+  return (
+    <>
+      {/* Bu node ga chiziq ulab bo'lmasligi uchun Handle'larni qo'shmaymiz */}
+      <div
+        className={cn(
+          "w-3 h-3 bg-gray-500/30 rounded-full backdrop-blur-sm border border-gray-400/50 transition-all duration-150",
+          "hover:bg-primary/50 hover:border-primary",
+          selected && "ring-2 ring-primary bg-primary/70 border-primary"
+        )}
+        title="Yordamchi Tugun: Chiziq yo'nalishini boshqarish uchun"
+      />
+    </>
+  );
+};
+
+export const HelperNode = memo(HelperNodeComponent);
+
+```
+
 ### 📄 constructor/nodes/custom/index.ts
 
 ```ts
@@ -3367,6 +3888,8 @@ import {
   CallbackQueryTriggerNode,
 } from "./triggers";
 
+import { HelperNode } from "./custom/HelperNode";
+
 import { CustomCodeNode } from "./custom";
 
 export const CustomNodes = {
@@ -3380,6 +3903,7 @@ export const CustomNodes = {
   SendAudioNode,
   SendFileNode,
   CustomCodeNode,
+  HelperNode,
 };
 
 ```
@@ -3724,9 +4248,13 @@ const MessageTriggerNodeComponent = ({
 
   return (
     <Card
-      className={`w-100 rounded-lg shadow-md bg-gray-800 border-gray-700 ${
-        selected ? "ring-2 ring-blue-500/80" : ""
+      className={`w-80 rounded-lg shadow-xl bg-[#212529] border-2 ${
+        selected ? "border-sky-500/80" : "border-gray-600/50"
       }`}
+
+      // className={`w-100 rounded-lg shadow-md bg-gray-800 border-gray-700 ${
+      //   selected ? "ring-2 ring-blue-500/80" : ""
+      // }`}
     >
       <TargetHandler />
 
@@ -4763,8 +5291,20 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     onConnect: (connection: Connection) => {
       const newEdge = {
         ...connection,
-        type: "smoothstep",
-        animated: true,
+        type: "smart-edge", // Bizning maxsus chizig'imiz
+        // Rasmga mos stil
+        style: {
+          strokeWidth: 1.5,
+          stroke: "#495057", // To'q kulrang
+        },
+        // Strelka uchini ham chiziq rangiga moslaymiz
+        markerEnd: {
+          type: "arrowclosed",
+          width: 20,
+          height: 20,
+          color: "#495057", // To'q kulrang
+        },
+        animated: false,
       };
 
       set({
