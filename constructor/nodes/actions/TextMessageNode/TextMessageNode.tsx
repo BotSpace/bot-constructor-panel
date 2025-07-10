@@ -1,4 +1,4 @@
-import { Handle, NodeProps, Position } from "reactflow";
+import { NodeProps } from "reactflow";
 
 import TextareaAutosize from "react-textarea-autosize";
 
@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@radix-ui/react-select";
-import { Checkbox } from "@radix-ui/react-checkbox";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
@@ -106,18 +105,6 @@ const SendTextMessageNodeComponent = ({
                   <SelectItem value="MarkdownV2">MarkdownV2</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={`disable-preview-${id}`}
-                  checked={!!data.disableWebPagePreview}
-                  onCheckedChange={(checked) =>
-                    handleUpdate({ disableWebPagePreview: !!checked })
-                  }
-                />
-                <Label className="text-sm font-normal cursor-pointer">
-                  Link uchun prevyuni o'chirish
-                </Label>
-              </div>
             </div>
           </CardContent>
 

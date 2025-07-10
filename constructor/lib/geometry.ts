@@ -15,7 +15,7 @@ interface BBox {
  * @param rect To'rtburchakning BBox'i {x, y, width, height}
  * @returns Kesishsa `true`, aks holda `false`
  */
-export function lineIntersectsRect(
+function lineIntersectsRect(
   p1: { x: number; y: number },
   p2: { x: number; y: number },
   rect: BBox
@@ -43,7 +43,7 @@ export function lineIntersectsRect(
     const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
     const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
 
-    return t > 0 && t < 1 && u > 0 && u < 1;
+    return t >= 0 && t <= 1 && u >= 0 && u <= 1;
   };
 
   // Har bir tomon bilan tekshirish
@@ -57,7 +57,6 @@ export function lineIntersectsRect(
   return false;
 }
 
-// --- YANGI FUNKSIYA ---
 /**
  * Chiziq yo'lidagi to'siq bo'lgan nodelarni topadi.
  * @param sourcePos - Boshlang'ich nuqta
@@ -70,7 +69,7 @@ export const getObstacleNodes = (
   sourcePos: XYPosition,
   targetPos: XYPosition,
   nodes: Node[],
-  padding = 20 // Nodelarni aylanib o'tish uchun qo'shimcha joy
+  padding = 20 // Xavfsizlik maydonini kattaroq qilamiz
 ): Node[] => {
   const obstacles: Node[] = [];
 
@@ -90,12 +89,12 @@ export const getObstacleNodes = (
       height: node.height + padding * 2,
     };
 
-    // Agar node chiziq koridorida bo'lmasa, uni o'tkazib yuboramiz
+    // Agar node to'g'ri chiziqning bounding box'i bilan kesishmasa, o'tkazib yuboramiz
     if (
-      nodeBBox.x + nodeBBox.width < minX ||
-      nodeBBox.x > maxX ||
-      nodeBBox.y + nodeBBox.height < minY ||
-      nodeBBox.y > maxY
+      nodeBBox.x + nodeBBox.width < minX - padding ||
+      nodeBBox.x > maxX + padding ||
+      nodeBBox.y + nodeBBox.height < minY - padding ||
+      nodeBBox.y > maxY + padding
     ) {
       continue;
     }

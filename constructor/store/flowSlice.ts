@@ -59,6 +59,7 @@ export const createFlowSlice: StateCreator<
       isDirty: true,
     });
   },
+
   onConnect: (connection) => {
     // Bu funksiya endi index.ts da override qilinadi,
     // lekin slice ichida standart versiyasi bo'lgani yaxshi.

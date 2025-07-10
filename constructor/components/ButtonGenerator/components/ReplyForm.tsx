@@ -1,0 +1,184 @@
+// FAYL: constructor/components/ButtonGenerator/components/ReplyForm.tsx (YANGILANGAN)
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PlusCircle, Smartphone, MapPin, Globe, BarChart3 } from "lucide-react";
+import { ButtonConfig } from "../types";
+import { WebAppForm } from "./WebAppForm";
+
+interface ReplyFormProps {
+  onAdd: (button: ButtonConfig) => void;
+  disabled: boolean;
+}
+
+export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
+  const [text, setText] = useState("");
+  const [pollType, setPollType] = useState<"quiz" | "regular">("regular");
+  const [webAppUrl, setWebAppUrl] = useState("");
+  const [webAppText, setWebAppText] = useState("");
+
+  const handleAddText = () => {
+    if (!text) {
+      alert("Iltimos, matnli tugma uchun matn kiriting.");
+      return;
+    }
+    onAdd({ id: `btn-${Date.now()}`, text, type: "reply" });
+    setText("");
+  };
+
+  const handleAddWebApp = () => {
+    if (!webAppText || !webAppUrl) {
+      alert("Web App uchun matn va URL kiriting.");
+      return;
+    }
+    onAdd({
+      id: `btn-${Date.now()}`,
+      text: webAppText,
+      type: "web_app",
+      webApp: { url: webAppUrl },
+    });
+    setWebAppText("");
+    setWebAppUrl("");
+  };
+
+  const handleAddSpecial = (
+    type: "request_contact" | "request_location" | "request_poll"
+  ) => {
+    let newButton: ButtonConfig;
+    switch (type) {
+      case "request_contact":
+        newButton = {
+          id: `btn-${Date.now()}`,
+          text: "📱 Kontaktimni yuborish",
+          type,
+        };
+        break;
+      case "request_location":
+        newButton = {
+          id: `btn-${Date.now()}`,
+          text: "📍 Joylashuvimni yuborish",
+          type,
+        };
+        break;
+      case "request_poll":
+        newButton = {
+          id: `btn-${Date.now()}`,
+          text: `📊 So'rovnoma yaratish (${pollType})`,
+          type,
+          pollType,
+        };
+        break;
+    }
+    onAdd(newButton);
+  };
+
+  return (
+    <div className="mt-4 space-y-4">
+      {/* Oddiy matnli tugma */}
+      <div>
+        <Label htmlFor="reply-text">Oddiy matnli tugma</Label>
+        <div className="flex gap-2">
+          <Input
+            id="reply-text"
+            placeholder="Masalan, Asosiy Menyu"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+          <Button
+            type="button"
+            onClick={handleAddText}
+            disabled={disabled || !text}
+          >
+            <PlusCircle className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Web App tugmasi */}
+      <div className="space-y-2 p-3 border rounded-md">
+        <Label>Web App Tugmasi</Label>
+        <Input
+          placeholder="Tugma matni (masalan, 'Katalog')"
+          value={webAppText}
+          onChange={(e) => setWebAppText(e.target.value)}
+        />
+        <WebAppForm url={webAppUrl} onUrlChange={setWebAppUrl} />
+        <Button
+          type="button"
+          className="w-full"
+          onClick={handleAddWebApp}
+          disabled={disabled}
+        >
+          <Globe className="mr-2 h-4 w-4" /> Web App qo'shish
+        </Button>
+      </div>
+
+      <div className="relative my-2">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            Maxsus so'rovlar
+          </span>
+        </div>
+      </div>
+
+      {/* Maxsus so'rov tugmalari */}
+      <div className="space-y-3">
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          type="button"
+          onClick={() => handleAddSpecial("request_contact")}
+          disabled={disabled}
+        >
+          <Smartphone className="mr-2 h-4 w-4" /> Kontakt so'rash
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          type="button"
+          onClick={() => handleAddSpecial("request_location")}
+          disabled={disabled}
+        >
+          <MapPin className="mr-2 h-4 w-4" /> Joylashuv so'rash
+        </Button>
+
+        <div className="flex gap-2 items-end">
+          <div className="flex-grow">
+            <Label>So'rovnoma turi</Label>
+            <Select
+              value={pollType}
+              onValueChange={(v: "quiz" | "regular") => setPollType(v)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="regular">Oddiy</SelectItem>
+                <SelectItem value="quiz">Viktorina (Quiz)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => handleAddSpecial("request_poll")}
+            disabled={disabled}
+          >
+            <BarChart3 className="mr-2 h-4 w-4" /> Qo'shish
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
