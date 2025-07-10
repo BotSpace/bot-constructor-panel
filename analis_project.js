@@ -1,9 +1,12 @@
 const fs = require("fs");
 const path = require("path");
-const readline = require("readline");
 
 // --- SOZLAMALAR ---
+// Skript ishga tushiriladigan asosiy papka
+const ROOT_DIR = process.cwd();
+// Tahlil natijalari saqlanadigan fayl nomi
 const OUTPUT_FILE = "project_analysis.md";
+// E'tibor berilmaydigan papka va fayllar ro'yxati
 const IGNORE_LIST = [
   "node_modules",
   ".git",
@@ -11,12 +14,20 @@ const IGNORE_LIST = [
   ".vscode",
   "public",
   "package-lock.json",
-  OUTPUT_FILE,
-  "analyze_project.js",
+  OUTPUT_FILE, // Skript o'zini o'zi o'qimasligi uchun
+  "analyze_project.js", // Skript o'zini o'zi o'qimasligi uchun
 ];
+// Aynan qaysi papka ichidagi fayllarning tarkibini o'qish kerak
 const ANALYZE_CONTENT_DIR = "constructor";
 
 // --- YORDAMCHI FUNKSIYALAR ---
+
+/**
+ * Fayl strukturasini daraxtsimon ko'rinishda yaratadi va muhim fayllar tarkibini yig'adi
+ * @param {string} dir - Joriy papka yo'li
+ * @param {string} prefix - Daraxt uchun prefiks
+ * @returns {{structure: string, files: Array<{path: string, content: string}>}}
+ */
 function analyzeDirectory(dir, prefix = "") {
   let structure = "";
   const collectedFiles = [];
@@ -42,7 +53,8 @@ function analyzeDirectory(dir, prefix = "") {
         structure += result.structure;
         collectedFiles.push(...result.files);
       } else if (stats.isFile()) {
-        const relativePath = path.relative(dir, fullPath);
+        // Agar fayl ANALYZE_CONTENT_DIR ichida bo'lsa va kengaytmasi .ts yoki .tsx bo'lsa
+        const relativePath = path.relative(ROOT_DIR, fullPath);
         if (
           relativePath.startsWith(path.normalize(ANALYZE_CONTENT_DIR)) &&
           (entry.endsWith(".ts") || entry.endsWith(".tsx"))
@@ -52,6 +64,7 @@ function analyzeDirectory(dir, prefix = "") {
         }
       }
     } catch (error) {
+      // Ba'zi tizim fayllariga kirishda xatolik bo'lishi mumkin
       structure += `${prefix}    (xatolik: ${entry} o'qilmadi)\n`;
     }
   }
@@ -59,60 +72,44 @@ function analyzeDirectory(dir, prefix = "") {
   return { structure, files: collectedFiles };
 }
 
-// --- PAPKA TANLASH VA MAIN ---
-function promptFolderSelection() {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
+// --- ASOSIY MANTIQ ---
 
-  rl.question(
-    `Qaysi papkani tahlil qilaylik? (standart: joriy papka)\n> `,
-    function (inputPath) {
-      const ROOT_DIR = inputPath.trim()
-        ? path.resolve(inputPath.trim())
-        : process.cwd();
+function main() {
+  console.log("Loyihani tahlil qilish boshlandi...");
 
-      if (!fs.existsSync(ROOT_DIR)) {
-        console.error("❌ Bunday papka mavjud emas:", ROOT_DIR);
-        rl.close();
-        return;
-      }
+  let markdownContent = `# Loyiha Tahlili Hisoboti\n\nSana: ${new Date().toLocaleString()}\n\n`;
 
-      console.log("Loyihani tahlil qilish boshlandi...");
+  const { structure, files } = analyzeDirectory(ROOT_DIR);
 
-      let markdownContent = `# Loyiha Tahlili Hisoboti\n\nSana: ${new Date().toLocaleString()}\n\n`;
+  // 1. Fayl strukturasi
+  markdownContent += "## 📁 Fayl Strukturasi\n\n";
+  markdownContent += "```\n";
+  markdownContent += `${path.basename(ROOT_DIR)}\n`;
+  markdownContent += structure;
+  markdownContent += "```\n\n";
 
-      const { structure, files } = analyzeDirectory(ROOT_DIR);
+  // 2. Muhim fayllar tarkibi
+  markdownContent += `## 📄 Muhim Fayllar Tarkibi (içidan: ${ANALYZE_CONTENT_DIR})\n\n`;
 
-      markdownContent += "## 📁 Fayl Strukturasi\n\n";
-      markdownContent += "```\n";
-      markdownContent += `${path.basename(ROOT_DIR)}\n`;
-      markdownContent += structure;
-      markdownContent += "```\n\n";
+  if (files.length === 0) {
+    markdownContent += `*Belgilangan \`${ANALYZE_CONTENT_DIR}\` papkasidan o'qiladigan fayllar topilmadi.*\n`;
+  } else {
+    files.forEach((file) => {
+      const extension = path.extname(file.path).substring(1);
+      markdownContent += `### 📄 ${file.path}\n\n`;
+      markdownContent += `\`\`\`${extension}\n`;
+      markdownContent += file.content;
+      markdownContent += `\n\`\`\`\n\n`;
+    });
+  }
 
-      markdownContent += `## 📄 Muhim Fayllar Tarkibi (içidan: ${ANALYZE_CONTENT_DIR})\n\n`;
+  // Natijani faylga yozish
+  fs.writeFileSync(OUTPUT_FILE, markdownContent);
 
-      if (files.length === 0) {
-        markdownContent += `*Belgilangan \`${ANALYZE_CONTENT_DIR}\` papkasidan o'qiladigan fayllar topilmadi.*\n`;
-      } else {
-        files.forEach((file) => {
-          const extension = path.extname(file.path).substring(1);
-          markdownContent += `### 📄 ${file.path}\n\n`;
-          markdownContent += `\`\`\`${extension}\n`;
-          markdownContent += file.content;
-          markdownContent += `\n\`\`\`\n\n`;
-        });
-      }
-
-      fs.writeFileSync(path.join(ROOT_DIR, OUTPUT_FILE), markdownContent);
-
-      console.log(`✅ Tahlil "${ROOT_DIR}" papkasida yakunlandi.`);
-      console.log(`📄 Natija fayl: ${OUTPUT_FILE}`);
-      rl.close();
-    }
+  console.log(
+    `✅ Tahlil muvaffaqiyatli yakunlandi! Natijalar "${OUTPUT_FILE}" fayliga saqlandi.`
   );
 }
 
 // Skriptni ishga tushirish
-promptFolderSelection();
+main();

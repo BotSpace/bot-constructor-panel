@@ -5,6 +5,7 @@ import { callbackMethods } from "./callback";
 import { userMethods } from "./types/user";
 import { pythonKeywords } from "../python/keywords";
 import { aiogramGlobals } from "./globals";
+import { buttonSnippets } from "./buttons";
 
 // Takliflarga `range` qo'shuvchi yordamchi funksiya
 function createSuggestionsWithRange(suggestions: any[], range: monaco.IRange) {
@@ -92,6 +93,7 @@ export function AiogramEditorSetup(monacoInstance: typeof monaco) {
       const allGlobalSuggestions = [
         ...pythonKeywords(monacoInstance),
         ...aiogramGlobals(monacoInstance),
+        ...buttonSnippets(monacoInstance), // <-- QO'SHILGAN QATOR
       ];
 
       return {

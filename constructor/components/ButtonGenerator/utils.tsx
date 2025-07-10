@@ -1,0 +1,40 @@
+// FAYL: constructor/components/ButtonGenerator/utils.ts (YANGILANGAN)
+import { ReactNode } from "react";
+import {
+  Link,
+  Code,
+  Smartphone,
+  MapPin,
+  Globe,
+  LogIn,
+  Repeat,
+  BarChart3,
+} from "lucide-react";
+import { ButtonConfig } from "./types";
+
+export const getIconForButton = (button: ButtonConfig): ReactNode => {
+  const commonClasses = "mr-2 h-4 w-4";
+  switch (button.type) {
+    case "url":
+      return <Link className={commonClasses} />;
+    case "callback":
+      return <Code className={commonClasses} />;
+    case "request_contact":
+      return <Smartphone className={commonClasses} />;
+    case "request_location":
+      return <MapPin className={commonClasses} />;
+    // --- YANGI IKONKALAR ---
+    case "web_app":
+      return <Globe className={commonClasses} />;
+    case "login_url":
+      return <LogIn className={commonClasses} />;
+    case "switch_inline_query":
+    case "switch_inline_query_current_chat":
+      return <Repeat className={commonClasses} />;
+    case "request_poll":
+      return <BarChart3 className={commonClasses} />;
+    default:
+      // 'reply' uchun ikonka yo'q
+      return null;
+  }
+};

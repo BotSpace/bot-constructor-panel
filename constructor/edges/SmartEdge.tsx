@@ -1,14 +1,24 @@
 "use client";
-import { BaseEdge, type EdgeProps, getSmoothStepPath } from "reactflow";
+import {
+  BaseEdge,
+  type EdgeProps,
+  getSmoothStepPath,
+  useNodes,
+} from "reactflow";
+import { getObstacleNodes } from "../lib/geometry";
 
-export interface FeedbackLoopEdgeProps extends EdgeProps {
+import { EdgeContextMenu } from "./components/EdgeContextMenu";
+
+export interface SmartEdgeProps extends EdgeProps {
   data?: {
-    loopOffset?: number;
+    // Kelajakda qo'shimcha sozlamalar uchun
   };
 }
 
-export default function FeedbackLoopEdge({
+export default function SmartEdge({
   id,
+  source,
+  target,
   sourceX,
   sourceY,
   targetX,
@@ -17,23 +27,27 @@ export default function FeedbackLoopEdge({
   targetPosition,
   style = {},
   markerEnd,
-  data,
-}: FeedbackLoopEdgeProps) {
-  const loopOffset = data?.loopOffset || 80;
+  selected,
+}: SmartEdgeProps) {
+  const nodes = useNodes();
 
-  // Sizning node'laringiz uchun maxsus o'lchamlar
-  const NODE_WIDTH = 320; // w-80 = 320px
-  const NODE_HEIGHT = 200; // Taxminiy balandlik
-  const HANDLE_OFFSET = 16; // Handle'ning markazdan masofasi
-  const MIN_LOOP_DISTANCE = 60; // Minimal aylanish masofasi
+  const getPath = (): string => {
+    // 1. To'siqlarni aniqlash
+    const potentialObstacles = nodes.filter(
+      (n) => n.id !== source && n.id !== target
+    );
+    const obstacles = getObstacleNodes(
+      { x: sourceX, y: sourceY },
+      { x: targetX, y: targetY },
+      potentialObstacles
+    );
 
-  const getFeedbackLoopPath = () => {
-    // Target yuqorida bo'lsa feedback loop kerak
-    const needsLoop = targetY < sourceY - 20;
+    // 2. Aylanma yo'l kerakmi?
+    const needsLoop = targetY < sourceY - 20 || obstacles.length > 0;
 
     if (!needsLoop) {
-      // Oddiy smooth step path
-      const [edgePath] = getSmoothStepPath({
+      // Yo'l toza bo'lsa, standart silliq chiziq
+      const [path] = getSmoothStepPath({
         sourceX,
         sourceY,
         sourcePosition,
@@ -42,90 +56,69 @@ export default function FeedbackLoopEdge({
         targetPosition,
         borderRadius: 15,
       });
-      return edgePath;
+      return path;
     }
 
-    // Feedback loop yo'lini hisoblash
-    const horizontalDistance = Math.abs(targetX - sourceX);
-    const verticalDistance = sourceY - targetY;
+    // --- MUKAMMALLASHTIRILGAN, ANIQ VA SILLIQ AYLANMA YO'L CHIZISH ALGORITMI ---
+    const verticalMargin = 40;
+    const cornerRadius = 15;
 
-    // Qaysi tomonga aylanishni aniqlash
-    const shouldLoopRight = sourceX <= targetX;
-    const loopDirection = shouldLoopRight ? 1 : -1;
+    // Asosiy nuqtalarni va yo'nalishlarni hisoblash
+    const sourceNode = nodes.find((n) => n.id === source);
+    const targetNode = nodes.find((n) => n.id === target);
 
-    // Aylanish masofasini hisoblash
-    const baseOffset = Math.max(
-      loopOffset,
-      horizontalDistance / 2 + NODE_WIDTH / 2 + MIN_LOOP_DISTANCE
-    );
-    const sideOffset = baseOffset * loopDirection;
+    // Qaysi tomondan aylanib o'tish
+    const loopDirection = targetX >= sourceX ? 1 : -1;
 
-    // Yo'l nuqtalari
-    const points = [
-      // Source'dan boshlanish (pastki handle)
-      { x: sourceX, y: sourceY },
-      // Pastga tushish
-      { x: sourceX, y: sourceY + 40 },
-      // Yon tomonga burilish
-      { x: sourceX + sideOffset, y: sourceY + 40 },
-      // Target'dan yuqoriga ko'tarilish
-      { x: sourceX + sideOffset, y: targetY - 40 },
-      // Target tomon burilish
-      { x: targetX, y: targetY - 40 },
-      // Target'ga kirish (yuqori handle)
-      { x: targetX, y: targetY },
-    ];
-
-    // Smooth path yaratish
-    let path = `M ${points[0].x} ${points[0].y}`;
-
-    for (let i = 1; i < points.length; i++) {
-      const current = points[i];
-      const previous = points[i - 1];
-
-      if (i === points.length - 1) {
-        // Oxirgi segment - to'g'ri chiziq
-        path += ` L ${current.x} ${current.y}`;
-      } else {
-        const next = points[i + 1];
-        const cornerRadius = 15;
-
-        // Gorizontal yoki vertikal harakat ekanligini aniqlash
-        const isHorizontalMove =
-          Math.abs(current.x - previous.x) > Math.abs(current.y - previous.y);
-
-        if (isHorizontalMove) {
-          // Gorizontal harakat
-          const direction = current.x > previous.x ? 1 : -1;
-          const cornerStartX = current.x - cornerRadius * direction;
-
-          path += ` L ${cornerStartX} ${previous.y}`;
-
-          if (next) {
-            const nextDirection = next.y > current.y ? 1 : -1;
-            const cornerEndY = current.y + cornerRadius * nextDirection;
-            path += ` Q ${current.x} ${previous.y} ${current.x} ${cornerEndY}`;
-          }
-        } else {
-          // Vertikal harakat
-          const direction = current.y > previous.y ? 1 : -1;
-          const cornerStartY = current.y - cornerRadius * direction;
-
-          path += ` L ${previous.x} ${cornerStartY}`;
-
-          if (next) {
-            const nextDirection = next.x > current.x ? 1 : -1;
-            const cornerEndX = current.x + cornerRadius * nextDirection;
-            path += ` Q ${previous.x} ${current.y} ${cornerEndX} ${current.y}`;
-          }
-        }
-      }
+    // Aylanib o'tish yo'lagining X koordinatasi
+    let laneX: number;
+    if (loopDirection === 1) {
+      // O'ngdan
+      const sourceRight = sourceNode
+        ? sourceNode.position.x + (sourceNode.width || 0)
+        : sourceX;
+      const targetRight = targetNode
+        ? targetNode.position.x + (targetNode.width || 0)
+        : targetX;
+      laneX = Math.max(sourceRight, targetRight) + 60;
+    } else {
+      // Chapdan
+      const sourceLeft = sourceNode ? sourceNode.position.x : sourceX;
+      const targetLeft = targetNode ? targetNode.position.x : targetX;
+      laneX = Math.min(sourceLeft, targetLeft) - 60;
     }
 
-    return path;
+    // Yo'lning burilish nuqtalari
+    const p1 = { x: sourceX, y: sourceY + verticalMargin };
+    const p2 = { x: laneX, y: p1.y };
+    const p3 = { x: laneX, y: targetY - verticalMargin };
+    const p4 = { x: targetX, y: p3.y };
+
+    // Har bir segment uchun aniq yo'nalishlarni hisoblash
+    const vDir1 = Math.sign(p2.y - p1.y); // Bu deyarli har doim 0, lekin qoldiramiz
+    const hDir1 = Math.sign(p2.x - p1.x); // Bu loopDirection bilan bir xil
+
+    const vDir2 = Math.sign(p3.y - p2.y); // Bu eng muhim vertikal yo'nalish
+    const hDir2 = Math.sign(p4.x - p3.x); // Bu -loopDirection bilan bir xil
+
+    const vDir3 = Math.sign(targetY - p4.y); // Bu har doim +1
+
+    // SVG path stringini qismlab, ehtiyotkorlik bilan yig'amiz
+    return [
+      `M ${sourceX} ${sourceY}`, // Boshlang'ich nuqta
+      `V ${p1.y - cornerRadius * vDir1}`, // 1-burilishgacha vertikal harakat
+      `Q ${p1.x} ${p1.y}, ${p1.x + cornerRadius * hDir1} ${p1.y}`, // 1-burilish (silliq)
+      `H ${p2.x - cornerRadius * hDir1}`, // 2-burilishgacha gorizontal harakat
+      `Q ${p2.x} ${p2.y}, ${p2.x} ${p2.y + cornerRadius * vDir2}`, // 2-burilish
+      `V ${p3.y - cornerRadius * vDir2}`, // 3-burilishgacha vertikal harakat
+      `Q ${p3.x} ${p3.y}, ${p3.x + cornerRadius * hDir2} ${p3.y}`, // 3-burilish
+      `H ${p4.x - cornerRadius * hDir2}`, // 4-burilishgacha gorizontal harakat
+      `Q ${p4.x} ${p4.y}, ${p4.x} ${p4.y + cornerRadius * vDir3}`, // 4-burilish
+      `V ${targetY}`, // Manzilga yetib borish
+    ].join(" ");
   };
 
-  const edgePath = getFeedbackLoopPath();
+  const edgePath = getPath();
 
   return (
     <BaseEdge
@@ -133,7 +126,7 @@ export default function FeedbackLoopEdge({
       path={edgePath}
       markerEnd={markerEnd}
       style={{
-        stroke: "#495057", // Sizning loyihangizga mos rang
+        stroke: "#495057",
         strokeWidth: 1.5,
         ...style,
       }}
