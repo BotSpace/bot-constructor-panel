@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  RefObject,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -20,6 +14,7 @@ import { useFlowStore } from "./store";
 import { CustomNodes } from "./nodes";
 import { CustomEdge } from "./edges";
 import { QuickAddPalette } from "./components";
+import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
 
 // Sichqoncha pozitsiyasini kuzatish uchun kichik hook
 function useMousePosition() {
@@ -37,10 +32,17 @@ function useMousePosition() {
 }
 
 function FlowchartInner() {
-  const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+
   const { screenToFlowPosition } = useReactFlow();
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const mousePosition = useMousePosition();
+
+  useFlowKeyboardShortcuts({
+    containerRef: reactFlowWrapper,
+    mousePosition: mousePosition,
+    onOpenPalette: () => {},
+  });
 
   // Store'dan kerakli qismlarni olamiz
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } =

@@ -3,7 +3,7 @@ import { useReactFlow } from "reactflow";
 import { useFlowStore } from "../store";
 
 type UseFlowKeyboardShortcutsProps = {
-  containerRef: RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   mousePosition: { x: number; y: number };
   onOpenPalette: () => void;
 };
