@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 7/9/2025, 10:24:18 PM
+Sana: 7/10/2025, 3:19:23 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -87,7 +87,6 @@ constructor-next-js
 │   │   └── index.ts
 │   ├── constructor.tsx
 │   ├── data
-│   │   ├── editor-themes.ts
 │   │   ├── elements.ts
 │   │   ├── filters.ts
 │   │   ├── index.ts
@@ -140,12 +139,6 @@ constructor-next-js
 │   │   │   │   ├── CustomCodeNode.tsx
 │   │   │   │   ├── components
 │   │   │   │   │   └── CodeEditorDialog.tsx
-│   │   │   │   ├── editor
-│   │   │   │   │   ├── aiogram.types.ts
-│   │   │   │   │   ├── components
-│   │   │   │   │   │   ├── editor.tsx
-│   │   │   │   │   │   └── mono-editor.tsx
-│   │   │   │   │   └── editor.setup.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
 │   │   │   └── index.ts
@@ -186,6 +179,39 @@ constructor-next-js
 │   │   ├── index.ts
 │   │   └── types.ts
 │   └── types
+├── editor
+│   ├── index.tsx
+│   ├── settings
+│   │   └── index.tsx
+│   ├── setup
+│   │   ├── aiogram
+│   │   │   ├── bot
+│   │   │   │   ├── edit.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── send.ts
+│   │   │   ├── callback
+│   │   │   │   ├── context.ts
+│   │   │   │   ├── edit.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── send.ts
+│   │   │   ├── globals.ts
+│   │   │   ├── index.ts
+│   │   │   ├── message
+│   │   │   │   ├── context.ts
+│   │   │   │   ├── edit.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── send.ts
+│   │   │   └── types
+│   │   │       └── user.ts
+│   │   ├── index.ts
+│   │   └── python
+│   │       └── keywords.ts
+│   ├── store
+│   │   ├── index.ts
+│   │   └── settings.ts
+│   └── themes
+│       ├── ayu-mirage.ts
+│       └── botfather.ts
 ├── hooks
 │   └── useWebSocketLogs.ts
 ├── just.py
@@ -209,13 +235,7 @@ constructor-next-js
 ```tsx
 "use client";
 
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  RefObject,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -229,6 +249,7 @@ import { useFlowStore } from "./store";
 import { CustomNodes } from "./nodes";
 import { CustomEdge } from "./edges";
 import { QuickAddPalette } from "./components";
+import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
 
 // Sichqoncha pozitsiyasini kuzatish uchun kichik hook
 function useMousePosition() {
@@ -246,10 +267,17 @@ function useMousePosition() {
 }
 
 function FlowchartInner() {
-  const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+
   const { screenToFlowPosition } = useReactFlow();
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const mousePosition = useMousePosition();
+
+  useFlowKeyboardShortcuts({
+    containerRef: reactFlowWrapper,
+    mousePosition: mousePosition,
+    onOpenPalette: () => {},
+  });
 
   // Store'dan kerakli qismlarni olamiz
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } =
