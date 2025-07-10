@@ -1,67 +1,50 @@
 {
   "nodes": [
     {
-      "id": "dndnode_1752040754026_2",
-      "type": "MessageTriggerNode",
+      "id": "dndnode_1752068103674_8",
+      "type": "CustomCodeNode",
       "position": {
-        "x": 369.7808762448935,
-        "y": -80.730885112819
+        "x": -2943.4130760737385,
+        "y": 855.0451423267747
       },
-      "data": {},
+      "data": {
+        "pythonCode": "await bot.send_message(chat_id=chat_id, text='salom botam')"
+      },
       "width": 320,
-      "height": 183
+      "height": 298,
+      "selected": true,
+      "dragging": false,
+      "positionAbsolute": {
+        "x": -2943.4130760737385,
+        "y": 855.0451423267747
+      }
     },
     {
-      "id": "dndnode_1752040754710_3",
-      "type": "ReplyButtonTriggerNode",
+      "id": "dndnode_1752133571633_1",
+      "type": "MessageTriggerNode",
       "position": {
-        "x": 374.74919537893976,
-        "y": -319.64911491172427
+        "x": -2933.505267369788,
+        "y": 466.07722577236586
       },
-      "data": {},
+      "data": {
+        "type": "any",
+        "context": {}
+      },
       "width": 320,
-      "height": 189,
+      "height": 185,
       "selected": false,
       "positionAbsolute": {
-        "x": 374.74919537893976,
-        "y": -319.64911491172427
-      },
-      "dragging": false
-    },
-    {
-      "id": "dndnode_1752040918295_4",
-      "type": "MessageTriggerNode",
-      "position": {
-        "x": 96.88738937036379,
-        "y": -307.04699804892766
-      },
-      "data": {},
-      "width": 320,
-      "height": 183
-    },
-    {
-      "id": "dndnode_1752040919180_5",
-      "type": "MessageTriggerNode",
-      "position": {
-        "x": -326.4617199828873,
-        "y": 45.8340297363641
-      },
-      "data": {},
-      "width": 320,
-      "height": 183,
-      "selected": false,
-      "positionAbsolute": {
-        "x": -326.4617199828873,
-        "y": 45.8340297363641
+        "x": -2933.505267369788,
+        "y": 466.07722577236586
       },
       "dragging": false
     }
   ],
   "edges": [
     {
-      "source": "dndnode_1752040754026_2",
+      "source": "dndnode_1752133571633_1",
       "sourceHandle": null,
-      "target": "dndnode_1752040754710_3",
+      "target": "dndnode_1752068103674_8",
       "targetHandle": null,
       "type": "smart-edge",
       "style": {
@@ -75,26 +58,7 @@
         "color": "#495057"
       },
       "animated": false,
-      "id": "reactflow__edge-dndnode_1752040754026_2-dndnode_1752040754710_3"
-    },
-    {
-      "source": "dndnode_1752040918295_4",
-      "sourceHandle": null,
-      "target": "dndnode_1752040919180_5",
-      "targetHandle": null,
-      "type": "smart-edge",
-      "style": {
-        "strokeWidth": 1.5,
-        "stroke": "#495057"
-      },
-      "markerEnd": {
-        "type": "arrowclosed",
-        "width": 20,
-        "height": 20,
-        "color": "#495057"
-      },
-      "animated": false,
-      "id": "reactflow__edge-dndnode_1752040918295_4-dndnode_1752040919180_5"
+      "id": "reactflow__edge-dndnode_1752133571633_1-dndnode_1752068103674_8"
     }
   ]
 }

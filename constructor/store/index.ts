@@ -7,7 +7,6 @@ import { createClipboardSlice } from "./clipboardSlice";
 import { createActions } from "./actions";
 import { Connection, addEdge } from "reactflow";
 
-// `...a` o'rniga to'g'ridan-to'g'ri `(set, get)` ishlatish kodni tushunarliroq qiladi.
 // Keling, shu usulga o'tamiz.
 export const useFlowStore = create<FlowStoreState>()((set, get) => {
   return {

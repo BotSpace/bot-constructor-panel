@@ -41,8 +41,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const pythonExecutable = "/home/kumo/workspace/dvijok/.venv/bin/python";
-    const pythonProjectPath = "/home/kumo/workspace/dvijok";
+    const pythonExecutable =
+      "/home/kumo/workspace/botmather/engine/.venv/bin/python";
+    const pythonProjectPath = "/home/kumo/workspace/botmather/engine";
 
     const ngrok = await axios.get("http://localhost:3000/api/ngrok/start");
 
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
         "app.main:app",
         "--reload",
         "--reload-dir",
-        "/home/kumo/workspace/dvijok",
+        "/home/kumo/workspace/botmather/engine",
         "--port",
         "8000",
       ],

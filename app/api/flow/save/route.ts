@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     // Maqsad fayl: Sizning Python loyihangiz (`dvijok`) joylashgan papkadagi `nodes.json`
     // Bu yo'lni to'g'ri va to'liq (absolyut) ko'rsatish juda muhim!
     const destinationFilePath = path.join(
-      "/home/kumo/workspace/dvijok",
+      "/home/kumo/workspace/botmather/engine",
       "nodes.json"
     );
 

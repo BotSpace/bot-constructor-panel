@@ -15,10 +15,10 @@ export const Elements: ElementTypes[] = [
       {
         type: "command",
         name: "Command",
-        description: "Execute a command",
+        description: "Bot buyrug'ini ushlaydi (masalan, /start)",
         icon: "⌘",
         color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-        triggerId: "MessageTriggerNode",
+        triggerId: "CommandTriggerNode", // Bu nom muhim! Keyingi qadamlarda ishlatamiz.
       },
       {
         type: "reply_button",
@@ -28,15 +28,6 @@ export const Elements: ElementTypes[] = [
         color: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
         triggerId: "ReplyButtonTriggerNode", // Bu nom muhim!
       },
-      {
-        type: "callback_button",
-        name: "Callback Button",
-        description: "Oldingi qadamdagi aniq bir inline tugmani ushlaydi",
-        icon: "👆",
-        color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
-        triggerId: "CallbackButtonTriggerNode",
-      },
-
       {
         type: "callback_query",
         name: "Advanced Callback",
@@ -103,21 +94,6 @@ export const Elements: ElementTypes[] = [
         color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
         triggerId: "CustomCodeNode",
       },
-      {
-        type: "audio",
-        name: "Waypoint",
-        description: "Chiziq yo'nalishini boshqarish uchun yordamchi nuqta",
-        icon: "📍", // Yoki boshqa ikonka
-        color: "bg-gray-500/10 text-gray-400 border-gray-500/20",
-        triggerId: "HelperNode",
-      },
-      // {
-      //   type: "condition",
-      //   name: "Condition",
-      //   description: "Add conditional logic to your flow",
-      //   icon: "🔀",
-      //   color: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-      // },
     ],
   },
 ];
