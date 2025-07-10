@@ -1,0 +1,108 @@
+import { useEffect, RefObject } from "react";
+import { useReactFlow } from "reactflow";
+import { useFlowStore } from "../store";
+
+type UseFlowKeyboardShortcutsProps = {
+  containerRef: RefObject<HTMLDivElement>;
+  mousePosition: { x: number; y: number };
+  onOpenPalette: () => void;
+};
+
+export function useFlowKeyboardShortcuts({
+  containerRef,
+  mousePosition,
+  onOpenPalette,
+}: UseFlowKeyboardShortcutsProps) {
+  const { screenToFlowPosition } = useReactFlow();
+  const {
+    selectAll,
+    copySelection,
+    paste,
+    duplicateSelection,
+    deleteSelectedElements,
+    setCtrlPressed,
+  } = useFlowStore((state) => ({
+    selectAll: state.selectAll,
+    copySelection: state.copySelection,
+    paste: state.paste,
+    duplicateSelection: state.duplicateSelection,
+    deleteSelectedElements: state.deleteSelectedElements,
+    setCtrlPressed: state.setCtrlPressed,
+  }));
+
+  useEffect(() => {
+    const containerElement = containerRef.current;
+    if (!containerElement) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      if (event.key === "Control") {
+        setCtrlPressed(true);
+      }
+
+      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+      const ctrlOrCmd = isMac ? event.metaKey : event.ctrlKey;
+
+      if (ctrlOrCmd && event.key.toLowerCase() === "a") {
+        event.preventDefault();
+        selectAll();
+      } else if (ctrlOrCmd && event.key.toLowerCase() === "c") {
+        event.preventDefault();
+        copySelection();
+      } else if (ctrlOrCmd && event.key.toLowerCase() === "v") {
+        event.preventDefault();
+        const position = screenToFlowPosition(mousePosition);
+        paste(position);
+      } else if (ctrlOrCmd && event.key.toLowerCase() === "d") {
+        event.preventDefault();
+        duplicateSelection();
+      } else if (event.key === "Delete" || event.key === "Backspace") {
+        event.preventDefault();
+        deleteSelectedElements();
+      } else if (ctrlOrCmd && event.key === " ") {
+        event.preventDefault();
+        onOpenPalette();
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key === "Control") {
+        setCtrlPressed(false);
+      }
+    };
+
+    const handleBlur = () => {
+      setCtrlPressed(false);
+    };
+
+    containerElement.setAttribute("tabIndex", "0");
+    containerElement.addEventListener("keydown", handleKeyDown);
+    containerElement.addEventListener("keyup", handleKeyUp);
+    containerElement.addEventListener("blur", handleBlur);
+
+    return () => {
+      containerElement.removeEventListener("keydown", handleKeyDown);
+      containerElement.removeEventListener("keyup", handleKeyUp);
+      containerElement.removeEventListener("blur", handleBlur);
+    };
+  }, [
+    selectAll,
+    copySelection,
+    paste,
+    duplicateSelection,
+    deleteSelectedElements,
+    mousePosition,
+    screenToFlowPosition,
+    setCtrlPressed,
+    containerRef,
+    onOpenPalette,
+  ]);
+}

@@ -6,20 +6,17 @@ import {
   SendFileNode,
 } from "./actions";
 import {
-  CallbackButtonTriggerNode,
   MessageTriggerNode,
   ReplyButtonTriggerNode,
   CallbackQueryTriggerNode,
+  CommandTriggerNode,
 } from "./triggers";
-
-import { HelperNode } from "./custom/HelperNode";
 
 import { CustomCodeNode } from "./custom";
 
 export const CustomNodes = {
   ReplyButtonTriggerNode,
   MessageTriggerNode,
-  CallbackButtonTriggerNode,
   CallbackQueryTriggerNode,
   SendTextMessageNode,
   SendPhotoNode,
@@ -27,5 +24,5 @@ export const CustomNodes = {
   SendAudioNode,
   SendFileNode,
   CustomCodeNode,
-  HelperNode,
+  CommandTriggerNode,
 };

@@ -4,10 +4,6 @@
 @custom-variant dark (&:is(.dark *));
 
 /* customizatio */
-.view-lines.monaco-mouse-cursor-text {
-  padding-left: 45px;
-}
-
 .editorText {
   font-family: "Fira Code", monospace, "Droid Sans Mono", "monospace", monospace;
   font-weight: normal;
