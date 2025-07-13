@@ -1,49 +1,32 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 7/10/2025, 8:45:01 PM
+Sana: 7/12/2025, 10:15:01 PM
 
 ## 📁 Fayl Strukturasi
 
 ```
 constructor-next-js
+├── .env
 ├── .gitignore
 ├── README.md
 ├── analis_project.js
 ├── app
-│   ├── api
-│   │   ├── bot
-│   │   │   ├── run
-│   │   │   │   └── route.ts
-│   │   │   ├── state.ts
-│   │   │   ├── status
-│   │   │   │   └── route.ts
-│   │   │   └── stop
-│   │   │       └── route.ts
-│   │   ├── flow
-│   │   │   ├── load
-│   │   │   │   └── route.ts
-│   │   │   └── save
-│   │   │       └── route.ts
-│   │   └── ngrok
-│   │       ├── start
-│   │       │   └── route.ts
-│   │       ├── state.ts
-│   │       └── stop
-│   │           └── route.ts
-│   ├── constructor
-│   │   ├── components
-│   │   │   ├── LogViewer
-│   │   │   │   ├── Header.tsx
-│   │   │   │   ├── LogLine.tsx
-│   │   │   │   ├── LogList.tsx
-│   │   │   │   ├── OpenButton.tsx
-│   │   │   │   ├── ResizeHandler.tsx
-│   │   │   │   ├── index.tsx
-│   │   │   │   └── types.ts
-│   │   │   ├── actions.tsx
-│   │   │   ├── header.tsx
-│   │   │   └── index.ts
-│   │   └── page.tsx
+│   ├── AuthProvider.tsx
+│   ├── [lang]
+│   │   └── constructor
+│   │       ├── components
+│   │       │   ├── LogViewer
+│   │       │   │   ├── Header.tsx
+│   │       │   │   ├── LogLine.tsx
+│   │       │   │   ├── LogList.tsx
+│   │       │   │   ├── OpenButton.tsx
+│   │       │   │   ├── ResizeHandler.tsx
+│   │       │   │   ├── index.tsx
+│   │       │   │   └── types.ts
+│   │       │   ├── actions.tsx
+│   │       │   ├── header.tsx
+│   │       │   └── index.ts
+│   │       └── page.tsx
 │   ├── favicon.ico
 │   ├── globals.css
 │   ├── layout.tsx
@@ -106,6 +89,8 @@ constructor-next-js
 │   │   └── themes.ts
 │   ├── edges
 │   │   ├── SmartEdge.tsx
+│   │   ├── components
+│   │   │   └── EdgeContextMenu.tsx
 │   │   └── index.ts
 │   ├── hooks
 │   │   └── useFlowKeyboardShortcuts.ts
@@ -230,10 +215,19 @@ constructor-next-js
 │       └── botfather.ts
 ├── hooks
 │   └── useWebSocketLogs.ts
+├── i18n
+│   ├── request.ts
+│   └── routing.ts
 ├── just.py
 ├── lib
 │   └── utils.ts
 ├── log-server.mjs
+├── messages
+│   ├── en.json
+│   ├── jp.json
+│   ├── ru.json
+│   └── uz.json
+├── middleware.ts
 ├── next-env.d.ts
 ├── next.config.ts
 ├── nodes.json
@@ -1694,16 +1688,24 @@ export type ThemeName = keyof typeof themes;
 
 ```tsx
 "use client";
-import { BaseEdge, type EdgeProps, getSmoothStepPath } from "reactflow";
+import {
+  BaseEdge,
+  type EdgeProps,
+  getSmoothStepPath,
+  useNodes,
+} from "reactflow";
+import { getObstacleNodes } from "../lib/geometry";
 
-export interface FeedbackLoopEdgeProps extends EdgeProps {
+export interface SmartEdgeProps extends EdgeProps {
   data?: {
-    loopOffset?: number;
+    // Kelajakda qo'shimcha sozlamalar uchun
   };
 }
 
-export default function FeedbackLoopEdge({
+export default function SmartEdge({
   id,
+  source,
+  target,
   sourceX,
   sourceY,
   targetX,
@@ -1712,23 +1714,27 @@ export default function FeedbackLoopEdge({
   targetPosition,
   style = {},
   markerEnd,
-  data,
-}: FeedbackLoopEdgeProps) {
-  const loopOffset = data?.loopOffset || 80;
+  selected,
+}: SmartEdgeProps) {
+  const nodes = useNodes();
 
-  // Sizning node'laringiz uchun maxsus o'lchamlar
-  const NODE_WIDTH = 320; // w-80 = 320px
-  const NODE_HEIGHT = 200; // Taxminiy balandlik
-  const HANDLE_OFFSET = 16; // Handle'ning markazdan masofasi
-  const MIN_LOOP_DISTANCE = 60; // Minimal aylanish masofasi
+  const getPath = (): string => {
+    // 1. To'siqlarni aniqlash
+    const potentialObstacles = nodes.filter(
+      (n) => n.id !== source && n.id !== target
+    );
+    const obstacles = getObstacleNodes(
+      { x: sourceX, y: sourceY },
+      { x: targetX, y: targetY },
+      potentialObstacles
+    );
 
-  const getFeedbackLoopPath = () => {
-    // Target yuqorida bo'lsa feedback loop kerak
-    const needsLoop = targetY < sourceY - 20;
+    // 2. Aylanma yo'l kerakmi?
+    const needsLoop = targetY < sourceY - 20 || obstacles.length > 0;
 
     if (!needsLoop) {
-      // Oddiy smooth step path
-      const [edgePath] = getSmoothStepPath({
+      // Yo'l toza bo'lsa, standart silliq chiziq
+      const [path] = getSmoothStepPath({
         sourceX,
         sourceY,
         sourcePosition,
@@ -1737,104 +1743,179 @@ export default function FeedbackLoopEdge({
         targetPosition,
         borderRadius: 15,
       });
-      return edgePath;
+      return path;
     }
 
-    // Feedback loop yo'lini hisoblash
-    const horizontalDistance = Math.abs(targetX - sourceX);
-    const verticalDistance = sourceY - targetY;
+    // --- MUKAMMALLASHTIRILGAN, ANIQ VA SILLIQ AYLANMA YO'L CHIZISH ALGORITMI ---
+    const verticalMargin = 40;
+    const cornerRadius = 15;
 
-    // Qaysi tomonga aylanishni aniqlash
-    const shouldLoopRight = sourceX <= targetX;
-    const loopDirection = shouldLoopRight ? 1 : -1;
+    // Asosiy nuqtalarni va yo'nalishlarni hisoblash
+    const sourceNode = nodes.find((n) => n.id === source);
+    const targetNode = nodes.find((n) => n.id === target);
 
-    // Aylanish masofasini hisoblash
-    const baseOffset = Math.max(
-      loopOffset,
-      horizontalDistance / 2 + NODE_WIDTH / 2 + MIN_LOOP_DISTANCE
-    );
-    const sideOffset = baseOffset * loopDirection;
+    // Qaysi tomondan aylanib o'tish
+    const loopDirection = targetX >= sourceX ? 1 : -1;
 
-    // Yo'l nuqtalari
-    const points = [
-      // Source'dan boshlanish (pastki handle)
-      { x: sourceX, y: sourceY },
-      // Pastga tushish
-      { x: sourceX, y: sourceY + 40 },
-      // Yon tomonga burilish
-      { x: sourceX + sideOffset, y: sourceY + 40 },
-      // Target'dan yuqoriga ko'tarilish
-      { x: sourceX + sideOffset, y: targetY - 40 },
-      // Target tomon burilish
-      { x: targetX, y: targetY - 40 },
-      // Target'ga kirish (yuqori handle)
-      { x: targetX, y: targetY },
-    ];
-
-    // Smooth path yaratish
-    let path = `M ${points[0].x} ${points[0].y}`;
-
-    for (let i = 1; i < points.length; i++) {
-      const current = points[i];
-      const previous = points[i - 1];
-
-      if (i === points.length - 1) {
-        // Oxirgi segment - to'g'ri chiziq
-        path += ` L ${current.x} ${current.y}`;
-      } else {
-        const next = points[i + 1];
-        const cornerRadius = 15;
-
-        // Gorizontal yoki vertikal harakat ekanligini aniqlash
-        const isHorizontalMove =
-          Math.abs(current.x - previous.x) > Math.abs(current.y - previous.y);
-
-        if (isHorizontalMove) {
-          // Gorizontal harakat
-          const direction = current.x > previous.x ? 1 : -1;
-          const cornerStartX = current.x - cornerRadius * direction;
-
-          path += ` L ${cornerStartX} ${previous.y}`;
-
-          if (next) {
-            const nextDirection = next.y > current.y ? 1 : -1;
-            const cornerEndY = current.y + cornerRadius * nextDirection;
-            path += ` Q ${current.x} ${previous.y} ${current.x} ${cornerEndY}`;
-          }
-        } else {
-          // Vertikal harakat
-          const direction = current.y > previous.y ? 1 : -1;
-          const cornerStartY = current.y - cornerRadius * direction;
-
-          path += ` L ${previous.x} ${cornerStartY}`;
-
-          if (next) {
-            const nextDirection = next.x > current.x ? 1 : -1;
-            const cornerEndX = current.x + cornerRadius * nextDirection;
-            path += ` Q ${previous.x} ${current.y} ${cornerEndX} ${current.y}`;
-          }
-        }
-      }
+    // Aylanib o'tish yo'lagining X koordinatasi
+    let laneX: number;
+    if (loopDirection === 1) {
+      // O'ngdan
+      const sourceRight = sourceNode
+        ? sourceNode.position.x + (sourceNode.width || 0)
+        : sourceX;
+      const targetRight = targetNode
+        ? targetNode.position.x + (targetNode.width || 0)
+        : targetX;
+      laneX = Math.max(sourceRight, targetRight) + 60;
+    } else {
+      // Chapdan
+      const sourceLeft = sourceNode ? sourceNode.position.x : sourceX;
+      const targetLeft = targetNode ? targetNode.position.x : targetX;
+      laneX = Math.min(sourceLeft, targetLeft) - 60;
     }
 
-    return path;
+    // Yo'lning burilish nuqtalari
+    const p1 = { x: sourceX, y: sourceY + verticalMargin };
+    const p2 = { x: laneX, y: p1.y };
+    const p3 = { x: laneX, y: targetY - verticalMargin };
+    const p4 = { x: targetX, y: p3.y };
+
+    // Har bir segment uchun aniq yo'nalishlarni hisoblash
+    const vDir1 = Math.sign(p2.y - p1.y); // Bu deyarli har doim 0, lekin qoldiramiz
+    const hDir1 = Math.sign(p2.x - p1.x); // Bu loopDirection bilan bir xil
+
+    const vDir2 = Math.sign(p3.y - p2.y); // Bu eng muhim vertikal yo'nalish
+    const hDir2 = Math.sign(p4.x - p3.x); // Bu -loopDirection bilan bir xil
+
+    const vDir3 = Math.sign(targetY - p4.y); // Bu har doim +1
+
+    // SVG path stringini qismlab, ehtiyotkorlik bilan yig'amiz
+    return [
+      `M ${sourceX} ${sourceY}`, // Boshlang'ich nuqta
+      `V ${p1.y - cornerRadius * vDir1}`, // 1-burilishgacha vertikal harakat
+      `Q ${p1.x} ${p1.y}, ${p1.x + cornerRadius * hDir1} ${p1.y}`, // 1-burilish (silliq)
+      `H ${p2.x - cornerRadius * hDir1}`, // 2-burilishgacha gorizontal harakat
+      `Q ${p2.x} ${p2.y}, ${p2.x} ${p2.y + cornerRadius * vDir2}`, // 2-burilish
+      `V ${p3.y - cornerRadius * vDir2}`, // 3-burilishgacha vertikal harakat
+      `Q ${p3.x} ${p3.y}, ${p3.x + cornerRadius * hDir2} ${p3.y}`, // 3-burilish
+      `H ${p4.x - cornerRadius * hDir2}`, // 4-burilishgacha gorizontal harakat
+      `Q ${p4.x} ${p4.y}, ${p4.x} ${p4.y + cornerRadius * vDir3}`, // 4-burilish
+      `V ${targetY}`, // Manzilga yetib borish
+    ].join(" ");
   };
 
-  const edgePath = getFeedbackLoopPath();
+  const edgePath = getPath();
+
+  // Tanlangan va tanlanmagan holat uchun stillarni aniqlab olamiz
+  const selectedStyle = {
+    stroke: "#3b82f6", // Ko'k rang
+    strokeWidth: 2.5,
+  };
+
+  const defaultStyle = {
+    stroke: "#495057", // To'q kulrang (default)
+    strokeWidth: 1.5,
+  };
+
+  const dynamicStyle = selected ? selectedStyle : defaultStyle;
+
+  const markerColor = selected ? "#3b82f6" : "#495057";
 
   return (
-    <BaseEdge
-      id={id}
-      path={edgePath}
-      markerEnd={markerEnd}
-      style={{
-        stroke: "#495057", // Sizning loyihangizga mos rang
-        strokeWidth: 1.5,
-        ...style,
-      }}
-    />
+    <>
+      <marker
+        id={`arrowhead-${id}`}
+        viewBox="0 0 10 10"
+        refX="9" // Chiziq uchidan biroz oldinroq tugaydi
+        refY="5"
+        markerUnits="strokeWidth"
+        markerWidth="10" // O'lchami
+        markerHeight="8"
+        orient="auto-start-reverse"
+      >
+        {/* MINIMALISTIK VA NAFIS STRELKA */}
+        <path
+          d="M 0 0 L 10 5 L 0 10 z" // Oddiy, lekin to'g'ri shakldagi uchburchak
+          fill={markerColor}
+          stroke="none"
+        />
+      </marker>
+
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        markerEnd={`url(#arrowhead-${id})`}
+        style={{
+          ...style,
+          ...dynamicStyle,
+          transition:
+            "stroke-width 0.15s ease-in-out, stroke 0.15s ease-in-out",
+        }}
+      />
+    </>
   );
 }
+
+```
+
+### 📄 constructor/edges/components/EdgeContextMenu.tsx
+
+```tsx
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+// Ranglar palitrasi
+const colors = [
+  "#6b7280", // Gray
+  "#ef4444", // Red
+  "#f97316", // Orange
+  "#eab308", // Yellow
+  "#22c55e", // Green
+  "#3b82f6", // Blue
+  "#8b5cf6", // Violet
+];
+
+interface EdgeContextMenuProps {
+  onDelete: () => void;
+  onColorChange: (color: string) => void;
+}
+
+export const EdgeContextMenu = ({
+  onDelete,
+  onColorChange,
+}: EdgeContextMenuProps) => {
+  return (
+    <div className="p-1.5 bg-background border shadow-xl rounded-lg flex items-center gap-2">
+      {/* Rang tanlash qismi */}
+      <div className="flex items-center gap-1.5">
+        {colors.map((color) => (
+          <button
+            key={color}
+            onClick={() => onColorChange(color)}
+            className="w-5 h-5 rounded-full border border-border transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+            style={{ backgroundColor: color }}
+            aria-label={`Change color to ${color}`}
+          />
+        ))}
+      </div>
+
+      {/* Ajratuvchi */}
+      <div className="w-px h-5 bg-border mx-1" />
+
+      {/* O'chirish tugmasi */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+        onClick={onDelete}
+        aria-label="Delete edge"
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+};
 
 ```
 
@@ -1986,7 +2067,7 @@ interface BBox {
  * @param rect To'rtburchakning BBox'i {x, y, width, height}
  * @returns Kesishsa `true`, aks holda `false`
  */
-export function lineIntersectsRect(
+function lineIntersectsRect(
   p1: { x: number; y: number },
   p2: { x: number; y: number },
   rect: BBox
@@ -2014,7 +2095,7 @@ export function lineIntersectsRect(
     const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
     const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
 
-    return t > 0 && t < 1 && u > 0 && u < 1;
+    return t >= 0 && t <= 1 && u >= 0 && u <= 1;
   };
 
   // Har bir tomon bilan tekshirish
@@ -2028,7 +2109,6 @@ export function lineIntersectsRect(
   return false;
 }
 
-// --- YANGI FUNKSIYA ---
 /**
  * Chiziq yo'lidagi to'siq bo'lgan nodelarni topadi.
  * @param sourcePos - Boshlang'ich nuqta
@@ -2041,7 +2121,7 @@ export const getObstacleNodes = (
   sourcePos: XYPosition,
   targetPos: XYPosition,
   nodes: Node[],
-  padding = 20 // Nodelarni aylanib o'tish uchun qo'shimcha joy
+  padding = 20 // Xavfsizlik maydonini kattaroq qilamiz
 ): Node[] => {
   const obstacles: Node[] = [];
 
@@ -2061,12 +2141,12 @@ export const getObstacleNodes = (
       height: node.height + padding * 2,
     };
 
-    // Agar node chiziq koridorida bo'lmasa, uni o'tkazib yuboramiz
+    // Agar node to'g'ri chiziqning bounding box'i bilan kesishmasa, o'tkazib yuboramiz
     if (
-      nodeBBox.x + nodeBBox.width < minX ||
-      nodeBBox.x > maxX ||
-      nodeBBox.y + nodeBBox.height < minY ||
-      nodeBBox.y > maxY
+      nodeBBox.x + nodeBBox.width < minX - padding ||
+      nodeBBox.x > maxX + padding ||
+      nodeBBox.y + nodeBBox.height < minY - padding ||
+      nodeBBox.y > maxY + padding
     ) {
       continue;
     }
@@ -5260,6 +5340,7 @@ export const createFlowSlice: StateCreator<
       isDirty: true,
     });
   },
+
   onConnect: (connection) => {
     // Bu funksiya endi index.ts da override qilinadi,
     // lekin slice ichida standart versiyasi bo'lgani yaxshi.
@@ -5268,6 +5349,7 @@ export const createFlowSlice: StateCreator<
       isDirty: true,
     });
   },
+
   updateNodeData: (nodeId, newData) => {
     set({
       nodes: get().nodes.map((node) => {
@@ -5282,18 +5364,36 @@ export const createFlowSlice: StateCreator<
 
   deleteSelectedElements: () => {
     const { nodes, edges } = get();
-    const selectedNodeIds = nodes.filter((n) => n.selected).map((n) => n.id);
+    const selectedNodes = nodes.filter((node) => node.selected);
+    const selectedEdges = edges.filter((edge) => edge.selected);
+
+    // Agar hech narsa tanlanmagan bo'lsa, hech narsa qilmaymiz
+    if (selectedNodes.length === 0 && selectedEdges.length === 0) {
+      return;
+    }
+
+    const selectedNodeIds = selectedNodes.map((node) => node.id);
+
+    // O'chirilmaydigan nodelarni qoldiramiz
+    const nextNodes = nodes.filter((node) => !node.selected);
+
+    // O'chirilmaydigan chiziqlarni qoldiramiz:
+    // 1. O'zi tanlanmagan BO'LISHI KERAK
+    // 2. Tanlangan node'larga ulanmagan BO'LISHI KERAK
+    const nextEdges = edges.filter(
+      (edge) =>
+        !edge.selected &&
+        !selectedNodeIds.includes(edge.source) &&
+        !selectedNodeIds.includes(edge.target)
+    );
 
     set({
-      nodes: nodes.filter((node) => !node.selected),
-      edges: edges.filter(
-        (e) =>
-          !selectedNodeIds.includes(e.source) &&
-          !selectedNodeIds.includes(e.target)
-      ),
+      nodes: nextNodes,
+      edges: nextEdges,
       isDirty: true,
     });
   },
+
   selectAll: () => {
     set({
       nodes: get().nodes.map((n) => ({ ...n, selected: true })),
@@ -5342,13 +5442,6 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
         style: {
           strokeWidth: 1.5,
           stroke: "#495057", // To'q kulrang
-        },
-        // Strelka uchini ham chiziq rangiga moslaymiz
-        markerEnd: {
-          type: "arrowclosed",
-          width: 20,
-          height: 20,
-          color: "#495057", // To'q kulrang
         },
         animated: false,
       };

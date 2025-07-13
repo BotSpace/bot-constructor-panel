@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   LogEntry,
   LogLevel,
-} from "@/app/constructor/components/LogViewer/types";
+} from "@/app/[lang]/constructor/components/LogViewer/types";
 
 let logIdCounter = 0;
 

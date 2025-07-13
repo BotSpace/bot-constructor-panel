@@ -28,7 +28,7 @@ export interface Actions {
     position: { x: number; y: number }
   ) => void;
   saveFlow: () => Promise<void>;
-  loadFlow: () => Promise<void>;
+  loadFlow: (flowId: string) => Promise<void>;
 }
 
 // Barcha qismlarni birlashtirgan yakuniy store tipi
