@@ -2,6 +2,9 @@ import { StateCreator } from "zustand";
 import { toast } from "sonner";
 import { Node } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
+import { instanceAuth } from "@/services/instance";
+import { APIResponseType } from "@/types/http";
+import { FlowData } from "@/types/http/flow";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: string) => {
@@ -85,30 +88,25 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     }
   },
 
-  loadFlow: async () => {
+  loadFlow: async (flowId) => {
     set({ isLoading: true });
     try {
-      const response = await fetch("/api/flow/load");
-      if (!response.ok) throw new Error("Sxemani yuklab bo'lmadi.");
-      const data = await response.json();
+      const response = await instanceAuth<APIResponseType<FlowData>>(
+        "/project/flow/" + flowId
+      );
+      if (response.status != 200) throw new Error("Sxemani yuklab bo'lmadi.");
 
-      if (data.nodes && data.nodes.length > 0) {
-        const maxId = Math.max(
-          ...data.nodes.map((n: Node) => {
-            const parts = n.id.split("_");
-            return parts.length > 1 ? parseInt(parts[parts.length - 1], 10) : 0;
-          })
-        );
-        nodeIdCounter = data.nodes.length;
-      }
-
-      // === MUHIM O'ZGARISH ===
       // Yuklangandan so'ng, ham joriy, ham boshlang'ich holatni o'rnatamiz.
+      const json = response.data.data.data;
+
       set({
-        nodes: data.nodes || [],
-        edges: data.edges || [],
+        nodes: json["nodes"] || [],
+        edges: json["edges"] || [],
         isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
-        initialState: { nodes: data.nodes || [], edges: data.edges || [] },
+        initialState: {
+          nodes: json["nodes"] || [],
+          edges: json["edges"] || [],
+        },
       });
     } catch (error) {
       console.error("Yuklashda xatolik:", error);

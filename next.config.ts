@@ -1,7 +1,19 @@
-import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
-const nextConfig: NextConfig = {
-  /* config options here */
+const withNextIntl = createNextIntlPlugin();
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // basePath dinamik bo'la olmaydi. Uni statik qilib o'rnating.
+  basePath: "/share",
+
+  // assetPrefix odatda basePath bilan bir xil bo'ladi.
+  assetPrefix: "/share",
+
+  // next/image komponenti uchun to'g'ri yo'lni ko'rsatish
+  images: {
+    path: "/share/_next/image",
+  },
 };
 
-export default nextConfig;
+module.exports = withNextIntl(nextConfig);

@@ -7,8 +7,6 @@ import {
 } from "reactflow";
 import { getObstacleNodes } from "../lib/geometry";
 
-import { EdgeContextMenu } from "./components/EdgeContextMenu";
-
 export interface SmartEdgeProps extends EdgeProps {
   data?: {
     // Kelajakda qo'shimcha sozlamalar uchun
@@ -120,16 +118,52 @@ export default function SmartEdge({
 
   const edgePath = getPath();
 
+  // Tanlangan va tanlanmagan holat uchun stillarni aniqlab olamiz
+  const selectedStyle = {
+    stroke: "#3b82f6", // Ko'k rang
+    strokeWidth: 2.5,
+  };
+
+  const defaultStyle = {
+    stroke: "#495057", // To'q kulrang (default)
+    strokeWidth: 1.5,
+  };
+
+  const dynamicStyle = selected ? selectedStyle : defaultStyle;
+
+  const markerColor = selected ? "#3b82f6" : "#495057";
+
   return (
-    <BaseEdge
-      id={id}
-      path={edgePath}
-      markerEnd={markerEnd}
-      style={{
-        stroke: "#495057",
-        strokeWidth: 1.5,
-        ...style,
-      }}
-    />
+    <>
+      <marker
+        id={`arrowhead-${id}`}
+        viewBox="0 0 10 10"
+        refX="9" // Chiziq uchidan biroz oldinroq tugaydi
+        refY="5"
+        markerUnits="strokeWidth"
+        markerWidth="10" // O'lchami
+        markerHeight="8"
+        orient="auto-start-reverse"
+      >
+        {/* MINIMALISTIK VA NAFIS STRELKA */}
+        <path
+          d="M 0 0 L 10 5 L 0 10 z" // Oddiy, lekin to'g'ri shakldagi uchburchak
+          fill={markerColor}
+          stroke="none"
+        />
+      </marker>
+
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        markerEnd={`url(#arrowhead-${id})`}
+        style={{
+          ...style,
+          ...dynamicStyle,
+          transition:
+            "stroke-width 0.15s ease-in-out, stroke 0.15s ease-in-out",
+        }}
+      />
+    </>
   );
 }

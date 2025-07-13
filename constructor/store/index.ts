@@ -34,13 +34,6 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
           strokeWidth: 1.5,
           stroke: "#495057", // To'q kulrang
         },
-        // Strelka uchini ham chiziq rangiga moslaymiz
-        markerEnd: {
-          type: "arrowclosed",
-          width: 20,
-          height: 20,
-          color: "#495057", // To'q kulrang
-        },
         animated: false,
       };
 

@@ -4,7 +4,11 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
+import { NextIntlClientProvider } from "next-intl";
+
 import { Fira_Code } from "next/font/google";
+import AuthProvider from "./AuthProvider";
+import ReactQueryProvider from "./ReactQueryProvider";
 
 export const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -36,10 +40,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-          <Toaster />
-        </ThemeProvider>
+        <ReactQueryProvider>
+          <AuthProvider>
+            <NextIntlClientProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+              >
+                {children}
+                <Toaster />
+              </ThemeProvider>
+            </NextIntlClientProvider>
+          </AuthProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

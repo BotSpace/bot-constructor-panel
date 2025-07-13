@@ -68,6 +68,7 @@ export const createFlowSlice: StateCreator<
       isDirty: true,
     });
   },
+
   updateNodeData: (nodeId, newData) => {
     set({
       nodes: get().nodes.map((node) => {
@@ -82,18 +83,36 @@ export const createFlowSlice: StateCreator<
 
   deleteSelectedElements: () => {
     const { nodes, edges } = get();
-    const selectedNodeIds = nodes.filter((n) => n.selected).map((n) => n.id);
+    const selectedNodes = nodes.filter((node) => node.selected);
+    const selectedEdges = edges.filter((edge) => edge.selected);
+
+    // Agar hech narsa tanlanmagan bo'lsa, hech narsa qilmaymiz
+    if (selectedNodes.length === 0 && selectedEdges.length === 0) {
+      return;
+    }
+
+    const selectedNodeIds = selectedNodes.map((node) => node.id);
+
+    // O'chirilmaydigan nodelarni qoldiramiz
+    const nextNodes = nodes.filter((node) => !node.selected);
+
+    // O'chirilmaydigan chiziqlarni qoldiramiz:
+    // 1. O'zi tanlanmagan BO'LISHI KERAK
+    // 2. Tanlangan node'larga ulanmagan BO'LISHI KERAK
+    const nextEdges = edges.filter(
+      (edge) =>
+        !edge.selected &&
+        !selectedNodeIds.includes(edge.source) &&
+        !selectedNodeIds.includes(edge.target)
+    );
 
     set({
-      nodes: nodes.filter((node) => !node.selected),
-      edges: edges.filter(
-        (e) =>
-          !selectedNodeIds.includes(e.source) &&
-          !selectedNodeIds.includes(e.target)
-      ),
+      nodes: nextNodes,
+      edges: nextEdges,
       isDirty: true,
     });
   },
+
   selectAll: () => {
     set({
       nodes: get().nodes.map((n) => ({ ...n, selected: true })),
