@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 7/12/2025, 10:15:01 PM
+Sana: 7/15/2025, 11:44:03 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -12,25 +12,30 @@ constructor-next-js
 ├── analis_project.js
 ├── app
 │   ├── AuthProvider.tsx
-│   ├── [lang]
-│   │   └── constructor
-│   │       ├── components
-│   │       │   ├── LogViewer
-│   │       │   │   ├── Header.tsx
-│   │       │   │   ├── LogLine.tsx
-│   │       │   │   ├── LogList.tsx
-│   │       │   │   ├── OpenButton.tsx
-│   │       │   │   ├── ResizeHandler.tsx
-│   │       │   │   ├── index.tsx
-│   │       │   │   └── types.ts
-│   │       │   ├── actions.tsx
-│   │       │   ├── header.tsx
-│   │       │   └── index.ts
-│   │       └── page.tsx
+│   ├── ReactQueryProvider.tsx
+│   ├── [bot]
+│   │   ├── components
+│   │   │   ├── LogViewer
+│   │   │   │   ├── Header.tsx
+│   │   │   │   ├── LogLine.tsx
+│   │   │   │   ├── LogList.tsx
+│   │   │   │   ├── OpenButton.tsx
+│   │   │   │   ├── ResizeHandler.tsx
+│   │   │   │   ├── index.tsx
+│   │   │   │   └── types.ts
+│   │   │   ├── actions.tsx
+│   │   │   ├── header.tsx
+│   │   │   └── index.ts
+│   │   └── page.tsx
+│   ├── api
+│   │   └── auth
+│   │       ├── [...nextauth]
+│   │       │   ├── option.ts
+│   │       │   └── route.ts
+│   │       └── next-auth.d.ts
 │   ├── favicon.ico
 │   ├── globals.css
-│   ├── layout.tsx
-│   └── page.tsx
+│   └── layout.tsx
 ├── components
 │   ├── theme
 │   │   ├── theme-provider.tsx
@@ -93,7 +98,8 @@ constructor-next-js
 │   │   │   └── EdgeContextMenu.tsx
 │   │   └── index.ts
 │   ├── hooks
-│   │   └── useFlowKeyboardShortcuts.ts
+│   │   ├── useFlowKeyboardShortcuts.ts
+│   │   └── useMousePosition.ts
 │   ├── lib
 │   │   └── geometry.ts
 │   ├── nodes
@@ -214,12 +220,14 @@ constructor-next-js
 │       ├── ayu-mirage.ts
 │       └── botfather.ts
 ├── hooks
+│   ├── use-debounces.tsx
 │   └── useWebSocketLogs.ts
 ├── i18n
 │   ├── request.ts
 │   └── routing.ts
 ├── just.py
 ├── lib
+│   ├── query-generator.ts
 │   └── utils.ts
 ├── log-server.mjs
 ├── messages
@@ -227,15 +235,26 @@ constructor-next-js
 │   ├── jp.json
 │   ├── ru.json
 │   └── uz.json
-├── middleware.ts
 ├── next-env.d.ts
 ├── next.config.ts
 ├── nodes.json
 ├── package.json
 ├── postcss.config.mjs
+├── services
+│   ├── instance.ts
+│   ├── react-query
+│   │   ├── index.ts
+│   │   ├── use-react-query-action.ts
+│   │   └── use-scroll-query-action.ts
+│   └── requests
+│       └── auth.ts
 ├── tsconfig.json
 └── types
-    └── element-types.ts
+    ├── element-types.ts
+    └── http
+        ├── bot.ts
+        ├── flow.ts
+        └── index.ts
 ```
 
 ## 📄 Muhim Fayllar Tarkibi (içidan: constructor)
@@ -1330,28 +1349,21 @@ import { CustomNodes } from "./nodes";
 import { CustomEdge } from "./edges";
 import { QuickAddPalette } from "./components";
 import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
-
-// Sichqoncha pozitsiyasini kuzatish uchun kichik hook
-function useMousePosition() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      setMousePosition({ x: event.clientX, y: event.clientY });
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  return mousePosition;
-}
+import { useMousePosition } from "./hooks/useMousePosition";
+import { toast } from "sonner";
+import { instanceAuth } from "@/services/instance";
+import { useParams } from "next/navigation";
 
 function FlowchartInner() {
+  const { bot }: { bot: string } = useParams();
+
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   const { screenToFlowPosition } = useReactFlow();
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const mousePosition = useMousePosition();
+
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useFlowKeyboardShortcuts({
     containerRef: reactFlowWrapper,
@@ -1362,6 +1374,40 @@ function FlowchartInner() {
   // Store'dan kerakli qismlarni olamiz
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } =
     useFlowStore();
+
+  // O'zgartirishdan keyin (tavsiya etiladi)
+  const saveFlow = useCallback(() => {
+    instanceAuth.patch(`/project/flow/${bot}/`, {
+      data: {
+        nodes,
+        edges,
+      },
+    });
+  }, [bot, nodes, edges]); // Funksiya faqat shu qiymatlar o'zgarganda yangilanadi
+
+  // Bu useEffect nodes va edges o'zgarishini kuzatib boradi
+  useEffect(() => {
+    // Agar eski taymer bo'lsa, uni tozalaymiz
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Yangi taymerni o'rnatamiz. 2 sekunddan so'ng saqlaydi.
+    saveTimeoutRef.current = setTimeout(() => {
+      // Faqatgina o'zgarish bo'lgandagina saqlash mantiqini qo'shish mumkin
+      // Bu yerda saveFlow'ni chaqiramiz.
+      // `saveFlow` endi bildirishnoma ko'rsatmasligi uchun uni o'zgartirish kerak bo'lishi mumkin.
+      console.log("Avtomatik saqlanmoqda...");
+      saveFlow();
+    }, 2000); // 2000ms = 2 sekund
+
+    // Komponent yo'q qilinganda taymerni tozalash uchun
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [nodes, edges, saveFlow]); // nodes, edges yoki saveFlow o'zgarganda ishlaydi
 
   const handlePaletteSelect = (element: ElementItemType) => {
     const position = screenToFlowPosition(mousePosition);
@@ -2043,6 +2089,27 @@ export function useFlowKeyboardShortcuts({
     containerRef,
     onOpenPalette,
   ]);
+}
+
+```
+
+### 📄 constructor/hooks/useMousePosition.ts
+
+```ts
+import { useEffect, useState } from "react";
+
+export function useMousePosition() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      setMousePosition({ x: event.clientX, y: event.clientY });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  return mousePosition;
 }
 
 ```
@@ -5040,6 +5107,9 @@ import { StateCreator } from "zustand";
 import { toast } from "sonner";
 import { Node } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
+import { instanceAuth } from "@/services/instance";
+import { APIResponseType } from "@/types/http";
+import { FlowData } from "@/types/http/flow";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: string) => {
@@ -5123,30 +5193,25 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     }
   },
 
-  loadFlow: async () => {
+  loadFlow: async (flowId) => {
     set({ isLoading: true });
     try {
-      const response = await fetch("/api/flow/load");
-      if (!response.ok) throw new Error("Sxemani yuklab bo'lmadi.");
-      const data = await response.json();
+      const response = await instanceAuth<APIResponseType<FlowData>>(
+        "/project/flow/" + flowId
+      );
+      if (response.status != 200) throw new Error("Sxemani yuklab bo'lmadi.");
 
-      if (data.nodes && data.nodes.length > 0) {
-        const maxId = Math.max(
-          ...data.nodes.map((n: Node) => {
-            const parts = n.id.split("_");
-            return parts.length > 1 ? parseInt(parts[parts.length - 1], 10) : 0;
-          })
-        );
-        nodeIdCounter = data.nodes.length;
-      }
-
-      // === MUHIM O'ZGARISH ===
       // Yuklangandan so'ng, ham joriy, ham boshlang'ich holatni o'rnatamiz.
+      const json = response.data.data.data;
+
       set({
-        nodes: data.nodes || [],
-        edges: data.edges || [],
+        nodes: json["nodes"] || [],
+        edges: json["edges"] || [],
         isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
-        initialState: { nodes: data.nodes || [], edges: data.edges || [] },
+        initialState: {
+          nodes: json["nodes"] || [],
+          edges: json["edges"] || [],
+        },
       });
     } catch (error) {
       console.error("Yuklashda xatolik:", error);
@@ -5489,7 +5554,7 @@ export interface Actions {
     position: { x: number; y: number }
   ) => void;
   saveFlow: () => Promise<void>;
-  loadFlow: () => Promise<void>;
+  loadFlow: (flowId: string) => Promise<void>;
 }
 
 // Barcha qismlarni birlashtirgan yakuniy store tipi
