@@ -9,8 +9,18 @@ import { Elements } from "@/constructor/data/elements";
 import { ConstructorPageHeader } from "./components/header";
 
 import LogViewer from "./components/LogViewer";
+import useUserStore from "@/services/store/project";
+import { useParams } from "next/navigation";
 
 export default function Page() {
+  const { id }: { id: string } = useParams();
+
+  const { fetchProject, loading, response } = useUserStore((state) => state);
+
+  useEffect(() => {
+    fetchProject(id);
+  }, [fetchProject, id]);
+
   // 1. Qidiruv matnini saqlash uchun state
   const [searchTerm, setSearchTerm] = useState("");
 

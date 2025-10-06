@@ -3,7 +3,7 @@ import { getSession, signOut } from "next-auth/react";
 import { RefreshAccessToken } from "./requests/auth";
 
 export const instanceAuth = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API,
+  baseURL: process.env.NEXT_PUBLIC_API + "/api",
 });
 
 export const instance = axios.create({
@@ -16,18 +16,6 @@ instanceAuth.interceptors.request.use(
     const session = await getSession();
 
     config.headers["Authorization"] = `Bearer ${session?.user.access}`;
-
-    //   {
-    //     "id": "2",
-    //     "access": "REMOVED_CREDENTIAL",
-    //     "refresh": "REMOVED_CREDENTIAL",
-    //     "first_name": "Muhiddin",
-    //     "last_name": "Kabraliev (D)",
-    //     "phone": "998905650213",
-    //     "lang": "uz",
-    //     "accessTokenExpires": 1752344925337,
-    //     "role": "user"
-    // }
 
     return config;
   },
