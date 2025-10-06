@@ -16,12 +16,13 @@ import { CustomEdge } from "./edges";
 import { QuickAddPalette } from "./components";
 import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
 import { useMousePosition } from "./hooks/useMousePosition";
-import { toast } from "sonner";
 import { instanceAuth } from "@/services/instance";
 import { useParams } from "next/navigation";
+import useUserStore from "@/services/store/project";
 
 function FlowchartInner() {
   const { bot }: { bot: string } = useParams();
+  const { fetchProject, loading, response } = useUserStore((state) => state);
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
@@ -43,12 +44,13 @@ function FlowchartInner() {
 
   // O'zgartirishdan keyin (tavsiya etiladi)
   const saveFlow = useCallback(() => {
-    instanceAuth.patch(`/project/flow/${bot}/`, {
-      data: {
-        nodes,
-        edges,
-      },
-    });
+    if (response)
+      instanceAuth.patch(`/flow/${response.data.flow}/`, {
+        flow: {
+          nodes: nodes,
+          edges: edges,
+        },
+      });
   }, [bot, nodes, edges]); // Funksiya faqat shu qiymatlar o'zgarganda yangilanadi
 
   // Bu useEffect nodes va edges o'zgarishini kuzatib boradi

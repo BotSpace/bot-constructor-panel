@@ -40,7 +40,7 @@ const getDefaultNodeData = (nodeType: string) => {
 };
 
 let nodeIdCounter = 0;
-const generateNodeId = () => `dndnode_${Date.now()}_${nodeIdCounter++}`;
+const generateNodeId = () => `node_${Date.now()}_${nodeIdCounter++}`;
 
 export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   set,
@@ -63,7 +63,7 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
 
     try {
       const flowData = { nodes, edges };
-      const response = await fetch("/api/flow/save", {
+      const response = await fetch("flow/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(flowData),
@@ -91,21 +91,20 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   loadFlow: async (flowId) => {
     set({ isLoading: true });
     try {
-      const response = await instanceAuth<APIResponseType<FlowData>>(
-        "/project/flow/" + flowId
+      const { data } = await instanceAuth<APIResponseType<FlowData>>(
+        "/flow/" + flowId
       );
-      if (response.status != 200) throw new Error("Sxemani yuklab bo'lmadi.");
 
       // Yuklangandan so'ng, ham joriy, ham boshlang'ich holatni o'rnatamiz.
-      const json = response.data.data.data;
+      const flow = data.data.flow;
 
       set({
-        nodes: json["nodes"] || [],
-        edges: json["edges"] || [],
+        nodes: flow["nodes"],
+        edges: flow["edges"],
         isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
         initialState: {
-          nodes: json["nodes"] || [],
-          edges: json["edges"] || [],
+          nodes: flow["nodes"],
+          edges: flow["edges"],
         },
       });
     } catch (error) {

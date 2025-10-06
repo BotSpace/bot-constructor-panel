@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import HeaderActions from "./actions";
+import HeaderActions from "./action/actions";
+
+import LogoImage from "@/public/logo/android-chrome-512x512.png";
 
 // Asosiy Header komponenti
 export function ConstructorPageHeader() {
@@ -12,7 +14,7 @@ export function ConstructorPageHeader() {
           <Image
             width={120}
             height={120}
-            src={"/logo/android-chrome-512x512.png"}
+            src={LogoImage}
             alt="Logo"
             className="w-0 lg:w-auto h-8 lg:h-10 absolute left-0 top-1/2 -translate-y-1/2"
           />

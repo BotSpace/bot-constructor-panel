@@ -3,7 +3,7 @@ import { getSession, signOut } from "next-auth/react";
 import { RefreshAccessToken } from "./requests/auth";
 
 export const instanceAuth = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API,
+  baseURL: process.env.NEXT_PUBLIC_API + "/api",
 });
 
 export const instance = axios.create({
@@ -16,18 +16,6 @@ instanceAuth.interceptors.request.use(
     const session = await getSession();
 
     config.headers["Authorization"] = `Bearer ${session?.user.access}`;
-
-    //   {
-    //     "id": "2",
-    //     "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyMzQ2MDY0LCJpYXQiOjE3NTIzNDQ2MjQsImp0aSI6IjUyYjlhMDRiYzIzYjRhY2FhNDlkYjk0YzYxYWM4YjNkIiwidXNlcl9pZCI6Mn0.3WhCatOC0yjEdnaRi7ixNUl35dqU6NHCMcSqqRP1Kwo",
-    //     "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1NDkzNjYyNCwiaWF0IjoxNzUyMzQ0NjI0LCJqdGkiOiJjZWJiZWVlMjFiOGQ0MGIwYjBmYzViYWVlMjM3OWIyNSIsInVzZXJfaWQiOjJ9.WsefKCp0x_oRytTadgBLo6SXXgWsr2UD2liOv3gw4Hc",
-    //     "first_name": "Muhiddin",
-    //     "last_name": "Kabraliev (D)",
-    //     "phone": "998905650213",
-    //     "lang": "uz",
-    //     "accessTokenExpires": 1752344925337,
-    //     "role": "user"
-    // }
 
     return config;
   },

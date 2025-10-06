@@ -3,12 +3,15 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { GetMe, Login, RefreshAccessToken } from "@/services/requests/auth";
 import { AuthSession } from "../next-auth";
 
+import env from "@/lib/env";
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
       credentials: {
         code: {},
+        debugLogin: {},
       },
 
       async authorize(credentials) {
@@ -49,7 +52,7 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, trigger, user, session: sessionUser }) {
       // Agar trigger update bo'lsa, tokenni yangilash
