@@ -111,7 +111,7 @@ export default function Page() {
                     // Guruh null bo'lishi mumkinligi uchun qo'shimcha tekshiruv
                     group && (
                       <div key={group.title} className="mb-4">
-                        <h3 className="text-xs font-semibold text-slate-600 mb-2">
+                        <h3 className="text-xs font-semibold mb-2">
                           {group.title}
                         </h3>
                         <div className="grid grid-cols-1 gap-2">

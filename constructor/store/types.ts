@@ -1,5 +1,6 @@
 import { Edge, Node, OnConnect, OnEdgesChange, OnNodesChange } from "reactflow";
 import { ElementItemType } from "@/types/element-types";
+import { FlowData } from "@/types/http/flow";
 
 // React Flow asosiy holati uchun slice tipi
 export interface FlowSlice {
@@ -28,7 +29,7 @@ export interface Actions {
     position: { x: number; y: number }
   ) => void;
   saveFlow: () => Promise<void>;
-  loadFlow: (flowId: string) => Promise<void>;
+  loadFlow: (flow: FlowData["flow"]) => Promise<void>;
 }
 
 // Barcha qismlarni birlashtirgan yakuniy store tipi

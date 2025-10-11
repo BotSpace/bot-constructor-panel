@@ -10,7 +10,6 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Elements } from "@/constructor/data/elements";
 import { ElementItemType } from "@/types/element-types";
-import { useMemo } from "react";
 
 interface QuickAddPaletteProps {
   isOpen: boolean;
@@ -23,12 +22,6 @@ export function QuickAddPalette({
   onOpenChange,
   onSelect,
 }: QuickAddPaletteProps) {
-  // `Elements` ma'lumotlarini tekis ro'yxatga o'giramiz
-  const allElements = useMemo(
-    () => Elements.flatMap((group) => group.elements),
-    []
-  );
-
   const handleSelect = (element: ElementItemType) => {
     onSelect(element);
     onOpenChange(false);

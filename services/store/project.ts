@@ -5,17 +5,18 @@ import { APIResponseType } from "@/types/http";
 
 interface UserStore {
   response: APIResponseType<Project> | null;
+  status: Project["debug"]["status"] | null;
   loading: boolean;
   error: string | null;
   fetchProject: (id: string) => Promise<void>;
-  setDebugBot: (bot: Project["bot_for_debug"]) => void;
-  setRelaseBot: (bot: Project["bot_for_release"]) => void;
+  changeResponseStatus: (status: Project["debug"]["status"]) => void;
 }
 
 const useUserStore = create<UserStore>((set, get) => ({
   response: null,
   loading: false,
   error: null,
+  status: null,
 
   // 🔹 API'dan ma'lumot olish
   fetchProject: async (id: string) => {
@@ -29,6 +30,7 @@ const useUserStore = create<UserStore>((set, get) => ({
         response: data,
         loading: false,
         error: null,
+        status: data.data.debug?.status || null,
       });
     } catch (error) {
       set({
@@ -38,37 +40,8 @@ const useUserStore = create<UserStore>((set, get) => ({
     }
   },
 
-  // 🔹 bot_for_debug maydonini yangilash
-  setDebugBot: (bot) => {
-    const current = get().response;
-
-    if (current && current.data) {
-      set({
-        response: {
-          ...current,
-          data: {
-            ...current.data,
-            bot_for_debug: bot,
-          },
-        },
-      });
-    }
-  },
-
-  setRelaseBot: (bot) => {
-    const current = get().response;
-
-    if (current && current.data) {
-      set({
-        response: {
-          ...current,
-          data: {
-            ...current.data,
-            bot_for_release: bot,
-          },
-        },
-      });
-    }
+  changeResponseStatus: (status: Project["debug"]["status"]) => {
+    set({ status });
   },
 }));
 

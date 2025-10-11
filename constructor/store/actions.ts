@@ -2,9 +2,6 @@ import { StateCreator } from "zustand";
 import { toast } from "sonner";
 import { Node } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
-import { instanceAuth } from "@/services/instance";
-import { APIResponseType } from "@/types/http";
-import { FlowData } from "@/types/http/flow";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: string) => {
@@ -88,30 +85,17 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     }
   },
 
-  loadFlow: async (flowId) => {
+  loadFlow: async (flow) => {
     set({ isLoading: true });
-    try {
-      const { data } = await instanceAuth<APIResponseType<FlowData>>(
-        "/flow/" + flowId
-      );
 
-      // Yuklangandan so'ng, ham joriy, ham boshlang'ich holatni o'rnatamiz.
-      const flow = data.data.flow;
-
-      set({
+    set({
+      nodes: flow["nodes"],
+      edges: flow["edges"],
+      isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
+      initialState: {
         nodes: flow["nodes"],
         edges: flow["edges"],
-        isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
-        initialState: {
-          nodes: flow["nodes"],
-          edges: flow["edges"],
-        },
-      });
-    } catch (error) {
-      console.error("Yuklashda xatolik:", error);
-      toast.error("Sxemani yuklashda xatolik yuz berdi.");
-    } finally {
-      set({ isLoading: false });
-    }
+      },
+    });
   },
 });
