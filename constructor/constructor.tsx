@@ -45,7 +45,7 @@ function FlowchartInner() {
   // O'zgartirishdan keyin (tavsiya etiladi)
   const saveFlow = useCallback(() => {
     if (response)
-      instanceAuth.patch(`/flow/${response.data.flow}/`, {
+      instanceAuth.patch(`/project/${response.data.id}/`, {
         flow: {
           nodes: nodes,
           edges: edges,
