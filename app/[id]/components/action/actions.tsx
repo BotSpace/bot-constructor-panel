@@ -41,9 +41,16 @@ export default function HeaderActions() {
     shallow
   );
 
-  const { data: debugBotEnv } = useReactQueryAction<APIResponseType<Env>>({
+  const { data: debugBotEnv, error } = useReactQueryAction<
+    APIResponseType<Env>
+  >({
     url: `enviroment/BOT_TOKEN/?project=${id}`,
   });
+
+  console.log(
+    "🔍 ~ HeaderActions ~ app/[id]/components/action/actions.tsx:44 ~ error:",
+    error
+  );
 
   /* ------------------------- Load flow on project fetch ------------------------- */
   useEffect(() => {
@@ -136,7 +143,16 @@ export default function HeaderActions() {
 
   return (
     <div className="flex items-center gap-3">
-      {debugBotEnv.data.value ? (
+      {error?.status === 404 ? (
+        <AddBotDialog
+          bot_for="debug"
+          project_id={+id}
+          dialog_title="Debug Bot qo‘shish"
+          dialog_description="Telegram debug bot tokenini kiriting"
+        >
+          <Button size="sm">Add Debug Bot</Button>
+        </AddBotDialog>
+      ) : (
         <>
           {status === "running" ? (
             <>
@@ -169,15 +185,6 @@ export default function HeaderActions() {
             </Button>
           )}
         </>
-      ) : (
-        <AddBotDialog
-          bot_for="debug"
-          project_id={+id}
-          dialog_title="Debug Bot qo‘shish"
-          dialog_description="Telegram debug bot tokenini kiriting"
-        >
-          <Button size="sm">Add Debug Bot</Button>
-        </AddBotDialog>
       )}
     </div>
   );

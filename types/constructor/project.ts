@@ -1,9 +1,3 @@
-interface Bot {
-  id: number;
-  name: string;
-  username: string;
-}
-
 export interface Project {
   id: number;
   name: string;

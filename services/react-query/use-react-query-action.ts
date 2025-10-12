@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { queryGenerator } from "@/lib/query-generator";
 import { useDebounces } from "@/hooks/use-debounces";
 import { instanceAuth } from "../instance";
+import { AxiosError } from "@/types/http/error";
 
 export const useReactQueryAction = <T>({
   url,
@@ -32,14 +33,14 @@ export const useReactQueryAction = <T>({
   // Debounced URL
   const debouncedUrl = debounceTime ? useDebounces(url, debounceTime) : url;
 
-  return useQuery<T>({
+  return useQuery<T, AxiosError>({
     queryKey: [debouncedUrl],
     queryFn: async () => {
       try {
         let { data } = await instanceAuth.get(debouncedUrl);
         return data;
       } catch (error) {
-        return null;
+        return error;
       }
     },
     enabled: enabled && (!debounceTime || debouncedUrl === url),
