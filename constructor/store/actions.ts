@@ -66,7 +66,6 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     toast.loading("Saqlanmoqda...");
 
     try {
-      // const flowData = { nodes, edges };
       const response = await instanceAuth.patch(`/project/${project_id}/`, {
         flow: {
           nodes: nodes,
