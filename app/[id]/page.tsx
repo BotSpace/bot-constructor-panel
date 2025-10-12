@@ -8,9 +8,12 @@ import Constructor from "@/constructor/constructor";
 import { Elements } from "@/constructor/data/elements";
 import { ConstructorPageHeader } from "./components/header";
 
-import LogViewer from "./components/LogViewer";
+import { LogViewer } from "./components/LogViewer";
 import useUserStore from "@/services/store/project";
 import { useParams } from "next/navigation";
+import { Card } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Page() {
   const { id }: { id: string } = useParams();
@@ -154,12 +157,27 @@ export default function Page() {
             )}
           </div>
         </ScrollArea>
-        {/* Main Canvas Area */}
-        <main className="flex-1 flex flex-col">
-          <Constructor />
-        </main>
-        <LogViewer />
+        {response ? (
+          <main className="flex-1 flex flex-col">
+            <Constructor />
+            <LogViewer projectId={response?.data.debug.service_id} />
+          </main>
+        ) : (
+          <ConstructorLoading />
+        )}
       </div>
+    </div>
+  );
+}
+
+function ConstructorLoading() {
+  return (
+    <div className="w-full h-screen grid grid-cols-12 grid-rows-12 gap-4">
+      <Skeleton className="col-span-3 row-span-4 col-start-3 row-start-3"></Skeleton>
+      <Skeleton className="col-span-3 col-start-4 row-start-8"></Skeleton>
+      <Skeleton className="col-span-3 row-span-3 col-start-8 row-start-4"></Skeleton>
+      <Skeleton className="col-span-3 row-span-2 col-start-7 row-start-8"></Skeleton>
+      <Skeleton className="col-span-3 col-start-3 row-start-10"></Skeleton>
     </div>
   );
 }

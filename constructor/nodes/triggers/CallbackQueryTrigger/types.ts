@@ -1,6 +1,7 @@
 export interface CallbackQueryTriggerData {
-  filter?: string;
-  context?: {
-    value?: string;
+  filter: string;
+  context: {
+    global: boolean;
+    value: string;
   };
 }

@@ -2,9 +2,11 @@ import { StateCreator } from "zustand";
 import { toast } from "sonner";
 import { Node } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
+import { ElementItemType } from "@/types/element-types";
+import { instanceAuth } from "@/services/instance";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
-const getDefaultNodeData = (nodeType: string) => {
+const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
   const baseMessageData = {
     recipients: { sendToSender: true, additionalIds: [] },
     keyboard: {
@@ -31,6 +33,11 @@ const getDefaultNodeData = (nodeType: string) => {
       return { ...baseMessageData, fileSourceType: "url", caption: "" };
     case "CustomCodeNode":
       return {}; // Custom code uchun alohida sozlamalar
+    case "CallbackQueryTriggerNode":
+      return {
+        global: true,
+        value: "",
+      };
     default:
       return {};
   }
@@ -53,20 +60,20 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     set({ nodes: [...get().nodes, newNode], isDirty: true });
   },
 
-  saveFlow: async () => {
+  saveFlow: async (project_id: string) => {
     const { nodes, edges } = get();
     set({ isLoading: true });
     toast.loading("Saqlanmoqda...");
 
     try {
-      const flowData = { nodes, edges };
-      const response = await fetch("flow/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(flowData),
+      // const flowData = { nodes, edges };
+      const response = await instanceAuth.patch(`/project/${project_id}/`, {
+        flow: {
+          nodes: nodes,
+          edges: edges,
+        },
       });
-
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error("Serverda saqlashda xatolik.");
       }
 

@@ -16,13 +16,10 @@ import { CustomEdge } from "./edges";
 import { QuickAddPalette } from "./components";
 import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
 import { useMousePosition } from "./hooks/useMousePosition";
-import { instanceAuth } from "@/services/instance";
 import { useParams } from "next/navigation";
-import useUserStore from "@/services/store/project";
 
 function FlowchartInner() {
-  const { bot }: { bot: string } = useParams();
-  const { fetchProject, loading, response } = useUserStore((state) => state);
+  const { id }: { id: string } = useParams();
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
@@ -39,19 +36,23 @@ function FlowchartInner() {
   });
 
   // Store'dan kerakli qismlarni olamiz
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } =
-    useFlowStore();
+  const {
+    nodes,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    addNode,
+    isDirty,
+    saveFlow,
+  } = useFlowStore();
 
-  // O'zgartirishdan keyin (tavsiya etiladi)
-  const saveFlow = useCallback(() => {
-    if (response)
-      instanceAuth.patch(`/project/${response.data.id}/`, {
-        flow: {
-          nodes: nodes,
-          edges: edges,
-        },
-      });
-  }, [bot, nodes, edges]); // Funksiya faqat shu qiymatlar o'zgarganda yangilanadi
+  useEffect(() => {
+    console.log(
+      "🔍 ~ FlowchartInner ~ constructor/constructor.tsx:48 ~ isDirty:",
+      isDirty
+    );
+  }, [isDirty]);
 
   // Bu useEffect nodes va edges o'zgarishini kuzatib boradi
   useEffect(() => {
@@ -66,7 +67,7 @@ function FlowchartInner() {
       // Bu yerda saveFlow'ni chaqiramiz.
       // `saveFlow` endi bildirishnoma ko'rsatmasligi uchun uni o'zgartirish kerak bo'lishi mumkin.
       console.log("Avtomatik saqlanmoqda...");
-      saveFlow();
+      saveFlow(id);
     }, 2000); // 2000ms = 2 sekund
 
     // Komponent yo'q qilinganda taymerni tozalash uchun

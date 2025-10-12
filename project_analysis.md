@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 7/15/2025, 11:44:03 PM
+Sana: 10/12/2025, 6:59:12 AM
 
 ## 📁 Fayl Strukturasi
 
@@ -13,7 +13,7 @@ constructor-next-js
 ├── app
 │   ├── AuthProvider.tsx
 │   ├── ReactQueryProvider.tsx
-│   ├── [bot]
+│   ├── [id]
 │   │   ├── components
 │   │   │   ├── LogViewer
 │   │   │   │   ├── Header.tsx
@@ -23,7 +23,10 @@ constructor-next-js
 │   │   │   │   ├── ResizeHandler.tsx
 │   │   │   │   ├── index.tsx
 │   │   │   │   └── types.ts
-│   │   │   ├── actions.tsx
+│   │   │   ├── action
+│   │   │   │   ├── actions.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── prompt-interface.tsx
 │   │   │   ├── header.tsx
 │   │   │   └── index.ts
 │   │   └── page.tsx
@@ -33,6 +36,8 @@ constructor-next-js
 │   │       │   ├── option.ts
 │   │       │   └── route.ts
 │   │       └── next-auth.d.ts
+│   ├── auth
+│   │   └── page.tsx
 │   ├── favicon.ico
 │   ├── globals.css
 │   └── layout.tsx
@@ -48,6 +53,8 @@ constructor-next-js
 │       ├── command.tsx
 │       ├── dialog.tsx
 │       ├── dropdown-menu.tsx
+│       ├── hover-border-gradient.tsx
+│       ├── input-otp.tsx
 │       ├── input.tsx
 │       ├── label.tsx
 │       ├── radio-group.tsx
@@ -56,6 +63,7 @@ constructor-next-js
 │       ├── separator.tsx
 │       ├── slider.tsx
 │       ├── sonner.tsx
+│       ├── spinner.tsx
 │       ├── switch.tsx
 │       ├── tabs.tsx
 │       ├── textarea.tsx
@@ -173,15 +181,13 @@ constructor-next-js
 │   │       │   ├── ReplyButtonTrigger.tsx
 │   │       │   ├── index.ts
 │   │       │   └── types.ts
-│   │       ├── index.ts
-│   │       └── shared
-│   ├── store
-│   │   ├── actions.ts
-│   │   ├── clipboardSlice.ts
-│   │   ├── flowSlice.ts
-│   │   ├── index.ts
-│   │   └── types.ts
-│   └── types
+│   │       └── index.ts
+│   └── store
+│       ├── actions.ts
+│       ├── clipboardSlice.ts
+│       ├── flowSlice.ts
+│       ├── index.ts
+│       └── types.ts
 ├── editor
 │   ├── index.tsx
 │   ├── settings
@@ -225,8 +231,10 @@ constructor-next-js
 ├── i18n
 │   ├── request.ts
 │   └── routing.ts
+├── just.json
 ├── just.py
 ├── lib
+│   ├── env.ts
 │   ├── query-generator.ts
 │   └── utils.ts
 ├── log-server.mjs
@@ -246,10 +254,18 @@ constructor-next-js
 │   │   ├── index.ts
 │   │   ├── use-react-query-action.ts
 │   │   └── use-scroll-query-action.ts
-│   └── requests
-│       └── auth.ts
+│   ├── requests
+│   │   ├── auth.ts
+│   │   └── bot.ts
+│   └── store
+│       └── project.ts
 ├── tsconfig.json
 └── types
+    ├── auth
+    │   ├── get-me.ts
+    │   └── login.tsx
+    ├── constructor
+    │   └── project.ts
     ├── element-types.ts
     └── http
         ├── bot.ts
@@ -1260,7 +1276,6 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Elements } from "@/constructor/data/elements";
 import { ElementItemType } from "@/types/element-types";
-import { useMemo } from "react";
 
 interface QuickAddPaletteProps {
   isOpen: boolean;
@@ -1273,12 +1288,6 @@ export function QuickAddPalette({
   onOpenChange,
   onSelect,
 }: QuickAddPaletteProps) {
-  // `Elements` ma'lumotlarini tekis ro'yxatga o'giramiz
-  const allElements = useMemo(
-    () => Elements.flatMap((group) => group.elements),
-    []
-  );
-
   const handleSelect = (element: ElementItemType) => {
     onSelect(element);
     onOpenChange(false);
@@ -1350,12 +1359,13 @@ import { CustomEdge } from "./edges";
 import { QuickAddPalette } from "./components";
 import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
 import { useMousePosition } from "./hooks/useMousePosition";
-import { toast } from "sonner";
 import { instanceAuth } from "@/services/instance";
 import { useParams } from "next/navigation";
+import useUserStore from "@/services/store/project";
 
 function FlowchartInner() {
   const { bot }: { bot: string } = useParams();
+  const { fetchProject, loading, response } = useUserStore((state) => state);
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
@@ -1377,12 +1387,13 @@ function FlowchartInner() {
 
   // O'zgartirishdan keyin (tavsiya etiladi)
   const saveFlow = useCallback(() => {
-    instanceAuth.patch(`/project/flow/${bot}/`, {
-      data: {
-        nodes,
-        edges,
-      },
-    });
+    if (response)
+      instanceAuth.patch(`/project/${response.data.id}/`, {
+        flow: {
+          nodes: nodes,
+          edges: edges,
+        },
+      });
   }, [bot, nodes, edges]); // Funksiya faqat shu qiymatlar o'zgarganda yangilanadi
 
   // Bu useEffect nodes va edges o'zgarishini kuzatib boradi
@@ -1508,36 +1519,37 @@ import { ElementTypes } from "@/types/element-types";
 
 export const Elements: ElementTypes[] = [
   {
-    title: "Trigger",
+    // Bular bot senariysini ishga tushiruvchi hodisalar
+    title: "🚀 Triggerlar (Boshlovchilar)",
     elements: [
       {
         type: "message",
-        name: "Message",
-        description: "Send a message to the user",
+        name: "Xabar kelganda",
+        description: "Foydalanuvchidan xabar kelganda.",
         icon: "💬",
         color: "bg-amber-500/10 text-amber-400 border-amber-500/20",
         triggerId: "MessageTriggerNode",
       },
       {
         type: "command",
-        name: "Command",
-        description: "Bot buyrug'ini ushlaydi (masalan, /start)",
+        name: "Buyruq kelganda",
+        description: "/start yoki /help kabi buyruq yuborganda.",
         icon: "⌘",
         color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-        triggerId: "CommandTriggerNode", // Bu nom muhim! Keyingi qadamlarda ishlatamiz.
+        triggerId: "CommandTriggerNode",
       },
       {
         type: "reply_button",
-        name: "Reply Button",
-        description: "Oldingi qadamdagi reply tugmani ushlaydi",
-        icon: "↩️", // Yoki Lucide'dan icon
+        name: "Javob tugmasi bosilganda",
+        description: "Tugmani bosganda.",
+        icon: "↩️",
         color: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-        triggerId: "ReplyButtonTriggerNode", // Bu nom muhim!
+        triggerId: "ReplyButtonTriggerNode",
       },
       {
         type: "callback_query",
-        name: "Advanced Callback",
-        description: "Callback ma'lumotini filtrlab ushlaydi",
+        name: "Inline tugma bosilganda",
+        description: "Inline tugmani bosganda.",
         icon: "🕸️",
         color: "bg-teal-500/10 text-teal-400 border-teal-500/20",
         triggerId: "CallbackQueryTriggerNode",
@@ -1545,44 +1557,46 @@ export const Elements: ElementTypes[] = [
     ],
   },
   {
-    title: "Actions",
+    // Bular bot bajaradigan amallar
+    title: "⚙️ Amallar",
     elements: [
       {
         type: "message",
-        name: "Send Message",
-        description: "Send a message to the user",
+        name: "Matn yuborish",
+        description: "Foydalanuvchiga matnli xabar yuboradi.",
         icon: "💬",
         color: "bg-amber-500/10 text-amber-400 border-amber-500/20",
         triggerId: "SendTextMessageNode",
       },
       {
         type: "photo",
-        name: "Send Photo",
-        description: "Send a photo to the user",
+        name: "Rasm yuborish",
+        description: "Foydalanuvchiga rasm yuboradi.",
         icon: "🖼️",
         color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
         triggerId: "SendPhotoNode",
       },
       {
         type: "video",
-        name: "Send Video",
-        description: "Send a video to the user",
+        name: "Video yuborish",
+        description: "Foydalanuvchiga video yuboradi.",
         icon: "📹",
         color: "bg-red-500/10 text-red-400 border-red-500/20",
         triggerId: "SendVideoNode",
       },
       {
         type: "audio",
-        name: "Send Audio",
-        description: "Send an audio file to the user",
+        name: "Audio yuborish",
+        description: "Foydalanuvchiga audio fayl yuboradi.",
         icon: "🎵",
         color: "bg-pink-500/10 text-pink-400 border-pink-500/20",
         triggerId: "SendAudioNode",
       },
       {
         type: "file",
-        name: "Send File",
-        description: "Send a file to the user",
+        name: "Fayl yuborish",
+        description:
+          "Foydalanuvchiga hujjat yoki boshqa turdagi fayl yuboradi.",
         icon: "📄",
         color: "bg-gray-500/10 text-gray-400 border-gray-500/20",
         triggerId: "SendFileNode",
@@ -1590,12 +1604,14 @@ export const Elements: ElementTypes[] = [
     ],
   },
   {
-    title: "Custom Logic",
+    // Bu murakkab mantiq uchun maxsus blok
+    title: "🧩 Maxsus Mantiq",
     elements: [
       {
         type: "code",
-        name: "Custom Code",
-        description: "Run custom code for advanced logic",
+        name: "Maxsus Kod",
+        description:
+          "Murakkab amallar va shartlar uchun Python kodi yozish imkonini beradi.",
         icon: "🖥️",
         color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
         triggerId: "CustomCodeNode",
@@ -5107,9 +5123,6 @@ import { StateCreator } from "zustand";
 import { toast } from "sonner";
 import { Node } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
-import { instanceAuth } from "@/services/instance";
-import { APIResponseType } from "@/types/http";
-import { FlowData } from "@/types/http/flow";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: string) => {
@@ -5145,7 +5158,7 @@ const getDefaultNodeData = (nodeType: string) => {
 };
 
 let nodeIdCounter = 0;
-const generateNodeId = () => `dndnode_${Date.now()}_${nodeIdCounter++}`;
+const generateNodeId = () => `node_${Date.now()}_${nodeIdCounter++}`;
 
 export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   set,
@@ -5168,7 +5181,7 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
 
     try {
       const flowData = { nodes, edges };
-      const response = await fetch("/api/flow/save", {
+      const response = await fetch("flow/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(flowData),
@@ -5193,32 +5206,18 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     }
   },
 
-  loadFlow: async (flowId) => {
+  loadFlow: async (flow) => {
     set({ isLoading: true });
-    try {
-      const response = await instanceAuth<APIResponseType<FlowData>>(
-        "/project/flow/" + flowId
-      );
-      if (response.status != 200) throw new Error("Sxemani yuklab bo'lmadi.");
 
-      // Yuklangandan so'ng, ham joriy, ham boshlang'ich holatni o'rnatamiz.
-      const json = response.data.data.data;
-
-      set({
-        nodes: json["nodes"] || [],
-        edges: json["edges"] || [],
-        isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
-        initialState: {
-          nodes: json["nodes"] || [],
-          edges: json["edges"] || [],
-        },
-      });
-    } catch (error) {
-      console.error("Yuklashda xatolik:", error);
-      toast.error("Sxemani yuklashda xatolik yuz berdi.");
-    } finally {
-      set({ isLoading: false });
-    }
+    set({
+      nodes: flow["nodes"],
+      edges: flow["edges"],
+      isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
+      initialState: {
+        nodes: flow["nodes"],
+        edges: flow["edges"],
+      },
+    });
   },
 });
 
@@ -5526,6 +5525,7 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 ```ts
 import { Edge, Node, OnConnect, OnEdgesChange, OnNodesChange } from "reactflow";
 import { ElementItemType } from "@/types/element-types";
+import { FlowData } from "@/types/http/flow";
 
 // React Flow asosiy holati uchun slice tipi
 export interface FlowSlice {
@@ -5554,7 +5554,7 @@ export interface Actions {
     position: { x: number; y: number }
   ) => void;
   saveFlow: () => Promise<void>;
-  loadFlow: (flowId: string) => Promise<void>;
+  loadFlow: (flow: FlowData["flow"]) => Promise<void>;
 }
 
 // Barcha qismlarni birlashtirgan yakuniy store tipi
