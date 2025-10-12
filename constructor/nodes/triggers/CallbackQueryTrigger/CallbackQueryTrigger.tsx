@@ -1,6 +1,6 @@
 // FAYL: constructor/nodes/triggers/CallbackQueryTrigger/CallbackQueryTrigger.tsx (YANGI, "AQLLI" VERSIYA)
 
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import { NodeProps, useNodes, useEdges } from "reactflow";
 import { useFlowStore } from "@/constructor/store";
 import { CallbackQueryTriggerData } from "./types";
@@ -26,6 +26,7 @@ import { MousePointerClick } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SourceHandler, TargetHandler } from "../../components";
 import { KeyboardConfig } from "../../actions/TextMessageNode/types";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
 interface NodeWithKeyboardData {
@@ -38,6 +39,7 @@ const CallbackQueryTriggerNodeComponent = ({
   selected,
 }: NodeProps<CallbackQueryTriggerData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const [global, setGlobal] = useState<boolean>(true);
   const nodes = useNodes();
   const edges = useEdges();
 
@@ -76,11 +78,11 @@ const CallbackQueryTriggerNodeComponent = ({
 
   const onFilterChange = (newFilter: string) => {
     // Agar filtr o'zgarsa, tanlangan qiymatni tozalab qo'yamiz
-    handleUpdate({ filter: newFilter, context: { value: "" } });
+    handleUpdate({ filter: newFilter, context: { value: "", global } });
   };
 
   const onValueChange = (newValue: string) => {
-    handleUpdate({ context: { value: newValue } });
+    handleUpdate({ context: { value: newValue, global } });
   };
 
   const isConfigured =
@@ -167,6 +169,14 @@ const CallbackQueryTriggerNodeComponent = ({
             )}
           </div>
         )}
+
+        <Label className="mt-2">
+          <Checkbox
+            checked={global}
+            onCheckedChange={(e) => setGlobal(e as boolean)}
+          />
+          Global
+        </Label>
       </CardContent>
 
       <SourceHandler />

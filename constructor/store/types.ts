@@ -28,7 +28,7 @@ export interface Actions {
     element: ElementItemType,
     position: { x: number; y: number }
   ) => void;
-  saveFlow: () => Promise<void>;
+  saveFlow: (project_id: string) => Promise<void>;
   loadFlow: (flow: FlowData["flow"]) => Promise<void>;
 }
 
