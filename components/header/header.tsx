@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import HeaderActions from "./action/actions";
-
-import { PromptInterface } from "./action/prompt-interface";
 import LogoImage from "@/public/logo/android-chrome-192x192.png";
+import HeaderActions from "./components/debug/debug";
+import { PromptInterface } from "./components/ai-chat/prompt-interface";
+import Relase from "./components/relas/relas";
 
 // Asosiy Header komponenti
 export function ConstructorPageHeader() {
@@ -20,9 +20,10 @@ export function ConstructorPageHeader() {
             className="w-0 lg:w-auto h-8 lg:h-10 absolute left-0 top-1/2 -translate-y-1/2"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          {/* <PromptInterface /> */}
           <HeaderActions />
-          <PromptInterface />
+          <Relase />
         </div>
       </header>
     </>

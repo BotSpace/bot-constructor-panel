@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { instance } from "../instance";
-import { ScrollAPIResponse } from "@/types";
+import { ScrollAPIResponse } from "@/types/http/index";
 
 export const useReactQueryScrollLoadingAction = <T>(
   url: string,
