@@ -19,10 +19,6 @@ export const authOptions: NextAuthOptions = {
 
         // Avval Confirm API orqali tasdiqlash tokenlarini olish
         let data = await Login({ code });
-        console.log(
-          " LOG_ID: [330254b9aee9] ~ 🚀 ~ file: option.ts:22 ~ authorize ~  data:",
-          data
-        );
 
         if (!data) {
           throw new Error("Code hato");
@@ -50,7 +46,6 @@ export const authOptions: NextAuthOptions = {
             role: getMe.data.role,
           };
         } else {
-          console.log(data);
           throw new Error(JSON.stringify({ errors: false, status: false }));
         }
       },
