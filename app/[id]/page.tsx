@@ -6,14 +6,11 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Constructor from "@/constructor/constructor";
 import { Elements } from "@/constructor/data/elements";
-import { ConstructorPageHeader } from "./components/header";
-
-import { LogViewer } from "./components/LogViewer";
 import useUserStore from "@/services/store/project";
 import { useParams } from "next/navigation";
-import { Card } from "@/components/ui/card";
-import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConstructorPageHeader } from "@/components/header/header";
+import { LogViewer } from "@/components/log-viewer/log-viewer";
 
 export default function Page() {
   const { id }: { id: string } = useParams();

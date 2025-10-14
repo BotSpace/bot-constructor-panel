@@ -1,19 +1,15 @@
+import "./globals.css";
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 import { NextIntlClientProvider } from "next-intl";
 
-import { Fira_Code } from "next/font/google";
 import AuthProvider from "./AuthProvider";
 import ReactQueryProvider from "./ReactQueryProvider";
 
-export const firaCode = Fira_Code({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

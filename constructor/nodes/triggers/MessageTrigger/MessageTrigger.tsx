@@ -36,8 +36,6 @@ const MessageTriggerNodeComponent = ({
   const { filtersForType, isNodeConfigured } = useMemo(() => {
     const filters = getFiltersForType(data.type);
 
-    console.log("Received filters:", filters); // Debug uchun
-
     const configured =
       data.type === "any" ||
       data.type === "any_text" ||

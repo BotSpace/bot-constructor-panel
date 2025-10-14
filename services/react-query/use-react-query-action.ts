@@ -36,6 +36,8 @@ export const useReactQueryAction = <T>({
   return useQuery<T, AxiosError>({
     queryKey: [debouncedUrl],
     queryFn: async () => {
+      return await instanceAuth.get(debouncedUrl);
+
       try {
         let { data } = await instanceAuth.get(debouncedUrl);
         return data;

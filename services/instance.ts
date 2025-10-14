@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getSession } from "next-auth/react";
 import { RefreshAccessToken } from "./requests/auth";
+import { log } from "console";
 
 export const instanceAuth = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API + "/api",
@@ -41,7 +42,11 @@ instanceAuth.interceptors.response.use(
 
       session.user = user;
 
+      console.log('request resend now');
+
+
       return instanceAuth(prevRequest);
+
     }
 
     // log out if user is not authenticated
