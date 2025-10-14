@@ -47,13 +47,6 @@ function FlowchartInner() {
     saveFlow,
   } = useFlowStore();
 
-  useEffect(() => {
-    console.log(
-      "🔍 ~ FlowchartInner ~ constructor/constructor.tsx:48 ~ isDirty:",
-      isDirty
-    );
-  }, [isDirty]);
-
   // Bu useEffect nodes va edges o'zgarishini kuzatib boradi
   useEffect(() => {
     // Agar eski taymer bo'lsa, uni tozalaymiz
@@ -66,7 +59,6 @@ function FlowchartInner() {
       // Faqatgina o'zgarish bo'lgandagina saqlash mantiqini qo'shish mumkin
       // Bu yerda saveFlow'ni chaqiramiz.
       // `saveFlow` endi bildirishnoma ko'rsatmasligi uchun uni o'zgartirish kerak bo'lishi mumkin.
-      console.log("Avtomatik saqlanmoqda...");
       saveFlow(id);
     }, 2000); // 2000ms = 2 sekund
 

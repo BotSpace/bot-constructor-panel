@@ -11,7 +11,6 @@ import { Code2, PenLine } from "lucide-react";
 import { NodeHeader } from "@/constructor/nodes/actions/shared/NodeHeader";
 import { SourceHandler, TargetHandler } from "../../components";
 import { CustomCodeNodeData } from "./types";
-import { EditorThemeName } from "@/constructor/data/editor-themes";
 import { CodeEditorDialog } from "./components/CodeEditorDialog";
 
 const DEFAULT_CODE = `# Ushbu kod sxema shu nuqtaga yetganda ishga tushadi.
@@ -57,8 +56,8 @@ const CustomCodeNodeComponent = ({
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const handleSave = (newCode: string, theme: EditorThemeName) => {
-    updateNodeData(id, { pythonCode: newCode, editorTheme: theme });
+  const handleSave = (newCode: string) => {
+    updateNodeData(id, { pythonCode: newCode });
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +98,6 @@ const CustomCodeNodeComponent = ({
 
           <CodeEditorDialog
             initialCode={data.pythonCode || DEFAULT_CODE}
-            initialTheme={data.editorTheme}
             onSave={handleSave}
             contextType={"message"}
           >
