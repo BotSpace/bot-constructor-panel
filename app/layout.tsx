@@ -3,13 +3,12 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
 
 import { NextIntlClientProvider } from "next-intl";
 
 import AuthProvider from "./AuthProvider";
 import ReactQueryProvider from "./ReactQueryProvider";
-
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,7 +44,7 @@ export default function RootLayout({
                 enableSystem
               >
                 {children}
-                <Toaster />
+                <Toaster position="top-center" reverseOrder={false} />
               </ThemeProvider>
             </NextIntlClientProvider>
           </AuthProvider>

@@ -1,9 +1,9 @@
 import { StateCreator } from "zustand";
-import { toast } from "sonner";
 import { Node } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
 import { ElementItemType } from "@/types/element-types";
 import { instanceAuth } from "@/services/instance";
+import toast from "react-hot-toast";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
