@@ -12,30 +12,33 @@ import { instanceAuth } from "@/services/instance";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-export function AddBotDialog({
+export function SetEnvDialog({
   dialog_title,
   dialog_description,
   env_name,
   project_id,
   children,
+  onSuccess,
 }: {
   dialog_title: string;
   dialog_description: string;
   env_name: string;
   project_id: number;
   children: React.ReactNode;
+  onSuccess?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [token, setToken] = useState("");
 
-  const handleAddDebugBot = async () => {
+  const handleSetEnv = async () => {
     try {
       await instanceAuth.post("/enviroment/", {
-        key: "BOT_TOKEN",
+        key: env_name,
         value: token,
         project: project_id,
       });
       toast.success("Bot muvaffaqiyatli qo'shildi!");
+      onSuccess?.();
       setOpen(false);
     } catch {
       toast.error("Bot qo'shishda xatolik yuz berdi.");
@@ -57,7 +60,7 @@ export function AddBotDialog({
           onChange={(e) => setToken(e.target.value)}
         />
 
-        <Button onClick={handleAddDebugBot}>Add Bot</Button>
+        <Button onClick={handleSetEnv}>Add Bot</Button>
       </DialogContent>
     </Dialog>
   );
