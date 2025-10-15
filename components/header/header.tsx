@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import LogoImage from "@/public/logo/android-chrome-192x192.png";
-import HeaderActions from "./components/debug/debug";
+// import HeaderActions from "./components/debug/debug";
 import { PromptInterface } from "./components/ai-chat/prompt-interface";
 import Relase from "./components/relas/relas";
 
@@ -22,7 +22,7 @@ export function ConstructorPageHeader() {
         </div>
         <div className="flex items-center gap-2">
           {/* <PromptInterface /> */}
-          <HeaderActions />
+          {/* <HeaderActions /> */}
           <Relase />
         </div>
       </header>

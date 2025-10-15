@@ -3,7 +3,6 @@ export interface APIResponseType<T> {
   data: T;
 }
 
-
 export interface ScrollAPIResponse<T> {
   data: {
     links: {

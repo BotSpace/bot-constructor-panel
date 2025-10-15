@@ -15,7 +15,7 @@ import { LogViewer } from "@/components/log-viewer/log-viewer";
 export default function Page() {
   const { id }: { id: string } = useParams();
 
-  const { fetchProject, loading, response } = useUserStore((state) => state);
+  const { fetchProject, response } = useUserStore((state) => state);
 
   useEffect(() => {
     fetchProject(id);
@@ -157,17 +157,19 @@ export default function Page() {
         {response ? (
           <main className="flex-1 flex flex-col">
             <Constructor />
-            <LogViewer projectId={response?.data.debug.service_id} />
+            {response.debug.service_id && (
+              <LogViewer projectId={response.debug.service_id} />
+            )}
           </main>
         ) : (
-          <ConstructorLoading />
+          <ConstructorLoadingSkeletions />
         )}
       </div>
     </div>
   );
 }
 
-function ConstructorLoading() {
+function ConstructorLoadingSkeletions() {
   return (
     <div className="w-full h-screen grid grid-cols-12 grid-rows-12 gap-4">
       <Skeleton className="col-span-3 row-span-4 col-start-3 row-start-3"></Skeleton>

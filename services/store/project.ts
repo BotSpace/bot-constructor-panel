@@ -1,15 +1,13 @@
-import { Project } from "@/types/constructor/project";
+import { ProjectRetrive } from "@/types/http/project";
 import { create } from "zustand";
 import { instanceAuth } from "../instance";
 import { APIResponseType } from "@/types/http";
 
 interface UserStore {
-  response: APIResponseType<Project> | null;
-  status: Project["debug"]["status"] | null;
+  response: ProjectRetrive | null;
   loading: boolean;
   error: string | null;
   fetchProject: (id: string) => Promise<void>;
-  changeResponseStatus: (status: Project["debug"]["status"]) => void;
 }
 
 const useUserStore = create<UserStore>((set, get) => ({
@@ -22,15 +20,14 @@ const useUserStore = create<UserStore>((set, get) => ({
   fetchProject: async (id: string) => {
     set({ loading: true, error: null });
     try {
-      const { data } = await instanceAuth.get<APIResponseType<Project>>(
+      const { data } = await instanceAuth.get<APIResponseType<ProjectRetrive>>(
         `/project/${id}`
       );
 
       set({
-        response: data,
+        response: data.data,
         loading: false,
         error: null,
-        status: data.data.debug?.status || null,
       });
     } catch (error) {
       set({
@@ -38,10 +35,6 @@ const useUserStore = create<UserStore>((set, get) => ({
         loading: false,
       });
     }
-  },
-
-  changeResponseStatus: (status: Project["debug"]["status"]) => {
-    set({ status });
   },
 }));
 
