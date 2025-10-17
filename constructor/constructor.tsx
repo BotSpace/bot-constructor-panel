@@ -17,23 +17,10 @@ import { QuickAddPalette } from "./components";
 import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
 import { useMousePosition } from "./hooks/useMousePosition";
 import { useParams } from "next/navigation";
+import useProjectStore from "./store/project";
 
 function FlowchartInner() {
   const { id }: { id: string } = useParams();
-
-  const reactFlowWrapper = useRef<HTMLDivElement>(null);
-
-  const { screenToFlowPosition } = useReactFlow();
-  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
-  const mousePosition = useMousePosition();
-
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useFlowKeyboardShortcuts({
-    containerRef: reactFlowWrapper,
-    mousePosition: mousePosition,
-    onOpenPalette: () => {},
-  });
 
   // Store'dan kerakli qismlarni olamiz
   const {
@@ -43,9 +30,35 @@ function FlowchartInner() {
     onEdgesChange,
     onConnect,
     addNode,
-    isDirty,
     saveFlow,
+    loadFlow,
   } = useFlowStore();
+
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+
+  const { loading, project } = useProjectStore();
+
+  const { screenToFlowPosition } = useReactFlow();
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const mousePosition = useMousePosition();
+
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // load flow from project
+  useEffect(() => {
+    if (project) {
+      loadFlow({
+        nodes: project.flow.nodes,
+        edges: project.flow.edges,
+      });
+    }
+  }, [loading]);
+
+  useFlowKeyboardShortcuts({
+    containerRef: reactFlowWrapper,
+    mousePosition: mousePosition,
+    onOpenPalette: () => {},
+  });
 
   // Bu useEffect nodes va edges o'zgarishini kuzatib boradi
   useEffect(() => {
