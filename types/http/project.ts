@@ -3,7 +3,15 @@ export interface ProjectRetrive {
   name: string;
   debug: {
     id: 14;
-    status: string;
+    status:
+      | "pending"
+      | "initializing"
+      | "running"
+      | "stopped"
+      | "stopping"
+      | "failed"
+      | "suspended";
+
     service_id: null;
   };
   release: {
@@ -12,10 +20,10 @@ export interface ProjectRetrive {
     status: "running";
     service_id: string;
   } | null;
-  debug_bot: false;
-  release_bot: false;
+  debug_bot: boolean;
+  release_bot: boolean;
   flow: {
-    nodes: any[];
-    edges: any[];
+    nodes: [];
+    edges: [];
   };
 }

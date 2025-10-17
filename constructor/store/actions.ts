@@ -33,11 +33,25 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
       return { ...baseMessageData, fileSourceType: "url", caption: "" };
     case "CustomCodeNode":
       return {}; // Custom code uchun alohida sozlamalar
-    case "CallbackQueryTriggerNode":
+    case "ReplyButtonTriggerNode":
       return {
         global: true,
-        value: "",
+        context: {},
       };
+    case "CommandTriggerNode":
+      return {
+        command: "/start",
+        global: true,
+      };
+    case "CallbackQueryTriggerNode":
+      return {
+        filter: "",
+        global: true,
+        context: {
+          value: "",
+        },
+      };
+
     default:
       return {};
   }

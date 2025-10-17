@@ -11,7 +11,6 @@ import {
 import { useParams } from "next/navigation";
 import React from "react";
 import { SetEnvDialog } from "../add-env";
-import useUserStore from "@/services/store/project";
 import {
   Activity,
   Bot,
@@ -22,10 +21,11 @@ import {
 import { Link } from "@/i18n/routing";
 import { instanceAuth } from "@/services/instance";
 import toast from "react-hot-toast";
+import useProjectStore from "@/constructor/store/project";
 
 function Release() {
-  const { fetchProject, response } = useUserStore((state) => state);
   const { id }: { id: string } = useParams();
+  const { loadProject, loading, project } = useProjectStore();
 
   function handleCreateRelease() {
     const toastId = toast.loading("release qilinmoqda");
@@ -36,22 +36,22 @@ function Release() {
       })
       .then(() => {
         toast.success("Telegram bot relase qilindi", { id: toastId });
-        fetchProject(id);
+        loadProject(id);
       })
       .catch(() => {
         toast.error("Xatolik yuz berdi", { id: toastId });
       });
   }
 
-  // if loading
-  if (!response) return <>Loading...</>;
+  // Yuklanish
+  if (loading) return <>Loading...</>;
 
-  // if not an release
-  if (!response.release_bot) {
+  // relase uchun bot tayinlash
+  if (!project?.release_bot) {
     return (
       <SetEnvDialog
         env_name="RELEASE_BOT_TOKEN"
-        project_id={response.id}
+        project_id={id}
         dialog_title="Release Bot qo‘shish"
         dialog_description="Telegram release bot tokenini kiriting"
         onSuccess={() => {
@@ -59,7 +59,7 @@ function Release() {
           handleCreateRelease();
 
           // fetch project qayta chaqiramiz
-          fetchProject(id);
+          loadProject(id);
         }}
       >
         <Button>Add Release Bot</Button>
@@ -67,8 +67,8 @@ function Release() {
     );
   }
 
-  // agar hali relase yaratmagan bo'lsa
-  if (!response.release)
+  // Relase qilb yubrish
+  if (!project?.release)
     return (
       <Button
         onClick={() => handleCreateRelease()}

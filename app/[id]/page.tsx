@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Constructor from "@/constructor/constructor";
 import { Elements } from "@/constructor/data/elements";
-import useUserStore from "@/services/store/project";
+import useProjectStore from "@/constructor/store/project";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConstructorPageHeader } from "@/components/header/header";
@@ -15,11 +15,12 @@ import { LogViewer } from "@/components/log-viewer/log-viewer";
 export default function Page() {
   const { id }: { id: string } = useParams();
 
-  const { fetchProject, response } = useUserStore((state) => state);
+  const { loadProject, loading, project } = useProjectStore();
 
+  // loading project
   useEffect(() => {
-    fetchProject(id);
-  }, [fetchProject, id]);
+    loadProject(id);
+  }, []);
 
   // 1. Qidiruv matnini saqlash uchun state
   const [searchTerm, setSearchTerm] = useState("");
@@ -154,11 +155,11 @@ export default function Page() {
             )}
           </div>
         </ScrollArea>
-        {response ? (
+        {project ? (
           <main className="flex-1 flex flex-col">
             <Constructor />
-            {response.debug.service_id && (
-              <LogViewer projectId={response.debug.service_id} />
+            {project.debug.service_id && (
+              <LogViewer projectId={project.debug.service_id} />
             )}
           </main>
         ) : (
