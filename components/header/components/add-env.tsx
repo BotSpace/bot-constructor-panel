@@ -23,7 +23,7 @@ export function SetEnvDialog({
   dialog_title: string;
   dialog_description: string;
   env_name: string;
-  project_id: number;
+  project_id: number | string;
   children: React.ReactNode;
   onSuccess?: () => void;
 }) {

@@ -12,6 +12,7 @@ import { TypeSelector } from "./components/TypeSelector";
 import { FilterSelector } from "./components/FilterSelector";
 import { ParameterInput } from "./components/ParameterInput";
 import { SourceHandler, TargetHandler } from "../../components";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const MessageTriggerNodeComponent = ({
   id,
@@ -26,11 +27,14 @@ const MessageTriggerNodeComponent = ({
   };
 
   const onTypeChange = (newType: string) => {
-    handleUpdate({ type: newType, filter: undefined, context: {} });
+    handleUpdate({
+      type: newType,
+      filter: undefined,
+    });
   };
 
   const onFilterChange = (newFilter: string) => {
-    handleUpdate({ filter: newFilter, context: {} });
+    handleUpdate({ filter: newFilter });
   };
 
   const { filtersForType, isNodeConfigured } = useMemo(() => {
@@ -100,6 +104,19 @@ const MessageTriggerNodeComponent = ({
               />
             </div>
           )}
+
+          <Label className="mt-2">
+            <Checkbox
+              checked={data.global}
+              onCheckedChange={(e) =>
+                handleUpdate({
+                  ...data,
+                  global: e as boolean,
+                })
+              }
+            />
+            Global
+          </Label>
         </CardContent>
       )}
 

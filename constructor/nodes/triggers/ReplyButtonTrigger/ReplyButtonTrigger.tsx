@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { SourceHandler, TargetHandler } from "../../components";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { KeyboardConfig } from "../../actions/TextMessageNode/types";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
 // --- O'ZGARTIRISH: `keyboard` ixtiyoriy qilindi, xatolikdan saqlanish uchun ---
@@ -125,6 +126,18 @@ const ReplyButtonTriggerNodeComponent = ({
             </span>
           </div>
         )}
+
+        <Label className="mt-2">
+          <Checkbox
+            checked={data.global}
+            onCheckedChange={(e) =>
+              updateNodeData(id, {
+                global: e as boolean,
+              })
+            }
+          />
+          Global
+        </Label>
       </CardContent>
       <SourceHandler />
     </Card>

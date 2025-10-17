@@ -39,7 +39,6 @@ const CallbackQueryTriggerNodeComponent = ({
   selected,
 }: NodeProps<CallbackQueryTriggerData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [global, setGlobal] = useState<boolean>(true);
   const nodes = useNodes();
   const edges = useEdges();
 
@@ -78,11 +77,11 @@ const CallbackQueryTriggerNodeComponent = ({
 
   const onFilterChange = (newFilter: string) => {
     // Agar filtr o'zgarsa, tanlangan qiymatni tozalab qo'yamiz
-    handleUpdate({ filter: newFilter, context: { value: "", global } });
+    handleUpdate({ ...data, filter: newFilter });
   };
 
   const onValueChange = (newValue: string) => {
-    handleUpdate({ context: { value: newValue, global } });
+    handleUpdate({ context: { ...data.context, value: newValue } });
   };
 
   const isConfigured =
@@ -172,8 +171,13 @@ const CallbackQueryTriggerNodeComponent = ({
 
         <Label className="mt-2">
           <Checkbox
-            checked={global}
-            onCheckedChange={(e) => setGlobal(e as boolean)}
+            checked={data.global}
+            onCheckedChange={(e) =>
+              handleUpdate({
+                ...data,
+                global: e as boolean,
+              })
+            }
           />
           Global
         </Label>

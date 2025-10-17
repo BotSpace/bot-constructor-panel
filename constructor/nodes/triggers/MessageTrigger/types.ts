@@ -14,6 +14,8 @@ interface SizeContext {
 export interface MessageTriggerNodeData {
   type?: string;
   filter?: string;
+  global: boolean;
+
   context?: {
     value?: string;
     radius?: RadiusContext;

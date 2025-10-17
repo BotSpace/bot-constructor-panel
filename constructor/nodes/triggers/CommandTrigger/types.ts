@@ -5,4 +5,5 @@ export interface CommandTriggerNodeData {
   command?: string;
   /** Buyruq bilan birga keladigan qo'shimcha ma'lumotlarni (deep linking) ushlash uchun ixtiyoriy maydon */
   withArgs?: boolean;
+  global: boolean;
 }
