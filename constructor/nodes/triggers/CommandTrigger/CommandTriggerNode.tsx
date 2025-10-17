@@ -84,6 +84,18 @@ const CommandTriggerNodeComponent = ({
             Argumentlarni ushlash (deep linking)
           </Label>
         </div>
+
+        <Label className="mt-2">
+          <Checkbox
+            checked={data.global}
+            onCheckedChange={(e) =>
+              handleUpdate({
+                global: e as boolean,
+              })
+            }
+          />
+          Global
+        </Label>
       </CardContent>
 
       <SourceHandler />
