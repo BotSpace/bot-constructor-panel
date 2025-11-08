@@ -95,27 +95,8 @@ export function CollectionNode({
       }
     });
 
-    // Default state key'lar
-    const defaultKeys = [
-      "user_id",
-      "first_name",
-      "last_name",
-      "username",
-      "language_code",
-      "is_bot",
-      "is_premium",
-    ];
-    defaultKeys.forEach((key) => stateKeys.add(key));
-
-    // Field nomini ham qo'shish
-    if (CollectionData?.data) {
-      CollectionData.data.fields.forEach((field) => {
-        stateKeys.add(field.name);
-      });
-    }
-
     return Array.from(stateKeys).sort();
-  }, [nodes, CollectionData?.data]);
+  }, [nodes]);
 
   // State key o'zgartirish
   const handleStateKeyChange = (fieldName: string, stateKey: string) => {

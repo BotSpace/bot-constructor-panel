@@ -109,7 +109,7 @@ export const Elements: ElementTypes[] = [
       },
       {
         type: "collection",
-        name: "Collection yig'ish",
+        name: "Ma'lumotlarni saqlash",
         description: "Collectiondan ma'lumotlarni yig'ib borish uchun",
         icon: "📦",
         color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
