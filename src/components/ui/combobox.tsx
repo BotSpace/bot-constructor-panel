@@ -1,0 +1,119 @@
+"use client";
+
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+export interface ComboboxOption {
+  value: string;
+  label: string;
+  group?: string;
+}
+
+interface ComboboxProps {
+  options: ComboboxOption[];
+  value?: string;
+  onValueChange: (value: string) => void;
+  placeholder?: string;
+  searchPlaceholder?: string;
+  emptyText?: string;
+  className?: string;
+  triggerClassName?: string;
+}
+
+export function Combobox({
+  options,
+  value,
+  onValueChange,
+  placeholder = "Tanlang...",
+  searchPlaceholder = "Qidirish...",
+  emptyText = "Hech narsa topilmadi.",
+  className,
+  triggerClassName,
+}: ComboboxProps) {
+  const [open, setOpen] = React.useState(false);
+
+  const selectedOption = options.find((option) => option.value === value);
+
+  // Group options by group property
+  const groupedOptions = React.useMemo(() => {
+    const groups: Record<string, ComboboxOption[]> = {};
+    options.forEach((option) => {
+      const group = option.group || "default";
+      if (!groups[group]) {
+        groups[group] = [];
+      }
+      groups[group].push(option);
+    });
+    return groups;
+  }, [options]);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className={cn(
+            "w-full justify-between bg-gray-800/50 border-gray-600/50 hover:bg-gray-700/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20",
+            triggerClassName
+          )}
+        >
+          {selectedOption ? selectedOption.label : placeholder}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className={cn("w-[var(--radix-popover-trigger-width)] p-0", className)}
+      >
+        <Command className="bg-[#212529] border-gray-700/50">
+          <CommandInput placeholder={searchPlaceholder} className="text-sm" />
+          <CommandList>
+            <CommandEmpty>{emptyText}</CommandEmpty>
+            {Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
+              <CommandGroup
+                key={groupName}
+                heading={groupName !== "default" ? groupName : undefined}
+              >
+                {groupOptions.map((option) => (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    onSelect={() => {
+                      onValueChange(option.value === value ? "" : option.value);
+                      setOpen(false);
+                    }}
+                    className="cursor-pointer focus:bg-gray-800/50 focus:text-purple-400"
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === option.value ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {option.label}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            ))}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}

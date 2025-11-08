@@ -16,7 +16,14 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
     },
   };
 
+  const baseTriggerData = {
+    global: true,
+    context: {},
+    node_type: nodeType,
+  };
+
   switch (nodeType) {
+    // Actions
     case "SendTextMessageNode":
       return {
         ...baseMessageData,
@@ -33,23 +40,35 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
       return { ...baseMessageData, fileSourceType: "url", caption: "" };
     case "CustomCodeNode":
       return {}; // Custom code uchun alohida sozlamalar
+
+    // Triggers
+    case "MessageTriggerNode":
+      return {
+        ...baseTriggerData,
+      };
     case "ReplyButtonTriggerNode":
       return {
-        global: true,
-        context: {},
+        ...baseTriggerData,
       };
     case "CommandTriggerNode":
       return {
+        ...baseTriggerData,
         command: "/start",
-        global: true,
       };
     case "CallbackQueryTriggerNode":
       return {
+        ...baseTriggerData,
         filter: "",
-        global: true,
         context: {
           value: "",
         },
+      };
+    // Custom Nodes
+    case "StateNode":
+      return {
+        key: "state_key",
+        type: "user_id",
+        node_type: nodeType,
       };
 
     default:

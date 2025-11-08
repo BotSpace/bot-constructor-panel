@@ -99,6 +99,22 @@ export const Elements: ElementTypes[] = [
         color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
         triggerId: "CustomCodeNode",
       },
+      {
+        type: "state",
+        name: "Ma'lumotlar yig'ish",
+        description: "Foydalanuvchidan ma'lumotlarni yig'ib borish uchun",
+        icon: "🗄",
+        color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+        triggerId: "StateNode",
+      },
+      {
+        type: "collection",
+        name: "Collection yig'ish",
+        description: "Collectiondan ma'lumotlarni yig'ib borish uchun",
+        icon: "📦",
+        color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+        triggerId: "CollectionNode",
+      },
     ],
   },
 ];

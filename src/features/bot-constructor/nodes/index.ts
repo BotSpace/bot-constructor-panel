@@ -12,7 +12,7 @@ import {
   CommandTriggerNode,
 } from "./triggers";
 
-import { CustomCodeNode } from "./custom";
+import { CustomCodeNode, StateNode, CollectionNode } from "./custom";
 
 export const CustomNodes = {
   ReplyButtonTriggerNode,
@@ -25,4 +25,6 @@ export const CustomNodes = {
   SendFileNode,
   CustomCodeNode,
   CommandTriggerNode,
+  StateNode,
+  CollectionNode,
 };

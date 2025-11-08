@@ -14,11 +14,14 @@ export interface ElementItemType {
     | "contact"
     | "sticker"
     | "file"
-    | "code"
     | "condition"
     | "reply_button"
     | "callback_button"
-    | "callback_query";
+    | "callback_query"
+    // Special nodes
+    | "code"
+    | "state"
+    | "collection";
 
   name: string;
   description: string;

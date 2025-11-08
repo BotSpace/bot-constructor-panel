@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { varibulNameValidator } from "@/lib/input-validators";
 import { instanceAuth } from "@/services/instance";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
 import { useState } from "react";
@@ -42,7 +43,7 @@ export function AddNewCollectionModal({
     useState<CollectionDetail["fields"][number]["type"]>("text");
   const [open, setOpen] = useState(false);
 
-  const isValidFieldName = /^[A-Za-z_][A-Za-z0-9_]*$/.test(fieldName);
+  const isValidFieldName = varibulNameValidator(fieldName);
   const isFormValid = fieldName && fieldType && isValidFieldName;
 
   function handleSubmit(e: React.FormEvent) {
