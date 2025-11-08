@@ -13,6 +13,7 @@ import { FilterSelector } from "./components/FilterSelector";
 import { ParameterInput } from "./components/ParameterInput";
 import { SourceHandler, TargetHandler } from "../../components";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 
 const MessageTriggerNodeComponent = ({
   id,
@@ -56,13 +57,9 @@ const MessageTriggerNodeComponent = ({
 
   return (
     <Card
-      className={`w-80 rounded-lg shadow-xl bg-[#212529] border-2 ${
+      className={`w-80 rounded-lg shadow-xl border-2 ${
         selected ? "border-sky-500/80" : "border-gray-600/50"
       }`}
-
-      // className={`w-100 rounded-lg shadow-md bg-gray-800 border-gray-700 ${
-      //   selected ? "ring-2 ring-blue-500/80" : ""
-      // }`}
     >
       <TargetHandler />
 
@@ -82,7 +79,6 @@ const MessageTriggerNodeComponent = ({
               onValueChange={onTypeChange}
             />
           </div>
-
           {showFilterSection && (
             <div className="space-y-1.5 animate-in fade-in-50">
               <Label className="text-xs text-gray-400">Filter</Label>
@@ -93,7 +89,6 @@ const MessageTriggerNodeComponent = ({
               />
             </div>
           )}
-
           {showFilterSection && data.filter && data.filter !== "any" && (
             <div className="space-y-1.5 animate-in fade-in-50">
               <Label className="text-xs text-gray-400">Parametr</Label>

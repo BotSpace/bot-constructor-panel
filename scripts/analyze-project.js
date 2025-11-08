@@ -34,7 +34,7 @@ function analyzeDirectory(dir, prefix = "") {
 
   const entries = fs.readdirSync(dir);
   const filteredEntries = entries.filter(
-    (entry) => !IGNORE_LIST.includes(entry)
+    (entry) => !IGNORE_LIST.includes(entry),
   );
 
   for (let i = 0; i < filteredEntries.length; i++) {
@@ -107,7 +107,7 @@ function main() {
   fs.writeFileSync(OUTPUT_FILE, markdownContent);
 
   console.log(
-    `✅ Tahlil muvaffaqiyatli yakunlandi! Natijalar "${OUTPUT_FILE}" fayliga saqlandi.`
+    `✅ Tahlil muvaffaqiyatli yakunlandi! Natijalar "${OUTPUT_FILE}" fayliga saqlandi.`,
   );
 }
 
