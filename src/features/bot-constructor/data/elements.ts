@@ -84,6 +84,15 @@ export const Elements: ElementTypes[] = [
         color: "bg-gray-500/10 text-gray-400 border-gray-500/20",
         triggerId: "SendFileNode",
       },
+      {
+        type: "edit_message",
+        name: "Xabarni tahrirlash",
+        description:
+          "Yuborilgan xabarni tahrirlash (matn, caption, tugmalar, media).",
+        icon: "✏️",
+        color: "bg-green-500/10 text-green-400 border-green-500/20",
+        triggerId: "EditMessageNode",
+      },
     ],
   },
   {
