@@ -6,6 +6,7 @@ import Image from "next/image";
 import { PromptInterface } from "./components/ai-chat/prompt-interface";
 import { ReleasePanel } from "./components/relas/relas";
 import DebugActions from "./components/debug/debug";
+import { SaveStatusBadge } from "@/features/bot-constructor/components/save-status-badge";
 
 // Asosiy Header komponenti
 export function ConstructorPageHeader() {
@@ -25,6 +26,7 @@ export function ConstructorPageHeader() {
           {/* <PromptInterface /> */}
           <DebugActions />
           <ReleasePanel />
+          <SaveStatusBadge status="saved" lastSavedTime={new Date()} />
         </div>
       </header>
     </>

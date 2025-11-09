@@ -18,6 +18,7 @@ export interface ElementItemType {
     | "reply_button"
     | "callback_button"
     | "callback_query"
+    | "edit_message"
     // Special nodes
     | "code"
     | "state"

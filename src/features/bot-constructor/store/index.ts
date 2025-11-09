@@ -26,6 +26,7 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     ...createActions(set, get, {} as any),
 
     onConnect: (connection: Connection) => {
+      const { initialState } = get();
       const newEdge = {
         ...connection,
         type: "smart-edge", // Bizning maxsus chizig'imiz
@@ -37,9 +38,16 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
         animated: false,
       };
 
+      const newEdges = addEdge(newEdge, get().edges);
+
+      // Haqiqiy o'zgarishlarni tekshirish
+      const hasRealChanges =
+        !initialState ||
+        JSON.stringify(newEdges) !== JSON.stringify(initialState.edges);
+
       set({
-        edges: addEdge(newEdge, get().edges),
-        isDirty: true,
+        edges: newEdges,
+        isDirty: hasRealChanges,
       });
     },
   };
