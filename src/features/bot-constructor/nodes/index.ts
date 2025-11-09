@@ -4,6 +4,7 @@ import {
   SendVideoNode,
   SendAudioNode,
   SendFileNode,
+  EditMessageNode,
 } from "./actions";
 import {
   MessageTriggerNode,
@@ -23,6 +24,7 @@ export const CustomNodes = {
   SendVideoNode,
   SendAudioNode,
   SendFileNode,
+  EditMessageNode,
   CustomCodeNode,
   CommandTriggerNode,
   StateNode,

@@ -38,6 +38,18 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
       return { ...baseMessageData, audioSourceType: "url", caption: "" };
     case "SendFileNode":
       return { ...baseMessageData, fileSourceType: "url", caption: "" };
+    case "EditMessageNode":
+      return {
+        messageIdSource: "context",
+        editType: "text",
+        newText: "",
+        parseMode: "None",
+        keyboard: {
+          active: "inline",
+          inline: [],
+          reply: [],
+        },
+      };
     case "CustomCodeNode":
       return {}; // Custom code uchun alohida sozlamalar
 
@@ -127,14 +139,24 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   loadFlow: async (flow) => {
     set({ isLoading: true });
 
+    // Avval initialState ni o'rnatamiz, keyin nodes va edges ni
+    // Bu orqali onNodesChange va onEdgesChange chaqirilganda
+    // initialState allaqachon mavjud bo'ladi
     set({
-      nodes: flow["nodes"],
-      edges: flow["edges"],
-      isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
       initialState: {
         nodes: flow["nodes"],
         edges: flow["edges"],
       },
+      isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
+    });
+
+    // Keyin nodes va edges ni o'rnatamiz
+    // Bu isLoading: true bo'lganda bo'ladi, shuning uchun
+    // onNodesChange va onEdgesChange isDirty ni o'zgartirmaydi
+    set({
+      nodes: flow["nodes"],
+      edges: flow["edges"],
+      isLoading: false,
     });
   },
 });
