@@ -20,8 +20,32 @@ export const createFlowSlice: StateCreator<
 
   // --- Yaxshilangan onNodesChange ---
   onNodesChange: (changes: NodeChange[]) => {
-    const { isCtrlPressed } = get(); // Asosiy store'dan holatni olamiz
+    const { isCtrlPressed, initialState, isLoading } = get(); // Asosiy store'dan holatni olamiz
     const gridSize = 10; // 10px'lik to'r
+
+    // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
+    if (isLoading) {
+      const updatedChanges = changes.map((change) => {
+        if (
+          isCtrlPressed &&
+          change.type === "position" &&
+          change.dragging &&
+          change.position
+        ) {
+          const snappedPosition = {
+            x: Math.round(change.position.x / gridSize) * gridSize,
+            y: Math.round(change.position.y / gridSize) * gridSize,
+          };
+          return { ...change, position: snappedPosition };
+        }
+        return change;
+      });
+      set({
+        nodes: applyNodeChanges(updatedChanges, get().nodes),
+        // isLoading bo'lsa, isDirty ni o'zgartirmaymiz
+      });
+      return;
+    }
 
     // Har bir o'zgarishni tekshirib chiqamiz
     const updatedChanges = changes.map((change) => {
@@ -45,18 +69,43 @@ export const createFlowSlice: StateCreator<
       return change;
     });
 
+    const newNodes = applyNodeChanges(updatedChanges, get().nodes);
+
+    // Haqiqiy o'zgarishlarni tekshirish
+    const hasRealChanges =
+      !initialState ||
+      JSON.stringify(newNodes) !== JSON.stringify(initialState.nodes);
+
     set({
       // Yangilangan o'zgarishlarni qo'llaymiz
-      nodes: applyNodeChanges(updatedChanges, get().nodes),
-      isDirty: true,
+      nodes: newNodes,
+      isDirty: hasRealChanges,
     });
   },
   // --- onNodesChange tugadi ---
 
   onEdgesChange: (changes) => {
+    const { initialState, isLoading } = get();
+
+    // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
+    if (isLoading) {
+      set({
+        edges: applyEdgeChanges(changes, get().edges),
+        // isLoading bo'lsa, isDirty ni o'zgartirmaymiz
+      });
+      return;
+    }
+
+    const newEdges = applyEdgeChanges(changes, get().edges);
+
+    // Haqiqiy o'zgarishlarni tekshirish
+    const hasRealChanges =
+      !initialState ||
+      JSON.stringify(newEdges) !== JSON.stringify(initialState.edges);
+
     set({
-      edges: applyEdgeChanges(changes, get().edges),
-      isDirty: true,
+      edges: newEdges,
+      isDirty: hasRealChanges,
     });
   },
 

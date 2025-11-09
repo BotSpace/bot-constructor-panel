@@ -32,6 +32,8 @@ function FlowchartInner() {
     addNode,
     saveFlow,
     loadFlow,
+    isDirty,
+    initialState,
   } = useFlowStore();
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -62,6 +64,14 @@ function FlowchartInner() {
 
   // Bu useEffect nodes va edges o'zgarishini kuzatib boradi
   useEffect(() => {
+    // Agar initial state hali o'rnatilmagan bo'lsa yoki o'zgarishlar yo'q bo'lsa, save qilmaymiz
+    console.log("🚀 ~ file: constructor.tsx:69 ~ isDirty:", isDirty);
+    console.log("🚀 ~ file: constructor.tsx:70 ~ initialState:", initialState);
+
+    if (!initialState || !isDirty) {
+      return;
+    }
+
     // Agar eski taymer bo'lsa, uni tozalaymiz
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -69,10 +79,10 @@ function FlowchartInner() {
 
     // Yangi taymerni o'rnatamiz. 2 sekunddan so'ng saqlaydi.
     saveTimeoutRef.current = setTimeout(() => {
-      // Faqatgina o'zgarish bo'lgandagina saqlash mantiqini qo'shish mumkin
-      // Bu yerda saveFlow'ni chaqiramiz.
-      // `saveFlow` endi bildirishnoma ko'rsatmasligi uchun uni o'zgartirish kerak bo'lishi mumkin.
-      saveFlow(id);
+      // Faqatgina o'zgarish bo'lgandagina saqlash
+      if (isDirty) {
+        // saveFlow(id);
+      }
     }, 2000); // 2000ms = 2 sekund
 
     // Komponent yo'q qilinganda taymerni tozalash uchun
@@ -81,7 +91,7 @@ function FlowchartInner() {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [nodes, edges, saveFlow]); // nodes, edges yoki saveFlow o'zgarganda ishlaydi
+  }, [nodes, edges, isDirty, initialState, saveFlow, id]); // nodes, edges, isDirty yoki saveFlow o'zgarganda ishlaydi
 
   const handlePaletteSelect = (element: ElementItemType) => {
     const position = screenToFlowPosition(mousePosition);
