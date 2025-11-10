@@ -34,13 +34,21 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 
       const newEdge = {
         ...connection,
-        type: "smart-edge", // Bizning maxsus chizig'imiz
+        type: "step",
+        markerEnd: {
+          type: "arrow",
+          width: 30,
+          height: 30,
+          color: isEditMessageEdge ? "#f97316" : "#495057",
+        },
+        // React Flow'ning default edge'ini ishlatamiz
         // Rasmga mos stil
         style: {
           strokeWidth: 1.5,
           stroke: isEditMessageEdge ? "#f97316" : "#495057", // Orange-500 yoki to'q kulrang
         },
-        animated: false,
+        // EditMessageHandler'dan chiqqan edge'lar uchun animated true
+        animated: isEditMessageEdge ? true : false,
       };
 
       const newEdges = addEdge(newEdge, get().edges);

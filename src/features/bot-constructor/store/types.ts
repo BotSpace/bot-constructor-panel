@@ -10,6 +10,7 @@ export interface FlowSlice {
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
   updateNodeData: (nodeId: string, newData: any) => void;
+  updateEdgeData: (edgeId: string, newData: any) => void;
   deleteSelectedElements: () => void;
   selectAll: () => void;
 }

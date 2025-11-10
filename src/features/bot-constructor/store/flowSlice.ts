@@ -152,6 +152,40 @@ export const createFlowSlice: StateCreator<
     });
   },
 
+  updateEdgeData: (edgeId, newData) => {
+    const { initialState, isLoading } = get();
+
+    // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
+    if (isLoading) {
+      set({
+        edges: get().edges.map((edge) => {
+          if (edge.id === edgeId) {
+            return { ...edge, data: { ...edge.data, ...newData } };
+          }
+          return edge;
+        }),
+      });
+      return;
+    }
+
+    const newEdges = get().edges.map((edge) => {
+      if (edge.id === edgeId) {
+        return { ...edge, data: { ...edge.data, ...newData } };
+      }
+      return edge;
+    });
+
+    // Haqiqiy o'zgarishlarni tekshirish
+    const hasRealChanges =
+      !initialState ||
+      JSON.stringify(newEdges) !== JSON.stringify(initialState.edges);
+
+    set({
+      edges: newEdges,
+      isDirty: hasRealChanges,
+    });
+  },
+
   deleteSelectedElements: () => {
     const { nodes, edges } = get();
     const selectedNodes = nodes.filter((node) => node.selected);
