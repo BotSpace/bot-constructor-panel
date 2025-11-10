@@ -81,7 +81,7 @@ function FlowchartInner() {
     saveTimeoutRef.current = setTimeout(() => {
       // Faqatgina o'zgarish bo'lgandagina saqlash
       if (isDirty) {
-        // saveFlow(id);
+        saveFlow(id);
       }
     }, 2000); // 2000ms = 2 sekund
 

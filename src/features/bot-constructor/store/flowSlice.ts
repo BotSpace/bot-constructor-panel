@@ -119,14 +119,36 @@ export const createFlowSlice: StateCreator<
   },
 
   updateNodeData: (nodeId, newData) => {
+    const { initialState, isLoading } = get();
+
+    // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
+    if (isLoading) {
+      set({
+        nodes: get().nodes.map((node) => {
+          if (node.id === nodeId) {
+            return { ...node, data: { ...node.data, ...newData } };
+          }
+          return node;
+        }),
+      });
+      return;
+    }
+
+    const newNodes = get().nodes.map((node) => {
+      if (node.id === nodeId) {
+        return { ...node, data: { ...node.data, ...newData } };
+      }
+      return node;
+    });
+
+    // Haqiqiy o'zgarishlarni tekshirish
+    const hasRealChanges =
+      !initialState ||
+      JSON.stringify(newNodes) !== JSON.stringify(initialState.nodes);
+
     set({
-      nodes: get().nodes.map((node) => {
-        if (node.id === nodeId) {
-          return { ...node, data: { ...node.data, ...newData } };
-        }
-        return node;
-      }),
-      isDirty: true,
+      nodes: newNodes,
+      isDirty: hasRealChanges,
     });
   },
 
