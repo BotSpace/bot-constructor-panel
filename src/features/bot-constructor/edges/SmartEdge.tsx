@@ -1,19 +1,41 @@
 "use client";
+import { memo, useMemo } from "react";
+import { BaseEdge, type EdgeProps, useNodes, Position } from "reactflow";
 import {
-  BaseEdge,
-  type EdgeProps,
-  getSmoothStepPath,
-  useNodes,
-} from "reactflow";
+  computeOrthogonalPath,
+  computeBezierPath,
+  avoidNodeCollision,
+  getNearestAnchorPoint,
+  getPathMidpoint,
+  getLabelRotation,
+  type EdgePathConfig,
+} from "../lib/edge-utils";
 import { getObstacleNodes } from "../lib/geometry";
 
 export interface SmartEdgeProps extends EdgeProps {
   data?: {
-    // Kelajakda qo'shimcha sozlamalar uchun
+    label?: string;
+    showArrowStart?: boolean;
+    showArrowEnd?: boolean;
+    strokeDasharray?: string;
+    // Custom anchor points (if manually adjusted)
+    sourceAnchor?: { x: number; y: number };
+    targetAnchor?: { x: number; y: number };
   };
 }
 
-export default function SmartEdge({
+/**
+ * SmartEdge - Miro-like intelligent edge routing
+ *
+ * Features:
+ * - Smart routing: orthogonal for aligned nodes, bezier for others
+ * - Automatic anchor point optimization
+ * - Collision avoidance with obstacle nodes
+ * - Optional label placement at midpoint
+ * - Customizable arrow styles
+ * - Performance optimized with memoization
+ */
+function SmartEdge({
   id,
   source,
   target,
@@ -25,149 +47,244 @@ export default function SmartEdge({
   targetPosition,
   style = {},
   markerEnd,
+  markerStart,
   selected,
+  data,
+  label,
+  labelStyle,
+  labelShowBg,
+  labelBgStyle,
 }: SmartEdgeProps) {
   const nodes = useNodes();
 
-  const getPath = (): string => {
-    // 1. To'siqlarni aniqlash
+  // Get source and target nodes for anchor calculation
+  const sourceNode = useMemo(
+    () => nodes.find((n) => n.id === source),
+    [nodes, source]
+  );
+  const targetNode = useMemo(
+    () => nodes.find((n) => n.id === target),
+    [nodes, target]
+  );
+
+  // Calculate optimal anchor points
+  const sourceAnchor = useMemo(() => {
+    if (data?.sourceAnchor) {
+      return data.sourceAnchor;
+    }
+    if (sourceNode) {
+      return getNearestAnchorPoint(
+        sourceNode,
+        { x: targetX, y: targetY },
+        sourcePosition
+      );
+    }
+    return { x: sourceX, y: sourceY };
+  }, [sourceNode, sourceX, sourceY, targetX, targetY, sourcePosition, data]);
+
+  const targetAnchor = useMemo(() => {
+    if (data?.targetAnchor) {
+      return data.targetAnchor;
+    }
+    if (targetNode) {
+      return getNearestAnchorPoint(
+        targetNode,
+        { x: sourceX, y: sourceY },
+        targetPosition
+      );
+    }
+    return { x: targetX, y: targetY };
+  }, [targetNode, sourceX, sourceY, targetX, targetY, targetPosition, data]);
+
+  // Get obstacle nodes
+  const obstacles = useMemo(() => {
     const potentialObstacles = nodes.filter(
       (n) => n.id !== source && n.id !== target
     );
-    const obstacles = getObstacleNodes(
-      { x: sourceX, y: sourceY },
-      { x: targetX, y: targetY },
-      potentialObstacles
-    );
+    return getObstacleNodes(sourceAnchor, targetAnchor, potentialObstacles);
+  }, [nodes, source, target, sourceAnchor, targetAnchor]);
 
-    // 2. Aylanma yo'l kerakmi?
-    const needsLoop = targetY < sourceY - 20 || obstacles.length > 0;
+  // Determine routing strategy
+  const routingStrategy = useMemo<"orthogonal" | "bezier">(() => {
+    const dx = Math.abs(targetAnchor.x - sourceAnchor.x);
+    const dy = Math.abs(targetAnchor.y - sourceAnchor.y);
+    const alignmentThreshold = 50;
 
-    if (!needsLoop) {
-      // Yo'l toza bo'lsa, standart silliq chiziq
-      const [path] = getSmoothStepPath({
-        sourceX,
-        sourceY,
-        sourcePosition,
-        targetX,
-        targetY,
-        targetPosition,
-        borderRadius: 15,
-      });
-      return path;
+    // Use orthogonal for roughly aligned nodes
+    if (
+      Math.abs(dx) < alignmentThreshold ||
+      Math.abs(dy) < alignmentThreshold
+    ) {
+      return "orthogonal";
     }
 
-    // --- MUKAMMALLASHTIRILGAN, ANIQ VA SILLIQ AYLANMA YO'L CHIZISH ALGORITMI ---
-    const verticalMargin = 40;
-    const cornerRadius = 15;
+    // Use bezier for non-aligned nodes
+    return "bezier";
+  }, [sourceAnchor, targetAnchor]);
 
-    // Asosiy nuqtalarni va yo'nalishlarni hisoblash
-    const sourceNode = nodes.find((n) => n.id === source);
-    const targetNode = nodes.find((n) => n.id === target);
+  // Compute path
+  const pathConfig: EdgePathConfig = useMemo(
+    () => ({
+      sourcePos: sourceAnchor,
+      targetPos: targetAnchor,
+      sourceNode: sourceNode,
+      targetNode: targetNode,
+      sourcePosition: sourcePosition || Position.Bottom,
+      targetPosition: targetPosition || Position.Top,
+      obstacles,
+      borderRadius: 15,
+      padding: 20,
+    }),
+    [
+      sourceAnchor,
+      targetAnchor,
+      sourceNode,
+      targetNode,
+      sourcePosition,
+      targetPosition,
+      obstacles,
+    ]
+  );
 
-    // Qaysi tomondan aylanib o'tish
-    const loopDirection = targetX >= sourceX ? 1 : -1;
-
-    // Aylanib o'tish yo'lagining X koordinatasi
-    let laneX: number;
-    if (loopDirection === 1) {
-      // O'ngdan
-      const sourceRight = sourceNode
-        ? sourceNode.position.x + (sourceNode.width || 0)
-        : sourceX;
-      const targetRight = targetNode
-        ? targetNode.position.x + (targetNode.width || 0)
-        : targetX;
-      laneX = Math.max(sourceRight, targetRight) + 60;
+  const rawPath = useMemo(() => {
+    if (routingStrategy === "orthogonal") {
+      return computeOrthogonalPath(pathConfig);
     } else {
-      // Chapdan
-      const sourceLeft = sourceNode ? sourceNode.position.x : sourceX;
-      const targetLeft = targetNode ? targetNode.position.x : targetX;
-      laneX = Math.min(sourceLeft, targetLeft) - 60;
+      return computeBezierPath(pathConfig).path;
     }
+  }, [routingStrategy, pathConfig]);
 
-    // Yo'lning burilish nuqtalari
-    const p1 = { x: sourceX, y: sourceY + verticalMargin };
-    const p2 = { x: laneX, y: p1.y };
-    const p3 = { x: laneX, y: targetY - verticalMargin };
-    const p4 = { x: targetX, y: p3.y };
+  // Apply collision avoidance
+  const edgePath = useMemo(() => {
+    if (obstacles.length > 0) {
+      return avoidNodeCollision(rawPath, sourceAnchor, targetAnchor, obstacles);
+    }
+    return rawPath;
+  }, [rawPath, sourceAnchor, targetAnchor, obstacles]);
 
-    // Har bir segment uchun aniq yo'nalishlarni hisoblash
-    const vDir1 = Math.sign(p2.y - p1.y); // Bu deyarli har doim 0, lekin qoldiramiz
-    const hDir1 = Math.sign(p2.x - p1.x); // Bu loopDirection bilan bir xil
+  // Calculate label position
+  const labelPosition = useMemo(() => {
+    return getPathMidpoint(sourceAnchor, targetAnchor, routingStrategy);
+  }, [sourceAnchor, targetAnchor, routingStrategy]);
 
-    const vDir2 = Math.sign(p3.y - p2.y); // Bu eng muhim vertikal yo'nalish
-    const hDir2 = Math.sign(p4.x - p3.x); // Bu -loopDirection bilan bir xil
+  const labelRotation = useMemo(() => {
+    return getLabelRotation(sourceAnchor, targetAnchor);
+  }, [sourceAnchor, targetAnchor]);
 
-    const vDir3 = Math.sign(targetY - p4.y); // Bu har doim +1
-
-    // SVG path stringini qismlab, ehtiyotkorlik bilan yig'amiz
-    return [
-      `M ${sourceX} ${sourceY}`, // Boshlang'ich nuqta
-      `V ${p1.y - cornerRadius * vDir1}`, // 1-burilishgacha vertikal harakat
-      `Q ${p1.x} ${p1.y}, ${p1.x + cornerRadius * hDir1} ${p1.y}`, // 1-burilish (silliq)
-      `H ${p2.x - cornerRadius * hDir1}`, // 2-burilishgacha gorizontal harakat
-      `Q ${p2.x} ${p2.y}, ${p2.x} ${p2.y + cornerRadius * vDir2}`, // 2-burilish
-      `V ${p3.y - cornerRadius * vDir2}`, // 3-burilishgacha vertikal harakat
-      `Q ${p3.x} ${p3.y}, ${p3.x + cornerRadius * hDir2} ${p3.y}`, // 3-burilish
-      `H ${p4.x - cornerRadius * hDir2}`, // 4-burilishgacha gorizontal harakat
-      `Q ${p4.x} ${p4.y}, ${p4.x} ${p4.y + cornerRadius * vDir3}`, // 4-burilish
-      `V ${targetY}`, // Manzilga yetib borish
-    ].join(" ");
-  };
-
-  const edgePath = getPath();
-
-  // Edge'ning asl rangini style prop'idan olamiz
+  // Edge styling
   const originalStroke = (style as any)?.stroke || "#495057";
+  const strokeWidth = (style as any)?.strokeWidth || 1.5;
+  const strokeDasharray =
+    data?.strokeDasharray || (style as any)?.strokeDasharray;
 
-  // Tanlangan va tanlanmagan holat uchun stillarni aniqlab olamiz
   const selectedStyle = {
-    stroke: "#3b82f6", // Ko'k rang (selected)
+    stroke: "#3b82f6",
     strokeWidth: 2.5,
   };
 
   const defaultStyle = {
-    stroke: originalStroke, // Asl rang (orange-500 yoki default)
-    strokeWidth: (style as any)?.strokeWidth || 1.5,
+    stroke: originalStroke,
+    strokeWidth,
+    strokeDasharray,
   };
 
   const dynamicStyle = selected ? selectedStyle : defaultStyle;
 
-  // Marker rangi: selected bo'lsa ko'k, aks holda asl rang
+  // Arrow markers
+  const showArrowStart = data?.showArrowStart ?? false;
+  const showArrowEnd = data?.showArrowEnd ?? true;
   const markerColor = selected ? "#3b82f6" : originalStroke;
+
+  // Determine which label to show (data.label takes precedence)
+  const displayLabel = data?.label || label;
 
   return (
     <>
-      <marker
-        id={`arrowhead-${id}`}
-        viewBox="0 0 10 10"
-        refX="9" // Chiziq uchidan biroz oldinroq tugaydi
-        refY="5"
-        markerUnits="strokeWidth"
-        markerWidth="10" // O'lchami
-        markerHeight="8"
-        orient="auto-start-reverse"
-      >
-        {/* MINIMALISTIK VA NAFIS STRELKA */}
-        <path
-          d="M 0 0 L 10 5 L 0 10 z" // Oddiy, lekin to'g'ri shakldagi uchburchak
-          fill={markerColor}
-          stroke="none"
-        />
-      </marker>
+      {/* Arrow markers */}
+      {showArrowEnd && (
+        <marker
+          id={`arrowhead-end-${id}`}
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerUnits="strokeWidth"
+          markerWidth="10"
+          markerHeight="8"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" fill={markerColor} stroke="none" />
+        </marker>
+      )}
 
+      {showArrowStart && (
+        <marker
+          id={`arrowhead-start-${id}`}
+          viewBox="0 0 10 10"
+          refX="1"
+          refY="5"
+          markerUnits="strokeWidth"
+          markerWidth="10"
+          markerHeight="8"
+          orient="auto"
+        >
+          <path d="M 10 0 L 0 5 L 10 10 z" fill={markerColor} stroke="none" />
+        </marker>
+      )}
+
+      {/* Edge path */}
       <BaseEdge
         id={id}
         path={edgePath}
-        markerEnd={`url(#arrowhead-${id})`}
+        markerEnd={showArrowEnd ? `url(#arrowhead-end-${id})` : undefined}
+        markerStart={showArrowStart ? `url(#arrowhead-start-${id})` : undefined}
         style={{
-          ...style, // style prop'idagi boshqa sozlamalar
-          ...dynamicStyle, // dynamicStyle stroke va strokeWidth ni override qiladi
+          ...dynamicStyle,
+          ...style,
+          // Ensure stroke doesn't scale with zoom
+          vectorEffect: "non-scaling-stroke" as any,
           transition:
             "stroke-width 0.15s ease-in-out, stroke 0.15s ease-in-out",
         }}
       />
+
+      {/* Label */}
+      {displayLabel && (
+        <g transform={`translate(${labelPosition.x}, ${labelPosition.y})`}>
+          {labelShowBg && (
+            <rect
+              x={-20}
+              y={-10}
+              width={40}
+              height={16}
+              fill="white"
+              fillOpacity={0.8}
+              stroke="none"
+              rx={4}
+              style={labelBgStyle}
+            />
+          )}
+          <text
+            x={0}
+            y={-8}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            transform={`rotate(${labelRotation})`}
+            style={{
+              fontSize: 12,
+              fill: "#374151",
+              pointerEvents: "none",
+              userSelect: "none",
+              ...labelStyle,
+            }}
+            className="react-flow__edge-text"
+          >
+            <tspan>{displayLabel}</tspan>
+          </text>
+        </g>
+      )}
     </>
   );
 }
+
+// Memoize component to prevent unnecessary re-renders
+export default memo(SmartEdge);

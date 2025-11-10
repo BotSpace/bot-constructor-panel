@@ -1,8 +1,7 @@
-// Mavjud `export const CustomEdge = {};` qatorini o'chiring va o'rniga buni yozing:
+import SelectableEdge from "./SelectableEdge";
 
-import SmartEdge from "./SmartEdge";
-
+// Custom edge with selected state visual feedback
 export const CustomEdge = {
-  // Yangi edge turiga nom beramiz
-  "smart-edge": SmartEdge,
+  default: SelectableEdge,
+  step: SelectableEdge,
 };
