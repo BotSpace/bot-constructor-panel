@@ -31,6 +31,7 @@ import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandler, TargetHandler } from "../../components";
+import { EditMessageTarget } from "../../components/shared/ReactFlowHandlers/EditMessageTarget";
 
 const SendVideoNodeComponent = ({
   id,
@@ -55,6 +56,7 @@ const SendVideoNodeComponent = ({
   return (
     <Card className={cn("w-96 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandler />
+      <EditMessageTarget />
 
       <NodeHeader
         icon={<Video className="text-primary" />}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, memo } from "react";
-import { Handle, Position, NodeProps } from "reactflow";
+import { NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -13,17 +13,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { SendFileNodeData, RecipientType, FileSourceType } from "./types";
+import { SendFileNodeData, FileSourceType } from "./types";
 
 import { NodeFooter } from "../shared/NodeFooter";
 import { NodeHeader } from "../shared/NodeHeader";
 import { FileText } from "lucide-react";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandler, TargetHandler } from "../../components";
+import { EditMessageTarget } from "../../components/shared/ReactFlowHandlers/EditMessageTarget";
 
 const SendFileNodeComponent = ({
   id,
@@ -47,6 +47,7 @@ const SendFileNodeComponent = ({
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandler />
+      <EditMessageTarget />
 
       <NodeHeader
         icon={<FileText className="text-primary" />}

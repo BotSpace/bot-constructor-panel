@@ -23,6 +23,7 @@ import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandler, TargetHandler } from "../../components";
+import { EditMessageTarget } from "../../components/shared/ReactFlowHandlers/EditMessageTarget";
 
 const SendPhotoNodeComponent = ({
   id,
@@ -46,6 +47,7 @@ const SendPhotoNodeComponent = ({
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandler />
+      <EditMessageTarget />
 
       <NodeHeader
         icon={<Camera className="text-primary" />}

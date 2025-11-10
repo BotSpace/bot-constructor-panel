@@ -118,20 +118,24 @@ export default function SmartEdge({
 
   const edgePath = getPath();
 
+  // Edge'ning asl rangini style prop'idan olamiz
+  const originalStroke = (style as any)?.stroke || "#495057";
+
   // Tanlangan va tanlanmagan holat uchun stillarni aniqlab olamiz
   const selectedStyle = {
-    stroke: "#3b82f6", // Ko'k rang
+    stroke: "#3b82f6", // Ko'k rang (selected)
     strokeWidth: 2.5,
   };
 
   const defaultStyle = {
-    stroke: "#495057", // To'q kulrang (default)
-    strokeWidth: 1.5,
+    stroke: originalStroke, // Asl rang (orange-500 yoki default)
+    strokeWidth: (style as any)?.strokeWidth || 1.5,
   };
 
   const dynamicStyle = selected ? selectedStyle : defaultStyle;
 
-  const markerColor = selected ? "#3b82f6" : "#495057";
+  // Marker rangi: selected bo'lsa ko'k, aks holda asl rang
+  const markerColor = selected ? "#3b82f6" : originalStroke;
 
   return (
     <>
@@ -158,8 +162,8 @@ export default function SmartEdge({
         path={edgePath}
         markerEnd={`url(#arrowhead-${id})`}
         style={{
-          ...style,
-          ...dynamicStyle,
+          ...style, // style prop'idagi boshqa sozlamalar
+          ...dynamicStyle, // dynamicStyle stroke va strokeWidth ni override qiladi
           transition:
             "stroke-width 0.15s ease-in-out, stroke 0.15s ease-in-out",
         }}

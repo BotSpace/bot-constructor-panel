@@ -27,13 +27,18 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 
     onConnect: (connection: Connection) => {
       const { initialState } = get();
+
+      // EditMessageHandler'dan chiqqan edge'ni aniqlash
+      const isEditMessageEdge =
+        connection.sourceHandle === "edit-message-handler";
+
       const newEdge = {
         ...connection,
         type: "smart-edge", // Bizning maxsus chizig'imiz
         // Rasmga mos stil
         style: {
           strokeWidth: 1.5,
-          stroke: "#495057", // To'q kulrang
+          stroke: isEditMessageEdge ? "#f97316" : "#495057", // Orange-500 yoki to'q kulrang
         },
         animated: false,
       };

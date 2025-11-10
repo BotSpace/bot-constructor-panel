@@ -9,6 +9,7 @@ export function SourceHandler() {
       position={Position.Bottom}
       // Handle'ga stil berish uchun asosiy klasslar
       className="!w-4 !h-4 !bg-sky-500 !border-2 !border-gray-800 flex items-center justify-center"
+      id="source-handler"
     >
       <PlusIcon
         size={12}

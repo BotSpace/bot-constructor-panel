@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 11/7/2025, 8:37:14 PM
+Sana: 11/9/2025, 6:09:20 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -17,6 +17,8 @@ constructor-next-js
 ├── config
 ├── docs
 │   ├── ARCHITECTURE.md
+│   ├── MESSAGE_EDIT_FEATURE.md
+│   ├── MVP_READINESS.md
 │   ├── javascript-snippets.md
 │   ├── project-analysis.md
 │   └── typescript-snippets.md
@@ -45,7 +47,8 @@ constructor-next-js
 │   │   │   │   │   ├── table-header.tsx
 │   │   │   │   │   └── utils.ts
 │   │   │   │   └── page.tsx
-│   │   │   └── page.tsx
+│   │   │   ├── page.tsx
+│   │   │   └── send-message
 │   │   ├── api
 │   │   │   └── auth
 │   │   │       ├── [...nextauth]
@@ -86,6 +89,7 @@ constructor-next-js
 │   │       ├── button.tsx
 │   │       ├── card.tsx
 │   │       ├── checkbox.tsx
+│   │       ├── combobox.tsx
 │   │       ├── command.tsx
 │   │       ├── dialog.tsx
 │   │       ├── dropdown-menu.tsx
@@ -93,6 +97,7 @@ constructor-next-js
 │   │       ├── input-otp.tsx
 │   │       ├── input.tsx
 │   │       ├── label.tsx
+│   │       ├── popover.tsx
 │   │       ├── progress.tsx
 │   │       ├── radio-group.tsx
 │   │       ├── resizable.tsx
@@ -132,7 +137,8 @@ constructor-next-js
 │   │   │   │   ├── QuickAddPalette
 │   │   │   │   │   ├── QuickAddPalette.tsx
 │   │   │   │   │   └── index.ts
-│   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── save-status-badge.tsx
 │   │   │   ├── constructor.tsx
 │   │   │   ├── data
 │   │   │   │   ├── elements.ts
@@ -193,6 +199,10 @@ constructor-next-js
 │   │   │   │   │   │   ├── AudioMessageNode.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── EditMessageNode
+│   │   │   │   │   │   ├── EditMessageNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── FileMessageNode
 │   │   │   │   │   │   ├── FileMessageNode.tsx
 │   │   │   │   │   │   ├── index.ts
@@ -223,6 +233,10 @@ constructor-next-js
 │   │   │   │   │       │   └── index.ts
 │   │   │   │   │       └── index.ts
 │   │   │   │   ├── custom
+│   │   │   │   │   ├── CollectionNode
+│   │   │   │   │   │   ├── CollectionNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── CustomCodeNode
 │   │   │   │   │   │   ├── CustomCodeNode.tsx
 │   │   │   │   │   │   ├── components
@@ -231,7 +245,8 @@ constructor-next-js
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── StateNode
 │   │   │   │   │   │   ├── StateNode.tsx
-│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── triggers

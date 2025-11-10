@@ -1,12 +1,15 @@
-"use client";
-
+import { useState, memo, useMemo } from "react";
 import { NodeProps, useNodes, useEdges } from "reactflow";
-import { useFlowStore } from "@/features/bot-constructor/store";
-import { memo, useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Edit, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Edit, AlertCircle } from "lucide-react";
+import { NodeHeader } from "../shared/NodeHeader";
+import { SourceHandler, TargetHandler } from "../../components";
+import { EditMessageNodeData, EditMessageType, MessageIdSource } from "./types";
+import { EditMessageHandler } from "../../components/shared/ReactFlowHandlers/EditMessageHandler";
+import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import {
   SelectContent,
@@ -14,305 +17,286 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@radix-ui/react-select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Input } from "@/components/ui/input";
 import TextareaAutosize from "react-textarea-autosize";
-import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
-import { SourceHandler, TargetHandler } from "../../components";
-import { EditMessageNodeData, EditMessageType, MessageIdSource } from "./types";
-import { ParseMode } from "../TextMessageNode/types";
+import { ParseMode, KeyboardConfig } from "../TextMessageNode/types";
+import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator";
+import { Badge } from "@/components/ui/badge";
 
-const EditMessageNodeComponent = ({
-  id,
-  data,
-  selected,
-}: NodeProps<EditMessageNodeData>) => {
-  const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const nodes = useNodes();
-  const edges = useEdges();
+export const EditMessageNode = memo(
+  ({ id, data, selected, isConnectable }: NodeProps<EditMessageNodeData>) => {
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const updateNodeData = useFlowStore((state) => state.updateNodeData);
+    const nodes = useNodes();
+    const edges = useEdges();
 
-  // Oldingi bog'langan node'larni topish
-  const previousNode = useMemo(() => {
-    const incomingEdge = edges.find((edge) => edge.target === id);
-    if (!incomingEdge) return null;
+    // Ma'lumotlarni yangilash funksiyasi
+    const handleUpdate = (update: Partial<EditMessageNodeData>) => {
+      updateNodeData(id, update);
+    };
 
-    const parentNode = nodes.find((node) => node.id === incomingEdge.source);
-    return parentNode || null;
-  }, [nodes, edges, id]);
+    // EditMessageHandler'dan chiqqan edge orqali EditMessageTarget'ga ulangan message node'ni topish
+    const connectedMessageNode = useMemo(() => {
+      // EditMessageHandler'dan chiqqan edge'ni topish (source === id && sourceHandle === "edit-message-handler")
+      const editHandlerEdge = edges.find(
+        (edge) =>
+          edge.source === id && edge.sourceHandle === "edit-message-handler"
+      );
+      if (!editHandlerEdge) return null;
 
-  // Oldingi node'ning turiga qarab qaysi edit qismlari mumkinligini aniqlash
-  const availableEdits = useMemo<{
-    text?: boolean;
-    caption?: boolean;
-    keyboard?: boolean;
-    media?: boolean;
-  }>(() => {
-    if (!previousNode) {
-      // Oldingi node bo'lmasa, barcha qismlar mumkin
-      return { text: true, caption: true, keyboard: true, media: true };
-    }
+      // Shu edge'ning target node'i (EditMessageTarget'ga ulangan message node)
+      const targetNode = nodes.find(
+        (node) => node.id === editHandlerEdge.target
+      );
+      return targetNode;
+    }, [nodes, edges, id]);
 
-    const nodeType = previousNode.type;
+    // Connected message node type'iga qarab avtomatik edit type'ni aniqlash
+    const autoEditType = useMemo<EditMessageType | null>(() => {
+      if (!connectedMessageNode) return null;
 
-    switch (nodeType) {
-      case "SendTextMessageNode":
-        // Text message'da faqat text va keyboard edit mumkin
-        return { text: true, keyboard: true };
-      case "SendPhotoNode":
-      case "SendVideoNode":
-      case "SendAudioNode":
-      case "SendFileNode":
-        // Media node'lar uchun caption, keyboard va media edit mumkin
-        return { caption: true, keyboard: true, media: true };
-      default:
-        // Boshqa node'lar uchun barcha qismlar mumkin
-        return { text: true, caption: true, keyboard: true, media: true };
-    }
-  }, [previousNode]);
+      const nodeType = connectedMessageNode.type;
 
-  // Oldingi node'dan media type'ni aniqlash (media edit uchun)
-  const autoDetectedMediaType = useMemo<
-    "photo" | "video" | "audio" | "file" | null
-  >(() => {
-    if (!previousNode) return null;
-
-    const nodeType = previousNode.type;
-
-    switch (nodeType) {
-      case "SendPhotoNode":
-        return "photo";
-      case "SendVideoNode":
-        return "video";
-      case "SendAudioNode":
-        return "audio";
-      case "SendFileNode":
-        return "file";
-      default:
-        return null;
-    }
-  }, [previousNode]);
-
-  // Oldingi node'dan ma'lumotlarni olish
-  const previousNodeData = useMemo<any>(() => {
-    if (!previousNode) return null;
-    return previousNode.data;
-  }, [previousNode]);
-
-  const handleUpdate = (update: Partial<EditMessageNodeData>) => {
-    updateNodeData(id, update);
-  };
-
-  // Oldingi node'dan ma'lumotlarni avtomatik olish
-  useEffect(() => {
-    if (
-      previousNodeData &&
-      !data.newText &&
-      !data.newCaption &&
-      !data.keyboard &&
-      !data.mediaSource
-    ) {
-      const updates: Partial<EditMessageNodeData> = {};
-
-      // Text edit uchun
-      if (availableEdits.text && previousNodeData.messageText) {
-        updates.newText = previousNodeData.messageText;
-        updates.parseMode = previousNodeData.parseMode || "None";
+      // Text message node - faqat matnini edit qilish mumkin
+      if (nodeType === "SendTextMessageNode") {
+        return "text";
       }
 
-      // Caption edit uchun
-      if (availableEdits.caption && previousNodeData.caption) {
-        updates.newCaption = previousNodeData.caption;
+      // Media message nodes (photo, video, audio, file) - faqat caption'ni edit qilish mumkin
+      if (
+        nodeType === "SendPhotoNode" ||
+        nodeType === "SendVideoNode" ||
+        nodeType === "SendAudioNode" ||
+        nodeType === "SendFileNode"
+      ) {
+        return "caption";
       }
 
-      // Keyboard edit uchun
-      if (availableEdits.keyboard && previousNodeData.keyboard) {
-        updates.keyboard = previousNodeData.keyboard;
+      return null;
+    }, [connectedMessageNode]);
+
+    // Message ID source tanlash
+    const messageIdSource = data.messageIdSource || "previous_node";
+
+    // Edit type: avtomatik aniqlangan bo'lsa uni ishlatamiz, aks holda data'dan olamiz
+    const editType = autoEditType || data.editType || "text";
+
+    // Connected message node mavjudligini tekshirish
+    const hasConnectedNode = !!connectedMessageNode;
+
+    // Connected message node'dan ma'lumotlarni olish (avtomatik to'ldirish uchun)
+    const connectedNodeData = connectedMessageNode?.data as any;
+
+    // Konfiguratsiya holatini tekshirish
+    const isConfigured = useMemo(() => {
+      if (messageIdSource === "manual" && !data.messageId) return false;
+      if (messageIdSource === "previous_node" && !hasConnectedNode)
+        return false;
+
+      switch (editType) {
+        case "text":
+          return !!data.newText;
+        case "caption":
+          return !!data.newCaption;
+        case "keyboard":
+          return !!data.keyboard;
+        case "media":
+          return !!data.mediaType && !!data.mediaSource;
+        default:
+          return false;
       }
+    }, [messageIdSource, data, editType, hasConnectedNode]);
 
-      // Media edit uchun
-      if (availableEdits.media && autoDetectedMediaType) {
-        updates.mediaType = autoDetectedMediaType;
-        // Oldingi node'dan media source'ni olish
-        if (previousNodeData.photoUrl)
-          updates.mediaSource = previousNodeData.photoUrl;
-        else if (previousNodeData.photoFileId)
-          updates.mediaSource = previousNodeData.photoFileId;
-        else if (previousNodeData.videoUrl)
-          updates.mediaSource = previousNodeData.videoUrl;
-        else if (previousNodeData.videoFileId)
-          updates.mediaSource = previousNodeData.videoFileId;
-        else if (previousNodeData.audioUrl)
-          updates.mediaSource = previousNodeData.audioUrl;
-        else if (previousNodeData.audioFileId)
-          updates.mediaSource = previousNodeData.audioFileId;
-        else if (previousNodeData.fileUrl)
-          updates.mediaSource = previousNodeData.fileUrl;
-        else if (previousNodeData.fileId)
-          updates.mediaSource = previousNodeData.fileId;
-      }
+    return (
+      <Card
+        className={cn(
+          "w-100 shadow-lg relative",
+          selected && "ring-2 ring-primary"
+        )}
+      >
+        {/* Standard Target Handle (Top) */}
+        <TargetHandler />
 
-      if (Object.keys(updates).length > 0) {
-        updateNodeData(id, updates);
-      }
-    }
-  }, [
-    previousNodeData,
-    availableEdits,
-    autoDetectedMediaType,
-    data.newText,
-    data.newCaption,
-    data.keyboard,
-    data.mediaSource,
-    id,
-    updateNodeData,
-  ]);
+        {/* Custom Edit Target Handle (Left side) - Tahrirlanadigan messageni qabul qiladi */}
+        <EditMessageHandler />
 
-  // UI'da ko'rsatish uchun hisob-kitoblar
-  const textLength = data.newText?.length || 0;
-  const buttonCount =
-    (data.keyboard?.active === "inline"
-      ? data.keyboard?.inline
-      : data.keyboard?.reply
-    )?.flat().length || 0;
+        <NodeHeader
+          icon={<Edit className="text-primary" />}
+          title="Xabarni tahrirlash"
+          isCollapsed={isCollapsed}
+          onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        />
 
-  return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
-
-      <NodeHeader
-        icon={<Edit className="text-primary" />}
-        title="Xabarni tahrirlash"
-        buttonCount={buttonCount}
-        isCollapsed={isCollapsed}
-        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
-      />
-
-      {!isCollapsed && (
-        <>
+        {!isCollapsed && (
           <CardContent className="flex flex-col gap-4">
-            {/* Message ID manbasi */}
+            {/* Message ID Source Selection */}
             <div className="grid gap-2">
               <Label>Message ID manbasi</Label>
               <Select
-                value={data.messageIdSource || "context"}
+                value={messageIdSource}
                 onValueChange={(value: MessageIdSource) =>
                   handleUpdate({ messageIdSource: value })
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Message ID manbasi" />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="context">Context'dan</SelectItem>
                   <SelectItem value="previous_node">
-                    Oldingi node'dan
+                    Oldingi node'dan (ulangan)
                   </SelectItem>
+                  <SelectItem value="context">Context'dan</SelectItem>
                   <SelectItem value="manual">Qo'lda kiritish</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
 
-            {/* Manual bo'lsa Message ID input */}
-            {data.messageIdSource === "manual" && (
-              <div className="grid gap-2">
-                <Label>Message ID</Label>
-                <Input
-                  placeholder="Message ID ni kiriting..."
-                  value={data.messageId || ""}
-                  onChange={(e) => handleUpdate({ messageId: e.target.value })}
-                />
-              </div>
-            )}
-
-            {/* Oldingi node ma'lumotlari */}
-            {previousNode && (
-              <div className="rounded-md bg-muted/50 p-3">
-                <p className="text-xs text-muted-foreground mb-2">
-                  Oldingi node:{" "}
-                  <span className="font-semibold">{previousNode.type}</span>
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  O'zgarishi mumkin bo'lgan qismlar:{" "}
-                  {Object.entries(availableEdits)
-                    .filter(([_, enabled]) => enabled)
-                    .map(([key]) => {
-                      const labels: Record<string, string> = {
-                        text: "Matn",
-                        caption: "Caption",
-                        keyboard: "Tugmalar",
-                        media: "Media",
-                      };
-                      return labels[key];
-                    })
-                    .join(", ")}
-                </p>
-              </div>
-            )}
-
-            {/* Text edit */}
-            {availableEdits.text && (
-              <>
+              {/* Manual message ID input */}
+              {messageIdSource === "manual" && (
                 <div className="grid gap-2">
-                  <div className="flex justify-between items-center">
-                    <Label>Yangi matn</Label>
-                    <span
-                      className={cn(
-                        "text-xs",
-                        textLength > 4096
-                          ? "text-destructive"
-                          : "text-muted-foreground"
-                      )}
-                    >
-                      {textLength}/4096
-                    </span>
-                  </div>
-                  <TextareaAutosize
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    placeholder={
-                      previousNodeData?.messageText
-                        ? `Joriy matn: ${previousNodeData.messageText.substring(
-                            0,
-                            50
-                          )}...`
-                        : "Yangi matnni kiriting..."
+                  <Label>Message ID</Label>
+                  <Input
+                    placeholder="Message ID ni kiriting"
+                    value={data.messageId || ""}
+                    onChange={(e) =>
+                      handleUpdate({ messageId: e.target.value })
                     }
-                    value={data.newText || ""}
-                    onChange={(e) => handleUpdate({ newText: e.target.value })}
-                    maxLength={4096}
                   />
-                  {previousNodeData?.messageText && !data.newText && (
-                    <p className="text-xs text-muted-foreground">
-                      Joriy matn: {previousNodeData.messageText}
-                    </p>
+                </div>
+              )}
+
+              {/* Connected message node status */}
+              {messageIdSource === "previous_node" && (
+                <div className="flex items-center gap-2 text-sm">
+                  {hasConnectedNode ? (
+                    <Badge variant="secondary" className="gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {connectedMessageNode?.type || "Node"} ulangan
+                    </Badge>
+                  ) : (
+                    <div className="flex items-center gap-1 text-destructive text-xs">
+                      <AlertCircle className="h-3 w-3" />
+                      Hech qanday message node ulanmagan
+                    </div>
                   )}
                 </div>
-                <div className="grid gap-3">
-                  <Label className="flex items-center gap-2">
-                    <Settings className="w-4 h-4" /> Sozlamalar
-                  </Label>
-                  <Select
-                    value={data.parseMode || "None"}
-                    onValueChange={(value: ParseMode) =>
-                      handleUpdate({ parseMode: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Parse Mode" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="None">Oddiy matn</SelectItem>
-                      <SelectItem value="HTML">HTML</SelectItem>
-                      <SelectItem value="MarkdownV2">MarkdownV2</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </>
+              )}
+            </div>
+
+            {/* Edit Type Selection - faqat connected message node ulangan bo'lsa */}
+            {hasConnectedNode && autoEditType && (
+              <div className="grid gap-2">
+                <Label>Nimani tahrirlash</Label>
+                <Select
+                  value={editType}
+                  onValueChange={(value: EditMessageType) =>
+                    handleUpdate({ editType: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {autoEditType === "text" && (
+                      <>
+                        <SelectItem value="text">Matn</SelectItem>
+                        <SelectItem value="keyboard">Tugmalar</SelectItem>
+                      </>
+                    )}
+                    {autoEditType === "caption" && (
+                      <>
+                        <SelectItem value="caption">Caption</SelectItem>
+                        <SelectItem value="keyboard">Tugmalar</SelectItem>
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {connectedMessageNode?.type === "SendTextMessageNode" &&
+                    "Matn xabari ulangan - faqat matnini edit qilish mumkin"}
+                  {(connectedMessageNode?.type === "SendPhotoNode" ||
+                    connectedMessageNode?.type === "SendVideoNode" ||
+                    connectedMessageNode?.type === "SendAudioNode" ||
+                    connectedMessageNode?.type === "SendFileNode") &&
+                    "Media xabari ulangan - faqat caption'ni edit qilish mumkin"}
+                </p>
+              </div>
             )}
 
-            {/* Caption edit */}
-            {availableEdits.caption && (
+            {/* Manual rejimda yoki connected message node ulanmagan bo'lsa - barcha variantlarni ko'rsatish */}
+            {(!hasConnectedNode || !autoEditType) && (
+              <div className="grid gap-2">
+                <Label>Nimani tahrirlash</Label>
+                <Select
+                  value={editType}
+                  onValueChange={(value: EditMessageType) =>
+                    handleUpdate({ editType: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="text">Matn</SelectItem>
+                    <SelectItem value="caption">
+                      Caption (media uchun)
+                    </SelectItem>
+                    <SelectItem value="keyboard">Tugmalar</SelectItem>
+                    <SelectItem value="media">Media</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Edit Type Specific UI */}
+            {editType === "text" && (
+              <div className="grid gap-2">
+                <div className="flex justify-between items-center">
+                  <Label>Yangi matn</Label>
+                  <span
+                    className={cn(
+                      "text-xs",
+                      (data.newText?.length || 0) > 4096
+                        ? "text-destructive"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    {data.newText?.length || 0}/4096
+                  </span>
+                </div>
+                <TextareaAutosize
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  placeholder={
+                    hasConnectedNode && connectedNodeData?.messageText
+                      ? `Joriy: ${connectedNodeData.messageText.substring(
+                          0,
+                          50
+                        )}...`
+                      : "Yangi matnni kiriting..."
+                  }
+                  value={data.newText || ""}
+                  onChange={(e) => handleUpdate({ newText: e.target.value })}
+                  maxLength={4096}
+                />
+                <Select
+                  value={
+                    data.parseMode || connectedNodeData?.parseMode || "None"
+                  }
+                  onValueChange={(value: ParseMode) =>
+                    handleUpdate({ parseMode: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Parse Mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="None">Oddiy matn</SelectItem>
+                    <SelectItem value="HTML">HTML</SelectItem>
+                    <SelectItem value="MarkdownV2">MarkdownV2</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {editType === "caption" && (
               <div className="grid gap-2">
                 <div className="flex justify-between items-center">
                   <Label>Yangi caption</Label>
@@ -330,54 +314,126 @@ const EditMessageNodeComponent = ({
                 <TextareaAutosize
                   className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   placeholder={
-                    previousNodeData?.caption
-                      ? `Joriy caption: ${previousNodeData.caption.substring(
+                    hasConnectedNode && connectedNodeData?.caption
+                      ? `Joriy: ${connectedNodeData.caption.substring(
                           0,
                           50
                         )}...`
-                      : "Yangi caption kiriting..."
+                      : "Yangi caption ni kiriting..."
                   }
                   value={data.newCaption || ""}
                   onChange={(e) => handleUpdate({ newCaption: e.target.value })}
                   maxLength={1024}
                 />
-                {previousNodeData?.caption && !data.newCaption && (
-                  <p className="text-xs text-muted-foreground">
-                    Joriy caption: {previousNodeData.caption}
-                  </p>
-                )}
               </div>
             )}
 
-            {/* Media edit */}
-            {availableEdits.media && (
-              <>
-                <div className="grid gap-2">
-                  <div className="flex items-center justify-between">
-                    <Label>Media turi</Label>
-                    {autoDetectedMediaType && previousNode && (
-                      <span className="text-xs text-muted-foreground">
-                        Avtomatik: {autoDetectedMediaType}
-                      </span>
-                    )}
+            {/* Keyboard edit - har doim ko'rsatiladi agar message node ulangan bo'lsa */}
+            {editType === "keyboard" && (
+              <div className="grid gap-2">
+                <Label>Tugmalar</Label>
+                <ButtonGenerator
+                  initialKeyboard={data.keyboard || connectedNodeData?.keyboard}
+                  onSave={(keyboard: KeyboardConfig) =>
+                    handleUpdate({ keyboard })
+                  }
+                >
+                  <div className="relative w-full">
+                    <button
+                      type="button"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-input bg-background rounded-md hover:bg-accent hover:text-accent-foreground text-sm"
+                    >
+                      Tugmalarni sozlash
+                    </button>
+                    {(data.keyboard || connectedNodeData?.keyboard) &&
+                      (((data.keyboard || connectedNodeData?.keyboard)
+                        ?.active === "inline"
+                        ? (data.keyboard || connectedNodeData?.keyboard)?.inline
+                        : (data.keyboard || connectedNodeData?.keyboard)?.reply
+                      )?.flat().length || 0) > 0 && (
+                        <Badge
+                          variant="destructive"
+                          className="absolute -top-2 -right-2 px-1.5"
+                        >
+                          {((data.keyboard || connectedNodeData?.keyboard)
+                            ?.active === "inline"
+                            ? (data.keyboard || connectedNodeData?.keyboard)
+                                ?.inline
+                            : (data.keyboard || connectedNodeData?.keyboard)
+                                ?.reply
+                          )?.flat().length || 0}
+                        </Badge>
+                      )}
                   </div>
-                  <Select
-                    value={data.mediaType || autoDetectedMediaType || "photo"}
-                    onValueChange={(
-                      value: "photo" | "video" | "audio" | "file"
-                    ) => handleUpdate({ mediaType: value })}
+                </ButtonGenerator>
+              </div>
+            )}
+
+            {/* Keyboard edit maydonini alohida ko'rsatish - agar text yoki caption edit qilinayotgan bo'lsa */}
+            {/* Barcha message node'lar uchun keyboard edit qilish mumkin */}
+            {hasConnectedNode &&
+              (editType === "text" || editType === "caption") && (
+                <div className="grid gap-2 border-t pt-4">
+                  <Label>Tugmalarni ham tahrirlash</Label>
+                  <ButtonGenerator
+                    initialKeyboard={
+                      data.keyboard || connectedNodeData?.keyboard
+                    }
+                    onSave={(keyboard: KeyboardConfig) =>
+                      handleUpdate({ keyboard })
+                    }
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Media turi" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="photo">Rasm</SelectItem>
-                      <SelectItem value="video">Video</SelectItem>
-                      <SelectItem value="audio">Audio</SelectItem>
-                      <SelectItem value="file">Fayl</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <div className="relative w-full">
+                      <button
+                        type="button"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-input bg-background rounded-md hover:bg-accent hover:text-accent-foreground text-sm"
+                      >
+                        Tugmalarni sozlash
+                      </button>
+                      {(data.keyboard || connectedNodeData?.keyboard) &&
+                        (((data.keyboard || connectedNodeData?.keyboard)
+                          ?.active === "inline"
+                          ? (data.keyboard || connectedNodeData?.keyboard)
+                              ?.inline
+                          : (data.keyboard || connectedNodeData?.keyboard)
+                              ?.reply
+                        )?.flat().length || 0) > 0 && (
+                          <Badge
+                            variant="destructive"
+                            className="absolute -top-2 -right-2 px-1.5"
+                          >
+                            {((data.keyboard || connectedNodeData?.keyboard)
+                              ?.active === "inline"
+                              ? (data.keyboard || connectedNodeData?.keyboard)
+                                  ?.inline
+                              : (data.keyboard || connectedNodeData?.keyboard)
+                                  ?.reply
+                            )?.flat().length || 0}
+                          </Badge>
+                        )}
+                    </div>
+                  </ButtonGenerator>
                 </div>
+              )}
+
+            {editType === "media" && (
+              <div className="grid gap-2">
+                <Select
+                  value={data.mediaType || "photo"}
+                  onValueChange={(
+                    value: "photo" | "video" | "audio" | "file"
+                  ) => handleUpdate({ mediaType: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Media turi" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="photo">Rasm</SelectItem>
+                    <SelectItem value="video">Video</SelectItem>
+                    <SelectItem value="audio">Audio</SelectItem>
+                    <SelectItem value="file">Fayl</SelectItem>
+                  </SelectContent>
+                </Select>
                 <div className="grid gap-2">
                   <Label>Media manbasi (URL yoki file_id)</Label>
                   <Input
@@ -388,23 +444,24 @@ const EditMessageNodeComponent = ({
                     }
                   />
                 </div>
-              </>
+              </div>
+            )}
+
+            {/* Configuration Status */}
+            {!isConfigured && (
+              <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 p-2 rounded-md">
+                <AlertCircle className="h-4 w-4" />
+                <span>Barcha maydonlar to'ldirilishi kerak</span>
+              </div>
             )}
           </CardContent>
+        )}
 
-          {/* Keyboard edit uchun footer */}
-          {availableEdits.keyboard && (
-            <NodeFooter
-              nodeId={id}
-              keyboard={data.keyboard}
-              onUpdate={(update) => handleUpdate(update)}
-            />
-          )}
-        </>
-      )}
-      <SourceHandler />
-    </Card>
-  );
-};
+        {/* Standard Source Handle (Bottom) */}
+        <SourceHandler />
+      </Card>
+    );
+  }
+);
 
-export const EditMessageNode = memo(EditMessageNodeComponent);
+EditMessageNode.displayName = "EditMessageNode";
