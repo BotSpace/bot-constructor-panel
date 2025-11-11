@@ -13,6 +13,9 @@ RUN npm run build
 # Production Stage
 FROM node:22-alpine AS runner
 WORKDIR /app
+
+
+RUN apk add curl
 ENV NODE_ENV=production
 
 # Copy built application and node modules from the builder stage
