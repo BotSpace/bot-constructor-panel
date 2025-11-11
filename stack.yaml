@@ -5,7 +5,7 @@ services:
     image: jscorptech/botmother-constructor:3
     ports:
       - mode: ingress
-        target: 3001
+        target: 3000
         published: ${PORT:?enviromentda PORT topilmadi}
         protocol: tcp
     networks:
@@ -22,7 +22,7 @@ services:
         delay: 10s
         max_failure_ratio: 0.2
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3001/ || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
