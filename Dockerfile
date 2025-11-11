@@ -19,7 +19,7 @@ ENV NODE_ENV=production
 COPY --from=builder /app ./
 
 # Expose port (default for Next.js)
-EXPOSE 3001
+EXPOSE 3000
 
 # Start the Next.js application
 CMD ["npm", "start"]
