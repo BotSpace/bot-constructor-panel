@@ -94,7 +94,7 @@ export const EditMessageNode = memo(
 
       switch (editType) {
         case "text":
-          return !!data.newText;
+          return !!data.messageText;
         case "caption":
           return !!data.newCaption;
         case "keyboard":
@@ -254,12 +254,12 @@ export const EditMessageNode = memo(
                   <span
                     className={cn(
                       "text-xs",
-                      (data.newText?.length || 0) > 4096
+                      (data.messageText?.length || 0) > 4096
                         ? "text-destructive"
                         : "text-muted-foreground"
                     )}
                   >
-                    {data.newText?.length || 0}/4096
+                    {data.messageText?.length || 0}/4096
                   </span>
                 </div>
                 <TextareaAutosize
@@ -267,13 +267,13 @@ export const EditMessageNode = memo(
                   placeholder={
                     hasConnectedNode && connectedNodeData?.messageText
                       ? `Joriy: ${connectedNodeData.messageText.substring(
-                          0,
-                          50
-                        )}...`
+                        0,
+                        50
+                      )}...`
                       : "Yangi matnni kiriting..."
                   }
-                  value={data.newText || ""}
-                  onChange={(e) => handleUpdate({ newText: e.target.value })}
+                  value={data.messageText || ""}
+                  onChange={(e) => handleUpdate({ messageText: e.target.value })}
                   maxLength={4096}
                 />
                 <Select
@@ -316,9 +316,9 @@ export const EditMessageNode = memo(
                   placeholder={
                     hasConnectedNode && connectedNodeData?.caption
                       ? `Joriy: ${connectedNodeData.caption.substring(
-                          0,
-                          50
-                        )}...`
+                        0,
+                        50
+                      )}...`
                       : "Yangi caption ni kiriting..."
                   }
                   value={data.newCaption || ""}
@@ -358,9 +358,9 @@ export const EditMessageNode = memo(
                           {((data.keyboard || connectedNodeData?.keyboard)
                             ?.active === "inline"
                             ? (data.keyboard || connectedNodeData?.keyboard)
-                                ?.inline
+                              ?.inline
                             : (data.keyboard || connectedNodeData?.keyboard)
-                                ?.reply
+                              ?.reply
                           )?.flat().length || 0}
                         </Badge>
                       )}
@@ -394,9 +394,9 @@ export const EditMessageNode = memo(
                         (((data.keyboard || connectedNodeData?.keyboard)
                           ?.active === "inline"
                           ? (data.keyboard || connectedNodeData?.keyboard)
-                              ?.inline
+                            ?.inline
                           : (data.keyboard || connectedNodeData?.keyboard)
-                              ?.reply
+                            ?.reply
                         )?.flat().length || 0) > 0 && (
                           <Badge
                             variant="destructive"
@@ -405,9 +405,9 @@ export const EditMessageNode = memo(
                             {((data.keyboard || connectedNodeData?.keyboard)
                               ?.active === "inline"
                               ? (data.keyboard || connectedNodeData?.keyboard)
-                                  ?.inline
+                                ?.inline
                               : (data.keyboard || connectedNodeData?.keyboard)
-                                  ?.reply
+                                ?.reply
                             )?.flat().length || 0}
                           </Badge>
                         )}
