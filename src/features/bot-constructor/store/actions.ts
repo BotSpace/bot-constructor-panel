@@ -42,7 +42,7 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
       return {
         messageIdSource: "context",
         editType: "text",
-        newText: "",
+        messageText: "",
         parseMode: "None",
         keyboard: {
           active: "inline",
