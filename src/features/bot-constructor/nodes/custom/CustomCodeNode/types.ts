@@ -7,7 +7,7 @@ export interface CustomCodeNodeData {
   /** Foydalanuvchi tomonidan berilgan maxsus nom */
   nodeTitle?: string;
 
-  pythonCode?: string;
+  jsCode?: string;
   // Yangi maydon: foydalanuvchi tanlagan kontekst
   contextType?: CodeExecutionContext;
 }
