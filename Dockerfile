@@ -13,13 +13,16 @@ RUN npm run build
 # Production Stage
 FROM node:22-alpine AS runner
 WORKDIR /app
+
+
+RUN apk add curl
 ENV NODE_ENV=production
 
 # Copy built application and node modules from the builder stage
 COPY --from=builder /app ./
 
 # Expose port (default for Next.js)
-EXPOSE 3001
+EXPOSE 3000
 
 # Start the Next.js application
 CMD ["npm", "start"]
