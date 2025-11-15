@@ -21,10 +21,10 @@ import {
 import { instanceAuth } from "@/services/instance";
 import toast from "react-hot-toast";
 import useProjectStore from "@/features/bot-constructor/store/project";
-import { Link } from "@/i18n/routing";
+import { useLinkToParent } from "@/components/common/link-to-parrent";
 
 function ReleasePanel() {
-  const { id }: { id: string } = useParams();
+  const { id, lang }: { id: string; lang: string } = useParams();
   const { loadProject, loading, project } = useProjectStore();
 
   function handleCreateRelease() {
@@ -78,17 +78,26 @@ function ReleasePanel() {
       </Button>
     );
 
-  return <ReleaseDropDown id={id} onPublish={handleCreateRelease} />;
+  return (
+    <ReleaseDropDown lang={lang} id={id} onPublish={handleCreateRelease} />
+  );
 }
 
 // Drop Down
 function ReleaseDropDown({
   id,
+  lang,
   onPublish,
 }: {
   id: string;
+  lang: string;
   onPublish: () => void;
 }) {
+  const { handleClick } = useLinkToParent({
+    href: `/${lang}/bot/${id}/release`,
+    onClick: (e) => console.log("Clicked!"),
+  });
+
   return (
     <>
       <DropdownMenu>
@@ -106,14 +115,12 @@ function ReleaseDropDown({
                 <ExternalLink />
               </DropdownMenuShortcut>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link className="cursor-pointer" href={`/bot/${id}/release`}>
-                <ListTree />
-                1h ago version 10.1
-                <DropdownMenuShortcut>
-                  <ChevronRight />
-                </DropdownMenuShortcut>
-              </Link>
+            <DropdownMenuItem onClick={handleClick}>
+              <ListTree />
+              1h ago version 10.1
+              <DropdownMenuShortcut>
+                <ChevronRight />
+              </DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Activity />

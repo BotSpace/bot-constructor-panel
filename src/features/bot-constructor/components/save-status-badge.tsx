@@ -1,18 +1,34 @@
 "use client";
 
 import { Check, AlertCircle, Loader2 } from "lucide-react";
-
-type SaveStatus = "idle" | "saving" | "saved" | "unsaved";
+import { useMemo } from "react";
+import { useFlowStore } from "../store";
+import { cn } from "@/lib/utils";
 
 interface SaveStatusBadgeProps {
-  status: SaveStatus;
-  lastSavedTime?: Date;
+  className?: string;
 }
 
-export function SaveStatusBadge({
-  status,
-  lastSavedTime,
-}: SaveStatusBadgeProps) {
+export function SaveStatusBadge({ className }: SaveStatusBadgeProps) {
+  const { isDirty, isLoading, lastSavedTime, countdownRemaining } =
+    useFlowStore();
+
+  // Countdown ni sekundlarga aylantirish
+  const countdownSeconds = useMemo(() => {
+    if (countdownRemaining === null) return null;
+    return Math.ceil(countdownRemaining / 1000);
+  }, [countdownRemaining]);
+
+  // Statusni aniqlash
+  const status = useMemo(() => {
+    if (isLoading) return "saving";
+    if (isDirty && countdownRemaining !== null && countdownRemaining > 0)
+      return "countdown";
+    if (isDirty) return "unsaved";
+    if (lastSavedTime) return "saved";
+    return "idle";
+  }, [isDirty, isLoading, lastSavedTime, countdownRemaining]);
+
   const baseStyles =
     "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-300";
 
@@ -32,6 +48,11 @@ export function SaveStatusBadge({
       icon: <Check className="w-4 h-4" />,
       text: "Saved",
     },
+    countdown: {
+      styles: `${baseStyles} bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-500/30`,
+      icon: <AlertCircle className="w-4 h-4" />,
+      text: "Unsaved changes",
+    },
     unsaved: {
       styles: `${baseStyles} bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-500/30`,
       icon: <AlertCircle className="w-4 h-4" />,
@@ -42,9 +63,14 @@ export function SaveStatusBadge({
   const config = statusConfigs[status];
 
   return (
-    <div className={`${config.styles} pointer-events-none`}>
+    <div className={cn(config.styles, "pointer-events-none", className)}>
       {config.icon}
       <span>{config.text}</span>
+      {status === "countdown" && countdownSeconds !== null && (
+        <span className="text-xs opacity-75 font-mono">
+          ({countdownSeconds}s)
+        </span>
+      )}
       {lastSavedTime && status === "saved" && (
         <span className="text-xs opacity-75">
           {lastSavedTime.toLocaleTimeString([], {
