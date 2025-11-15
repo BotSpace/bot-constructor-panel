@@ -108,7 +108,6 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   saveFlow: async (project_id: string) => {
     const { nodes, edges } = get();
     set({ isLoading: true });
-    toast.loading("Saqlanmoqda...");
 
     try {
       const response = await instanceAuth.patch(`/project/${project_id}/`, {
@@ -121,11 +120,11 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
         throw new Error("Serverda saqlashda xatolik.");
       }
 
-      toast.dismiss();
-      toast.success("Sxema muvaffaqiyatli saqlandi!");
       set({
         isDirty: false, // O'zgarishlar saqlandi
         initialState: { nodes, edges }, // Boshlang'ich holatni yangilaymiz
+        lastSavedTime: new Date(), // Saqlash vaqtini yangilaymiz
+        countdownRemaining: null, // Countdown ni to'xtatamiz
       });
     } catch (error) {
       console.error("Saqlashda xatolik:", error);
@@ -148,6 +147,7 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
         edges: flow["edges"],
       },
       isDirty: false, // Yangi yuklandi, demak o'zgarishlar yo'q
+      lastSavedTime: new Date(), // Yuklangan vaqtni saqlaymiz
     });
 
     // Keyin nodes va edges ni o'rnatamiz

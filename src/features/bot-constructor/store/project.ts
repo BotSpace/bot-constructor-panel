@@ -17,16 +17,14 @@ const useProjectStore = create<ProjectState>((set, get) => ({
   loading: true,
   loadProject(project_id) {
     set({ loading: true });
-    const toastId = toast.loading("Bot yuklanmoqda...");
 
     instanceAuth
       .get<APIDetailCreateResponse<ProjectRetrive>>(`/project/${project_id}`)
       .then(({ data }) => {
-        toast.success("Bot muvaffaqiyatli yuklandi", { id: toastId });
         set({ project: data.data });
       })
       .catch(() => {
-        toast.error("Bot yuklashda xatolik yuz berdi", { id: toastId });
+        toast.error("Bot yuklashda xatolik yuz berdi");
       })
       .finally(() => {
         set({ loading: false });
