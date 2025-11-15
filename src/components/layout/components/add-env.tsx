@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { instanceAuth } from "@/services/instance";
 
+// TODO faqt add uchun qilish kerak
 export function AddEnvDialog({
   dialog_title,
   dialog_description,

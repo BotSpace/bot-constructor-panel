@@ -15,9 +15,20 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     // UI holatlari uchun boshlang'ich qiymatlar
     isDirty: false,
     isLoading: false,
+    lastSavedTime: null,
+    countdownRemaining: null,
+    countdownDuration: 2000, // 2 sekund
 
     isCtrlPressed: false, // Boshlang'ich holat
     setCtrlPressed: (isPressed) => set({ isCtrlPressed: isPressed }),
+
+    startCountdown: () => {
+      set({ countdownRemaining: get().countdownDuration });
+    },
+
+    stopCountdown: () => {
+      set({ countdownRemaining: null });
+    },
 
     // Barcha slice'larni birlashtiramiz
     // Har bir slice'ga (set, get) ni uzatamiz

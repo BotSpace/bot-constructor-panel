@@ -18,6 +18,7 @@ import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
 import { useMousePosition } from "./hooks/useMousePosition";
 import { useParams } from "next/navigation";
 import useProjectStore from "./store/project";
+import { SaveStatusBadge } from "./components/save-status-badge";
 
 function FlowchartInner() {
   const { id }: { id: string } = useParams();
@@ -34,6 +35,9 @@ function FlowchartInner() {
     loadFlow,
     isDirty,
     initialState,
+    startCountdown,
+    stopCountdown,
+    countdownRemaining,
   } = useFlowStore();
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -44,7 +48,7 @@ function FlowchartInner() {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const mousePosition = useMousePosition();
 
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // load flow from project
   useEffect(() => {
@@ -62,36 +66,65 @@ function FlowchartInner() {
     onOpenPalette: () => {},
   });
 
-  // Bu useEffect nodes va edges o'zgarishini kuzatib boradi
+  // Countdown ni kamaytirish va save qilish
   useEffect(() => {
-    // Agar initial state hali o'rnatilmagan bo'lsa yoki o'zgarishlar yo'q bo'lsa, save qilmaymiz
-    console.log("🚀 ~ file: constructor.tsx:69 ~ isDirty:", isDirty);
-    console.log("🚀 ~ file: constructor.tsx:70 ~ initialState:", initialState);
-
-    if (!initialState || !isDirty) {
+    // Agar countdown yo'q bo'lsa, interval ni tozalaymiz
+    if (countdownRemaining === null) {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
       return;
     }
 
-    // Agar eski taymer bo'lsa, uni tozalaymiz
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
+    // Agar countdown 0 ga yetgan bo'lsa, save qilamiz
+    if (countdownRemaining <= 0) {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
 
-    // Yangi taymerni o'rnatamiz. 2 sekunddan so'ng saqlaydi.
-    saveTimeoutRef.current = setTimeout(() => {
-      // Faqatgina o'zgarish bo'lgandagina saqlash
-      if (isDirty) {
+      // Agar hali ham o'zgarishlar bo'lsa, save qilamiz
+      if (isDirty && initialState) {
         saveFlow(id);
       }
-    }, 2000); // 2000ms = 2 sekund
+      return;
+    }
 
-    // Komponent yo'q qilinganda taymerni tozalash uchun
+    // Countdown ni har 100ms da kamaytiramiz
+    countdownIntervalRef.current = setInterval(() => {
+      const current = useFlowStore.getState().countdownRemaining;
+      if (current !== null && current > 0) {
+        useFlowStore.setState({
+          countdownRemaining: Math.max(0, current - 100),
+        });
+      } else {
+        if (countdownIntervalRef.current) {
+          clearInterval(countdownIntervalRef.current);
+          countdownIntervalRef.current = null;
+        }
+      }
+    }, 100);
+
     return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
       }
     };
-  }, [nodes, edges, isDirty, initialState, saveFlow, id]); // nodes, edges, isDirty yoki saveFlow o'zgarganda ishlaydi
+  }, [countdownRemaining, isDirty, initialState, saveFlow, id]);
+
+  // Bu useEffect nodes va edges o'zgarishini kuzatib boradi va countdown ni boshlaydi
+  useEffect(() => {
+    // Agar initial state hali o'rnatilmagan bo'lsa yoki o'zgarishlar yo'q bo'lsa, countdown ni to'xtatamiz
+    if (!initialState || !isDirty) {
+      stopCountdown();
+      return;
+    }
+
+    // Countdown ni boshlaymiz
+    startCountdown();
+  }, [nodes, edges, isDirty, initialState, startCountdown, stopCountdown]);
 
   const handlePaletteSelect = (element: ElementItemType) => {
     const position = screenToFlowPosition(mousePosition);
@@ -140,7 +173,7 @@ function FlowchartInner() {
   return (
     <div
       ref={reactFlowWrapper}
-      className="w-full h-[calc(100vh-56px)] outline-none" // `tabIndex` hook ichida o'rnatiladi
+      className="w-full h-[calc(100vh-56px)] outline-none relative" // `tabIndex` hook ichida o'rnatiladi
       onDrop={onDrop}
       onDragOver={onDragOver}
       onMouseDown={handleContainerClick}
@@ -161,6 +194,7 @@ function FlowchartInner() {
         minZoom={0.1}
         maxZoom={2}
       >
+        <SaveStatusBadge className="absolute top-2 right-2 z-20" />
         <Background gap={24} color="#666" />
         <MiniMap />
         <Controls />

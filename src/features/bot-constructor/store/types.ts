@@ -39,6 +39,11 @@ export interface FlowStoreState extends FlowSlice, ClipboardSlice, Actions {
   initialState: { nodes: Node[]; edges: Edge[] } | null;
   isDirty: boolean;
   isLoading: boolean;
+  lastSavedTime: Date | null;
+  countdownRemaining: number | null; // Sanoq qolgan vaqt (millisekundlarda)
+  countdownDuration: number; // Sanoq umumiy vaqti (millisekundlarda)
   isCtrlPressed: boolean;
   setCtrlPressed: (isPressed: boolean) => void;
+  startCountdown: () => void;
+  stopCountdown: () => void;
 }

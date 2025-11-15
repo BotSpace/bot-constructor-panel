@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { BugPlay, RotateCcw, StopCircle } from "lucide-react";
+import { BotMessageSquare, BugPlay, RotateCcw, StopCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 
@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { AddEnvDialog } from "../add-env";
+import { ButtonGroup } from "@/components/ui/button-group";
+import DebugBotEdit from "../debug-bot-edit";
 
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugActions() {
@@ -87,10 +89,17 @@ export default function DebugActions() {
                 <span className="animate-pulse">Starting...</span>
               </Button>
             ) : (
-              <Button onClick={handleRunAndReloadBot} variant="outline">
-                <BugPlay />
-                DEBUG
-              </Button>
+              <ButtonGroup>
+                <Button onClick={handleRunAndReloadBot} variant="outline">
+                  <BugPlay />
+                  DEBUG
+                </Button>
+                <DebugBotEdit>
+                  <Button className="cursor-pointer" variant={"outline"}>
+                    <BotMessageSquare />
+                  </Button>
+                </DebugBotEdit>
+              </ButtonGroup>
             )}
           </>
         )}
