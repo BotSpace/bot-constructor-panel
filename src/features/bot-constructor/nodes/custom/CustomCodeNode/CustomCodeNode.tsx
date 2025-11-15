@@ -57,15 +57,15 @@ const CustomCodeNodeComponent = ({
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleSave = (newCode: string) => {
-    updateNodeData(id, { pythonCode: newCode });
+    updateNodeData(id, { jsCode: newCode });
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateNodeData(id, { nodeTitle: e.target.value });
   };
 
-  const hasCode = data.pythonCode && data.pythonCode.trim() !== "";
-  const codePreview = generateCodePreview(data.pythonCode);
+  const hasCode = data.jsCode && data.jsCode.trim() !== "";
+  const codePreview = generateCodePreview(data.jsCode);
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -97,7 +97,7 @@ const CustomCodeNodeComponent = ({
           </div>
 
           <CodeEditorDialog
-            initialCode={data.pythonCode || DEFAULT_CODE}
+            initialCode={data.jsCode || DEFAULT_CODE}
             onSave={handleSave}
             contextType={"message"}
           >

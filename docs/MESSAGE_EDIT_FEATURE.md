@@ -84,7 +84,7 @@ export interface EditMessageNodeData {
   editType: EditMessageType;
 
   // Text edit uchun
-  newText?: string;
+  messageText?: string;
   parseMode?: ParseMode;
 
   // Caption edit uchun (media uchun)
