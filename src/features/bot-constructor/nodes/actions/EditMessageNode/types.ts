@@ -1,4 +1,3 @@
-// import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 import { KeyboardConfig, ParseMode } from "../TextMessageNode/types";
 
 export type EditMessageType = "text" | "caption" | "keyboard" | "media";
@@ -14,7 +13,7 @@ export interface EditMessageNodeData {
   editType?: EditMessageType;
 
   // Text edit uchun
-  messageText?: string;
+  newText?: string;
   parseMode?: ParseMode;
 
   // Caption edit uchun (media uchun)
