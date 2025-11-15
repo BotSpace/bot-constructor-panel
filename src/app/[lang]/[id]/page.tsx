@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConstructorPageHeader } from "@/components/layout/header";
 import { LogViewer } from "@/components/common/log-viewer";
+import { DebugConsole } from "@/components/layout/components/debug-console";
 
 export default function Page() {
   const { id }: { id: string } = useParams();
@@ -170,6 +171,7 @@ export default function Page() {
           <LogViewer projectId={project.debug.service_id} />
         )}
       </div>
+      <DebugConsole />
     </div>
   );
 }
