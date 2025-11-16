@@ -36,7 +36,6 @@ function ReleasePanel() {
       })
       .then(() => {
         toast.success("Telegram bot relase qilindi", { id: toastId });
-        loadProject(id);
       })
       .catch(() => {
         toast.error("Xatolik yuz berdi", { id: toastId });
@@ -77,6 +76,18 @@ function ReleasePanel() {
         Publish
       </Button>
     );
+
+  if (project.release.status === "initializing") {
+    return (
+      <Button
+        onClick={() => handleCreateRelease()}
+        className="bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200"
+        disabled
+      >
+        Publishing...
+      </Button>
+    );
+  }
 
   return (
     <ReleaseDropDown lang={lang} id={id} onPublish={handleCreateRelease} />

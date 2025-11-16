@@ -112,7 +112,7 @@ export function DebugConsole() {
     }
 
     // SSE connection
-    const url = `https://botlarnionasi.jscorp.uz/sse/api/project/${serviceId}/logs/`;
+    const url = `https://botlarnionasi.jscorp.uz/sse/api/project/${project?.release?.service_id}/logs/`;
     eventSourceRef.current = new EventSource(url);
 
     eventSourceRef.current.onopen = () => {

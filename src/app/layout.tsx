@@ -9,6 +9,7 @@ import { NextIntlClientProvider } from "next-intl";
 import AuthProvider from "./AuthProvider";
 import ReactQueryProvider from "./ReactQueryProvider";
 import { Toaster } from "react-hot-toast";
+import { WebSocketProvider } from "@/wss/web-socket-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,14 +39,16 @@ export default function RootLayout({
         <ReactQueryProvider>
           <AuthProvider>
             <NextIntlClientProvider>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-              >
-                {children}
-                <Toaster position="top-center" reverseOrder={false} />
-              </ThemeProvider>
+              <WebSocketProvider>
+                <ThemeProvider
+                  attribute="class"
+                  defaultTheme="system"
+                  enableSystem
+                >
+                  {children}
+                  <Toaster position="top-center" reverseOrder={false} />
+                </ThemeProvider>
+              </WebSocketProvider>
             </NextIntlClientProvider>
           </AuthProvider>
         </ReactQueryProvider>

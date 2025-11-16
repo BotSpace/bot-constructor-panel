@@ -10,7 +10,6 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConstructorPageHeader } from "@/components/layout/header";
-import { LogViewer } from "@/components/common/log-viewer";
 import { DebugConsole } from "@/components/layout/components/debug-console";
 
 export default function Page() {
@@ -159,16 +158,9 @@ export default function Page() {
         {project ? (
           <main className="flex-1 flex flex-col">
             <Constructor />
-            {project.debug.service_id && (
-              <LogViewer projectId={project.debug.service_id} />
-            )}
           </main>
         ) : (
           <ConstructorLoadingSkeletions />
-        )}
-        {/* live debug logs */}
-        {project?.debug.service_id && (
-          <LogViewer projectId={project.debug.service_id} />
         )}
       </div>
       <DebugConsole />
