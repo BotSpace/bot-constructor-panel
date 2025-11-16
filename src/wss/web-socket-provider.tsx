@@ -9,12 +9,13 @@ type WebSocketType = WebSocket | null;
 const WebSocketContext = createContext<WebSocketType>(null);
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
-  const { changeRelease } = useProjectStore();
+  const { changeRelease, project, changeDebug } = useProjectStore();
   const socketRef = useRef<WebSocketType>(null);
   const session = useSession();
 
   useEffect(() => {
-    if (!socketRef.current && session.status === "authenticated") {
+    console.log(project);
+    if (!socketRef.current && session.status === "authenticated" && project) {
       const ws = new WebSocket(
         `wss://botlarnionasi.jscorp.uz/ws/events/?token=${session.data.user.access}`
       );
@@ -27,10 +28,13 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
         switch (message["event"]) {
           case "release_status":
-            changeRelease(message["data"]);
+            const version = message["data"]["version"];
+            if (version > (project.release?.version || 0))
+              changeRelease(message["data"]);
             break;
           case "debug_status":
-
+            changeDebug(message["data"]);
+            break;
           default:
             break;
         }
@@ -42,7 +46,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       };
       ws.onclose = () => console.log("WS closed");
     }
-  }, [session.status]);
+  }, [session.status, project]);
 
   return (
     <WebSocketContext.Provider value={socketRef.current}>

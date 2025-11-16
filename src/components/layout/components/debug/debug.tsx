@@ -17,7 +17,7 @@ import DebugBotEdit from "../debug-bot-edit";
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugActions() {
   const { id }: { id: string } = useParams();
-  const { loadProject, project, changeProjectStatus } = useProjectStore();
+  const { loadProject, project, changeDebug } = useProjectStore();
 
   /* ----------------------- Prevent Ctrl+R (refresh) ----------------------- */
   useEffect(() => {
@@ -31,11 +31,10 @@ export default function DebugActions() {
   }, []);
 
   /* --------------------------- Debug bot actions --------------------------- */
-  function handleRunAndReloadBot() {
+  function handleRunAndRelaodDebugBot() {
     instanceAuth
       .get(`/project/${id}/debug/`)
       .then(() => {
-        changeProjectStatus("initializing");
         toast.success("Bot ishga tushirilmoqda...");
       })
       .catch(() => {
@@ -48,7 +47,6 @@ export default function DebugActions() {
       .get(`/project/${id}/stop/`)
       .then(() => {
         toast.success("Bot muvaffaqiyatli to'xtatildi!");
-        changeProjectStatus("stopped");
       })
       .catch(() => {
         toast.error("Botni to'xtatishda xatolik yuz berdi.");
@@ -76,7 +74,7 @@ export default function DebugActions() {
                   <StopCircle />
                 </Button>
                 <Button
-                  onClick={handleRunAndReloadBot}
+                  onClick={handleRunAndRelaodDebugBot}
                   variant="outline"
                   className="cursor-pointer"
                   size={"icon"}
@@ -90,7 +88,7 @@ export default function DebugActions() {
               </Button>
             ) : (
               <ButtonGroup>
-                <Button onClick={handleRunAndReloadBot} variant="outline">
+                <Button onClick={handleRunAndRelaodDebugBot} variant="outline">
                   <BugPlay />
                   DEBUG
                 </Button>

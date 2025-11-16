@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
@@ -36,10 +36,25 @@ export function ButtonGenerator({
     getFinalKeyboardConfig,
   } = useButtonGeneratorState(isOpen, initialKeyboard);
 
-  const handleSaveChanges = () => {
-    onSave(getFinalKeyboardConfig());
-    setIsOpen(false);
-  };
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      onSave(getFinalKeyboardConfig());
+    }, 500);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [isOpen, currentButtons, activeTab]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -62,7 +77,6 @@ export function ButtonGenerator({
             onSelectRow={setSelectedRowIndex}
             onAddRow={handleAddRow}
             onRemoveButton={handleRemoveButton}
-            onSaveChanges={handleSaveChanges}
           />
         </div>
       </DialogContent>

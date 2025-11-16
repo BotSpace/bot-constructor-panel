@@ -103,6 +103,7 @@ export function AddNewCollectionModal({
                   <SelectItem value="text">Text</SelectItem>
                   <SelectItem value="number">Number</SelectItem>
                   <SelectItem value="bool">Boolean</SelectItem>
+                  <SelectItem value="date">Date</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

@@ -10,6 +10,7 @@ interface ProjectState {
   loadProject: (project_id: string) => void;
   changeProject: (project: ProjectRetrive) => void;
   changeRelease: (release: ProjectRetrive["release"]) => void;
+  changeDebug: (debug: ProjectRetrive["debug"]) => void;
 }
 
 const useProjectStore = create<ProjectState>((set, get) => ({
@@ -47,6 +48,18 @@ const useProjectStore = create<ProjectState>((set, get) => ({
       project: {
         ...project,
         release: release,
+      },
+    });
+  },
+  // change debug
+  changeDebug: (debug) => {
+    const project = get().project;
+    if (!project) return; // project null bo'lsa, hech narsa qilmaymiz
+
+    set({
+      project: {
+        ...project,
+        debug: debug,
       },
     });
   },

@@ -12,7 +12,6 @@ interface KeyboardPreviewProps {
   onSelectRow: (index: number) => void;
   onAddRow: () => void;
   onRemoveButton: (rowIndex: number, buttonId: string) => void;
-  onSaveChanges: () => void;
 }
 
 export const KeyboardPreview = ({
@@ -22,7 +21,6 @@ export const KeyboardPreview = ({
   onSelectRow,
   onAddRow,
   onRemoveButton,
-  onSaveChanges,
 }: KeyboardPreviewProps) => (
   <div className="md:col-span-8 flex flex-col gap-3 rounded-lg border bg-muted p-4 h-full w-full">
     <div className="flex justify-between items-center mb-2">
@@ -44,11 +42,6 @@ export const KeyboardPreview = ({
           onRemoveButton={(buttonId) => onRemoveButton(rowIndex, buttonId)}
         />
       ))}
-    </div>
-    <div className="mt-auto pt-4 border-t">
-      <Button className="w-full" onClick={onSaveChanges}>
-        Saqlash
-      </Button>
     </div>
   </div>
 );
