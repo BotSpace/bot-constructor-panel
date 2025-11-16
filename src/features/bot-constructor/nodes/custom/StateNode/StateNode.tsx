@@ -18,6 +18,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   // --- O'ZGARTIRISH: Mantiq to'liq yangilandi va soddalashtirildi ---
+  // --- O'ZGARTIRISH: Mantiq to'liq yangilandi va soddalashtirildi ---
   const availableTypes = useMemo<{
     dynamic: string[];
     default: string[];
@@ -54,16 +55,17 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
       `language_code`,
       `is_bot`,
       `is_premium`,
+      `message_id`,
+      `chat_id`,
     ];
     let dynamicFilters: string[] = [];
 
     switch (parentNodeData.node_type) {
       case "MessageTriggerNode":
-        // Parent node'ning type'iga qarab dynamic ma'lumotlar
         const messageType = parentNodeData.type;
         switch (messageType) {
           case "phone":
-            dynamicFilters = ["phone"];
+            dynamicFilters = ["phone_number"];
             break;
           case "text":
             dynamicFilters = ["text"];
@@ -72,7 +74,13 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
             dynamicFilters = ["location", "latitude", "longitude"];
             break;
           case "contact":
-            dynamicFilters = ["contact"];
+            dynamicFilters = [
+              "contact_user_id",
+              "contact_first_name",
+              "contact_last_name",
+              "contact_phone_number",
+              "contact_vcard",
+            ];
             break;
           case "document":
             dynamicFilters = [
@@ -80,41 +88,211 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
               "mime_type",
               "file_name",
               "file_size",
-              "file_path",
+              "file_unique_id", // Yangi: Telegram file_unique_id
+              "file_id", // Yangi: Telegram file_id
+              "caption", // Yangi: Hujjat uchun sarlavha
             ];
             break;
           case "photo":
-            dynamicFilters = ["photo"];
+            dynamicFilters = [
+              "photo",
+              "photo_file_id",
+              "photo_file_unique_id",
+              "photo_width",
+              "photo_height",
+              "photo_file_size",
+              "caption",
+            ];
             break;
           case "video":
-            dynamicFilters = ["video"];
+            dynamicFilters = [
+              "video",
+              "video_file_id",
+              "video_file_unique_id",
+              "video_width",
+              "video_height",
+              "video_duration",
+              "video_mime_type",
+              "video_file_size",
+              "caption",
+              "thumbnail_file_id", // Yangi: Video uchun thumbnail
+              "thumbnail_file_unique_id",
+              "thumbnail_width",
+              "thumbnail_height",
+              "thumbnail_file_size",
+            ];
             break;
           case "audio":
-            dynamicFilters = ["audio"];
+            dynamicFilters = [
+              "audio",
+              "audio_file_id",
+              "audio_file_unique_id",
+              "audio_duration",
+              "audio_mime_type",
+              "audio_file_size",
+              "audio_title",
+              "audio_performer",
+              "caption",
+            ];
+            break;
+          case "voice": // Yangi: Ovozli xabar
+            dynamicFilters = [
+              "voice",
+              "voice_file_id",
+              "voice_file_unique_id",
+              "voice_duration",
+              "voice_mime_type",
+              "voice_file_size",
+              "caption",
+            ];
+            break;
+          case "video_note": // Yangi: Dumaloq video xabar
+            dynamicFilters = [
+              "video_note",
+              "video_note_file_id",
+              "video_note_file_unique_id",
+              "video_note_length",
+              "video_note_duration",
+              "video_note_file_size",
+              "thumbnail_file_id",
+              "thumbnail_file_unique_id",
+              "thumbnail_width",
+              "thumbnail_height",
+              "thumbnail_file_size",
+            ];
             break;
           case "sticker":
-            dynamicFilters = ["sticker"];
+            dynamicFilters = [
+              "sticker",
+              "sticker_file_id",
+              "sticker_file_unique_id",
+              "sticker_width",
+              "sticker_height",
+              "sticker_emoji",
+              "sticker_set_name",
+              "sticker_is_animated",
+              "sticker_is_video",
+              "sticker_file_size",
+            ];
+            break;
+          case "animation": // Yangi: GIF animatsiya
+            dynamicFilters = [
+              "animation",
+              "animation_file_id",
+              "animation_file_unique_id",
+              "animation_width",
+              "animation_height",
+              "animation_duration",
+              "animation_file_name",
+              "animation_mime_type",
+              "animation_file_size",
+              "caption",
+              "thumbnail_file_id",
+              "thumbnail_file_unique_id",
+              "thumbnail_width",
+              "thumbnail_height",
+              "thumbnail_file_size",
+            ];
+            break;
+          case "game": // Yangi: O'yin
+            dynamicFilters = [
+              "game",
+              "game_title",
+              "game_description",
+              "game_photo",
+              "game_text",
+              "game_text_entities",
+              "game_animation",
+            ];
+            break;
+          case "poll": // Yangi: So'rovnoma
+            dynamicFilters = [
+              "poll",
+              "poll_id",
+              "poll_question",
+              "poll_options", // Har bir option: text, voter_count
+              "poll_total_voter_count",
+              "poll_is_closed",
+              "poll_is_anonymous",
+              "poll_type",
+              "poll_allows_multiple_answers",
+              "poll_correct_option_id",
+              "poll_explanation",
+              "poll_explanation_entities",
+              "poll_open_period",
+              "poll_close_date",
+            ];
+            break;
+          case "venue": // Yangi: joy (Venue)
+            dynamicFilters = [
+              "venue",
+              "venue_location_latitude",
+              "venue_location_longitude",
+              "venue_title",
+              "venue_address",
+              "venue_foursquare_id",
+              "venue_foursquare_type",
+              "venue_google_place_id",
+              "venue_google_place_type",
+            ];
+            break;
+          case "invoice": // Yangi: To'lov schyoti
+            dynamicFilters = [
+              "invoice",
+              "invoice_title",
+              "invoice_description",
+              "invoice_start_parameter",
+              "invoice_currency",
+              "invoice_total_amount",
+            ];
+            break;
+          case "successful_payment": // Yangi: Muvaffaqiyatli to'lov
+            dynamicFilters = [
+              "successful_payment",
+              "successful_payment_currency",
+              "successful_payment_total_amount",
+              "successful_payment_invoice_payload",
+              "successful_payment_shipping_option_id",
+              "successful_payment_order_info", // Yangi: OrderInfo obyekti
+              "successful_payment_telegram_payment_charge_id",
+              "successful_payment_provider_payment_charge_id",
+            ];
+            break;
+          case "web_app_data": // Yangi: Web App dan kelgan ma'lumot
+            dynamicFilters = [
+              "web_app_data",
+              "web_app_data_text",
+              "web_app_data_button_text",
+            ];
+            break;
+          case "dice": // Yangi: Kubik
+            dynamicFilters = ["dice", "dice_emoji", "dice_value"];
             break;
           case "any":
           case "any_text":
-            // "Har qanday" turlari uchun dynamic filter yo'q
-            dynamicFilters = [];
+            dynamicFilters = []; // "Har qanday" turlari uchun maxsus dinamik filter yo'q
             break;
           default:
-            // Agar type belgilanmagan bo'lsa, filter'ga qarab tekshiramiz
+            // Agar messageType belgilanmagan bo'lsa, filter'ga qarab tekshiramiz (eski mantiqni saqlaymiz, lekin yangi turlarni ustun qilamiz)
             const messageFilter = parentNodeData.filter;
             switch (messageFilter) {
               case "phone":
-                dynamicFilters = ["phone"];
+                dynamicFilters = ["phone_number"]; // To'g'irlandi
                 break;
               case "text":
-                dynamicFilters = ["text"];
+                dynamicFilters = ["text"]; // To'g'irlandi
                 break;
               case "location":
                 dynamicFilters = ["location", "latitude", "longitude"];
                 break;
               case "contact":
-                dynamicFilters = ["contact"];
+                dynamicFilters = [
+                  "contact_user_id",
+                  "contact_first_name",
+                  "contact_last_name",
+                  "contact_phone_number",
+                  "contact_vcard",
+                ]; // To'g'irlandi
                 break;
               case "document":
                 dynamicFilters = [
@@ -122,33 +300,240 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
                   "mime_type",
                   "file_name",
                   "file_size",
-                  "file_path",
+                  "file_unique_id",
+                  "file_id",
+                  "caption",
                 ];
                 break;
               case "photo":
-                dynamicFilters = ["photo"];
+                dynamicFilters = [
+                  "photo",
+                  "photo_file_id",
+                  "photo_file_unique_id",
+                  "photo_width",
+                  "photo_height",
+                  "photo_file_size",
+                  "caption",
+                ];
                 break;
               case "video":
-                dynamicFilters = ["video"];
+                dynamicFilters = [
+                  "video",
+                  "video_file_id",
+                  "video_file_unique_id",
+                  "video_width",
+                  "video_height",
+                  "video_duration",
+                  "video_mime_type",
+                  "video_file_size",
+                  "caption",
+                  "thumbnail_file_id",
+                  "thumbnail_file_unique_id",
+                  "thumbnail_width",
+                  "thumbnail_height",
+                  "thumbnail_file_size",
+                ];
                 break;
               case "audio":
-                dynamicFilters = ["audio"];
+                dynamicFilters = [
+                  "audio",
+                  "audio_file_id",
+                  "audio_file_unique_id",
+                  "audio_duration",
+                  "audio_mime_type",
+                  "audio_file_size",
+                  "audio_title",
+                  "audio_performer",
+                  "caption",
+                ];
+                break;
+              case "voice":
+                dynamicFilters = [
+                  "voice",
+                  "voice_file_id",
+                  "voice_file_unique_id",
+                  "voice_duration",
+                  "voice_mime_type",
+                  "voice_file_size",
+                  "caption",
+                ];
+                break;
+              case "video_note":
+                dynamicFilters = [
+                  "video_note",
+                  "video_note_file_id",
+                  "video_note_file_unique_id",
+                  "video_note_length",
+                  "video_note_duration",
+                  "video_note_file_size",
+                  "thumbnail_file_id",
+                  "thumbnail_file_unique_id",
+                  "thumbnail_width",
+                  "thumbnail_height",
+                  "thumbnail_file_size",
+                ];
                 break;
               case "sticker":
-                dynamicFilters = ["sticker"];
+                dynamicFilters = [
+                  "sticker",
+                  "sticker_file_id",
+                  "sticker_file_unique_id",
+                  "sticker_width",
+                  "sticker_height",
+                  "sticker_emoji",
+                  "sticker_set_name",
+                  "sticker_is_animated",
+                  "sticker_is_video",
+                  "sticker_file_size",
+                ];
+                break;
+              case "animation":
+                dynamicFilters = [
+                  "animation",
+                  "animation_file_id",
+                  "animation_file_unique_id",
+                  "animation_width",
+                  "animation_height",
+                  "animation_duration",
+                  "animation_file_name",
+                  "animation_mime_type",
+                  "animation_file_size",
+                  "caption",
+                  "thumbnail_file_id",
+                  "thumbnail_file_unique_id",
+                  "thumbnail_width",
+                  "thumbnail_height",
+                  "thumbnail_file_size",
+                ];
+                break;
+              case "game":
+                dynamicFilters = [
+                  "game",
+                  "game_title",
+                  "game_description",
+                  "game_photo",
+                  "game_text",
+                  "game_text_entities",
+                  "game_animation",
+                ];
+                break;
+              case "poll":
+                dynamicFilters = [
+                  "poll",
+                  "poll_id",
+                  "poll_question",
+                  "poll_options",
+                  "poll_total_voter_count",
+                  "poll_is_closed",
+                  "poll_is_anonymous",
+                  "poll_type",
+                  "poll_allows_multiple_answers",
+                  "poll_correct_option_id",
+                  "poll_explanation",
+                  "poll_explanation_entities",
+                  "poll_open_period",
+                  "poll_close_date",
+                ];
+                break;
+              case "venue":
+                dynamicFilters = [
+                  "venue",
+                  "venue_location_latitude",
+                  "venue_location_longitude",
+                  "venue_title",
+                  "venue_address",
+                  "venue_foursquare_id",
+                  "venue_foursquare_type",
+                  "venue_google_place_id",
+                  "venue_google_place_type",
+                ];
+                break;
+              case "invoice":
+                dynamicFilters = [
+                  "invoice",
+                  "invoice_title",
+                  "invoice_description",
+                  "invoice_start_parameter",
+                  "invoice_currency",
+                  "invoice_total_amount",
+                ];
+                break;
+              case "successful_payment":
+                dynamicFilters = [
+                  "successful_payment",
+                  "successful_payment_currency",
+                  "successful_payment_total_amount",
+                  "successful_payment_invoice_payload",
+                  "successful_payment_shipping_option_id",
+                  "successful_payment_order_info",
+                  "successful_payment_telegram_payment_charge_id",
+                  "successful_payment_provider_payment_charge_id",
+                ];
+                break;
+              case "web_app_data":
+                dynamicFilters = [
+                  "web_app_data",
+                  "web_app_data_text",
+                  "web_app_data_button_text",
+                ];
+                break;
+              case "dice":
+                dynamicFilters = ["dice", "dice_emoji", "dice_value"];
                 break;
             }
             break;
         }
         break;
       case "ReplyButtonTriggerNode":
-        dynamicFilters = [];
+        // ReplyButton bosilganda, odatda uning matni oddiy "text" xabar sifatida keladi.
+        // Agar callback_data bo'lsa, u "CallbackQueryTriggerNode" tomonidan ushlanadi.
+        // Shuning uchun bu yerda faqat "text" ni qo'shish mantiqiy.
+        dynamicFilters = ["text"];
         break;
       case "CommandTriggerNode":
-        dynamicFilters = [];
+        // Buyruq ham matnli xabar sifatida keladi.
+        dynamicFilters = ["text", "command"]; // "command" - bu buyruqning o'zi (/start kabi)
         break;
       case "CallbackQueryTriggerNode":
-        dynamicFilters = [];
+        // CallbackQuery yuborilganda, asosiy ma'lumot 'data' hisoblanadi.
+        dynamicFilters = [
+          "callback_query_id",
+          "from_user_id",
+          "chat_instance",
+          "data",
+          "inline_message_id",
+          "game_short_name",
+        ];
+        break;
+      // TODO: Shu nodeni qo'shish kerak kelajakda
+      case "ChannelPostTriggerNode": // Yangi: Kanal posti uchun trigger
+        // Kanal postlari MessageTriggerNode'ga o'xshash bo'lishi mumkin, lekin ayrim farqlari bor.
+        // Misol uchun, channel_post.author_signature kabi ma'lumotlar bo'lishi mumkin.
+        // Hozircha MessageTriggerNode'dagilarni o'zlashtiramiz va keyinroq kerak bo'lsa kengaytiramiz.
+        // Bu yerda dynamicFilters ni MessageTriggerNode dagidek kengaytirish mumkin.
+        // Sodda holda, hozircha "text", "photo", "video" va "caption"ni qo'shamiz.
+        dynamicFilters = ["text", "photo", "video", "caption"];
+        break;
+      case "EditedMessageTriggerNode": // Yangi: Tahrirlangan xabar triggeri
+        // Tahrirlangan xabar asl xabarga o'xshash ma'lumotlarni o'z ichiga oladi.
+        // Agar MessageTriggerNode ichidagi barcha turlar tahrirlansa, ularning ma'lumotlari bu yerda ham mavjud bo'ladi.
+        // Misol uchun, matnli xabar tahrirlansa, "text" mavjud bo'ladi.
+        // Bu yerda MessageTriggerNode'dagilarning deyarli barchasi mos keladi.
+        dynamicFilters = [
+          "text",
+          "photo",
+          "video",
+          "audio",
+          "voice",
+          "document",
+          "sticker",
+          "animation",
+          "caption",
+        ];
+        break;
+      // Qo'shimcha trigger turlarini shu yerga qo'shishingiz mumkin, masalan, InlineQuery, ChosenInlineResult va h.k.
+      default:
+        dynamicFilters = []; // Boshqa trigger turlari uchun dinamik filtrlar yo'q
         break;
     }
 

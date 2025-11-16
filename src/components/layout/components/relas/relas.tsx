@@ -22,6 +22,8 @@ import { instanceAuth } from "@/services/instance";
 import toast from "react-hot-toast";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { useLinkToParent } from "@/components/common/link-to-parrent";
+import Link from "next/link";
+import StatusBadge from "@/components/common/status-badge";
 
 function ReleasePanel() {
   const { id, lang }: { id: string; lang: string } = useParams();
@@ -104,6 +106,8 @@ function ReleaseDropDown({
   lang: string;
   onPublish: () => void;
 }) {
+  const { loadProject, loading, project } = useProjectStore();
+
   const { handleClick } = useLinkToParent({
     href: `/${lang}/bot/${id}/release`,
     onClick: (e) => console.log("Clicked!"),
@@ -119,20 +123,27 @@ function ReleaseDropDown({
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end">
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Bot />
-              <span className="text-muted-foreground">@coffechi_uz_bot</span>
-              <DropdownMenuShortcut>
-                <ExternalLink />
-              </DropdownMenuShortcut>
+            <DropdownMenuItem asChild>
+              <Link href={"https://t.me/" + project?.username}>
+                <Bot />
+                <span className="text-muted-foreground">
+                  @{project?.username}
+                </span>
+                <DropdownMenuShortcut>
+                  <ExternalLink />
+                </DropdownMenuShortcut>
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleClick}>
-              <ListTree />
-              1h ago version 10.1
-              <DropdownMenuShortcut>
-                <ChevronRight />
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
+            {project?.release?.status && (
+              <DropdownMenuItem onClick={handleClick}>
+                <ListTree />
+                Version {project.release.version}
+                <StatusBadge status={project.release.status} />
+                <DropdownMenuShortcut>
+                  <ChevronRight />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem>
               <Activity />
               12 changes
