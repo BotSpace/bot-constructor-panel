@@ -96,13 +96,7 @@ export function AddEnvDialog({
           <DialogDescription>{dialog_description}</DialogDescription>
         </DialogHeader>
 
-        <div className="mt-4 space-y-3">
-          <div className="text-sm text-muted-foreground">
-            Kalit: <span className="font-medium">{env_name}</span>
-            {" • "}
-            Loyihasi ID: <span className="font-medium">{project_id}</span>
-          </div>
-
+        <div className="space-y-3">
           <label className="text-sm font-medium">Bot token</label>
           <Input
             placeholder="Bot tokenini kiriting"

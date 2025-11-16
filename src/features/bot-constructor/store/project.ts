@@ -9,12 +9,15 @@ interface ProjectState {
   loading: boolean;
   loadProject: (project_id: string) => void;
   changeProject: (project: ProjectRetrive) => void;
-  changeProjectStatus: (status: ProjectRetrive["debug"]["status"]) => void;
+  changeRelease: (release: ProjectRetrive["release"]) => void;
 }
 
 const useProjectStore = create<ProjectState>((set, get) => ({
+  // datas
   project: null,
   loading: true,
+
+  // actions
   loadProject(project_id) {
     set({ loading: true });
 
@@ -30,25 +33,22 @@ const useProjectStore = create<ProjectState>((set, get) => ({
         set({ loading: false });
       });
   },
+
+  // changes
   changeProject: (project: ProjectRetrive) => {
     set({ project: project });
   },
-
-  changeProjectStatus: (status) => {
+  // change release
+  changeRelease: (release) => {
     const project = get().project;
-    if (project && project.debug) {
-      set({
-        ...get(),
-        project: {
-          ...project,
-          debug: {
-            id: project.debug.id,
-            service_id: project.debug.service_id,
-            status: status,
-          },
-        },
-      });
-    }
+    if (!project) return; // project null bo'lsa, hech narsa qilmaymiz
+
+    set({
+      project: {
+        ...project,
+        release: release,
+      },
+    });
   },
 }));
 
