@@ -33,7 +33,7 @@ interface BotInfoDialogProps {
 }
 
 export default function DebugBotEdit({ children }: BotInfoDialogProps) {
-  const { loadProject, project, changeProjectStatus } = useProjectStore();
+  const { project } = useProjectStore();
 
   const [botData, setBotData] = useState({
     id: 7979771827,
