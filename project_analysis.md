@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 11/9/2025, 6:09:20 PM
+Sana: 11/17/2025, 12:07:44 AM
 
 ## 📁 Fayl Strukturasi
 
@@ -10,6 +10,11 @@ constructor-next-js
 │   ├── config.ini
 │   └── language_cache
 ├── .env
+├── .env.example
+├── .eslintrc.json
+├── .github
+│   └── workflows
+│       └── deploy.yaml
 ├── .gitignore
 ├── Dockerfile
 ├── README.md
@@ -34,21 +39,22 @@ constructor-next-js
 │   ├── app
 │   │   ├── AuthProvider.tsx
 │   │   ├── ReactQueryProvider.tsx
-│   │   ├── [id]
-│   │   │   ├── collection
-│   │   │   │   ├── components
-│   │   │   │   │   ├── add-collection-modal.tsx
-│   │   │   │   │   ├── collection-modal.tsx
-│   │   │   │   │   ├── content-table.tsx
-│   │   │   │   │   ├── data-rows.tsx
-│   │   │   │   │   ├── empty-state.tsx
-│   │   │   │   │   ├── new-item-row.tsx
-│   │   │   │   │   ├── sidebar.tsx
-│   │   │   │   │   ├── table-header.tsx
-│   │   │   │   │   └── utils.ts
-│   │   │   │   └── page.tsx
-│   │   │   ├── page.tsx
-│   │   │   └── send-message
+│   │   ├── [lang]
+│   │   │   └── [id]
+│   │   │       ├── collection
+│   │   │       │   ├── components
+│   │   │       │   │   ├── add-collection-modal.tsx
+│   │   │       │   │   ├── collection-modal.tsx
+│   │   │       │   │   ├── content-table.tsx
+│   │   │       │   │   ├── data-rows.tsx
+│   │   │       │   │   ├── empty-state.tsx
+│   │   │       │   │   ├── new-item-row.tsx
+│   │   │       │   │   ├── sidebar.tsx
+│   │   │       │   │   ├── table-header.tsx
+│   │   │       │   │   └── utils.ts
+│   │   │       │   └── page.tsx
+│   │   │       ├── page.tsx
+│   │   │       └── send-message
 │   │   ├── api
 │   │   │   └── auth
 │   │   │       ├── [...nextauth]
@@ -63,7 +69,8 @@ constructor-next-js
 │   ├── components
 │   │   ├── common
 │   │   │   ├── i18nLink.tsx
-│   │   │   ├── log-viewer.tsx
+│   │   │   ├── link-to-parrent.tsx
+│   │   │   ├── status-badge.tsx
 │   │   │   ├── theme-provider.tsx
 │   │   │   └── toggle-button.tsx
 │   │   ├── forms
@@ -77,7 +84,8 @@ constructor-next-js
 │   │   │   │   ├── debug
 │   │   │   │   │   ├── debug.tsx
 │   │   │   │   │   └── index.ts
-│   │   │   │   ├── debug-panel.tsx
+│   │   │   │   ├── debug-bot-edit.tsx
+│   │   │   │   ├── debug-console.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   └── relas
 │   │   │   │       └── relas.tsx
@@ -86,6 +94,7 @@ constructor-next-js
 │   │       ├── alert-dialog.tsx
 │   │       ├── alert.tsx
 │   │       ├── badge.tsx
+│   │       ├── button-group.tsx
 │   │       ├── button.tsx
 │   │       ├── card.tsx
 │   │       ├── checkbox.tsx
@@ -147,6 +156,7 @@ constructor-next-js
 │   │   │   │   ├── messages.ts
 │   │   │   │   └── themes.ts
 │   │   │   ├── edges
+│   │   │   │   ├── SelectableEdge.tsx
 │   │   │   │   ├── SmartEdge.tsx
 │   │   │   │   ├── components
 │   │   │   │   │   └── EdgeContextMenu.tsx
@@ -192,6 +202,7 @@ constructor-next-js
 │   │   │   │   ├── useFlowKeyboardShortcuts.ts
 │   │   │   │   └── useMousePosition.ts
 │   │   │   ├── lib
+│   │   │   │   ├── edge-utils.ts
 │   │   │   │   └── geometry.ts
 │   │   │   ├── nodes
 │   │   │   │   ├── actions
@@ -228,6 +239,8 @@ constructor-next-js
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── shared
 │   │   │   │   │       ├── ReactFlowHandlers
+│   │   │   │   │       │   ├── EditMessageHandler.tsx
+│   │   │   │   │       │   ├── EditMessageTarget.tsx
 │   │   │   │   │       │   ├── SourceHandler.tsx
 │   │   │   │   │       │   ├── TargetHandler.tsx
 │   │   │   │   │       │   └── index.ts
@@ -319,18 +332,21 @@ constructor-next-js
 │   │       ├── auth.ts
 │   │       └── bot.ts
 │   ├── styles
-│   └── types
-│       ├── auth
-│       │   ├── get-me.ts
-│       │   └── login.tsx
-│       ├── element-types.ts
-│       └── http
-│           ├── collection.ts
-│           ├── env.ts
-│           ├── error.ts
-│           ├── flow.ts
-│           ├── project.ts
-│           └── response.ts
+│   ├── types
+│   │   ├── auth
+│   │   │   ├── get-me.ts
+│   │   │   └── login.tsx
+│   │   ├── element-types.ts
+│   │   └── http
+│   │       ├── collection.ts
+│   │       ├── env.ts
+│   │       ├── error.ts
+│   │       ├── flow.ts
+│   │       ├── project.ts
+│   │       └── response.ts
+│   └── wss
+│       └── web-socket-provider.tsx
+├── stack.yaml
 └── tsconfig.json
 ```
 
