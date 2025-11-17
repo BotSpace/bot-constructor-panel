@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   constructor:
-    image: jscorptech/botmother-constructor:9
+    image: jscorptech/botmother-constructor:14
     ports:
       - mode: ingress
         target: 3000
