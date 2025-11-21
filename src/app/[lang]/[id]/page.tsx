@@ -156,14 +156,14 @@ export default function Page() {
           </div>
         </ScrollArea>
         {project ? (
-          <main className="flex-1 flex flex-col">
+          <main className="flex-1 flex flex-col relative">
             <Constructor />
+            <DebugConsole />
           </main>
         ) : (
           <ConstructorLoadingSkeletions />
         )}
       </div>
-      <DebugConsole />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { X, Terminal, Trash2, Copy } from "lucide-react";
+import { X, Terminal, Trash2, Copy, TerminalIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useProjectStore from "@/features/bot-constructor/store/project";
 
@@ -30,7 +30,7 @@ export function DebugConsole() {
   // Ctrl + ` bilan toggle
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "`") {
+      if ((e.ctrlKey || e.metaKey) && e.code === "Backquote") {
         e.preventDefault();
         setIsOpen((prev) => !prev);
       }
@@ -112,7 +112,7 @@ export function DebugConsole() {
     }
 
     // SSE connection
-    const url = `https://botlarnionasi.jscorp.uz/sse/api/project/${project?.release?.service_id}/logs/`;
+    const url = `https://botlarnionasi.jscorp.uz/sse/api/project/${serviceId}/logs/`;
     eventSourceRef.current = new EventSource(url);
 
     eventSourceRef.current.onopen = () => {
@@ -217,7 +217,25 @@ export function DebugConsole() {
   const hasDebugBot = !!debugServiceId;
   const hasReleaseBot = !!releaseServiceId;
 
-  if (!isOpen) return null;
+
+  if (!isOpen) return (
+    <button
+      className="
+      h-[50px] w-[50px] rounded-2xl 
+      bg-gradient-to-br from-slate-800 to-slate-900
+      flex items-center justify-center 
+      absolute z-50 bottom-4 left-12
+      shadow-lg hover:shadow-2xl 
+      transform hover:scale-105 active:scale-95
+      transition-all duration-200
+      text-white
+    "
+      onClick={() => setIsOpen(true)} // terminal toggle funksiyasini qo'shing
+    >
+      <TerminalIcon className="w-6 h-6" />
+    </button>
+  );
+
 
   return (
     <div
@@ -317,10 +335,10 @@ export function DebugConsole() {
             {!hasDebugBot && !hasReleaseBot
               ? "No bot configured. Add a debug or release bot to see logs."
               : selectedBot === "debug" && !hasDebugBot
-              ? "Debug bot is not configured."
-              : selectedBot === "release" && !hasReleaseBot
-              ? "Release bot is not configured."
-              : "Waiting for logs..."}
+                ? "Debug bot is not configured."
+                : selectedBot === "release" && !hasReleaseBot
+                  ? "Release bot is not configured."
+                  : "Waiting for logs..."}
           </div>
         ) : (
           <div className="space-y-0.5">
