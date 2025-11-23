@@ -34,10 +34,13 @@ export interface Filter {
   field: string;
   operator: FilterOperator;
   value: string | number | boolean | Date | [Date, Date];
+  valueSource?: "static" | "state"; // static = literal value, state = from user state
+  stateKey?: string; // State key when valueSource is "state"
 }
 
 export interface FilterBuilderProps {
   fields: FilterField[];
   filters: Filter[];
   onChange: (filters: Filter[]) => void;
+  stateKeys?: string[]; // Available state keys from StateNodes
 }

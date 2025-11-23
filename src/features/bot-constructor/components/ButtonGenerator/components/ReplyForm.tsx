@@ -1,5 +1,5 @@
 // FAYL: constructor/components/ButtonGenerator/components/ReplyForm.tsx (YANGILANGAN)
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, Smartphone, MapPin, Globe, BarChart3, Database } from "lucide-react";
+import {
+  PlusCircle,
+  Smartphone,
+  MapPin,
+  Globe,
+  BarChart3,
+  Database,
+} from "lucide-react";
 import { ButtonConfig } from "../types";
 import { WebAppForm } from "./WebAppForm";
 import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
@@ -21,7 +28,14 @@ import { CollectionDetail } from "@/types/http/collection";
 import { Separator } from "@/components/ui/separator";
 import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/filter";
 import { Filter } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/types";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useNodes } from "reactflow";
+import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
 
 interface ReplyFormProps {
   onAdd: (button: ButtonConfig) => void;
@@ -34,20 +48,37 @@ export const ReplyForm = ({ onAdd, disabled, data }: ReplyFormProps) => {
   const [pollType, setPollType] = useState<"quiz" | "regular">("regular");
   const [webAppUrl, setWebAppUrl] = useState("");
   const [webAppText, setWebAppText] = useState("");
-  
+
   // Collection ma'lumotlari
   const { data: collections } = useCollectionStore();
   const [selectedCollection, setSelectedCollection] = useState<string>("");
   const [selectedField, setSelectedField] = useState<string>("");
   const [filters, setFilters] = useState<Filter[]>([]);
-  
+
   // Collection field'larini olish
   const { data: collectionFields } = useReactQueryAction<
     APIDetailCreateResponse<CollectionDetail>
   >({
-    url: selectedCollection ? `collection/${selectedCollection}/?project=[id]` : "",
+    url: selectedCollection
+      ? `collection/${selectedCollection}/?project=[id]`
+      : "",
     enabled: !!selectedCollection,
   });
+
+  // State keys'larni olish
+  const nodes = useNodes();
+  const availableStateKeys = useMemo(() => {
+    const stateKeys = new Set<string>();
+    nodes.forEach((node) => {
+      if (node.type === "StateNode") {
+        const nodeData = node.data as StateNodeData;
+        if (nodeData.key && nodeData.key.trim() !== "") {
+          stateKeys.add(nodeData.key);
+        }
+      }
+    });
+    return Array.from(stateKeys).sort();
+  }, [nodes]);
 
   // Collection o'zgarganda filter'larni tozalash
   const handleCollectionChange = (collectionName: string) => {
@@ -127,12 +158,18 @@ export const ReplyForm = ({ onAdd, disabled, data }: ReplyFormProps) => {
     // Field nomini button text sifatida ishlatish
     const buttonText = field.name;
 
-    // Reply button'lar uchun filter'larni saqlash kerak emas, lekin kelajakda ishlatish mumkin
-    // Hozircha oddiy reply button yaratamiz
+    // Collection ma'lumotlarini object ko'rinishida saqlash
+    const collectionData = {
+      collection: selectedCollection,
+      field: field.name,
+      ...(filters.length > 0 && { filters }),
+    };
+
     onAdd({
       id: `btn-${Date.now()}`,
       text: buttonText,
       type: "reply",
+      collectionData,
     });
 
     // Tozalash
@@ -288,7 +325,7 @@ export const ReplyForm = ({ onAdd, disabled, data }: ReplyFormProps) => {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 {/* Filter Builder */}
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="filters">
@@ -298,12 +335,17 @@ export const ReplyForm = ({ onAdd, disabled, data }: ReplyFormProps) => {
                     <AccordionContent>
                       <FilterBuilder
                         fields={collectionFields.data.fields.map((field) => ({
-                          id: field.id.toString(),
+                          id: field.name, // Field nomini id sifatida ishlatish
                           label: field.name,
-                          type: field.type as "text" | "number" | "bool" | "datetime",
+                          type: field.type as
+                            | "text"
+                            | "number"
+                            | "bool"
+                            | "datetime",
                         }))}
                         filters={filters}
                         onChange={setFilters}
+                        stateKeys={availableStateKeys}
                       />
                     </AccordionContent>
                   </AccordionItem>

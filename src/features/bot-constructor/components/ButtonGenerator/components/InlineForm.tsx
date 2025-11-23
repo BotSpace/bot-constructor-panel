@@ -1,5 +1,5 @@
 // FAYL: constructor/components/ButtonGenerator/components/InlineForm.tsx (YANGILANGAN)
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,7 +22,14 @@ import { CollectionDetail } from "@/types/http/collection";
 import { Separator } from "@/components/ui/separator";
 import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/filter";
 import { Filter } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/types";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useNodes } from "reactflow";
+import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
 
 interface InlineFormProps {
   onAdd: (button: ButtonConfig) => void;
@@ -65,20 +72,37 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
   const [value, setValue] = useState("");
   const [loginConfig, setLoginConfig] = useState<Partial<LoginUrlConfig>>({});
   const [webAppUrl, setWebAppUrl] = useState("");
-  
+
   // Collection ma'lumotlari
   const { data: collections } = useCollectionStore();
   const [selectedCollection, setSelectedCollection] = useState<string>("");
   const [selectedField, setSelectedField] = useState<string>("");
   const [filters, setFilters] = useState<Filter[]>([]);
-  
+
   // Collection field'larini olish
   const { data: collectionFields } = useReactQueryAction<
     APIDetailCreateResponse<CollectionDetail>
   >({
-    url: selectedCollection ? `collection/${selectedCollection}/?project=[id]` : "",
+    url: selectedCollection
+      ? `collection/${selectedCollection}/?project=[id]`
+      : "",
     enabled: !!selectedCollection,
   });
+
+  // State keys'larni olish
+  const nodes = useNodes();
+  const availableStateKeys = useMemo(() => {
+    const stateKeys = new Set<string>();
+    nodes.forEach((node) => {
+      if (node.type === "StateNode") {
+        const nodeData = node.data as StateNodeData;
+        if (nodeData.key && nodeData.key.trim() !== "") {
+          stateKeys.add(nodeData.key);
+        }
+      }
+    });
+    return Array.from(stateKeys).sort();
+  }, [nodes]);
 
   // Collection o'zgarganda filter'larni tozalash
   const handleCollectionChange = (collectionName: string) => {
@@ -148,18 +172,23 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
 
     // Field nomini button text sifatida ishlatish
     const buttonText = field.name;
-    
-    // Filter'larni JSON formatida callback_data'ga qo'shish
-    const filtersJson = filters.length > 0 ? JSON.stringify(filters) : "";
-    const callbackData = filtersJson
-      ? `collection_${selectedCollection}_field_${field.name}_filters_${encodeURIComponent(filtersJson)}`
-      : `collection_${selectedCollection}_field_${field.name}`;
+
+    // Collection ma'lumotlarini object ko'rinishida saqlash
+    const collectionData = {
+      collection: selectedCollection,
+      field: field.name,
+      ...(filters.length > 0 && { filters }),
+    };
+
+    // Callback data - backward compatibility uchun
+    const callbackData = `collection_${selectedCollection}_field_${field.name}`;
 
     onAdd({
       id: `btn-${Date.now()}`,
       text: buttonText,
       type: "callback",
       value: callbackData,
+      collectionData,
     });
 
     // Tozalash
@@ -276,7 +305,7 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 {/* Filter Builder */}
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="filters">
@@ -286,12 +315,17 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
                     <AccordionContent>
                       <FilterBuilder
                         fields={collectionFields.data.fields.map((field) => ({
-                          id: field.id.toString(),
+                          id: field.name, // Field nomini id sifatida ishlatish
                           label: field.name,
-                          type: field.type as "text" | "number" | "bool" | "datetime",
+                          type: field.type as
+                            | "text"
+                            | "number"
+                            | "bool"
+                            | "datetime",
                         }))}
                         filters={filters}
                         onChange={setFilters}
+                        stateKeys={availableStateKeys}
                       />
                     </AccordionContent>
                   </AccordionItem>

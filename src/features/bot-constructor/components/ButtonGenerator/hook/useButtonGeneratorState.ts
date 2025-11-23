@@ -25,7 +25,10 @@ export const useButtonGeneratorState = (
       setActiveTab(initialKeyboard?.active || "inline");
       setSelectedRowIndex(0);
     }
-  }, [isOpen, initialKeyboard]);
+    // Faqat dialog ochilganda state ni o'rnatamiz, initialKeyboard o'zgarganda emas
+    // chunki foydalanuvchi o'zgartirishlar kiritmoqda va ularni yo'qotmasligimiz kerak
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const isInlineTab = activeTab === "inline";
   const currentButtons = isInlineTab ? keyboards.inline : keyboards.reply;
@@ -68,9 +71,17 @@ export const useButtonGeneratorState = (
   };
 
   const handleAddRow = () => {
-    const newRowIndex = currentButtons.length;
-    // `setCurrentButtons` ga updater funksiya uzatamiz
-    setCurrentButtons((prev) => [...prev, []]); // <-- TUZATILDI
+    // Hozirgi activeTab va buttons qiymatlarini olamiz
+    const currentTabButtons = keyboards[activeTab];
+    const currentTab = activeTab;
+    const newRowIndex = currentTabButtons.length;
+
+    // Ikkala state yangilanishini bir vaqtning o'zida amalga oshirish
+    // React ularni avtomatik batch qiladi
+    setKeyboards((prev) => ({
+      ...prev,
+      [currentTab]: [...prev[currentTab], []],
+    }));
     setSelectedRowIndex(newRowIndex);
   };
 
@@ -102,8 +113,10 @@ export const useButtonGeneratorState = (
   const getFinalKeyboardConfig = (): KeyboardConfig => {
     return {
       active: activeTab,
-      inline: keyboards.inline.filter((row) => row.length > 0),
-      reply: keyboards.reply.filter((row) => row.length > 0),
+      // Bo'sh qatorlarni ham saqlaymiz, chunki foydalanuvchi ularni yaratgan
+      // va ular keyinchalik tugmalar bilan to'ldirilishi mumkin
+      inline: keyboards.inline,
+      reply: keyboards.reply,
     };
   };
 

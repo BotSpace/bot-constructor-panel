@@ -7,14 +7,15 @@ export function FilterBuilder({
   fields,
   filters,
   onChange,
+  stateKeys = [],
 }: FilterBuilderProps) {
   const addFilter = () => {
-    const defaultField = fields[0];
     const newFilter: Filter = {
       id: crypto.randomUUID(),
-      field: defaultField.id,
-      operator: getDefaultOperator(defaultField.type),
-      value: getDefaultValue(defaultField.type),
+      field: "",
+      operator: "contains",
+      value: "",
+      valueSource: "static",
     };
     onChange([...filters, newFilter]);
   };
@@ -62,6 +63,7 @@ export function FilterBuilder({
               key={filter.id}
               filter={filter}
               fields={fields}
+              stateKeys={stateKeys}
               onUpdate={(updates) => updateFilter(filter.id, updates)}
               onRemove={() => removeFilter(filter.id)}
             />
@@ -106,60 +108,3 @@ function getDefaultValue(type: FilterField["type"]): Filter["value"] {
       return new Date();
   }
 }
-
-// import { useState } from "react";
-// import { FilterBuilder } from "@/components/FilterBuilder";
-// import type { Filter, FilterField } from "@/types/filter";
-
-// // Example fields - customize these for your use case
-// const sampleFields: FilterField[] = [
-//   { id: "name", label: "Name", type: "text" },
-//   { id: "email", label: "Email", type: "text" },
-//   { id: "age", label: "Age", type: "number" },
-//   { id: "score", label: "Score", type: "number" },
-//   { id: "is_active", label: "Is Active", type: "bool" },
-//   { id: "is_verified", label: "Is Verified", type: "bool" },
-//   { id: "created_at", label: "Created Date", type: "datetime" },
-//   { id: "updated_at", label: "Updated Date", type: "datetime" },
-// ];
-
-// const Index = () => {
-//   const [filters, setFilters] = useState<Filter[]>([]);
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/20 py-12 px-4">
-//       <div className="max-w-5xl mx-auto">
-//         <div className="text-center mb-12 space-y-4">
-//           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-//             Advanced Filter Builder
-//           </h1>
-//           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-//             Build complex filters with an intuitive interface. Support for text,
-//             numbers, booleans, and dates.
-//           </p>
-//         </div>
-
-//         <div className="space-y-8">
-// <FilterBuilder
-//   fields={sampleFields}
-//   filters={filters}
-//   onChange={setFilters}
-// />
-
-//           {filters.length > 0 && (
-//             <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
-//               <h2 className="text-xl font-semibold mb-4">
-//                 Current Filters (JSON)
-//               </h2>
-//               <pre className="bg-muted p-4 rounded-md overflow-auto text-sm">
-//                 {JSON.stringify(filters, null, 2)}
-//               </pre>
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Index;

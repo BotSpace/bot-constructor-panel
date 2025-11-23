@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
 import { FilterBuilder } from "./filter/filter";
 import { useReactQueryAction } from "@/services/react-query";
@@ -8,6 +8,8 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendTextMessageNodeData } from "../types";
 import { Badge } from "@/components/ui/badge";
 import TelegramEditor from "@/features/bot-constructor/components/RichTextEditor/editor/TelegramEditor";
+import { useNodes } from "reactflow";
+import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
 
 type Props = {
   collection: CollectionListItem;
@@ -28,6 +30,21 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
     url: `collection/${collection.name}/?project=[id]`,
   });
 
+  // State keys'larni olish
+  const nodes = useNodes();
+  const availableStateKeys = useMemo(() => {
+    const stateKeys = new Set<string>();
+    nodes.forEach((node) => {
+      if (node.type === "StateNode") {
+        const nodeData = node.data as StateNodeData;
+        if (nodeData.key && nodeData.key.trim() !== "") {
+          stateKeys.add(nodeData.key);
+        }
+      }
+    });
+    return Array.from(stateKeys).sort();
+  }, [nodes]);
+
   if (!fields) return <Skeleton className="w-full h-10" />;
 
   // Collection'ga tegishli dynamic message'ni topish
@@ -40,7 +57,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
       <FilterBuilder
         key={`filter-builder-${collection.id}`}
         fields={fields.data.fields.map((field) => ({
-          id: field.id.toString(),
+          id: field.name, // Field nomini id sifatida ishlatish
           label: field.name,
           type: field.type,
         }))}
@@ -54,6 +71,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
             ),
           })
         }
+        stateKeys={availableStateKeys}
       />
 
       <div className="flex gap-2 mt-2">

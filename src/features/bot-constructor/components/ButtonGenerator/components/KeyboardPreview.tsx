@@ -25,7 +25,16 @@ export const KeyboardPreview = ({
   <div className="md:col-span-8 flex flex-col gap-3 rounded-lg border bg-muted p-4 h-full w-full">
     <div className="flex justify-between items-center mb-2">
       <Label className="text-muted-foreground">Tugmalar ko'rinishi</Label>
-      <Button variant="ghost" size="sm" onClick={onAddRow}>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onAddRow();
+        }}
+      >
         <Plus className="mr-2 h-4 w-4" /> Yangi Qator
       </Button>
     </div>
