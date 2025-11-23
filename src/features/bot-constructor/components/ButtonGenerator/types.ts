@@ -20,6 +20,13 @@ export interface CollectionButtonData {
   collection: string;
   field: string;
   filters?: Filter[];
+  // Layout options - pagination uchun
+  layout?: {
+    columns: number;      // Har bir qatorda nechta tugma (1-4)
+    rows: number;         // Har bir sahifada nechta qator (1-10)
+    // Jami: columns × rows = bir sahifada ko'rsatiladigan tugmalar soni
+    // Qolgan tugmalar keyingi sahifalarda (pagination)
+  };
 }
 
 // Barcha mumkin bo'lgan tugma turlari
