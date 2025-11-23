@@ -10,20 +10,51 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, Smartphone, MapPin, Globe, BarChart3 } from "lucide-react";
+import { PlusCircle, Smartphone, MapPin, Globe, BarChart3, Database } from "lucide-react";
 import { ButtonConfig } from "../types";
 import { WebAppForm } from "./WebAppForm";
+import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
+import { useCollectionStore } from "@/features/collections/store/collection-list";
+import { useReactQueryAction } from "@/services/react-query";
+import { APIDetailCreateResponse } from "@/types/http/response";
+import { CollectionDetail } from "@/types/http/collection";
+import { Separator } from "@/components/ui/separator";
+import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/filter";
+import { Filter } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/types";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface ReplyFormProps {
   onAdd: (button: ButtonConfig) => void;
   disabled: boolean;
+  data?: SendTextMessageNodeData;
 }
 
-export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
+export const ReplyForm = ({ onAdd, disabled, data }: ReplyFormProps) => {
   const [text, setText] = useState("");
   const [pollType, setPollType] = useState<"quiz" | "regular">("regular");
   const [webAppUrl, setWebAppUrl] = useState("");
   const [webAppText, setWebAppText] = useState("");
+  
+  // Collection ma'lumotlari
+  const { data: collections } = useCollectionStore();
+  const [selectedCollection, setSelectedCollection] = useState<string>("");
+  const [selectedField, setSelectedField] = useState<string>("");
+  const [filters, setFilters] = useState<Filter[]>([]);
+  
+  // Collection field'larini olish
+  const { data: collectionFields } = useReactQueryAction<
+    APIDetailCreateResponse<CollectionDetail>
+  >({
+    url: selectedCollection ? `collection/${selectedCollection}/?project=[id]` : "",
+    enabled: !!selectedCollection,
+  });
+
+  // Collection o'zgarganda filter'larni tozalash
+  const handleCollectionChange = (collectionName: string) => {
+    setSelectedCollection(collectionName);
+    setSelectedField("");
+    setFilters([]);
+  };
 
   const handleAddText = () => {
     if (!text) {
@@ -78,6 +109,36 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
         break;
     }
     onAdd(newButton);
+  };
+
+  // Collection-based button yaratish
+  const handleAddCollectionButton = () => {
+    if (!selectedCollection || !selectedField) {
+      alert("Iltimos, collection va field tanlang.");
+      return;
+    }
+
+    const field = collectionFields?.data.fields.find(
+      (f) => f.id.toString() === selectedField
+    );
+
+    if (!field) return;
+
+    // Field nomini button text sifatida ishlatish
+    const buttonText = field.name;
+
+    // Reply button'lar uchun filter'larni saqlash kerak emas, lekin kelajakda ishlatish mumkin
+    // Hozircha oddiy reply button yaratamiz
+    onAdd({
+      id: `btn-${Date.now()}`,
+      text: buttonText,
+      type: "reply",
+    });
+
+    // Tozalash
+    setSelectedCollection("");
+    setSelectedField("");
+    setFilters([]);
   };
 
   return (
@@ -179,6 +240,88 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
           </Button>
         </div>
       </div>
+
+      {/* Collection-based button yaratish */}
+      {collections && collections.length > 0 && (
+        <>
+          <Separator className="my-4" />
+          <div className="space-y-3">
+            <Label className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              Collection'dan tugma yaratish
+            </Label>
+            <div>
+              <Label htmlFor="reply-collection-select">Collection</Label>
+              <Select
+                value={selectedCollection}
+                onValueChange={handleCollectionChange}
+              >
+                <SelectTrigger id="reply-collection-select">
+                  <SelectValue placeholder="Collection tanlang..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {collections.map((collection) => (
+                    <SelectItem key={collection.id} value={collection.name}>
+                      {collection.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {selectedCollection && collectionFields && (
+              <>
+                <div>
+                  <Label htmlFor="reply-field-select">Field</Label>
+                  <Select
+                    value={selectedField}
+                    onValueChange={setSelectedField}
+                  >
+                    <SelectTrigger id="reply-field-select">
+                      <SelectValue placeholder="Field tanlang..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {collectionFields.data.fields.map((field) => (
+                        <SelectItem key={field.id} value={field.id.toString()}>
+                          {field.name} ({field.type})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Filter Builder */}
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="filters">
+                    <AccordionTrigger className="text-sm">
+                      Filter qo'shish (ixtiyoriy)
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <FilterBuilder
+                        fields={collectionFields.data.fields.map((field) => ({
+                          id: field.id.toString(),
+                          label: field.name,
+                          type: field.type as "text" | "number" | "bool" | "datetime",
+                        }))}
+                        filters={filters}
+                        onChange={setFilters}
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </>
+            )}
+            <Button
+              type="button"
+              className="w-full"
+              onClick={handleAddCollectionButton}
+              disabled={disabled || !selectedCollection || !selectedField}
+              variant="outline"
+            >
+              <Database className="mr-2 h-4 w-4" /> Collection Tugmasi Qo'shish
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

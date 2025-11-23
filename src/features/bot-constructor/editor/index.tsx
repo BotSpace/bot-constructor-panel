@@ -62,14 +62,14 @@ export default function AiogramEditor({
       <div className="flex-1 relative">
         <div className="pl-10 text-gray-500 select-none pointer-events-none">
           {contextType == "callback" ? (
-            <code>def myFunction(callback: types.Callback)</code>
+            <code>function customCode(callback: types.Callback)</code>
           ) : (
-            <code>def myFunction(message: types.Message)</code>
+            <code>function customCode(message: types.Message)</code>
           )}
         </div>
         <Editor
           height="100%"
-          language="python"
+          language="javascript"
           defaultValue={initialCode}
           onMount={handleEditorMount} // Yangi onMount funksiyamiz
           onChange={(e) => onSave(e || "")}
@@ -85,7 +85,7 @@ export default function AiogramEditor({
             folding: folding,
             renderWhitespace: renderWhitespace ? "all" : "none",
             automaticLayout: true,
-            scrollBeyondLastLine: false,
+            scrollBeyondLastLine: true,
             roundedSelection: false,
             readOnly: false,
             cursorStyle: "line",

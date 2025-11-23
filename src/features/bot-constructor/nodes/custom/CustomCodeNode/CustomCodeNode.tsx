@@ -13,25 +13,27 @@ import { SourceHandler, TargetHandler } from "../../components";
 import { CustomCodeNodeData } from "./types";
 import { CodeEditorDialog } from "./components/CodeEditorDialog";
 
-const DEFAULT_CODE = `# Ushbu kod sxema shu nuqtaga yetganda ishga tushadi.
-# Sizga quyidagi o'zgaruvchilar taqdim etiladi:
-#
-# bot: aiogram.Bot              - Bot obyekti
-# chat_id: int                  - Hozirgi chat ID'si
-# message: aiogram.types.Message - Trigger bo'lgan xabar (mavjud bo'lsa)
-# callback: aiogram.types.CallbackQuery - Trigger bo'lgan callback (mavjud bo'lsa)
-# context: dict                 - Sxema konteksti, o'zgaruvchilarni saqlaydi
-#
-# Siz 'context' lug'atiga yangi qiymatlar qo'shishingiz mumkin,
-# ular keyingi node'larda ishlatiladi.
+const DEFAULT_CODE = `
+// Ushbu kod handler ichida ishlaydi.
+// Sizga quyidagi o'zgaruvchilar taqdim etiladi:
+//
+// bot      - bot obyekti
+// ctx      - Telegraf/Aiogram.js konteksti (message yoki callback)
+// context  - Sxema konteksti (o'zgaruvchilarni saqlaydi)
+//
+// context ichiga yangi qiymatlar qo'shish mumkin.
 
-# Misol: Foydalanuvchi nomini 'user_name' o'zgaruvchisiga saqlash
-if message:
-    context['user_name'] = message.from_user.first_name
-    print(f"Foydalanuvchi {context['user_name']} kodni ishga tushirdi.")
+// Agar xabar bo'lsa
+if (ctx.message) {
+    context.user_name = ctx.message.from.first_name;
+    console.log(\`Foydalanuvchi \${context.user_name} kodni ishga tushirdi.\`);
+}
 
-# Misol: Bot orqali javob yuborish
-# await bot.send_message(chat_id, f"Salom, {context.get('user_name', 'Noma'lum')}!")
+// Bot orqali javob yuborish
+await bot.telegram.sendMessage(
+    ctx.chat.id,
+    \`Salom, \${context.user_name || 'Nomaʼlum'} !\`
+);
 `;
 
 // Kod prevyusini yaratuvchi yordamchi funksiya

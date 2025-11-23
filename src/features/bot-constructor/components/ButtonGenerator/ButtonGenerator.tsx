@@ -4,7 +4,10 @@ import { useState, ReactNode, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { KeyboardConfig } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
+import {
+  KeyboardConfig,
+  SendTextMessageNodeData,
+} from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
 import { useButtonGeneratorState } from "./hook/useButtonGeneratorState";
 import { ControlPanel } from "./components/ControlPanel";
 import { KeyboardPreview } from "./components/KeyboardPreview";
@@ -13,12 +16,14 @@ interface ButtonGeneratorProps {
   initialKeyboard?: KeyboardConfig;
   onSave: (keyboard: KeyboardConfig) => void;
   children: ReactNode;
+  data?: SendTextMessageNodeData; // Collection ma'lumotlari uchun
 }
 
 export function ButtonGenerator({
   initialKeyboard,
   onSave,
   children,
+  data,
 }: ButtonGeneratorProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -59,16 +64,17 @@ export function ButtonGenerator({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[90%] md:max-w-[80%] lg:max-w-[70%] h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[90%] md:max-w-[80%] lg:max-w-[90%] h-[90vh] overflow-y-auto">
         <VisuallyHidden>
           <DialogTitle>Tugmalarni Sozlash</DialogTitle>
         </VisuallyHidden>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-4 h-full">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-4 h-full w-full">
           <ControlPanel
             activeTab={activeTab}
             onTabChange={setActiveTab}
             onAddButton={handleAddButton}
             isCurrentRowFull={isCurrentRowFull}
+            data={data}
           />
           <KeyboardPreview
             buttons={currentButtons}

@@ -19,6 +19,7 @@ import { useMousePosition } from "./hooks/useMousePosition";
 import { useParams } from "next/navigation";
 import useProjectStore from "./store/project";
 import { SaveStatusBadge } from "./components/save-status-badge";
+import { useCollectionStore } from "../collections/store/collection-list";
 
 function FlowchartInner() {
   const { id }: { id: string } = useParams();
@@ -42,7 +43,9 @@ function FlowchartInner() {
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
-  const { loading, project } = useProjectStore();
+  // Projectni loading qilish kerak
+  // First loading start on hear
+  const { project, loading } = useProjectStore();
 
   const { screenToFlowPosition } = useReactFlow();
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
@@ -50,7 +53,8 @@ function FlowchartInner() {
 
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // load flow from project
+  // Loyiha yuklanib bo'lsa undagi ma'lumotlarni
+  // Constructorga yozib qo'yadi loading status true bo'lganda
   useEffect(() => {
     if (project) {
       loadFlow({

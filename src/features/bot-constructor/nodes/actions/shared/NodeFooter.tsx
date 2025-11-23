@@ -9,13 +9,14 @@ import {
   ButtonConfig,
 } from "@/features/bot-constructor/components/ButtonGenerator";
 
-import { KeyboardConfig } from "../TextMessageNode/types";
+import { KeyboardConfig, SendTextMessageNodeData } from "../TextMessageNode/types";
 
 interface NodeFooterProps {
   nodeId: string;
   keyboard?: KeyboardConfig;
   disableNotification?: boolean;
   protectContent?: boolean;
+  data?: SendTextMessageNodeData;
   onUpdate: (
     update: Partial<{
       keyboard: KeyboardConfig;
@@ -30,6 +31,7 @@ export const NodeFooter = ({
   keyboard,
   disableNotification,
   protectContent,
+  data,
   onUpdate,
 }: NodeFooterProps) => {
   const buttonCount =
@@ -75,7 +77,11 @@ export const NodeFooter = ({
         </div>
       </div>
 
-      <ButtonGenerator initialKeyboard={keyboard} onSave={handleKeyboardUpdate}>
+      <ButtonGenerator 
+        initialKeyboard={keyboard} 
+        onSave={handleKeyboardUpdate}
+        data={data}
+      >
         <div className="relative w-full">
           <Button variant="outline" className="w-full">
             <LayoutGrid className="mr-2 h-4 w-4" />
