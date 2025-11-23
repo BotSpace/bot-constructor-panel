@@ -17,13 +17,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Key } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Filter, FilterField, FilterOperator } from "./types";
 
 interface FilterRowProps {
   filter: Filter;
   fields: FilterField[];
+  stateKeys?: string[];
   onUpdate: (updates: Partial<Filter>) => void;
   onRemove: () => void;
 }
@@ -31,10 +32,12 @@ interface FilterRowProps {
 export function FilterRow({
   filter,
   fields,
+  stateKeys = [],
   onUpdate,
   onRemove,
 }: FilterRowProps) {
   const selectedField = fields.find((f) => f.id === filter.field);
+  const valueSource = filter.valueSource || "static";
 
   const renderOperatorSelect = () => {
     if (!selectedField) return null;
@@ -54,7 +57,69 @@ export function FilterRow({
         <SelectContent>
           {operators.map((op) => (
             <SelectItem key={op.value} value={op.value}>
-              {op.value}
+              {op.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  };
+
+  const renderValueSourceSelector = () => {
+    if (stateKeys.length === 0) return null;
+
+    return (
+      <Select
+        value={valueSource}
+        onValueChange={(source) => {
+          if (source === "state") {
+            onUpdate({
+              valueSource: "state",
+              stateKey: stateKeys[0] || "",
+            });
+          } else {
+            onUpdate({
+              valueSource: "static",
+              stateKey: undefined,
+              value: getDefaultValue(selectedField?.type || "text"),
+            });
+          }
+        }}
+      >
+        <SelectTrigger className="w-[100px]">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="static">Static</SelectItem>
+          <SelectItem value="state">
+            <div className="flex items-center gap-2">
+              <Key className="h-3 w-3" />
+              State
+            </div>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    );
+  };
+
+  const renderStateKeySelect = () => {
+    if (valueSource !== "state" || stateKeys.length === 0) return null;
+
+    return (
+      <Select
+        value={filter.stateKey || ""}
+        onValueChange={(key) => onUpdate({ stateKey: key })}
+      >
+        <SelectTrigger className="flex-1">
+          <SelectValue placeholder="State key tanlang..." />
+        </SelectTrigger>
+        <SelectContent>
+          {stateKeys.map((key) => (
+            <SelectItem key={key} value={key}>
+              <div className="flex items-center gap-2">
+                <Key className="h-3 w-3" />
+                {key}
+              </div>
             </SelectItem>
           ))}
         </SelectContent>
@@ -64,6 +129,11 @@ export function FilterRow({
 
   const renderValueInput = () => {
     if (!selectedField) return null;
+
+    // If valueSource is "state", show state key select instead
+    if (valueSource === "state") {
+      return renderStateKeySelect();
+    }
 
     switch (selectedField.type) {
       case "text":
@@ -127,7 +197,6 @@ export function FilterRow({
                 mode="single"
                 selected={filter.value as Date}
                 onSelect={(date) => date && onUpdate({ value: date })}
-                initialFocus
                 className="pointer-events-auto"
               />
             </PopoverContent>
@@ -155,6 +224,7 @@ export function FilterRow({
       </Select>
 
       {renderOperatorSelect()}
+      {renderValueSourceSelector()}
       {renderValueInput()}
 
       <Button
@@ -203,5 +273,18 @@ function getOperatorsForType(type: FilterField["type"]) {
         { value: "before", label: "Before" },
         { value: "after", label: "After" },
       ];
+  }
+}
+
+function getDefaultValue(type: FilterField["type"]): Filter["value"] {
+  switch (type) {
+    case "text":
+      return "";
+    case "number":
+      return 0;
+    case "bool":
+      return true;
+    case "datetime":
+      return new Date();
   }
 }

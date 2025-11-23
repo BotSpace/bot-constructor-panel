@@ -1,5 +1,7 @@
 // FAYL: constructor/components/ButtonGenerator/types.ts (YANGILANGAN)
 
+import { Filter } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/types";
+
 // Login URL uchun maxsus konfiguratsiya
 export interface LoginUrlConfig {
   url: string;
@@ -11,6 +13,13 @@ export interface LoginUrlConfig {
 // Web App uchun maxsus konfiguratsiya
 export interface WebAppConfig {
   url: string;
+}
+
+// Collection-based button uchun ma'lumotlar
+export interface CollectionButtonData {
+  collection: string;
+  field: string;
+  filters?: Filter[];
 }
 
 // Barcha mumkin bo'lgan tugma turlari
@@ -39,4 +48,7 @@ export interface ButtonConfig {
   webApp?: WebAppConfig;
   loginUrl?: LoginUrlConfig;
   pollType?: "quiz" | "regular"; // request_poll uchun
+
+  // Collection-based button uchun ma'lumotlar
+  collectionData?: CollectionButtonData;
 }
