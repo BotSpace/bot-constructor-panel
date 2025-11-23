@@ -4,12 +4,14 @@ import { AlertCircle } from "lucide-react";
 import { InlineForm } from "./InlineForm";
 import { ReplyForm } from "./ReplyForm";
 import { ButtonConfig } from "../types";
+import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
 
 interface ControlPanelProps {
   activeTab: "inline" | "reply";
   onTabChange: (tab: "inline" | "reply") => void;
   onAddButton: (button: ButtonConfig) => void;
   isCurrentRowFull: boolean;
+  data?: SendTextMessageNodeData;
 }
 
 export const ControlPanel = ({
@@ -17,6 +19,7 @@ export const ControlPanel = ({
   onTabChange,
   onAddButton,
   isCurrentRowFull,
+  data,
 }: ControlPanelProps) => {
   return (
     <div className="md:col-span-4 flex flex-col gap-6 sticky top-0">
@@ -29,10 +32,18 @@ export const ControlPanel = ({
           <TabsTrigger value="reply">Reply Keyboard</TabsTrigger>
         </TabsList>
         <TabsContent value="inline">
-          <InlineForm onAdd={onAddButton} disabled={isCurrentRowFull} />
+          <InlineForm
+            onAdd={onAddButton}
+            disabled={isCurrentRowFull}
+            data={data}
+          />
         </TabsContent>
         <TabsContent value="reply">
-          <ReplyForm onAdd={onAddButton} disabled={isCurrentRowFull} />
+          <ReplyForm
+            onAdd={onAddButton}
+            disabled={isCurrentRowFull}
+            data={data}
+          />
         </TabsContent>
       </Tabs>
       {isCurrentRowFull && (

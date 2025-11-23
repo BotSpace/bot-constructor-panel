@@ -1,12 +1,12 @@
-import { NodeProps } from "reactflow";
+"use client";
 
-import TextareaAutosize from "react-textarea-autosize";
+import { NodeProps } from "reactflow";
 
 import { ParseMode, SendTextMessageNodeData } from "./types";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { memo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { LetterText, Settings } from "lucide-react";
+import { LetterText, ListPlus, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Select } from "@/components/ui/select";
@@ -21,6 +21,10 @@ import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandler, TargetHandler } from "../../components";
 import { EditMessageTarget } from "../../components/shared/ReactFlowHandlers/EditMessageTarget";
+import { DynamicMessageConstructor } from "./components/dynamic-message-constructor-modal";
+import { Button } from "@/components/ui/button";
+
+import TelegramEditor from "@/features/bot-constructor/components/RichTextEditor/editor/TelegramEditor";
 
 const SendTextMessageNodeComponent = ({
   id,
@@ -29,13 +33,12 @@ const SendTextMessageNodeComponent = ({
 }: NodeProps<SendTextMessageNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
   // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
   const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
     updateNodeData(id, update);
   };
 
-  // UI'da ko'rsatish uchun hisob-kitoblar
-  const textLength = data.messageText?.length || 0;
   // Tugmalar sonini yangi `keyboard` strukturasidan hisoblaymiz
   const buttonCount =
     (data.keyboard?.active === "inline"
@@ -66,25 +69,21 @@ const SendTextMessageNodeComponent = ({
             <div className="grid gap-2">
               <div className="flex justify-between items-center">
                 <Label>Xabar matni</Label>
-                <span
-                  className={cn(
-                    "text-xs",
-                    textLength > 4096
-                      ? "text-destructive"
-                      : "text-muted-foreground"
-                  )}
-                >
-                  {textLength}/4096
-                </span>
+
+                <DynamicMessageConstructor data={data} id={id}>
+                  <Button size={"icon-sm"} variant={"outline"}>
+                    <ListPlus />
+                  </Button>
+                </DynamicMessageConstructor>
               </div>
-              <TextareaAutosize
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                placeholder="Bu yerga xabar matnini yozing..."
-                value={data.messageText || ""}
-                onChange={(e) => handleUpdate({ messageText: e.target.value })}
-                maxLength={4096}
+
+              <TelegramEditor
+                initialData={data.messageText || undefined}
+                onSave={(data) => handleUpdate({ messageText: data })}
+                data={data}
               />
             </div>
+
             {/* Sozlamalar */}
             <div className="grid gap-3">
               <Label className="flex items-center gap-2">
@@ -113,6 +112,7 @@ const SendTextMessageNodeComponent = ({
             keyboard={data.keyboard}
             disableNotification={data.disableNotification}
             protectContent={data.protectContent}
+            data={data}
             onUpdate={handleUpdate}
           />
         </>

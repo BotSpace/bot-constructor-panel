@@ -27,7 +27,7 @@ import StatusBadge from "@/components/common/status-badge";
 
 function ReleasePanel() {
   const { id, lang }: { id: string; lang: string } = useParams();
-  const { loadProject, loading, project } = useProjectStore();
+  const { loading, project } = useProjectStore();
 
   function handleCreateRelease() {
     const toastId = toast.loading("release qilinmoqda");
@@ -58,9 +58,6 @@ function ReleasePanel() {
         onSuccess={() => {
           // create new relase bot
           handleCreateRelease();
-
-          // fetch project qayta chaqiramiz
-          loadProject(id);
         }}
       >
         <Button>Add Release Bot</Button>
@@ -106,7 +103,7 @@ function ReleaseDropDown({
   lang: string;
   onPublish: () => void;
 }) {
-  const { loadProject, loading, project } = useProjectStore();
+  const { project } = useProjectStore();
 
   const { handleClick } = useLinkToParent({
     href: `/${lang}/bot/${id}/release`,

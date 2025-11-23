@@ -9,7 +9,7 @@ export interface CollectionDetail {
   fields: {
     id: number;
     name: string;
-    type: "text" | "number" | "bool";
+    type: "text" | "number" | "bool" | "datetime";
     required: boolean;
     default: any;
   }[];

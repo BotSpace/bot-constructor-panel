@@ -131,3 +131,35 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Telegram Message Variable Chip Style */
+.ce-toolbar__plus,
+.ce-toolbar__settings-btn {
+  color: #fff !important;
+  background-color: #27272a !important;
+  border-color: #27272a !important;
+  border-radius: 4px !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: #27272a !important;
+  border-radius: 4px !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+}
+
+.tg-variable-chip {
+  @apply bg-[#27272a] text-white;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: #27272a !important;
+  border-radius: 4px !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  cursor: pointer !important;
+}
+
+.codex-editor__redactor {
+  padding: 0 !important;
+}

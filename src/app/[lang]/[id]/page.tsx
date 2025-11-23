@@ -11,15 +11,20 @@ import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConstructorPageHeader } from "@/components/layout/header";
 import { DebugConsole } from "@/components/layout/components/debug-console";
+import { useCollectionStore } from "@/features/collections/store/collection-list";
 
 export default function Page() {
   const { id }: { id: string } = useParams();
 
   const { loadProject, project } = useProjectStore();
+  const { loadCollections } = useCollectionStore();
 
-  // loading project
   useEffect(() => {
+    // loading project
     loadProject(id);
+
+    // Load project collection
+    loadCollections(id);
   }, []);
 
   // 1. Qidiruv matnini saqlash uchun state

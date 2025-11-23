@@ -17,7 +17,7 @@ import DebugBotEdit from "../debug-bot-edit";
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugActions() {
   const { id }: { id: string } = useParams();
-  const { loadProject, project, changeDebug } = useProjectStore();
+  const { project } = useProjectStore();
 
   /* ----------------------- Prevent Ctrl+R (refresh) ----------------------- */
   useEffect(() => {
@@ -62,7 +62,6 @@ export default function DebugActions() {
             project_id={+id}
             dialog_title="Debug Bot qo‘shish"
             dialog_description="Telegram debug bot tokenini kiriting"
-            onSuccess={() => loadProject(id)}
           >
             <Button>Add Debug Bot</Button>
           </AddEnvDialog>

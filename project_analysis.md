@@ -1,14 +1,13 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 11/17/2025, 12:07:44 AM
+Sana: 11/22/2025, 3:58:36 AM
 
 ## 📁 Fayl Strukturasi
 
 ```
-constructor-next-js
+bot-constructor-panel
 ├── .cursor-free-vip
-│   ├── config.ini
-│   └── language_cache
+│   └── config.ini
 ├── .env
 ├── .env.example
 ├── .eslintrc.json
@@ -19,7 +18,6 @@ constructor-next-js
 ├── Dockerfile
 ├── README.md
 ├── components.json
-├── config
 ├── docs
 │   ├── ARCHITECTURE.md
 │   ├── MESSAGE_EDIT_FEATURE.md
@@ -53,8 +51,7 @@ constructor-next-js
 │   │   │       │   │   ├── table-header.tsx
 │   │   │       │   │   └── utils.ts
 │   │   │       │   └── page.tsx
-│   │   │       ├── page.tsx
-│   │   │       └── send-message
+│   │   │       └── page.tsx
 │   │   ├── api
 │   │   │   └── auth
 │   │   │       ├── [...nextauth]
@@ -73,7 +70,6 @@ constructor-next-js
 │   │   │   ├── status-badge.tsx
 │   │   │   ├── theme-provider.tsx
 │   │   │   └── toggle-button.tsx
-│   │   ├── forms
 │   │   ├── index.ts
 │   │   ├── layout
 │   │   │   ├── components
@@ -124,7 +120,6 @@ constructor-next-js
 │   │       ├── toggle.tsx
 │   │       └── tooltip.tsx
 │   ├── features
-│   │   ├── auth
 │   │   ├── bot-constructor
 │   │   │   ├── components
 │   │   │   │   ├── ButtonGenerator
@@ -301,8 +296,7 @@ constructor-next-js
 │   │   │   └── store
 │   │   │       ├── collection-list.ts
 │   │   │       └── index.ts
-│   │   ├── index.ts
-│   │   └── projects
+│   │   └── index.ts
 │   ├── hooks
 │   │   ├── use-debounces.tsx
 │   │   └── use-keyboard-shortcut.tsx
@@ -331,7 +325,6 @@ constructor-next-js
 │   │   └── requests
 │   │       ├── auth.ts
 │   │       └── bot.ts
-│   ├── styles
 │   ├── types
 │   │   ├── auth
 │   │   │   ├── get-me.ts
