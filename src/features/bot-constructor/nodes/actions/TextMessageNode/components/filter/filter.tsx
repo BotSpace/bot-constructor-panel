@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FilterRow } from "./filter-row";
 import type { Filter, FilterBuilderProps, FilterField } from "./types";
+import { generateId } from "@/lib/utils";
 
 export function FilterBuilder({
   fields,
@@ -11,7 +12,7 @@ export function FilterBuilder({
 }: FilterBuilderProps) {
   const addFilter = () => {
     const newFilter: Filter = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       field: "",
       operator: "contains",
       value: "",
