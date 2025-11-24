@@ -115,11 +115,20 @@ function LoadCollectionItemNode({ id, data, selected }: NodeProps<LoadCollection
             <div className="space-y-2">
               <Label>Filters</Label>
               <FilterBuilder
-                fields={fields.data.fields.map((field) => ({
-                  id: field.name,
-                  label: field.name,
-                  type: field.type,
-                }))}
+                fields={[
+                  // Default _id field
+                  {
+                    id: "_id",
+                    label: "id",
+                    type: "text" as const,
+                  },
+                  // Collection field'lari
+                  ...fields.data.fields.map((field) => ({
+                    id: field.name,
+                    label: field.name,
+                    type: field.type,
+                  }))
+                ]}
                 filters={data.filters || []}
                 onChange={(filters) => handleUpdate({ filters })}
                 stateKeys={availableStateKeys}
