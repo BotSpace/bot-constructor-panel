@@ -23,6 +23,24 @@ jobs:
         run: |
           cp .env.example .env
 
+      - name: update env
+        run: |
+          update_env() {
+              local env_file=".env"
+              cp .env.example "$env_file"
+
+              for kv in "$@"; do
+                  local key="${kv%%=*}"
+                  local value="${kv#*=}"
+                  sed -i "s|^$key=.*|$key=$value|" "$env_file"
+              done
+          }
+
+          update_env \
+            "NEXTAUTH_SECRET=${{ secrets.NEXT_SECRET }}" \
+            "NEXT_PUBLIC_API=${{ secrets.API_URL }}"
+
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
