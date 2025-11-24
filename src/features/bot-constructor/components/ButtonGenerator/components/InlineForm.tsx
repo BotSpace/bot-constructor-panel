@@ -359,15 +359,24 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
                     </AccordionTrigger>
                     <AccordionContent className="pt-4">
                       <FilterBuilder
-                        fields={collectionFields.data.fields.map((field) => ({
-                          id: field.name, // Field nomini id sifatida ishlatish
-                          label: field.name,
-                          type: field.type as
-                            | "text"
-                            | "number"
-                            | "bool"
-                            | "datetime",
-                        }))}
+                        fields={[
+                          // Default _id field
+                          {
+                            id: "_id",
+                            label: "id",
+                            type: "text" as const,
+                          },
+                          // Collection field'lari
+                          ...collectionFields.data.fields.map((field) => ({
+                            id: field.name, // Field nomini id sifatida ishlatish
+                            label: field.name,
+                            type: field.type as
+                              | "text"
+                              | "number"
+                              | "bool"
+                              | "datetime",
+                          }))
+                        ]}
                         filters={filters}
                         onChange={setFilters}
                         stateKeys={availableStateKeys}
