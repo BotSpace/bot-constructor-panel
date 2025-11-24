@@ -101,8 +101,14 @@ const CallbackQueryTriggerNodeComponent = ({
   );
 
   // --- 2. "AQLLI" REJIMNI YOQISH UCHUN SHART ---
-  const showSmartSelector =
+  // Endi faqat filter === "equals" da emas, balki "collection" da ham ko'rsatamiz
+  const showStaticSelector =
     isConnected && availableCallbacks.length > 0 && data.filter === "equals";
+  
+  const showCollectionSelector =
+    isConnected && 
+    availableCallbacks.filter(c => c.isCollection).length > 0 && 
+    data.filter === "collection";
 
   const handleUpdate = (update: Partial<CallbackQueryTriggerData>) => {
     updateNodeData(id, update);
@@ -120,8 +126,7 @@ const CallbackQueryTriggerNodeComponent = ({
     data.filter === "any" || (!!data.filter && !!data.context?.value);
 
   const filterOptions = useMemo(
-    () =>
-      ConstructorData.Filters.textFilters.filter((f) => f.value !== "command"),
+    () => ConstructorData.Filters.callbackFilters,
     []
   );
 
@@ -161,49 +166,73 @@ const CallbackQueryTriggerNodeComponent = ({
           />
         </div>
 
-        {/* --- 3. SMART SELECTOR (STATIC + COLLECTION) --- */}
+        {/* --- 3. SMART SELECTOR (STATIC YA COLLECTION) --- */}
         {data.filter && data.filter !== "any" && (
           <div className="space-y-1.5 animate-in fade-in-50">
             <Label className="text-xs text-muted-foreground">Parametr</Label>
-            {showSmartSelector ? (
+            {showStaticSelector ? (
+              // Static callback tugmalar uchun selector
               <Select
                 value={data.context?.value || ""}
                 onValueChange={onValueChange}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Callback tanlang..." />
+                  <SelectValue placeholder="Static callback tanlang..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableCallbacks.map((button) => (
-                    <SelectItem key={button.id} value={button.value}>
-                      <div className="flex items-center justify-between w-full gap-2">
-                        <span className="flex items-center gap-1.5">
-                          {button.isCollection && "📦 "}
-                          {button.text}
-                          {button.isCollection && (
+                  {availableCallbacks
+                    .filter((button) => !button.isCollection)
+                    .map((button) => (
+                      <SelectItem key={button.id} value={button.value}>
+                        <div className="flex items-center justify-between w-full gap-2">
+                          <span>{button.text}</span>
+                          <span className="text-xs text-muted-foreground font-mono">
+                            {button.value}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            ) : showCollectionSelector ? (
+              // Collection callback tugmalar uchun selector
+              <Select
+                value={data.context?.value || ""}
+                onValueChange={onValueChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Collection callback tanlang..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableCallbacks
+                    .filter((button) => button.isCollection)
+                    .map((button) => (
+                      <SelectItem key={button.id} value={button.value}>
+                        <div className="flex items-center justify-between w-full gap-2">
+                          <span className="flex items-center gap-1.5">
+                            📦 {button.text}
                             <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded">
                               Dynamic
                             </span>
-                          )}
-                        </span>
-                        <span className="text-xs text-muted-foreground font-mono">
-                          {button.isCollection 
-                            ? `${button.collectionName}.${button.fieldName}` 
-                            : button.value
-                          }
-                        </span>
-                      </div>
-                    </SelectItem>
-                  ))}
+                          </span>
+                          <span className="text-xs text-muted-foreground font-mono">
+                            {button.collectionName}.{button.fieldName}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             ) : (
+              // Qo'lda kiritish uchun input
               <ValueInput
                 value={data.context?.value || ""}
                 onChange={onValueChange}
                 placeholder={
                   data.filter === "regex"
                     ? "Masalan: item:.*"
+                    : data.filter === "collection"
+                    ? "Masalan: collection:users:id"
                     : "Masalan: main_menu"
                 }
               />

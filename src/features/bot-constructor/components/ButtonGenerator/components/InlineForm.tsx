@@ -85,6 +85,7 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
   // Layout settings - pagination uchun
   const [columns, setColumns] = useState<number>(2);  // Har qatorda 2 ta
   const [rows, setRows] = useState<number>(5);        // 5 qator
+  const [enablePagination, setEnablePagination] = useState<boolean>(true); // Pagination yoqilgan/o'chirilgan
 
   // Collection field'larini olish
   const { data: collectionFields } = useReactQueryAction<
@@ -119,6 +120,7 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
     // Reset layout to default
     setColumns(2);
     setRows(5);
+    setEnablePagination(true);
   };
 
   const handleAddClick = () => {
@@ -193,6 +195,7 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
         rows,     // Har sahifada nechta qator
         // Jami: columns × rows = bir sahifada tugmalar soni
       },
+      enablePagination,  // Pagination yoqilgan/o'chirilgan
     };
 
     // Callback data - backward compatibility uchun
@@ -212,6 +215,7 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
     setFilters([]);
     setColumns(2);
     setRows(5);
+    setEnablePagination(true);
   };
 
   return (
@@ -444,26 +448,51 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
                           {columns} × {rows} = {columns * rows} ta tugma
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Qolgan tugmalar keyingi sahifalarda ko'rsatiladi (pagination)
-                      </p>
                     </div>
+
+                    {/* Enable Pagination Toggle */}
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-md border">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="enable-pagination" className="text-sm font-medium cursor-pointer">
+                          Pagination yoqish
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Ko'p ma'lumotlar bo'lsa sahifalarga bo'lish
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          id="enable-pagination"
+                          type="checkbox"
+                          checked={enablePagination}
+                          onChange={(e) => setEnablePagination(e.target.checked)}
+                          className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary cursor-pointer"
+                        />
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">
+                      {enablePagination 
+                        ? "Qolgan tugmalar keyingi sahifalarda ko'rsatiladi" 
+                        : "Barcha tugmalar bir vaqtda ko'rsatiladi"}
+                    </p>
                   </CardContent>
                 </Card>
+
+                <Button
+                  type="button"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md"
+                  onClick={handleAddCollectionButton}
+                  disabled={disabled || !selectedCollection || !selectedField}
+                >
+                  <Database className="mr-2 h-4 w-4" /> Collection Tugmasi Qo'shish
+                </Button>
               </>
             )}
-            <Button
-              type="button"
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md"
-              onClick={handleAddCollectionButton}
-              disabled={disabled || !selectedCollection || !selectedField}
-            >
-              <Database className="mr-2 h-4 w-4" /> Collection Tugmasi Qo'shish
-            </Button>
-            </CardContent>
-          </Card>
-        </>
-      )}
-    </div>
-  );
+          </CardContent>
+        </Card>
+      </>
+    )}
+  </div>
+);
 };
