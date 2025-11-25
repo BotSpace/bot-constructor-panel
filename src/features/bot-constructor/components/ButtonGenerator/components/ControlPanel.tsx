@@ -22,7 +22,7 @@ export const ControlPanel = ({
   data,
 }: ControlPanelProps) => {
   return (
-    <div className="md:col-span-4 flex flex-col gap-6 sticky top-0">
+    <div className="md:col-span-5 flex flex-col gap-6 sticky top-0">
       <Tabs
         value={activeTab}
         onValueChange={(v) => onTabChange(v as "inline" | "reply")}

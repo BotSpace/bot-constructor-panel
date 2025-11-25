@@ -11,6 +11,16 @@ export const textFilters = [
   { value: "command", label: "Buyruq" },
 ];
 
+// Callback Query uchun maxsus filtrlar
+export const callbackFilters = [
+  ...anyFilter, // "Har qanday"ni qo'shamiz
+  { value: "equals", label: "Teng (Static)" },
+  { value: "collection", label: "Collection (Dynamic)" },
+  { value: "contains", label: "Ichida" },
+  { value: "starts_with", label: "Boshlanadi" },
+  { value: "regex", label: "Regex" },
+];
+
 // Joylashuv uchun filtrlar
 export const locationFilters = [
   ...anyFilter,
@@ -32,6 +42,7 @@ export const documentFilters = [
 // Barcha filtrlar to'plami
 export const Filters = {
   textFilters,
+  callbackFilters,
   locationFilters,
   fileFilters,
   documentFilters,

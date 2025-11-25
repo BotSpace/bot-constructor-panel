@@ -132,32 +132,55 @@
   }
 }
 
-/* Telegram Message Variable Chip Style */
-.ce-toolbar__plus,
-.ce-toolbar__settings-btn {
-  color: #fff !important;
-  background-color: #27272a !important;
-  border-color: #27272a !important;
-  border-radius: 4px !important;
-  border-width: 1px !important;
-  border-style: solid !important;
-  border-color: #27272a !important;
-  border-radius: 4px !important;
-  border-width: 1px !important;
-  border-style: solid !important;
+/* Telegram Message Variable Chip Style - Enhanced */
+.tg-variable-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  margin: 0 2px;
+  
+  /* Modern gradient background */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  
+  /* Smooth rounded corners */
+  border-radius: 6px;
+  
+  /* Subtle shadow for depth */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  /* Typography */
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  letter-spacing: 0.025em;
+  
+  /* Interactive */
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  
+  /* Prevent line break */
+  white-space: nowrap;
 }
 
-.tg-variable-chip {
-  @apply bg-[#27272a] text-white;
-  padding: 4px 8px !important;
-  border-radius: 4px !important;
-  border-width: 1px !important;
-  border-style: solid !important;
-  border-color: #27272a !important;
-  border-radius: 4px !important;
-  border-width: 1px !important;
-  border-style: solid !important;
-  cursor: pointer !important;
+.tg-variable-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #7b90f0 0%, #8a5db8 100%);
+}
+
+.tg-variable-chip:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Optional: Add icon before variable */
+.tg-variable-chip::before {
+  content: '$';
+  opacity: 0.8;
+  margin-right: 2px;
 }
 
 .codex-editor__redactor {
