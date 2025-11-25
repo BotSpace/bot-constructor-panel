@@ -36,6 +36,8 @@ export interface SendTextMessageNodeData {
     orderBy: string;
     // Qaysi tartibda olish kerak
     orderDirection: "asc" | "desc";
+    // Pagination enabled
+    enablePagination?: boolean;
     // Qaysi limitda olish kerak
     limit: number;
     // Qaysi offsetda olish kerak

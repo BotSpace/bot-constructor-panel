@@ -500,7 +500,9 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
           "callback_query_id",
           "from_user_id",
           "chat_instance",
-          "data",
+          "data", // Collection button value (only the actual data, not full callback)
+          "callback", // Full callback data
+          "collection_id", // NEW: Extract ID from collection callback format
           "inline_message_id",
           "game_short_name",
         ];

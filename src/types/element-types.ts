@@ -22,7 +22,8 @@ export interface ElementItemType {
     // Special nodes
     | "code"
     | "state"
-    | "collection";
+    | "collection"
+    | "load_collection_item";
 
   name: string;
   description: string;

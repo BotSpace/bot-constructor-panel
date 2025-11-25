@@ -15,7 +15,7 @@ export const useReactQueryAction = <T>({
   method = "GET",
   data,
 }: {
-  url: string;
+  url?: string;
   query?: Record<string, any>;
   debounceTime?: number;
   enabled?: boolean;
@@ -24,24 +24,49 @@ export const useReactQueryAction = <T>({
 }) => {
   const params = useParams();
 
+  // Handle undefined url early - return disabled query if no URL
+  if (!url) {
+    return useQuery<T>({
+      queryKey: ["disabled"],
+      queryFn: async () => {
+        throw new Error("URL is required");
+      },
+      enabled: false,
+    });
+  }
+
+  // Process URL with params
+  let processedUrl = url;
+
   Object.keys(params).forEach((key) => {
     const regex = new RegExp(`\\[${key}\\]`, "g");
     const value = Array.isArray(params[key])
       ? params[key]?.[0] // agar array bo'lsa — birinchi elementni olamiz
       : params[key];
 
-    if (value !== undefined) {
-      url = url.replace(regex, String(value));
+    if (value !== undefined && processedUrl) {
+      processedUrl = processedUrl.replace(regex, String(value));
     }
   });
 
+  // Safety check: if processedUrl is still undefined or became empty, return disabled query
+  if (!processedUrl) {
+    return useQuery<T>({
+      queryKey: ["disabled-no-url"],
+      queryFn: async () => {
+        throw new Error("Processed URL is empty");
+      },
+      enabled: false,
+    });
+  }
+
   // ✅ Agar query object bo'lsa, uni stringga qo'shamiz
   if (query) {
-    url += queryGenerator(query);
+    processedUrl += queryGenerator(query);
   }
 
   // ✅ Debounce ishlatish (ixtiyoriy)
-  const debouncedUrl = debounceTime ? useDebounces(url, debounceTime) : url;
+  const debouncedUrl = debounceTime ? useDebounces(processedUrl, debounceTime) : processedUrl;
 
   return useQuery<T>({
     queryKey: [debouncedUrl],
@@ -70,7 +95,7 @@ export const useReactQueryAction = <T>({
       }
     },
     // ✅ Debounce bo'lsa, URL tayyor bo'lganda ishga tushsin
-    enabled: enabled && (!debounceTime || debouncedUrl === url),
+    enabled: enabled && (!debounceTime || debouncedUrl === processedUrl),
     retry: (failureCount, error) => {
       // 401, 403, 404 kabi error'larda retry qilmaslik
       if (error && typeof error === "object" && "status" in error) {

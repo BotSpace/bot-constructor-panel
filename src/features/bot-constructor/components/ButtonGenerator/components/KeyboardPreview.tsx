@@ -4,6 +4,20 @@ import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { ButtonConfig } from "../types";
 import { ButtonRow } from "./ButtonRow";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 interface KeyboardPreviewProps {
   buttons: ButtonConfig[][];
@@ -12,6 +26,10 @@ interface KeyboardPreviewProps {
   onSelectRow: (index: number) => void;
   onAddRow: () => void;
   onRemoveButton: (rowIndex: number, buttonId: string) => void;
+  onEditButton?: (rowIndex: number, buttonId: string) => void;
+  onReorderButtons?: (rowIndex: number, reorderedButtons: ButtonConfig[]) => void;
+  onRemoveRow?: (rowIndex: number) => void;
+  onReorderRows?: (reorderedRows: ButtonConfig[][]) => void;
 }
 
 export const KeyboardPreview = ({
@@ -21,36 +39,77 @@ export const KeyboardPreview = ({
   onSelectRow,
   onAddRow,
   onRemoveButton,
-}: KeyboardPreviewProps) => (
-  <div className="md:col-span-8 flex flex-col gap-3 rounded-lg border bg-muted p-4 h-full w-full">
-    <div className="flex justify-between items-center mb-2">
-      <Label className="text-muted-foreground">Tugmalar ko'rinishi</Label>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          onAddRow();
-        }}
+  onEditButton,
+  onReorderButtons,
+  onRemoveRow,
+  onReorderRows,
+}: KeyboardPreviewProps) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor)
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id && onReorderRows) {
+      const oldIndex = buttons.findIndex((_, idx) => `row-${idx}` === active.id);
+      const newIndex = buttons.findIndex((_, idx) => `row-${idx}` === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const reorderedRows = arrayMove(buttons, oldIndex, newIndex);
+        onReorderRows(reorderedRows);
+      }
+    }
+  };
+
+  return (
+    <div className="md:col-span-7 flex flex-col gap-3 rounded-lg border bg-muted p-4 h-full w-full">
+      <div className="flex justify-between items-center mb-2">
+        <Label className="text-muted-foreground">Tugmalar ko'rinishi</Label>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onAddRow();
+          }}
+        >
+          <Plus className="mr-2 h-4 w-4" /> Yangi Qator
+        </Button>
+      </div>
+      
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
       >
-        <Plus className="mr-2 h-4 w-4" /> Yangi Qator
-      </Button>
+        <SortableContext
+          items={buttons.map((_, idx) => `row-${idx}`)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="flex flex-col gap-2 flex-grow min-h-[200px] bg-background/50 p-2 rounded-md">
+            {buttons.map((row, rowIndex) => (
+              <ButtonRow
+                key={`row-${rowIndex}`}
+                id={`row-${rowIndex}`}
+                row={row}
+                rowIndex={rowIndex}
+                isSelected={selectedRowIndex === rowIndex}
+                isFull={row.length >= maxButtonsPerRow}
+                maxButtons={maxButtonsPerRow}
+                onSelect={() => onSelectRow(rowIndex)}
+                onRemoveButton={(buttonId) => onRemoveButton(rowIndex, buttonId)}
+                onEditButton={onEditButton ? (buttonId) => onEditButton(rowIndex, buttonId) : undefined}
+                onReorderButtons={onReorderButtons ? (reordered) => onReorderButtons(rowIndex, reordered) : undefined}
+                onRemoveRow={onRemoveRow && buttons.length > 1 ? () => onRemoveRow(rowIndex) : undefined}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
-    <div className="flex flex-col gap-2 flex-grow min-h-[200px] bg-background/50 p-2 rounded-md">
-      {buttons.map((row, rowIndex) => (
-        <ButtonRow
-          key={rowIndex}
-          row={row}
-          rowIndex={rowIndex}
-          isSelected={selectedRowIndex === rowIndex}
-          isFull={row.length >= maxButtonsPerRow}
-          maxButtons={maxButtonsPerRow}
-          onSelect={() => onSelectRow(rowIndex)}
-          onRemoveButton={(buttonId) => onRemoveButton(rowIndex, buttonId)}
-        />
-      ))}
-    </div>
-  </div>
-);
+  );
+};

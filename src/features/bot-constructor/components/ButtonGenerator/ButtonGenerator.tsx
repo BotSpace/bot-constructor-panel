@@ -11,6 +11,8 @@ import {
 import { useButtonGeneratorState } from "./hook/useButtonGeneratorState";
 import { ControlPanel } from "./components/ControlPanel";
 import { KeyboardPreview } from "./components/KeyboardPreview";
+import { EditButtonDialog } from "./components/EditButtonDialog";
+import { ButtonConfig } from "./types";
 
 interface ButtonGeneratorProps {
   initialKeyboard?: KeyboardConfig;
@@ -26,6 +28,11 @@ export function ButtonGenerator({
   data,
 }: ButtonGeneratorProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [editingButton, setEditingButton] = useState<{
+    rowIndex: number;
+    buttonId: string;
+    button: ButtonConfig;
+  } | null>(null);
 
   const {
     activeTab,
@@ -38,6 +45,10 @@ export function ButtonGenerator({
     handleAddButton,
     handleAddRow,
     handleRemoveButton,
+    handleEditButton,
+    handleReorderButtons,
+    handleRemoveRow,
+    handleReorderRows,
     getFinalKeyboardConfig,
   } = useButtonGeneratorState(isOpen, initialKeyboard);
 
@@ -83,8 +94,35 @@ export function ButtonGenerator({
             onSelectRow={setSelectedRowIndex}
             onAddRow={handleAddRow}
             onRemoveButton={handleRemoveButton}
+            onEditButton={(rowIndex, buttonId) => {
+              // Find button to edit
+              const button = currentButtons[rowIndex]?.find(b => b.id === buttonId);
+              if (button) {
+                setEditingButton({ rowIndex, buttonId, button });
+              }
+            }}
+            onReorderButtons={handleReorderButtons}
+            onRemoveRow={handleRemoveRow}
+            onReorderRows={handleReorderRows}
           />
         </div>
+        
+        {/* Edit Button Dialog */}
+        <EditButtonDialog
+          button={editingButton?.button || null}
+          isOpen={!!editingButton}
+          onClose={() => setEditingButton(null)}
+          onSave={(updatedButton) => {
+            if (editingButton) {
+              handleEditButton(
+                editingButton.rowIndex,
+                editingButton.buttonId,
+                updatedButton
+              );
+              setEditingButton(null);
+            }
+          }}
+        />
       </DialogContent>
     </Dialog>
   );
