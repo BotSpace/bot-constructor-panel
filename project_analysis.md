@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 11/22/2025, 3:58:36 AM
+Sana: 11/25/2025, 10:20:56 AM
 
 ## 📁 Fayl Strukturasi
 
@@ -39,7 +39,7 @@ bot-constructor-panel
 │   │   ├── ReactQueryProvider.tsx
 │   │   ├── [lang]
 │   │   │   └── [id]
-│   │   │       ├── collection
+│   │   │       ├── collection_not_working_on_hear
 │   │   │       │   ├── components
 │   │   │       │   │   ├── add-collection-modal.tsx
 │   │   │       │   │   ├── collection-modal.tsx
@@ -87,11 +87,13 @@ bot-constructor-panel
 │   │   │   │       └── relas.tsx
 │   │   │   └── header.tsx
 │   │   └── ui
+│   │       ├── accordion.tsx
 │   │       ├── alert-dialog.tsx
 │   │       ├── alert.tsx
 │   │       ├── badge.tsx
 │   │       ├── button-group.tsx
 │   │       ├── button.tsx
+│   │       ├── calendar.tsx
 │   │       ├── card.tsx
 │   │       ├── checkbox.tsx
 │   │       ├── combobox.tsx
@@ -141,6 +143,12 @@ bot-constructor-panel
 │   │   │   │   ├── QuickAddPalette
 │   │   │   │   │   ├── QuickAddPalette.tsx
 │   │   │   │   │   └── index.ts
+│   │   │   │   ├── RichTextEditor
+│   │   │   │   │   └── editor
+│   │   │   │   │       ├── EditorStyles.css
+│   │   │   │   │       ├── TelegramEditor.tsx
+│   │   │   │   │       └── tools
+│   │   │   │   │           └── VariableTool.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── save-status-badge.tsx
 │   │   │   ├── constructor.tsx
@@ -219,6 +227,13 @@ bot-constructor-panel
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── TextMessageNode
 │   │   │   │   │   │   ├── TextMessageNode.tsx
+│   │   │   │   │   │   ├── components
+│   │   │   │   │   │   │   ├── accordion-item-wrapper.tsx
+│   │   │   │   │   │   │   ├── dynamic-message-constructor-modal.tsx
+│   │   │   │   │   │   │   └── filter
+│   │   │   │   │   │   │       ├── filter-row.tsx
+│   │   │   │   │   │   │       ├── filter.tsx
+│   │   │   │   │   │   │       └── types.ts
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── VideoMessageNode
