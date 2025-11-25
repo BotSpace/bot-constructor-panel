@@ -25,15 +25,23 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       ws.onopen = () => console.log("WS connected");
       ws.onmessage = (msg) => {
         const message = JSON.parse(msg.data);
+        console.log(
+          "🚀 ~ file: web-socket-provider.tsx:28 ~ message:",
+          message
+        );
 
         switch (message["event"]) {
           case "release_status":
             const version = message["data"]["version"];
-            if (version > (project.release?.version || 0))
+            if (
+              version > (project.release?.version || 0) &&
+              project.id === message["data"]["project"]
+            )
               changeRelease(message["data"]);
             break;
           case "debug_status":
-            changeDebug(message["data"]);
+            if (project.id === message["data"]["project"])
+              changeDebug(message["data"]);
             break;
           default:
             break;
