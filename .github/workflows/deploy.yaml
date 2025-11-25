@@ -59,18 +59,19 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ${{ secrets.DOCKER_REGISTRY }}
 
       - name: Tag and push to Docker Hub
         run: |
-          docker tag ${{ env.PROJECT_NAME }}:test ${{ secrets.DOCKER_USERNAME }}/${{ env.PROJECT_NAME }}:latest
-          docker tag ${{ env.PROJECT_NAME }}:test ${{ secrets.DOCKER_USERNAME }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.PROJECT_NAME }}:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}
+          docker tag ${{ env.PROJECT_NAME }}:test ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:latest
+          docker tag ${{ env.PROJECT_NAME }}:test ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}
+          docker push ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:latest
+          docker push ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}
           echo "SUCCESS TAGS: latest, ${{ github.run_number }}"
 
       - name: stack.yaml updated
         run: |
-          sed -i 's|image: ${{ secrets.DOCKER_USERNAME }}/${{ env.PROJECT_NAME }}:.*|image: ${{ secrets.DOCKER_USERNAME }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}|' stack.yaml
+          sed -i 's|image: ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:.*|image: ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}|' stack.yaml
 
       - name: Commit and push updated version
         run: |
@@ -128,4 +129,4 @@ jobs:
               "NEXT_PUBLIC_API=${{ secrets.API_URL }}"
 
             export PORT=${{ vars.PORT }}
-            docker stack deploy -c stack.yaml ${{ env.PROJECT_NAME }} 
+            docker stack deploy -c stack.yaml ${{ env.PROJECT_NAME }} --with-registry-auth
