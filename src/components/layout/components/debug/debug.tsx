@@ -18,13 +18,10 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugActions() {
   const { id }: { id: string } = useParams();
-  const { project, changeDebug } = useProjectStore();
+  const { project, changeDebug, changeProject } = useProjectStore();
 
   // Store'dan kerakli qismlarni olamiz
-  const {
-    saveFlow,
-  } = useFlowStore();
-
+  const { saveFlow } = useFlowStore();
 
   /* ----------------------- Prevent Ctrl+R (refresh) ----------------------- */
   useEffect(() => {
@@ -39,13 +36,13 @@ export default function DebugActions() {
 
   /* --------------------------- Debug bot actions --------------------------- */
   function handleRunAndRelaodDebugBot() {
-    saveFlow(id)
+    saveFlow(id);
 
     if (project)
       changeDebug({
-        ...project['debug'],
-        status: 'initializing'
-      })
+        ...project["debug"],
+        status: "initializing",
+      });
 
     instanceAuth
       .get(`/project/${id}/debug/`)
@@ -58,12 +55,11 @@ export default function DebugActions() {
   }
 
   function handleStopBot() {
-
     if (project)
       changeDebug({
-        ...project['debug'],
-        status: 'stopped'
-      })
+        ...project["debug"],
+        status: "stopped",
+      });
 
     instanceAuth
       .get(`/project/${id}/stop/`)
@@ -84,6 +80,9 @@ export default function DebugActions() {
             project_id={+id}
             dialog_title="Debug Bot qo‘shish"
             dialog_description="Telegram debug bot tokenini kiriting"
+            onSuccess={() => {
+              changeProject({ ...project, debug_bot: true });
+            }}
           >
             <Button>Add Debug Bot</Button>
           </AddEnvDialog>
