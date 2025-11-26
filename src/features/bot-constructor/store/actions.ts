@@ -99,6 +99,11 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   get
 ) => ({
   addNode: (element, position) => {
+    const { saveToHistory } = get();
+    
+    // History ga saqlash (undo/redo flag tekshiriladi ichida)
+    saveToHistory();
+    
     const newNode: Node = {
       id: generateNodeId(),
       type: element.triggerId,
@@ -139,6 +144,8 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   },
 
   loadFlow: async (flow) => {
+    const { clearHistory } = get();
+    
     set({ isLoading: true });
 
     // Avval initialState ni o'rnatamiz, keyin nodes va edges ni
@@ -161,5 +168,8 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
       edges: flow["edges"],
       isLoading: false,
     });
+
+    // History ni yangi flow bilan to'ldiramiz
+    clearHistory();
   },
 });

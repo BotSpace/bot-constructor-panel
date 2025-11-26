@@ -20,7 +20,7 @@ export const createFlowSlice: StateCreator<
 
   // --- Yaxshilangan onNodesChange ---
   onNodesChange: (changes: NodeChange[]) => {
-    const { isCtrlPressed, initialState, isLoading } = get(); // Asosiy store'dan holatni olamiz
+    const { isCtrlPressed, initialState, isLoading, saveToHistory } = get(); // Asosiy store'dan holatni olamiz
     const gridSize = 10; // 10px'lik to'r
 
     // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
@@ -76,6 +76,20 @@ export const createFlowSlice: StateCreator<
       !initialState ||
       JSON.stringify(newNodes) !== JSON.stringify(initialState.nodes);
 
+    // Faqat muhim o'zgarishlar uchun history ga saqlaymiz
+    // - Dragging emas bo'lgan o'zgarishlar
+    // - Yoki dragging tugagan (dragging: false yoki undefined)
+    const hasSignificantChange = changes.some((change) => {
+      if (change.type !== "position") return true; // Position emas - muhim
+      // Position o'zgarishi - faqat dragging tugagan bo'lsa saqlaymiz
+      return change.dragging === false || change.dragging === undefined;
+    });
+
+    if (hasSignificantChange && hasRealChanges) {
+      // History ga saqlash (undo/redo flag tekshiriladi ichida)
+      saveToHistory();
+    }
+
     set({
       // Yangilangan o'zgarishlarni qo'llaymiz
       nodes: newNodes,
@@ -85,7 +99,7 @@ export const createFlowSlice: StateCreator<
   // --- onNodesChange tugadi ---
 
   onEdgesChange: (changes) => {
-    const { initialState, isLoading } = get();
+    const { initialState, isLoading, saveToHistory } = get();
 
     // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
     if (isLoading) {
@@ -103,6 +117,11 @@ export const createFlowSlice: StateCreator<
       !initialState ||
       JSON.stringify(newEdges) !== JSON.stringify(initialState.edges);
 
+    // History ga saqlash (undo/redo flag tekshiriladi ichida)
+    if (hasRealChanges) {
+      saveToHistory();
+    }
+
     set({
       edges: newEdges,
       isDirty: hasRealChanges,
@@ -119,7 +138,7 @@ export const createFlowSlice: StateCreator<
   },
 
   updateNodeData: (nodeId, newData) => {
-    const { initialState, isLoading } = get();
+    const { initialState, isLoading, saveToHistory } = get();
 
     // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
     if (isLoading) {
@@ -133,6 +152,9 @@ export const createFlowSlice: StateCreator<
       });
       return;
     }
+
+    // History ga saqlash (undo/redo flag tekshiriladi ichida)
+    saveToHistory();
 
     const newNodes = get().nodes.map((node) => {
       if (node.id === nodeId) {
@@ -153,7 +175,7 @@ export const createFlowSlice: StateCreator<
   },
 
   updateEdgeData: (edgeId, newData) => {
-    const { initialState, isLoading } = get();
+    const { initialState, isLoading, saveToHistory } = get();
 
     // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
     if (isLoading) {
@@ -167,6 +189,9 @@ export const createFlowSlice: StateCreator<
       });
       return;
     }
+
+    // History ga saqlash (undo/redo flag tekshiriladi ichida)
+    saveToHistory();
 
     const newEdges = get().edges.map((edge) => {
       if (edge.id === edgeId) {
@@ -187,7 +212,7 @@ export const createFlowSlice: StateCreator<
   },
 
   deleteSelectedElements: () => {
-    const { nodes, edges } = get();
+    const { nodes, edges, saveToHistory } = get();
     const selectedNodes = nodes.filter((node) => node.selected);
     const selectedEdges = edges.filter((edge) => edge.selected);
 
@@ -195,6 +220,9 @@ export const createFlowSlice: StateCreator<
     if (selectedNodes.length === 0 && selectedEdges.length === 0) {
       return;
     }
+
+    // History ga saqlash (undo/redo flag tekshiriladi ichida)
+    saveToHistory();
 
     const selectedNodeIds = selectedNodes.map((node) => node.id);
 

@@ -23,6 +23,16 @@ export interface ClipboardSlice {
   duplicateSelection: () => void;
 }
 
+// History (undo/redo) uchun slice tipi
+export interface HistorySlice {
+  history: Array<{ nodes: Node[]; edges: Edge[] }>;
+  historyIndex: number;
+  saveToHistory: () => void;
+  undo: () => void;
+  redo: () => void;
+  clearHistory: () => void;
+}
+
 // Umumiy, yuqori darajadagi amallar
 export interface Actions {
   addNode: (
@@ -34,7 +44,7 @@ export interface Actions {
 }
 
 // Barcha qismlarni birlashtirgan yakuniy store tipi
-export interface FlowStoreState extends FlowSlice, ClipboardSlice, Actions {
+export interface FlowStoreState extends FlowSlice, ClipboardSlice, HistorySlice, Actions {
   // UI holatlari
   initialState: { nodes: Node[]; edges: Edge[] } | null;
   isDirty: boolean;

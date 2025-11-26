@@ -31,7 +31,11 @@ export const createClipboardSlice: StateCreator<
     const clipboard = get().clipboard;
     if (!clipboard || clipboard.nodes.length === 0) return;
 
-    const { nodes, edges } = get();
+    const { nodes, edges, saveToHistory } = get();
+    
+    // History ga saqlash (undo/redo flag tekshiriladi ichida)
+    saveToHistory();
+    
     const oldToNewIdMap = new Map<string, string>();
 
     const firstNode = clipboard.nodes[0];
@@ -69,9 +73,12 @@ export const createClipboardSlice: StateCreator<
     });
   },
   duplicateSelection: () => {
-    const { nodes, edges } = get();
+    const { nodes, edges, saveToHistory } = get();
     const selectedNodes = nodes.filter((n) => n.selected);
     if (selectedNodes.length === 0) return;
+
+    // History ga saqlash (undo/redo flag tekshiriladi ichida)
+    saveToHistory();
 
     const oldToNewIdMap = new Map<string, string>();
 
