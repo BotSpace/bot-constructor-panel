@@ -9,35 +9,39 @@ interface NodeHeaderProps {
   icon: ReactNode;
   /** Node'ning nomi (sarlavhasi) */
   title: string;
+  /** Node ID (ixtiyoriy) */
+  nodeId?: string;
+  /** Color class (ixtiyoriy) */
+  color?: string;
   /** Tugmalar sonini ko'rsatish uchun (ixtiyoriy) */
   buttonCount?: number;
   /** Node yig'ilgan (collapsed) holatidami? */
-  isCollapsed: boolean;
+  isCollapsed?: boolean;
   /** Sarlavha bosilganda chaqiriladigan funksiya */
-  onToggleCollapse: () => void;
+  onToggleCollapse?: () => void;
 }
 
 export const NodeHeader = ({
   icon,
   title,
+  nodeId,
+  color,
   buttonCount = 0,
-  isCollapsed,
+  isCollapsed = false,
   onToggleCollapse,
 }: NodeHeaderProps) => {
   return (
-    <CardHeader onClick={onToggleCollapse}>
+    <CardHeader onClick={onToggleCollapse} className={cn(color)}>
       <div
         className="h flex flex-row items-center justify-between p-3 cursor-pointer hover:bg-secondary rounded-md transition-colors"
         role="button"
       >
         <CardTitle className="flex items-center gap-2 text-base font-semibold">
-          {/* Ikonani props orqali qabul qilamiz */}
           {icon}
           {title}
         </CardTitle>
 
         <div className="flex items-center gap-2">
-          {/* Agar tugmalar bo'lsa, badge'ni ko'rsatamiz */}
           {buttonCount > 0 && (
             <Badge variant="secondary" className="font-normal">
               <LayoutGrid className="w-3 h-3 mr-1" />
@@ -45,13 +49,14 @@ export const NodeHeader = ({
             </Badge>
           )}
 
-          {/* Yig'ish/ochish ikonasi */}
-          <ChevronDown
-            className={cn(
-              "h-5 w-5 text-muted-foreground transition-transform duration-200",
-              isCollapsed && "-rotate-90"
-            )}
-          />
+          {onToggleCollapse && (
+            <ChevronDown
+              className={cn(
+                "w-4 h-4 transition-transform",
+                isCollapsed && "transform -rotate-90"
+              )}
+            />
+          )}
         </div>
       </div>
     </CardHeader>

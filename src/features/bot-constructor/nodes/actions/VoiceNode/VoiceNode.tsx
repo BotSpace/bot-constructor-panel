@@ -1,0 +1,30 @@
+"use client";
+
+import { NodeProps } from "reactflow";
+import { memo } from "react";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { NodeHeader } from "../shared/NodeHeader";
+import { NodeFooter } from "../shared/NodeFooter";
+import { SourceHandler, TargetHandler } from "../../components";
+
+const VoiceNodeComponent = ({ id, data, selected }: NodeProps) => {
+  return (
+    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+      <TargetHandler />
+      <NodeHeader
+        icon="🎤"
+        title="Ovozli xabar"
+        nodeId={id}
+        color="bg-cyan-500/10"
+      />
+      <div className="p-4 text-sm text-muted-foreground text-center">
+        Voice message yuboradi
+      </div>
+      <NodeFooter nodeId={id} />
+      <SourceHandler />
+    </Card>
+  );
+};
+
+export const SendVoiceNode = memo(VoiceNodeComponent);
