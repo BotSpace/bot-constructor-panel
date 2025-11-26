@@ -1,0 +1,197 @@
+"use client";
+
+import { NodeProps } from "reactflow";
+import { memo, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { NodeHeader } from "../../actions/shared/NodeHeader";
+import { NodeFooter } from "../../actions/shared/NodeFooter";
+import { SourceHandler, TargetHandler } from "../../components";
+import { useFlowStore } from "@/features/bot-constructor/store";
+import { IfConditionNodeData, ConditionOperator } from "./types";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, Trash2 } from "lucide-react";
+
+const IfConditionNodeComponent = ({
+  id,
+  data,
+  selected,
+}: NodeProps<IfConditionNodeData>) => {
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const handleUpdate = (update: Partial<IfConditionNodeData>) => {
+    updateNodeData(id, update);
+  };
+
+  const addCondition = () => {
+    const newCondition: ConditionOperator = {
+      variable: "",
+      operator: "equals",
+      value: "",
+    };
+    handleUpdate({
+      conditions: [...(data.conditions || []), newCondition],
+    });
+  };
+
+  const removeCondition = (index: number) => {
+    const newConditions = [...(data.conditions || [])];
+    newConditions.splice(index, 1);
+    handleUpdate({ conditions: newConditions });
+  };
+
+  const updateCondition = (index: number, update: Partial<ConditionOperator>) => {
+    const newConditions = [...(data.conditions || [])];
+    newConditions[index] = { ...newConditions[index], ...update };
+    handleUpdate({ conditions: newConditions });
+  };
+
+  return (
+    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+      <TargetHandler />
+      <NodeHeader
+        icon="🔀"
+        title="Shart (If/Else)"
+        nodeId={id}
+        color="bg-violet-500/10"
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+      />
+
+      {!isCollapsed && (
+        <CardContent className="flex flex-col gap-4 pt-4">
+          {/* Logic Operator */}
+          <div className="flex flex-col gap-2">
+            <Label>Mantiq operatori</Label>
+            <Select
+              value={data.operator || "AND"}
+              onValueChange={(value: "AND" | "OR") =>
+                handleUpdate({ operator: value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Tanlang" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="AND">AND (Barcha shartlar)</SelectItem>
+                <SelectItem value="OR">OR (Biror shart)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Conditions */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <Label>Shartlar</Label>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={addCondition}
+                className="h-8"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Qo'shish
+              </Button>
+            </div>
+
+            {(data.conditions || []).map((condition, index) => (
+              <div
+                key={index}
+                className="flex flex-col gap-2 p-3 border rounded-md bg-muted/50"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Shart {index + 1}</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => removeCondition(index)}
+                    className="h-6 w-6 p-0"
+                  >
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
+                </div>
+
+                {/* Variable */}
+                <Input
+                  placeholder="O'zgaruvchi nomi (masalan: user_age)"
+                  value={condition.variable || ""}
+                  onChange={(e) =>
+                    updateCondition(index, { variable: e.target.value })
+                  }
+                  className="text-sm"
+                />
+
+                {/* Operator */}
+                <Select
+                  value={condition.operator}
+                  onValueChange={(value) =>
+                    updateCondition(index, { operator: value as any })
+                  }
+                >
+                  <SelectTrigger className="text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="equals">Teng (=)</SelectItem>
+                    <SelectItem value="not_equals">Teng emas (≠)</SelectItem>
+                    <SelectItem value="greater_than">Katta (&gt;)</SelectItem>
+                    <SelectItem value="less_than">Kichik (&lt;)</SelectItem>
+                    <SelectItem value="greater_equal">Katta yoki teng (≥)</SelectItem>
+                    <SelectItem value="less_equal">Kichik yoki teng (≤)</SelectItem>
+                    <SelectItem value="contains">O'z ichiga oladi</SelectItem>
+                    <SelectItem value="not_contains">O'z ichiga olmaydi</SelectItem>
+                    <SelectItem value="starts_with">Boshlanadi</SelectItem>
+                    <SelectItem value="ends_with">Tugaydi</SelectItem>
+                    <SelectItem value="is_empty">Bo'sh</SelectItem>
+                    <SelectItem value="not_empty">Bo'sh emas</SelectItem>
+                    <SelectItem value="exists">Mavjud</SelectItem>
+                    <SelectItem value="not_exists">Mavjud emas</SelectItem>
+                    <SelectItem value="in">Ro'yxatda bor</SelectItem>
+                    <SelectItem value="not_in">Ro'yxatda yo'q</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Value (hide for some operators) */}
+                {!["is_empty", "not_empty", "exists", "not_exists"].includes(
+                  condition.operator
+                ) && (
+                  <Input
+                    placeholder="Qiymat"
+                    value={condition.value?.toString() || ""}
+                    onChange={(e) =>
+                      updateCondition(index, { value: e.target.value })
+                    }
+                    className="text-sm"
+                  />
+                )}
+              </div>
+            ))}
+
+            {(!data.conditions || data.conditions.length === 0) && (
+              <div className="text-sm text-muted-foreground text-center py-4">
+                Hali shart qo'shilmagan
+              </div>
+            )}
+          </div>
+        </CardContent>
+      )}
+
+      <NodeFooter nodeId={id} />
+      <SourceHandler id="true" />
+      <SourceHandler id="false" />
+    </Card>
+  );
+};
+
+export const IfConditionNode = memo(IfConditionNodeComponent);
+

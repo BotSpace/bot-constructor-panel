@@ -17,7 +17,7 @@ interface NodeFooterProps {
   disableNotification?: boolean;
   protectContent?: boolean;
   data?: SendTextMessageNodeData;
-  onUpdate: (
+  onUpdate?: (
     update: Partial<{
       keyboard: KeyboardConfig;
       disableNotification: boolean;
@@ -39,8 +39,13 @@ export const NodeFooter = ({
       .length || 0;
 
   const handleKeyboardUpdate = (newKeyboard: KeyboardConfig) => {
-    onUpdate({ keyboard: newKeyboard });
+    onUpdate?.({ keyboard: newKeyboard });
   };
+
+  // If no onUpdate, render minimal footer
+  if (!onUpdate) {
+    return null;
+  }
 
   return (
     <CardFooter className="flex flex-col items-center gap-4 pt-4 border-t">
