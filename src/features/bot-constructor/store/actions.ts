@@ -17,7 +17,6 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
   };
 
   const baseTriggerData = {
-    global: true,
     context: {},
     node_type: nodeType,
   };
@@ -57,19 +56,23 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
     case "MessageTriggerNode":
       return {
         ...baseTriggerData,
+        global: false,
       };
     case "ReplyButtonTriggerNode":
       return {
         ...baseTriggerData,
+        global: false,
       };
     case "CommandTriggerNode":
       return {
         ...baseTriggerData,
+        global: true,
         command: "/start",
       };
     case "CallbackQueryTriggerNode":
       return {
         ...baseTriggerData,
+        global: false,
         filter: "",
         context: {
           value: "",
