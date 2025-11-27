@@ -13,11 +13,15 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 import { AddEnvDialog } from "../add-env";
 import { ButtonGroup } from "@/components/ui/button-group";
 import DebugBotEdit from "../debug-bot-edit";
+import { useFlowStore } from "@/features/bot-constructor/store";
 
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugActions() {
   const { id }: { id: string } = useParams();
-  const { project } = useProjectStore();
+  const { project, changeDebug, changeProject } = useProjectStore();
+
+  // Store'dan kerakli qismlarni olamiz
+  const { saveFlow } = useFlowStore();
 
   /* ----------------------- Prevent Ctrl+R (refresh) ----------------------- */
   useEffect(() => {
@@ -32,6 +36,14 @@ export default function DebugActions() {
 
   /* --------------------------- Debug bot actions --------------------------- */
   function handleRunAndRelaodDebugBot() {
+    saveFlow(id);
+
+    if (project)
+      changeDebug({
+        ...project["debug"],
+        status: "initializing",
+      });
+
     instanceAuth
       .get(`/project/${id}/debug/`)
       .then(() => {
@@ -43,6 +55,12 @@ export default function DebugActions() {
   }
 
   function handleStopBot() {
+    if (project)
+      changeDebug({
+        ...project["debug"],
+        status: "stopped",
+      });
+
     instanceAuth
       .get(`/project/${id}/stop/`)
       .then(() => {
@@ -62,13 +80,16 @@ export default function DebugActions() {
             project_id={+id}
             dialog_title="Debug Bot qo‘shish"
             dialog_description="Telegram debug bot tokenini kiriting"
+            onSuccess={() => {
+              changeProject({ ...project, debug_bot: true });
+            }}
           >
             <Button>Add Debug Bot</Button>
           </AddEnvDialog>
         ) : (
           <>
             {project.debug.status === "running" ? (
-              <div className="flex gap-1">
+              <ButtonGroup className="flex">
                 <Button size={"icon"} onClick={handleStopBot} variant="outline">
                   <StopCircle />
                 </Button>
@@ -80,7 +101,12 @@ export default function DebugActions() {
                 >
                   <RotateCcw />
                 </Button>
-              </div>
+                <DebugBotEdit>
+                  <Button className="cursor-pointer" variant={"outline"}>
+                    <BotMessageSquare />
+                  </Button>
+                </DebugBotEdit>
+              </ButtonGroup>
             ) : project.debug.status === "initializing" ? (
               <Button variant="outline" disabled>
                 <span className="animate-pulse">Starting...</span>
@@ -89,7 +115,6 @@ export default function DebugActions() {
               <ButtonGroup>
                 <Button onClick={handleRunAndRelaodDebugBot} variant="outline">
                   <BugPlay />
-                  DEBUG
                 </Button>
                 <DebugBotEdit>
                   <Button className="cursor-pointer" variant={"outline"}>
