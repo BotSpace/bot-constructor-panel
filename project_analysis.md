@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 11/25/2025, 10:20:56 AM
+Sana: 11/26/2025, 12:17:03 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -19,12 +19,7 @@ bot-constructor-panel
 ├── README.md
 ├── components.json
 ├── docs
-│   ├── ARCHITECTURE.md
-│   ├── MESSAGE_EDIT_FEATURE.md
-│   ├── MVP_READINESS.md
-│   ├── javascript-snippets.md
-│   ├── project-analysis.md
-│   └── typescript-snippets.md
+│   └── ARCHITECTURE.md
 ├── next-env.d.ts
 ├── next-intl.config.js
 ├── next.config.ts

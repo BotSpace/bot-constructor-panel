@@ -17,7 +17,6 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
   };
 
   const baseTriggerData = {
-    global: true,
     context: {},
     node_type: nodeType,
   };
@@ -57,19 +56,23 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
     case "MessageTriggerNode":
       return {
         ...baseTriggerData,
+        global: false,
       };
     case "ReplyButtonTriggerNode":
       return {
         ...baseTriggerData,
+        global: false,
       };
     case "CommandTriggerNode":
       return {
         ...baseTriggerData,
+        global: true,
         command: "/start",
       };
     case "CallbackQueryTriggerNode":
       return {
         ...baseTriggerData,
+        global: false,
         filter: "",
         context: {
           value: "",
@@ -96,6 +99,11 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   get
 ) => ({
   addNode: (element, position) => {
+    const { saveToHistory } = get();
+    
+    // History ga saqlash (undo/redo flag tekshiriladi ichida)
+    saveToHistory();
+    
     const newNode: Node = {
       id: generateNodeId(),
       type: element.triggerId,
@@ -136,6 +144,8 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   },
 
   loadFlow: async (flow) => {
+    const { clearHistory } = get();
+    
     set({ isLoading: true });
 
     // Avval initialState ni o'rnatamiz, keyin nodes va edges ni
@@ -158,5 +168,8 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
       edges: flow["edges"],
       isLoading: false,
     });
+
+    // History ni yangi flow bilan to'ldiramiz
+    clearHistory();
   },
 });

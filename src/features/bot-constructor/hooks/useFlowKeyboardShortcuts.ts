@@ -21,6 +21,8 @@ export function useFlowKeyboardShortcuts({
     duplicateSelection,
     deleteSelectedElements,
     setCtrlPressed,
+    undo,
+    redo,
   } = useFlowStore((state) => ({
     selectAll: state.selectAll,
     copySelection: state.copySelection,
@@ -28,6 +30,8 @@ export function useFlowKeyboardShortcuts({
     duplicateSelection: state.duplicateSelection,
     deleteSelectedElements: state.deleteSelectedElements,
     setCtrlPressed: state.setCtrlPressed,
+    undo: state.undo,
+    redo: state.redo,
   }));
 
   useEffect(() => {
@@ -51,7 +55,16 @@ export function useFlowKeyboardShortcuts({
       const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
       const ctrlOrCmd = isMac ? event.metaKey : event.ctrlKey;
 
-      if (ctrlOrCmd && event.key.toLowerCase() === "a") {
+      if (ctrlOrCmd && event.key.toLowerCase() === "z" && !event.shiftKey) {
+        event.preventDefault();
+        undo();
+      } else if (
+        (ctrlOrCmd && event.key.toLowerCase() === "y") ||
+        (ctrlOrCmd && event.shiftKey && event.key.toLowerCase() === "z")
+      ) {
+        event.preventDefault();
+        redo();
+      } else if (ctrlOrCmd && event.key.toLowerCase() === "a") {
         event.preventDefault();
         selectAll();
       } else if (ctrlOrCmd && event.key.toLowerCase() === "c") {
@@ -99,6 +112,8 @@ export function useFlowKeyboardShortcuts({
     paste,
     duplicateSelection,
     deleteSelectedElements,
+    undo,
+    redo,
     mousePosition,
     screenToFlowPosition,
     setCtrlPressed,

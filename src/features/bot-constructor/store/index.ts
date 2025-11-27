@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { FlowStoreState } from "./types";
 import { createFlowSlice } from "./flowSlice";
 import { createClipboardSlice } from "./clipboardSlice";
+import { createHistorySlice } from "./historySlice";
 import { createActions } from "./actions";
 import { Connection, addEdge } from "reactflow";
 
@@ -34,10 +35,14 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     // Har bir slice'ga (set, get) ni uzatamiz
     ...createFlowSlice(set, get, {} as any),
     ...createClipboardSlice(set, get, {} as any),
+    ...createHistorySlice(set, get, {} as any),
     ...createActions(set, get, {} as any),
 
     onConnect: (connection: Connection) => {
-      const { initialState } = get();
+      const { initialState, saveToHistory } = get();
+
+      // History ga saqlash (undo/redo flag tekshiriladi ichida)
+      saveToHistory();
 
       // EditMessageHandler'dan chiqqan edge'ni aniqlash
       const isEditMessageEdge =
