@@ -31,6 +31,7 @@ export interface ElementItemType {
     | "copy_message"
     | "pin_message"
     | "unpin_message"
+    | "delete_message"
     | "chat_action"
     // Flow control
     | "delay"

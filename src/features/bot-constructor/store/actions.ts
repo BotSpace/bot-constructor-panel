@@ -49,6 +49,11 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
           reply: [],
         },
       };
+    case "DeleteMessageNode":
+      return {
+        deleteFromContext: false,
+        messageId: undefined,
+      };
     case "CustomCodeNode":
       return {}; // Custom code uchun alohida sozlamalar
 
