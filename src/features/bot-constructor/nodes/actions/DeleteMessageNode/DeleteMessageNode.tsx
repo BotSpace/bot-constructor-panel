@@ -39,7 +39,7 @@ const DeleteMessageNodeComponent = ({
     // DeleteMessageHandler'dan chiqqan edge'ni topish
     const deleteHandlerEdge = edges.find(
       (edge) =>
-        edge.source === id && edge.sourceHandle === "delete-message-handler"
+        edge.source === id && edge.sourceHandle === "delete-message-source"
     );
     if (!deleteHandlerEdge) return null;
 

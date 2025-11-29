@@ -50,7 +50,7 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 
       // DeleteMessageHandler'dan chiqqan edge'ni aniqlash
       const isDeleteMessageEdge =
-        connection.sourceHandle === "delete-message-handler";
+        connection.sourceHandle === "delete-message-source";
 
       // Edge rangini aniqlash
       let edgeColor = "#495057"; // Default kulrang
