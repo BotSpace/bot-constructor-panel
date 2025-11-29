@@ -48,6 +48,7 @@ function FlowchartInner() {
 
   const { screenToFlowPosition } = useReactFlow();
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const [snapToGrid, setSnapToGrid] = useState(false);
   const mousePosition = useMousePosition();
 
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -173,6 +174,18 @@ function FlowchartInner() {
     }
   };
 
+  // Ctrl bilan node drag qilganda grid snapping'ni yoqish
+  const handleNodeDrag = useCallback((event: React.MouseEvent, _node: any) => {
+    const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+    const isCtrlPressed = isMac ? event.metaKey : event.ctrlKey;
+    setSnapToGrid(isCtrlPressed);
+  }, []);
+
+  // Node drag tugaganda grid snapping'ni o'chirish
+  const handleNodeDragStop = useCallback(() => {
+    setSnapToGrid(false);
+  }, []);
+
   return (
     <div
       ref={reactFlowWrapper}
@@ -189,6 +202,8 @@ function FlowchartInner() {
         onConnect={onConnect}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onNodeDrag={handleNodeDrag}
+        onNodeDragStop={handleNodeDragStop}
         fitView
         panOnScroll
         selectionOnDrag
@@ -197,6 +212,8 @@ function FlowchartInner() {
         minZoom={0.1}
         maxZoom={2}
         connectionRadius={50}
+        snapToGrid={snapToGrid}
+        snapGrid={snapToGrid ? [20, 20] : undefined}
       >
         <SaveStatusBadge className="absolute top-2 right-2 z-20" />
         <Background gap={24} color="#666" />

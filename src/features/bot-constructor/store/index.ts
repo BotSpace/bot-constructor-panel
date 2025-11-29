@@ -20,9 +20,6 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     countdownRemaining: null,
     countdownDuration: 2000, // 2 sekund
 
-    isCtrlPressed: false, // Boshlang'ich holat
-    setCtrlPressed: (isPressed) => set({ isCtrlPressed: isPressed }),
-
     startCountdown: () => {
       set({ countdownRemaining: get().countdownDuration });
     },
