@@ -1,4 +1,354 @@
 {
-  "hello": "Salom",
-  "world": "Dunyoda"
+  "common": {
+    "search": "Komponentlarni qidirish... (Ctrl+K)",
+    "noResults": "Hech narsa topilmadi.",
+    "back": "Orqaga",
+    "collections": "Kolleksiyalar",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "delete": "O'chirish",
+    "edit": "Tahrirlash",
+    "add": "Qo'shish",
+    "remove": "O'chirish",
+    "close": "Yopish",
+    "loading": "Yuklanmoqda...",
+    "select": "Tanlash",
+    "submit": "Yuborish",
+    "send": "Yuborish"
+  },
+  "auth": {
+    "title": "Kodni Kiriting",
+    "description": "Kiring",
+    "telegramBot": "@bot_mather_auth_bot",
+    "getCode": "telegram botiga va 1 daqiqalik kodingizni oling.",
+    "sendCode": "Kodni Yuborish",
+    "debugLogin": "DEBUG Login",
+    "loginLoading": "Login...",
+    "loginSuccess": "Login muvaffaqiyatli",
+    "loginError": "Login xatosi"
+  },
+  "header": {
+    "back": "Orqaga",
+    "collections": "Kolleksiyalar"
+  },
+  "constructor": {
+    "triggers": {
+      "title": "🚀 Triggerlar (Boshlovchilar)",
+      "message": {
+        "name": "Xabar kelganda",
+        "description": "Foydalanuvchidan xabar kelganda."
+      },
+      "command": {
+        "name": "Buyruq kelganda",
+        "description": "/start yoki /help kabi buyruq yuborganda."
+      },
+      "replyButton": {
+        "name": "Javob tugmasi bosilganda",
+        "description": "Tugmani bosganda."
+      },
+      "callbackQuery": {
+        "name": "Inline tugma bosilganda",
+        "description": "Inline tugmani bosganda."
+      }
+    },
+    "actions": {
+      "title": "⚙️ Amallar",
+      "textMessage": {
+        "name": "Matn yuborish",
+        "description": "Foydalanuvchiga matnli xabar yuboradi."
+      },
+      "photo": {
+        "name": "Rasm yuborish",
+        "description": "Foydalanuvchiga rasm yuboradi."
+      },
+      "video": {
+        "name": "Video yuborish",
+        "description": "Foydalanuvchiga video yuboradi."
+      },
+      "audio": {
+        "name": "Audio yuborish",
+        "description": "Foydalanuvchiga audio fayl yuboradi."
+      },
+      "file": {
+        "name": "Fayl yuborish",
+        "description": "Foydalanuvchiga hujjat yoki boshqa turdagi fayl yuboradi."
+      },
+      "animation": {
+        "name": "GIF yuborish",
+        "description": "GIF yoki MP4 animation yuboradi."
+      },
+      "voice": {
+        "name": "Ovozli xabar",
+        "description": "Voice message yuboradi."
+      },
+      "videoNote": {
+        "name": "Video xabar",
+        "description": "Dumaloq video xabar yuboradi."
+      },
+      "location": {
+        "name": "Joylashuv",
+        "description": "Geografik joylashuvni yuboradi."
+      },
+      "contact": {
+        "name": "Kontakt",
+        "description": "Kontakt ma'lumotlarini yuboradi."
+      },
+      "poll": {
+        "name": "So'rovnoma",
+        "description": "So'rovnoma yoki test yaratadi."
+      },
+      "sticker": {
+        "name": "Sticker",
+        "description": "Sticker yuboradi."
+      },
+      "mediaGroup": {
+        "name": "Media guruh",
+        "description": "Bir nechta rasm/video birgalikda yuboradi (2-10 ta)."
+      },
+      "venue": {
+        "name": "Joy (Venue)",
+        "description": "Joylashuv + joy ma'lumotlari (nom, manzil)."
+      },
+      "dice": {
+        "name": "O'yin",
+        "description": "Tasodifiy o'yin (kub, darts, basketbol va h.k.)."
+      },
+      "editMessage": {
+        "name": "Xabarni tahrirlash",
+        "description": "Yuborilgan xabarni tahrirlash (matn, caption, tugmalar, media)."
+      }
+    },
+    "messageOperations": {
+      "title": "📨 Xabar Operatsiyalari",
+      "forward": {
+        "name": "Xabarni uzatish",
+        "description": "Xabarni boshqa chatga yoki guruhga uzatadi."
+      },
+      "copy": {
+        "name": "Xabarni nusxalash",
+        "description": "Xabarni nusxalab yuboradi."
+      },
+      "pin": {
+        "name": "Xabarni qadash",
+        "description": "Xabarni guruhda qadab qo'yadi."
+      },
+      "unpin": {
+        "name": "Qadalni olib tashlash",
+        "description": "Qadangan xabarni olib tashlaydi."
+      },
+      "delete": {
+        "name": "Xabarni o'chirish",
+        "description": "Xabarni o'chiradi."
+      },
+      "chatAction": {
+        "name": "Harakat ko'rsatish",
+        "description": "Typing yoki upload ko'rsatkichini ko'rsatadi."
+      }
+    },
+    "flowControl": {
+      "title": "🔀 Mantiq Oqimi",
+      "condition": {
+        "name": "Shart (If/Else)",
+        "description": "Shartga qarab ikki yo'ldan birini tanlaydi."
+      },
+      "delay": {
+        "name": "Kutish",
+        "description": "Belgilangan vaqt kutadi."
+      },
+      "random": {
+        "name": "Tasodifiy",
+        "description": "Tasodifiy yo'lni tanlaydi."
+      },
+      "variable": {
+        "name": "O'zgaruvchi",
+        "description": "O'zgaruvchilarni boshqaradi (set, increment, etc)."
+      },
+      "checkMembership": {
+        "name": "A'zolikni tekshirish",
+        "description": "Foydalanuvchi kanal/guruh a'zosi ekanligini tekshiradi."
+      }
+    },
+    "integrations": {
+      "title": "🌐 Integratsiyalar",
+      "httpRequest": {
+        "name": "HTTP So'rov",
+        "description": "Tashqi API'ga so'rov yuboradi."
+      },
+      "callbackAnswer": {
+        "name": "Callback Javob",
+        "description": "Inline tugma bosilganda javob beradi."
+      }
+    },
+    "customLogic": {
+      "title": "🧩 Maxsus Mantiq",
+      "code": {
+        "name": "Maxsus Kod",
+        "description": "Murakkab amallar va shartlar uchun Python kodi yozish imkonini beradi."
+      },
+      "state": {
+        "name": "Ma'lumotlar yig'ish",
+        "description": "Foydalanuvchidan ma'lumotlarni yig'ib borish uchun"
+      },
+      "collection": {
+        "name": "Ma'lumotlar ro'yxati",
+        "description": "Collectionga ma'lumotlar qo'shish"
+      },
+      "loadCollectionItem": {
+        "name": "Ma'lumot yuklash",
+        "description": "Collectiondan bitta ma'lumotni yuklash va contextga saqlash"
+      }
+    }
+  },
+  "messageTypes": {
+    "any": "Har qanday xabar",
+    "text": "Matn",
+    "location": "Joylashuv",
+    "contact": "Kontakt",
+    "phone": "Telefon",
+    "document": "Hujjat",
+    "photo": "Rasm",
+    "video": "Video",
+    "audio": "Audio",
+    "sticker": "Stiker"
+  },
+  "filters": {
+    "any": "Har qanday",
+    "equals": "Teng",
+    "contains": "Ichida",
+    "startsWith": "Boshlanadi",
+    "regex": "Regex",
+    "command": "Buyruq",
+    "radius": "Radius (ichida)",
+    "size": "Hajm (MB)",
+    "extension": "Kengaytmasi",
+    "equalsStatic": "Teng (Static)",
+    "collection": "Collection (Dynamic)"
+  },
+  "chatActions": {
+    "typing": "Yozmoqda...",
+    "uploadPhoto": "Rasm yuklanmoqda...",
+    "uploadVideo": "Video yuklanmoqda...",
+    "uploadVoice": "Ovozli xabar yuklanmoqda...",
+    "uploadDocument": "Hujjat yuklanmoqda...",
+    "findLocation": "Joylashuv aniqlanmoqda...",
+    "recordVideo": "Video yozilmoqda...",
+    "recordVoice": "Ovoz yozilmoqda..."
+  },
+  "errors": {
+    "networkError": "Internet aloqasi yo'q. Iltimos, qaytadan urinib ko'ring.",
+    "badRequest": "Noto'g'ri so'rov. Ma'lumotlarni tekshirib qaytadan urinib ko'ring.",
+    "unauthorized": "Sizning sessiyangiz tugagan. Qaytadan kiring.",
+    "forbidden": "Bu amalni bajarish uchun ruxsatingiz yo'q.",
+    "notFound": "Ma'lumot topilmadi.",
+    "validationError": "Ma'lumotlar noto'g'ri.",
+    "rateLimited": "Juda ko'p so'rov yuborildi. Biroz kutib qaytadan urinib ko'ring.",
+    "serverError": "Server xatoligi. Iltimos, keyinroq urinib ko'ring.",
+    "unknownError": "Xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring.",
+    "genericError": "Noma'lum xatolik yuz berdi.",
+    "fileUploadError": "Fayl yuklashda xatolik yuz berdi. Iltimos, qayta urinib ko'ring."
+  },
+  "buttons": {
+    "textButton": "Matnli tugma",
+    "webApp": "Web App",
+    "poll": "So'rovnoma",
+    "inlineButton": "Inline tugma",
+    "replyButton": "Javob tugmasi"
+  },
+  "nodes": {
+    "placeholder": {
+      "selectCollection": "Collection tanlang",
+      "selectField": "Field tanlang",
+      "selectMessage": "Xabarni tanlang",
+      "enterVariableName": "O'zgaruvchi nomi (masalan: user_age)",
+      "enterValue": "Qiymat kiriting",
+      "enterCode": "Masalan, Foydalanuvchini tekshirish",
+      "enterSeconds": "5",
+      "enterUrl": "https://api.example.com/endpoint",
+      "enterHeaders": "{\"Authorization\": \"Bearer {{token}}\"}",
+      "enterBody": "{\"key\": \"value\", \"user_id\": \"{{user_id}}\"}",
+      "enterTimeout": "30",
+      "enterMessageId": "Message ID ni kiriting",
+      "selectParseMode": "Parse Mode",
+      "selectMediaType": "Media turi",
+      "enterMediaUrl": "https://example.com/image.jpg yoki file_id",
+      "selectSource": "Manbani tanlang...",
+      "enterFileId": "video_fayl_idsi...",
+      "enterVideoUrl": "https://example.com/video.mp4",
+      "enterDuration": "Davomiyligi (s)",
+      "enterWidth": "Eni (px)",
+      "enterHeight": "Bo'yi (px)",
+      "enterThumbnail": "Muqova uchun File ID",
+      "enterCaption": "Video uchun matn kiriting...",
+      "enterPhone": "+998901234567",
+      "enterFirstName": "Alisher",
+      "enterLastName": "Navoiy",
+      "enterVCard": "BEGIN:VCARD&#10;VERSION:3.0&#10;...",
+      "enterLatitude": "41.311151",
+      "enterLongitude": "69.279737",
+      "enterLivePeriod": "3600",
+      "enterHeading": "90",
+      "enterProximityRadius": "500",
+      "selectActionType": "Harakat turini tanlang",
+      "selectCallbackType": "Static callback tanlang...",
+      "selectCollectionCallback": "Collection callback tanlang...",
+      "selectStateKey": "State key...",
+      "enterCustomStateKey": "Custom state key...",
+      "selectMemberType": "Kirish turini tanlang"
+    },
+    "label": {
+      "variableName": "O'zgaruvchi nomi",
+      "variableValue": "O'zgaruvchi qiymati",
+      "variableType": "O'zgaruvchi turi",
+      "stateKey": "State key",
+      "collection": "Collection",
+      "field": "Field",
+      "messageId": "Message ID",
+      "text": "Matn",
+      "parseMode": "Parse Mode",
+      "mediaType": "Media turi",
+      "mediaUrl": "Media URL",
+      "source": "Manba",
+      "fileId": "File ID",
+      "url": "URL",
+      "duration": "Davomiyligi",
+      "width": "Eni",
+      "height": "Bo'yi",
+      "thumbnail": "Muqova",
+      "caption": "Caption",
+      "phone": "Telefon",
+      "firstName": "Ism",
+      "lastName": "Familiya",
+      "vCard": "vCard",
+      "latitude": "Kenglik",
+      "longitude": "Uzunlik",
+      "livePeriod": "Yashash muddati",
+      "heading": "Yo'nalish",
+      "proximityRadius": "Yaqinlashish ogohlantirish radiusi",
+      "actionType": "Harakat turi",
+      "callbackType": "Callback turi",
+      "memberType": "A'zo turi",
+      "delay": "Kutish (soniyalar)",
+      "timeout": "Timeout (soniyalar)",
+      "headers": "Headers",
+      "body": "Body",
+      "responseKey": "Response Key"
+    },
+    "variableValue": "O'zgaruvchi qiymati",
+    "enterVariableValue": "Dynamic message qiymatini kiriting:",
+    "cancel": "Bekor qilish",
+    "save": "Saqlash",
+    "buttonRowLimit": "Bu qatorning limiti to'lgan ({maxButtons} ta).",
+    "collectionRowNote": "Collection qatori - boshqa button qo'shib bo'lmaydi",
+    "enterButtonText": "Iltimos, tugma matnini kiriting.",
+    "enterLoginUrl": "Login URL manzilini kiriting.",
+    "enterWebAppUrl": "Web App URL manzilini kiriting.",
+    "enterActionValue": "Iltimos, amal uchun qiymat kiriting.",
+    "selectCollectionAndField": "Iltimos, collection va field tanlang.",
+    "fileUploadError": "Fayl yuklashda xatolik yuz berdi. Iltimos, qayta urinib ko'ring."
+  },
+  "editor": {
+    "selectModel": "Model tanlash",
+    "yourPrompt": "Sizning so'rovingiz",
+    "enterPrompt": "So'rovingizni bu yerga kiriting... (Yuborish uchun Cmd/Ctrl + Enter)"
+  }
 }

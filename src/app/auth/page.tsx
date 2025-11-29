@@ -12,22 +12,24 @@ import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function AuthenticationPage() {
   const [code, setCode] = React.useState<string>("");
+  const t = useTranslations();
 
   const LoginUser = () => {
-    toast.loading("Login...");
+    toast.loading(t("auth.loginLoading"));
 
     signIn("credentials", {
       code: code,
       redirect: false,
     })
       .then(() => {
-        toast.success("Login success");
+        toast.success(t("auth.loginSuccess"));
       })
       .catch(() => {
-        toast.error("Login error");
+        toast.error(t("auth.loginError"));
       });
   };
 
@@ -43,18 +45,19 @@ export default function AuthenticationPage() {
         {/* Sarlavha va yo'riqnoma */}
         <div className="flex flex-col space-y-2">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Kodni Kiriting
+            {t("auth.title")}
           </h1>
           <p className="max-w-xs text-sm text-muted-foreground">
+            {t("auth.description")}{" "}
             <a
               href="https://t.me/bot_mather_auth_bot" // Bu yerga o'z botingiz havolasini qo'ying
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-foreground underline underline-offset-4"
             >
-              @bot_mather_auth_bot
+              {t("auth.telegramBot")}
             </a>{" "}
-            telegram botiga kiring va 1 daqiqalik kodingizni oling.
+            {t("auth.getCode")}
           </p>
         </div>
 
@@ -92,11 +95,11 @@ export default function AuthenticationPage() {
         <div className="flex gap-2">
           <Button>
             <Send />
-            Kodni Yuborish
+            {t("auth.sendCode")}
           </Button>
           <Button onClick={() => LoginUser()}>
             <Send />
-            DEBUG Login
+            {t("auth.debugLogin")}
           </Button>
         </div>
       </div>

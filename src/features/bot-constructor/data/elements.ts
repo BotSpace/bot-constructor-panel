@@ -321,7 +321,7 @@ export const Elements: ElementTypes[] = [
       {
         type: "collection",
         name: "Ma'lumotlar ro'yxati",
-        description: "Collectiondan ma'lumotlar ro'yxatini olish",
+        description: "Collectionga ma'lumotlar qo'shish",
         icon: "📦",
         color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
         triggerId: "CollectionNode",
@@ -329,7 +329,8 @@ export const Elements: ElementTypes[] = [
       {
         type: "load_collection_item",
         name: "Ma'lumot yuklash",
-        description: "Collectiondan bitta ma'lumotni yuklash va contextga saqlash",
+        description:
+          "Collectiondan bitta ma'lumotni yuklash va contextga saqlash",
         icon: "📥",
         color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
         triggerId: "LoadCollectionItemNode",
