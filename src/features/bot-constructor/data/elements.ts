@@ -335,6 +335,15 @@ export const Elements: ElementTypes[] = [
         color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
         triggerId: "LoadCollectionItemNode",
       },
+      {
+        type: "download",
+        name: "Fayl yuklab olish",
+        description:
+          "Foydalanuvchi yuborgan faylni yuklab oladi va API'ga yuboradi. UUID ni state'ga saqlaydi.",
+        icon: "⬇️",
+        color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+        triggerId: "DownloadNode",
+      },
     ],
   },
 ];

@@ -90,6 +90,11 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         type: "user_id",
         node_type: nodeType,
       };
+    case "DownloadNode":
+      return {
+        key: "file_uuid",
+        node_type: nodeType,
+      };
 
     default:
       return {};

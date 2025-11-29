@@ -196,6 +196,10 @@
       "loadCollectionItem": {
         "name": "Load Data",
         "description": "Load a single item from Collection and save to context"
+      },
+      "download": {
+        "name": "Download File",
+        "description": "Downloads file from user and uploads to API. Saves UUID to state."
       }
     }
   },

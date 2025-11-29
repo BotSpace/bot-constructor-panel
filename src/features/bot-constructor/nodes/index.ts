@@ -34,6 +34,7 @@ import {
   StateNode,
   CollectionNode,
   LoadCollectionItemNode,
+  DownloadNode,
   IfConditionNode,
   DelayNode,
   RandomNode,
@@ -81,6 +82,7 @@ export const CustomNodes = {
   StateNode,
   CollectionNode,
   LoadCollectionItemNode,
+  DownloadNode,
   
   // Custom - Flow Control
   IfConditionNode,

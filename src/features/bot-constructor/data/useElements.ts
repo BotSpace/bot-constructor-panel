@@ -329,6 +329,14 @@ export function useElements(): ElementTypes[] {
           color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
           triggerId: "LoadCollectionItemNode",
         },
+        {
+          type: "download",
+          name: t("constructor.customLogic.download.name"),
+          description: t("constructor.customLogic.download.description"),
+          icon: "⬇️",
+          color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+          triggerId: "DownloadNode",
+        },
       ],
     },
   ];

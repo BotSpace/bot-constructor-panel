@@ -196,6 +196,10 @@
       "loadCollectionItem": {
         "name": "Ma'lumot yuklash",
         "description": "Collectiondan bitta ma'lumotni yuklash va contextga saqlash"
+      },
+      "download": {
+        "name": "Fayl yuklab olish",
+        "description": "Foydalanuvchi yuborgan faylni yuklab oladi va API'ga yuboradi. UUID ni state'ga saqlaydi."
       }
     }
   },
