@@ -23,6 +23,7 @@ export interface SendFileNodeData {
   fileSourceType?: FileSourceType;
   fileId?: string;
   fileUrl?: string;
+  uploadedFileUuid?: string; // `fileSourceType` 'upload' bo'lganda ishlatiladi - backend'dan qaytgan UUID
 
   caption?: string;
 

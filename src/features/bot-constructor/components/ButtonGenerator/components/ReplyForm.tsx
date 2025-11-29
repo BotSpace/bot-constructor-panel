@@ -392,7 +392,11 @@ export const ReplyForm = ({ onAdd, disabled, data }: ReplyFormProps) => {
                               | "text"
                               | "number"
                               | "bool"
-                              | "datetime",
+                              | "datetime"
+                              | "file"
+                              | "audio"
+                              | "video"
+                              | "photo",
                           }))
                         ]}
                         filters={filters}
