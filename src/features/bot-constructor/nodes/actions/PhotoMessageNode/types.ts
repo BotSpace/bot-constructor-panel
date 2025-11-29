@@ -30,7 +30,7 @@ export interface SendPhotoNodeData {
   photoSourceType?: PhotoSourceType;
   photoFileId?: string; // `photoSourceType` 'file_id' bo'lganda ishlatiladi.
   photoUrl?: string; // `photoSourceType` 'url' bo'lganda ishlatiladi.
-  // 'upload' uchun alohida maydon qo'shish mumkin, masalan: `uploadedFile?: File`
+  uploadedFileUuid?: string; // `photoSourceType` 'upload' bo'lganda ishlatiladi - backend'dan qaytgan UUID
 
   caption?: string; // Rasm ostidagi matn (1024 belgacha).
 

@@ -23,6 +23,7 @@ export interface SendAudioNodeData {
   audioSourceType?: AudioSourceType;
   audioFileId?: string;
   audioUrl?: string;
+  uploadedFileUuid?: string; // `audioSourceType` 'upload' bo'lganda ishlatiladi - backend'dan qaytgan UUID
 
   caption?: string;
 

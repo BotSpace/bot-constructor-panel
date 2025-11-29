@@ -137,6 +137,10 @@ export function FilterRow({
 
     switch (selectedField.type) {
       case "text":
+      case "file":
+      case "audio":
+      case "video":
+      case "photo":
         return (
           <Input
             type="text"
@@ -242,6 +246,10 @@ export function FilterRow({
 function getOperatorsForType(type: FilterField["type"]) {
   switch (type) {
     case "text":
+    case "file":
+    case "audio":
+    case "video":
+    case "photo":
       return [
         { value: "equals", label: "Equals" },
         { value: "not_equals", label: "Not equals" },
@@ -279,6 +287,10 @@ function getOperatorsForType(type: FilterField["type"]) {
 function getDefaultValue(type: FilterField["type"]): Filter["value"] {
   switch (type) {
     case "text":
+    case "file":
+    case "audio":
+    case "video":
+    case "photo":
       return "";
     case "number":
       return 0;
