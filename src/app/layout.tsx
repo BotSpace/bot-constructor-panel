@@ -38,18 +38,16 @@ export default function RootLayout({
       >
         <ReactQueryProvider>
           <AuthProvider>
-            <NextIntlClientProvider>
-              <WebSocketProvider>
-                <ThemeProvider
-                  attribute="class"
-                  defaultTheme="system"
-                  enableSystem
-                >
-                  {children}
-                  <Toaster position="top-center" reverseOrder={false} />
-                </ThemeProvider>
-              </WebSocketProvider>
-            </NextIntlClientProvider>
+            <WebSocketProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+              >
+                {children}
+                <Toaster position="top-center" reverseOrder={false} />
+              </ThemeProvider>
+            </WebSocketProvider>
           </AuthProvider>
         </ReactQueryProvider>
       </body>

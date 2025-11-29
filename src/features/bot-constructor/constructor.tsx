@@ -196,6 +196,7 @@ function FlowchartInner() {
         deleteKeyCode={null} // O'zimizning handler'imizni ishlatamiz
         minZoom={0.1}
         maxZoom={2}
+        connectionRadius={50}
       >
         <SaveStatusBadge className="absolute top-2 right-2 z-20" />
         <Background gap={24} color="#666" />

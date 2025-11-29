@@ -5,16 +5,19 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Constructor from "@/features/bot-constructor/constructor";
-import { Elements } from "@/features/bot-constructor/data/elements";
+import { useElements } from "@/features/bot-constructor/data/useElements";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConstructorPageHeader } from "@/components/layout/header";
 import { DebugConsole } from "@/components/layout/components/debug-console";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
+import { useTranslations } from "next-intl";
 
 export default function Page() {
   const { id }: { id: string } = useParams();
+  const t = useTranslations();
+  const Elements = useElements();
 
   const { loadProject, project } = useProjectStore();
   const { loadCollections } = useCollectionStore();
@@ -97,7 +100,7 @@ export default function Page() {
               <Input
                 // Ref'ni inputga bog'laymiz
                 ref={searchInputRef}
-                placeholder="Search components... (Ctrl+K)" // Foydalanuvchiga ishora
+                placeholder={t("common.search")} // Foydalanuvchiga ishora
                 className="h-8 pl-9 text-sm placeholder:text-slate-400 focus-visible:border-white/20 focus-visible:ring-0"
                 // State'ni yangilaymiz
                 value={searchTerm}
@@ -155,7 +158,7 @@ export default function Page() {
               </div>
             ) : (
               <div className="text-center text-sm mt-8">
-                Hech narsa topilmadi.
+                {t("common.noResults")}
               </div>
             )}
           </div>
