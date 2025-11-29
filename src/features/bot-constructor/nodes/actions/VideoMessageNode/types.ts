@@ -23,6 +23,7 @@ export interface SendVideoNodeData {
   videoSourceType?: VideoSourceType;
   videoFileId?: string;
   videoUrl?: string;
+  uploadedFileUuid?: string; // `videoSourceType` 'upload' bo'lganda ishlatiladi - backend'dan qaytgan UUID
 
   caption?: string;
 
