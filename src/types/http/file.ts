@@ -17,4 +17,3 @@ export interface FileData {
 export interface CreateFileResponse extends APIDetailCreateResponse<FileData> {}
 
 export interface ListFileResponse extends APIDetailCreateResponse<FileData> {}
-

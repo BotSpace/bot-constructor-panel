@@ -47,6 +47,18 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
       // EditMessageHandler'dan chiqqan edge'ni aniqlash
       const isEditMessageEdge =
         connection.sourceHandle === "edit-message-handler";
+      
+      // DeleteMessageHandler'dan chiqqan edge'ni aniqlash
+      const isDeleteMessageEdge =
+        connection.sourceHandle === "delete-message-handler";
+
+      // Edge rangini aniqlash
+      let edgeColor = "#495057"; // Default kulrang
+      if (isEditMessageEdge) {
+        edgeColor = "#f97316"; // Orange
+      } else if (isDeleteMessageEdge) {
+        edgeColor = "#ef4444"; // Red
+      }
 
       const newEdge = {
         ...connection,
@@ -55,16 +67,16 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
           type: "arrow",
           width: 30,
           height: 30,
-          color: isEditMessageEdge ? "#f97316" : "#495057",
+          color: edgeColor,
         },
         // React Flow'ning default edge'ini ishlatamiz
         // Rasmga mos stil
         style: {
           strokeWidth: 1.5,
-          stroke: isEditMessageEdge ? "#f97316" : "#495057", // Orange-500 yoki to'q kulrang
+          stroke: edgeColor,
         },
-        // EditMessageHandler'dan chiqqan edge'lar uchun animated true
-        animated: isEditMessageEdge ? true : false,
+        // EditMessageHandler va DeleteMessageHandler'dan chiqqan edge'lar uchun animated true
+        animated: isEditMessageEdge || isDeleteMessageEdge ? true : false,
       };
 
       const newEdges = addEdge(newEdge, get().edges);
