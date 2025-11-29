@@ -25,8 +25,8 @@ import { NodeFooter } from "../shared/NodeFooter";
 import { NodeHeader } from "../shared/NodeHeader";
 import { FileText } from "lucide-react";
 import { RecipientsManager } from "../shared/RecipientSelector";
-import { SourceHandler, TargetHandler } from "../../components";
-import { EditMessageTarget } from "../../components/shared/ReactFlowHandlers/EditMessageTarget";
+import { SourceHandles, TargetHandles } from "../../components";
+import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 
 const SendFileNodeComponent = ({
   id,
@@ -101,8 +101,8 @@ const SendFileNodeComponent = ({
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
-      <EditMessageTarget />
+      <TargetHandles />
+      <SelectedMessageTarget />
 
       <NodeHeader
         icon={<FileText className="text-primary" />}
@@ -274,7 +274,7 @@ const SendFileNodeComponent = ({
         </>
       )}
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

@@ -4,9 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Edit, AlertCircle } from "lucide-react";
 import { NodeHeader } from "../shared/NodeHeader";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { EditMessageNodeData, EditMessageType, MessageIdSource } from "./types";
-import { EditMessageHandler } from "../../components/shared/ReactFlowHandlers/EditMessageHandler";
+import { EditMessageSource } from "../../components/shared/ReactFlowHandles/EditMessageSource";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -36,10 +36,10 @@ export const EditMessageNode = memo(
 
     // EditMessageHandler'dan chiqqan edge orqali EditMessageTarget'ga ulangan message node'ni topish
     const connectedMessageNode = useMemo(() => {
-      // EditMessageHandler'dan chiqqan edge'ni topish (source === id && sourceHandle === "edit-message-handler")
+      // EditMessageHandler'dan chiqqan edge'ni topish (source === id && sourceHandle === "edit-message-source")
       const editHandlerEdge = edges.find(
         (edge) =>
-          edge.source === id && edge.sourceHandle === "edit-message-handler"
+          edge.source === id && edge.sourceHandle === "edit-message-source"
       );
       if (!editHandlerEdge) return null;
 
@@ -114,10 +114,10 @@ export const EditMessageNode = memo(
         )}
       >
         {/* Standard Target Handle (Top) */}
-        <TargetHandler />
+        <TargetHandles />
 
         {/* Custom Edit Target Handle (Left side) - Tahrirlanadigan messageni qabul qiladi */}
-        <EditMessageHandler />
+        <EditMessageSource />
 
         <NodeHeader
           icon={<Edit className="text-primary" />}
@@ -458,7 +458,7 @@ export const EditMessageNode = memo(
         )}
 
         {/* Standard Source Handle (Bottom) */}
-        <SourceHandler />
+        <SourceHandles />
       </Card>
     );
   }

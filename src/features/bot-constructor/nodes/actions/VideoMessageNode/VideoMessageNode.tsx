@@ -33,8 +33,8 @@ import { Video } from "lucide-react";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
-import { SourceHandler, TargetHandler } from "../../components";
-import { EditMessageTarget } from "../../components/shared/ReactFlowHandlers/EditMessageTarget";
+import { SourceHandles, TargetHandles } from "../../components";
+import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 
 const SendVideoNodeComponent = ({
   id,
@@ -110,8 +110,8 @@ const SendVideoNodeComponent = ({
 
   return (
     <Card className={cn("w-96 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
-      <EditMessageTarget />
+      <TargetHandles />
+      <SelectedMessageTarget />
 
       <NodeHeader
         icon={<Video className="text-primary" />}
@@ -337,7 +337,7 @@ const SendVideoNodeComponent = ({
         </>
       )}
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

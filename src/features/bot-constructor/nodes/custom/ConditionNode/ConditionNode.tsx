@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { NodeFooter } from "../../actions/shared/NodeFooter";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { IfConditionNodeData, ConditionOperator } from "./types";
 import { Label } from "@/components/ui/label";
@@ -50,7 +50,10 @@ const IfConditionNodeComponent = ({
     handleUpdate({ conditions: newConditions });
   };
 
-  const updateCondition = (index: number, update: Partial<ConditionOperator>) => {
+  const updateCondition = (
+    index: number,
+    update: Partial<ConditionOperator>
+  ) => {
     const newConditions = [...(data.conditions || [])];
     newConditions[index] = { ...newConditions[index], ...update };
     handleUpdate({ conditions: newConditions });
@@ -58,7 +61,7 @@ const IfConditionNodeComponent = ({
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
       <NodeHeader
         icon="🔀"
         title="Shart (If/Else)"
@@ -146,10 +149,16 @@ const IfConditionNodeComponent = ({
                     <SelectItem value="not_equals">Teng emas (≠)</SelectItem>
                     <SelectItem value="greater_than">Katta (&gt;)</SelectItem>
                     <SelectItem value="less_than">Kichik (&lt;)</SelectItem>
-                    <SelectItem value="greater_equal">Katta yoki teng (≥)</SelectItem>
-                    <SelectItem value="less_equal">Kichik yoki teng (≤)</SelectItem>
+                    <SelectItem value="greater_equal">
+                      Katta yoki teng (≥)
+                    </SelectItem>
+                    <SelectItem value="less_equal">
+                      Kichik yoki teng (≤)
+                    </SelectItem>
                     <SelectItem value="contains">O'z ichiga oladi</SelectItem>
-                    <SelectItem value="not_contains">O'z ichiga olmaydi</SelectItem>
+                    <SelectItem value="not_contains">
+                      O'z ichiga olmaydi
+                    </SelectItem>
                     <SelectItem value="starts_with">Boshlanadi</SelectItem>
                     <SelectItem value="ends_with">Tugaydi</SelectItem>
                     <SelectItem value="is_empty">Bo'sh</SelectItem>
@@ -187,11 +196,10 @@ const IfConditionNodeComponent = ({
       )}
 
       <NodeFooter nodeId={id} />
-      <SourceHandler id="true" />
-      <SourceHandler id="false" />
+      <SourceHandles id="true" />
+      <SourceHandles id="false" />
     </Card>
   );
 };
 
 export const IfConditionNode = memo(IfConditionNodeComponent);
-

@@ -8,7 +8,7 @@ import React, { useMemo, useState } from "react";
 import { NodeProps, useEdges, useNodes } from "reactflow";
 import { Database, ChevronDown, Key, Type } from "lucide-react";
 import { StateNodeData } from "./types";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 
 export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
@@ -636,7 +636,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
           : "border-gray-700/50 shadow-md"
       }`}
     >
-      <TargetHandler />
+      <TargetHandles />
 
       <CardHeader className="pb-3 px-6 pt-6">
         <div
@@ -755,7 +755,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
         </CardContent>
       )}
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 }

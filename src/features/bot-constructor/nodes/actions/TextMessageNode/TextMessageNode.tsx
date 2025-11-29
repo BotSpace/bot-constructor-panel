@@ -19,8 +19,8 @@ import {
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
-import { SourceHandler, TargetHandler } from "../../components";
-import { EditMessageTarget } from "../../components/shared/ReactFlowHandlers/EditMessageTarget";
+import { SourceHandles, TargetHandles } from "../../components";
+import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { DynamicMessageConstructor } from "./components/dynamic-message-constructor-modal";
 import { Button } from "@/components/ui/button";
 
@@ -47,8 +47,9 @@ const SendTextMessageNodeComponent = ({
     )?.flat().length || 0;
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
-      <EditMessageTarget />
+      <TargetHandles />
+      <SelectedMessageTarget />
+
       <NodeHeader
         icon={<LetterText className="text-primary" />}
         title="Xabar yuborish"
@@ -117,7 +118,7 @@ const SendTextMessageNodeComponent = ({
           />
         </>
       )}
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

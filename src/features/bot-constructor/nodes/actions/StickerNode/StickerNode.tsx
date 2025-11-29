@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 
 interface StickerNodeData {
   stickerSourceType?: "file_id" | "url";
@@ -41,7 +41,7 @@ const StickerNodeInternal = ({
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
       <NodeHeader
         icon="🎭"
         title="Sticker yuborish"
@@ -77,7 +77,9 @@ const StickerNodeInternal = ({
               <Input
                 placeholder="CAACAgIAAxkBAAIC..."
                 value={data.stickerFileId || ""}
-                onChange={(e) => handleUpdate({ stickerFileId: e.target.value })}
+                onChange={(e) =>
+                  handleUpdate({ stickerFileId: e.target.value })
+                }
               />
             </div>
           ) : (
@@ -94,7 +96,7 @@ const StickerNodeInternal = ({
       )}
 
       <NodeFooter nodeId={id} />
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

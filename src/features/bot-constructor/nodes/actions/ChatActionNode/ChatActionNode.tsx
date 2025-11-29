@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
 import {
@@ -21,7 +21,11 @@ interface ChatActionNodeData {
   action?: string;
 }
 
-const ChatActionNodeInternal = ({ id, data, selected }: NodeProps<ChatActionNodeData>) => {
+const ChatActionNodeInternal = ({
+  id,
+  data,
+  selected,
+}: NodeProps<ChatActionNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -42,7 +46,7 @@ const ChatActionNodeInternal = ({ id, data, selected }: NodeProps<ChatActionNode
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
       <NodeHeader
         icon="⌨️"
         title="Harakat ko'rsatish"
@@ -72,14 +76,15 @@ const ChatActionNodeInternal = ({ id, data, selected }: NodeProps<ChatActionNode
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Bot hozir nimalar bilan band ekanligini ko'rsatadi (5 soniya davom etadi)
+              Bot hozir nimalar bilan band ekanligini ko'rsatadi (5 soniya davom
+              etadi)
             </p>
           </div>
         </CardContent>
       )}
 
       <NodeFooter nodeId={id} />
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

@@ -46,8 +46,8 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 
       // EditMessageHandler'dan chiqqan edge'ni aniqlash
       const isEditMessageEdge =
-        connection.sourceHandle === "edit-message-handler";
-      
+        connection.sourceHandle === "edit-message-source";
+
       // DeleteMessageHandler'dan chiqqan edge'ni aniqlash
       const isDeleteMessageEdge =
         connection.sourceHandle === "delete-message-handler";

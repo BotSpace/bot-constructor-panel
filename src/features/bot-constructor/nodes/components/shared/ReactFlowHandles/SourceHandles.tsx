@@ -4,13 +4,11 @@ import { Handle, Position } from "reactflow";
 
 interface SourceHandlerProps {
   id?: string;
-  label?: string;
   position?: Position;
 }
 
-export function SourceHandler({
+export function SourceHandles({
   id = "source-handler",
-  label,
   position = Position.Bottom,
 }: SourceHandlerProps) {
   return (
@@ -23,16 +21,4 @@ export function SourceHandler({
       <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
     </Handle>
   );
-  // TODO: Samandarni AI qo'shgan ekan  relation divni
-  // Balkim kerak bo'lib qolar
-  // return (
-  //   <div className="relative">
-  //     {label && (
-  //       <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-muted-foreground whitespace-nowrap">
-  //         {label}
-  //       </span>
-  //     )}
-
-  //   </div>
-  // );
 }

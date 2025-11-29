@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { NodeFooter } from "../../actions/shared/NodeFooter";
-import { TargetHandler } from "../../components";
+import { TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -68,7 +68,7 @@ const CheckMembershipNodeComponent = ({
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
       <NodeHeader
         icon="👥"
         title="A'zolikni tekshirish"

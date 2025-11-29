@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { Plus, Trash2 } from "lucide-react";
 
 interface MediaItem {
@@ -68,7 +68,7 @@ const MediaGroupNodeInternal = ({
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
       <NodeHeader
         icon="🖼️"
         title="Media guruh yuborish"
@@ -103,7 +103,9 @@ const MediaGroupNodeInternal = ({
             {mediaItems.map((item, index) => (
               <div key={index} className="p-3 border rounded-lg space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Media #{index + 1}</span>
+                  <span className="text-sm font-medium">
+                    Media #{index + 1}
+                  </span>
                   <Button
                     size="sm"
                     variant="ghost"
@@ -203,7 +205,7 @@ const MediaGroupNodeInternal = ({
       )}
 
       <NodeFooter nodeId={id} />
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };
