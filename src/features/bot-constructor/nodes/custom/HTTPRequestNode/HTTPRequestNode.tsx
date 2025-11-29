@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { NodeFooter } from "../../actions/shared/NodeFooter";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { HTTPRequestNodeData, HTTPMethod } from "./types";
 import { Label } from "@/components/ui/label";
@@ -35,7 +35,7 @@ const HTTPRequestNodeComponent = ({
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
       <NodeHeader
         icon="🌐"
         title="HTTP So'rov"
@@ -84,9 +84,7 @@ const HTTPRequestNodeComponent = ({
             <Label>Headers (JSON)</Label>
             <Textarea
               placeholder='{"Authorization": "Bearer {{token}}"}'
-              value={
-                data.headers ? JSON.stringify(data.headers, null, 2) : ""
-              }
+              value={data.headers ? JSON.stringify(data.headers, null, 2) : ""}
               onChange={(e) => {
                 try {
                   const headers = JSON.parse(e.target.value);
@@ -154,10 +152,9 @@ const HTTPRequestNodeComponent = ({
       )}
 
       <NodeFooter nodeId={id} />
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };
 
 export const HTTPRequestNode = memo(HTTPRequestNodeComponent);
-

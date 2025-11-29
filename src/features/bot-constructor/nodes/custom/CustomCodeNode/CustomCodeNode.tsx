@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Code2, PenLine } from "lucide-react";
 import { NodeHeader } from "@/features/bot-constructor/nodes/actions/shared/NodeHeader";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { CustomCodeNodeData } from "./types";
 import { CodeEditorDialog } from "./components/CodeEditorDialog";
 
@@ -71,7 +71,7 @@ const CustomCodeNodeComponent = ({
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
 
       <NodeHeader
         icon={<Code2 className="text-yellow-400" />}
@@ -127,7 +127,7 @@ const CustomCodeNodeComponent = ({
           </CodeEditorDialog>
         </CardContent>
       )}
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

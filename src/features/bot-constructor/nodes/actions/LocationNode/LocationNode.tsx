@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendLocationNodeData } from "./types";
 import { RecipientsManager } from "../shared/RecipientSelector";
@@ -28,7 +28,7 @@ const LocationNodeComponent = ({
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
       <NodeHeader
         icon="📍"
         title="Joylashuv"
@@ -136,10 +136,9 @@ const LocationNodeComponent = ({
       )}
 
       <NodeFooter nodeId={id} />
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };
 
 export const SendLocationNode = memo(LocationNodeComponent);
-

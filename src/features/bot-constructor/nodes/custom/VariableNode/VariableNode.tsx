@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { NodeFooter } from "../../actions/shared/NodeFooter";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { VariableNodeData, VariableOperation } from "./types";
 import { Label } from "@/components/ui/label";
@@ -32,11 +32,12 @@ const VariableNodeComponent = ({
     updateNodeData(id, update);
   };
 
-  const needsValue = data.operation && !["delete", "toggle"].includes(data.operation);
+  const needsValue =
+    data.operation && !["delete", "toggle"].includes(data.operation);
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
       <NodeHeader
         icon="🔢"
         title="O'zgaruvchi"
@@ -108,15 +109,9 @@ const VariableNodeComponent = ({
           <div className="text-xs text-muted-foreground space-y-1">
             <p className="font-medium">Masalan:</p>
             <ul className="list-disc list-inside space-y-0.5 ml-2">
-              {data.operation === "set" && (
-                <li>score = 100</li>
-              )}
-              {data.operation === "increment" && (
-                <li>score += 10</li>
-              )}
-              {data.operation === "decrement" && (
-                <li>lives -= 1</li>
-              )}
+              {data.operation === "set" && <li>score = 100</li>}
+              {data.operation === "increment" && <li>score += 10</li>}
+              {data.operation === "decrement" && <li>lives -= 1</li>}
               {data.operation === "append" && (
                 <li>items.push("yangi element")</li>
               )}
@@ -126,10 +121,9 @@ const VariableNodeComponent = ({
       )}
 
       <NodeFooter nodeId={id} />
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };
 
 export const VariableNode = memo(VariableNodeComponent);
-

@@ -31,7 +31,13 @@ import {
 import { useNodes } from "reactflow";
 import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { CollectionLayoutPreview } from "./CollectionLayoutPreview";
 
 interface InlineFormProps {
@@ -81,10 +87,10 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
   const [selectedCollection, setSelectedCollection] = useState<string>("");
   const [selectedField, setSelectedField] = useState<string>("");
   const [filters, setFilters] = useState<Filter[]>([]);
-  
+
   // Layout settings - pagination uchun
-  const [columns, setColumns] = useState<number>(2);  // Har qatorda 2 ta
-  const [rows, setRows] = useState<number>(5);        // 5 qator
+  const [columns, setColumns] = useState<number>(2); // Har qatorda 2 ta
+  const [rows, setRows] = useState<number>(5); // 5 qator
   const [enablePagination, setEnablePagination] = useState<boolean>(true); // Pagination yoqilgan/o'chirilgan
 
   // Collection field'larini olish
@@ -123,7 +129,8 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
     setEnablePagination(true);
   };
 
-  const handleAddClick = () => {
+  const handleAddClick = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!text) {
       alert("Iltimos, tugma matnini kiriting.");
       return;
@@ -191,11 +198,11 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
       field: field.name,
       ...(filters.length > 0 && { filters }),
       layout: {
-        columns,  // Har qatorda nechta tugma
-        rows,     // Har sahifada nechta qator
+        columns, // Har qatorda nechta tugma
+        rows, // Har sahifada nechta qator
         // Jami: columns × rows = bir sahifada tugmalar soni
       },
-      enablePagination,  // Pagination yoqilgan/o'chirilgan
+      enablePagination, // Pagination yoqilgan/o'chirilgan
     };
 
     // Callback data - backward compatibility uchun
@@ -219,33 +226,35 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
   };
 
   return (
-    <div className="mt-4 space-y-4">
-      <div>
-        <Label htmlFor="inline-text">Tugma matni</Label>
-        <Input
-          id="inline-text"
-          placeholder="Masalan, Bizning sayt"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-      </div>
-      <div>
-        <Label>Amal turi</Label>
-        <Select
-          value={actionType}
-          onValueChange={(v: InlineType) => setActionType(v)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Amal turini tanlang..." />
-          </SelectTrigger>
-          <SelectContent>
-            {inlineOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <form onSubmit={handleAddClick} className="mt-4 space-y-4">
+      <div className="grid grid-cols-6 gap-2">
+        <div className="col-span-4 flex flex-col gap-1.5">
+          <Label htmlFor="inline-text">Tugma matni</Label>
+          <Input
+            id="inline-text"
+            placeholder="Masalan, Bizning sayt"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+        </div>
+        <div className="col-span-2 flex flex-col gap-1.5">
+          <Label>Amal turi</Label>
+          <Select
+            value={actionType}
+            onValueChange={(v: InlineType) => setActionType(v)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Amal turini tanlang..." />
+            </SelectTrigger>
+            <SelectContent>
+              {inlineOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="animate-in fade-in-50">
@@ -258,7 +267,7 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
         {(actionType === "url" ||
           actionType === "callback" ||
           actionType.startsWith("switch_")) && (
-          <div>
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="inline-value">{selectedOption?.label}</Label>
             <Input
               id="inline-value"
@@ -270,12 +279,7 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
         )}
       </div>
 
-      <Button
-        type="button"
-        className="w-full"
-        onClick={handleAddClick}
-        disabled={disabled}
-      >
+      <Button type="submit" className="w-full" disabled={disabled}>
         <PlusCircle className="mr-2 h-4 w-4" /> Inline Tugma Qo'shish
       </Button>
 
@@ -283,7 +287,7 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
       {collections && collections.length > 0 && (
         <>
           <Separator className="my-6" />
-          
+
           <Card className="border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
             <CardHeader className="pb-4">
               <CardTitle className="text-base flex items-center gap-2">
@@ -297,215 +301,244 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="collection-select" className="text-sm font-medium">
-                Collection
-              </Label>
-              <Select
-                value={selectedCollection}
-                onValueChange={handleCollectionChange}
-              >
-                <SelectTrigger id="collection-select" className="mt-1.5">
-                  <SelectValue placeholder="Collection tanlang..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {collections.map((collection) => (
-                    <SelectItem key={collection.id} value={collection.name}>
-                      <div className="flex items-center gap-2">
-                        <Database className="h-3.5 w-3.5" />
-                        {collection.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {selectedCollection && collectionFields && (
-              <>
-                <div>
-                  <Label htmlFor="field-select" className="text-sm font-medium">
-                    Field
-                  </Label>
-                  <Select
-                    value={selectedField}
-                    onValueChange={setSelectedField}
-                  >
-                    <SelectTrigger id="field-select" className="mt-1.5">
-                      <SelectValue placeholder="Field tanlang..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {collectionFields.data.fields.map((field) => (
-                        <SelectItem key={field.id} value={field.id.toString()}>
-                          <div className="flex items-center justify-between w-full gap-2">
-                            <span>{field.name}</span>
-                            <span className="text-xs text-muted-foreground">({field.type})</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Filter Builder */}
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="filters" className="border rounded-lg px-4 bg-muted/30">
-                    <AccordionTrigger className="text-sm font-medium hover:no-underline">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
-                          Ixtiyoriy
-                        </span>
-                        Filter qo'shish
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-4">
-                      <FilterBuilder
-                        fields={[
-                          // Default _id field
-                          {
-                            id: "_id",
-                            label: "id",
-                            type: "text" as const,
-                          },
-                          // Collection field'lari
-                          ...collectionFields.data.fields.map((field) => ({
-                            id: field.name, // Field nomini id sifatida ishlatish
-                            label: field.name,
-                            type: field.type as
-                              | "text"
-                              | "number"
-                              | "bool"
-                              | "datetime"
-                              | "file"
-                              | "audio"
-                              | "video"
-                              | "photo",
-                          }))
-                        ]}
-                        filters={filters}
-                        onChange={setFilters}
-                        stateKeys={availableStateKeys}
-                      />
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-
-                {/* Layout Settings */}
-                <Card className="border-dashed">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <LayoutGrid className="h-4 w-4" />
-                      Pagination Sozlamalari
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      Har bir sahifada nechta tugma chiqishini belgilang
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Columns */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="columns" className="text-sm">
-                          Har bir qatorda
-                        </Label>
-                        <span className="text-sm font-medium text-primary">
-                          {columns} ta tugma
-                        </span>
-                      </div>
-                      <div className="flex gap-2">
-                        {[1, 2, 3, 4].map((num) => (
-                          <Button
-                            key={num}
-                            type="button"
-                            variant={columns === num ? "default" : "outline"}
-                            size="sm"
-                            className="flex-1"
-                            onClick={() => setColumns(num)}
-                          >
-                            {num}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Rows */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="rows" className="text-sm">
-                          Har bir sahifada
-                        </Label>
-                        <span className="text-sm font-medium text-primary">
-                          {rows} ta qator
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          id="rows"
-                          type="number"
-                          min={1}
-                          max={10}
-                          value={rows}
-                          onChange={(e) => setRows(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
-                          className="flex-1"
-                        />
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">
-                          qator
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Calculation */}
-                    <div className="p-3 bg-primary/10 border border-primary/30 rounded-md">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Bir sahifada:</span>
-                        <span className="font-bold text-primary">
-                          {columns} × {rows} = {columns * rows} ta tugma
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Enable Pagination Toggle */}
-                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-md border">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="enable-pagination" className="text-sm font-medium cursor-pointer">
-                          Pagination yoqish
-                        </Label>
-                        <p className="text-xs text-muted-foreground">
-                          Ko'p ma'lumotlar bo'lsa sahifalarga bo'lish
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <input
-                          id="enable-pagination"
-                          type="checkbox"
-                          checked={enablePagination}
-                          onChange={(e) => setEnablePagination(e.target.checked)}
-                          className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary cursor-pointer"
-                        />
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-muted-foreground">
-                      {enablePagination 
-                        ? "Qolgan tugmalar keyingi sahifalarda ko'rsatiladi" 
-                        : "Barcha tugmalar bir vaqtda ko'rsatiladi"}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Button
-                  type="button"
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md"
-                  onClick={handleAddCollectionButton}
-                  disabled={disabled || !selectedCollection || !selectedField}
+              <div>
+                <Label
+                  htmlFor="collection-select"
+                  className="text-sm font-medium"
                 >
-                  <Database className="mr-2 h-4 w-4" /> Collection Tugmasi Qo'shish
-                </Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </>
-    )}
-  </div>
-);
+                  Collection
+                </Label>
+                <Select
+                  value={selectedCollection}
+                  onValueChange={handleCollectionChange}
+                >
+                  <SelectTrigger id="collection-select" className="mt-1.5">
+                    <SelectValue placeholder="Collection tanlang..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {collections.map((collection) => (
+                      <SelectItem key={collection.id} value={collection.name}>
+                        <div className="flex items-center gap-2">
+                          <Database className="h-3.5 w-3.5" />
+                          {collection.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {selectedCollection && collectionFields && (
+                <>
+                  <div>
+                    <Label
+                      htmlFor="field-select"
+                      className="text-sm font-medium"
+                    >
+                      Field
+                    </Label>
+                    <Select
+                      value={selectedField}
+                      onValueChange={setSelectedField}
+                    >
+                      <SelectTrigger id="field-select" className="mt-1.5">
+                        <SelectValue placeholder="Field tanlang..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {collectionFields.data.fields.map((field) => (
+                          <SelectItem
+                            key={field.id}
+                            value={field.id.toString()}
+                          >
+                            <div className="flex items-center justify-between w-full gap-2">
+                              <span>{field.name}</span>
+                              <span className="text-xs text-muted-foreground">
+                                ({field.type})
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Filter Builder */}
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem
+                      value="filters"
+                      className="border rounded-lg px-4 bg-muted/30"
+                    >
+                      <AccordionTrigger className="text-sm font-medium hover:no-underline">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
+                            Ixtiyoriy
+                          </span>
+                          Filter qo'shish
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-4">
+                        <FilterBuilder
+                          fields={[
+                            // Default _id field
+                            {
+                              id: "_id",
+                              label: "id",
+                              type: "text" as const,
+                            },
+                            // Collection field'lari
+                            ...collectionFields.data.fields.map((field) => ({
+                              id: field.name, // Field nomini id sifatida ishlatish
+                              label: field.name,
+                              type: field.type as
+                                | "text"
+                                | "number"
+                                | "bool"
+                                | "datetime"
+                                | "file"
+                                | "audio"
+                                | "video"
+                                | "photo",
+                            })),
+                          ]}
+                          filters={filters}
+                          onChange={setFilters}
+                          stateKeys={availableStateKeys}
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+
+                  {/* Layout Settings */}
+                  <Card className="border-dashed">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <LayoutGrid className="h-4 w-4" />
+                        Pagination Sozlamalari
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Har bir sahifada nechta tugma chiqishini belgilang
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* Columns */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="columns" className="text-sm">
+                            Har bir qatorda
+                          </Label>
+                          <span className="text-sm font-medium text-primary">
+                            {columns} ta tugma
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          {[1, 2, 3, 4].map((num) => (
+                            <Button
+                              key={num}
+                              type="button"
+                              variant={columns === num ? "default" : "outline"}
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => setColumns(num)}
+                            >
+                              {num}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Rows */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="rows" className="text-sm">
+                            Har bir sahifada
+                          </Label>
+                          <span className="text-sm font-medium text-primary">
+                            {rows} ta qator
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            id="rows"
+                            type="number"
+                            min={1}
+                            max={10}
+                            value={rows}
+                            onChange={(e) =>
+                              setRows(
+                                Math.min(
+                                  10,
+                                  Math.max(1, parseInt(e.target.value) || 1)
+                                )
+                              )
+                            }
+                            className="flex-1"
+                          />
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                            qator
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Calculation */}
+                      <div className="p-3 bg-primary/10 border border-primary/30 rounded-md">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            Bir sahifada:
+                          </span>
+                          <span className="font-bold text-primary">
+                            {columns} × {rows} = {columns * rows} ta tugma
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Enable Pagination Toggle */}
+                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-md border">
+                        <div className="space-y-0.5">
+                          <Label
+                            htmlFor="enable-pagination"
+                            className="text-sm font-medium cursor-pointer"
+                          >
+                            Pagination yoqish
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            Ko'p ma'lumotlar bo'lsa sahifalarga bo'lish
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            id="enable-pagination"
+                            type="checkbox"
+                            checked={enablePagination}
+                            onChange={(e) =>
+                              setEnablePagination(e.target.checked)
+                            }
+                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary cursor-pointer"
+                          />
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-muted-foreground">
+                        {enablePagination
+                          ? "Qolgan tugmalar keyingi sahifalarda ko'rsatiladi"
+                          : "Barcha tugmalar bir vaqtda ko'rsatiladi"}
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Button
+                    type="button"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md"
+                    onClick={handleAddCollectionButton}
+                    disabled={disabled || !selectedCollection || !selectedField}
+                  >
+                    <Database className="mr-2 h-4 w-4" /> Collection Tugmasi
+                    Qo'shish
+                  </Button>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      )}
+    </form>
+  );
 };

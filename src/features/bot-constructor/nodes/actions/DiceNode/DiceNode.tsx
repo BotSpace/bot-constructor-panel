@@ -15,18 +15,14 @@ import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 
 interface DiceNodeData {
   emoji?: string;
   disableNotification?: boolean;
 }
 
-const DiceNodeInternal = ({
-  id,
-  data,
-  selected,
-}: NodeProps<DiceNodeData>) => {
+const DiceNodeInternal = ({ id, data, selected }: NodeProps<DiceNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -45,7 +41,7 @@ const DiceNodeInternal = ({
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
       <NodeHeader
         icon="🎲"
         title="O'yin yuborish"
@@ -82,7 +78,7 @@ const DiceNodeInternal = ({
       )}
 
       <NodeFooter nodeId={id} />
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

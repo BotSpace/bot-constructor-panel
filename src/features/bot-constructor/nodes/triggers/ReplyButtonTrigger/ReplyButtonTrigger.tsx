@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { ReplyButtonTriggerData } from "./types";
 import { AlertCircle, CornerDownLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { KeyboardConfig } from "../../actions/TextMessageNode/types";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -73,7 +73,7 @@ const ReplyButtonTriggerNodeComponent = ({
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
 
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-base">
@@ -139,7 +139,7 @@ const ReplyButtonTriggerNodeComponent = ({
           Global
         </Label>
       </CardContent>
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

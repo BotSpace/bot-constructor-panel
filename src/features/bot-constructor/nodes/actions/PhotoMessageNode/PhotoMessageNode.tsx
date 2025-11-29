@@ -25,8 +25,8 @@ import { Camera } from "lucide-react";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
-import { SourceHandler, TargetHandler } from "../../components";
-import { EditMessageTarget } from "../../components/shared/ReactFlowHandlers/EditMessageTarget";
+import { SourceHandles, TargetHandles } from "../../components";
+import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 
 const SendPhotoNodeComponent = ({
   id,
@@ -101,8 +101,8 @@ const SendPhotoNodeComponent = ({
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
-      <EditMessageTarget />
+      <TargetHandles />
+      <SelectedMessageTarget />
 
       <NodeHeader
         icon={<Camera className="text-primary" />}
@@ -253,7 +253,7 @@ const SendPhotoNodeComponent = ({
         </>
       )}
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

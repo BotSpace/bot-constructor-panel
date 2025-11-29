@@ -6,7 +6,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
-import { SourceHandler, TargetHandler, DeleteMessageHandler } from "../../components";
+import {
+  SourceHandles,
+  TargetHandles,
+  DeleteMessageSource,
+} from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -51,10 +55,10 @@ const DeleteMessageNodeComponent = ({
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
-      
+      <TargetHandles />
+
       {/* Custom Delete Source Handle (Right side) - O'chiriladigan messageni tanlash uchun */}
-      <DeleteMessageHandler />
+      <DeleteMessageSource />
 
       <NodeHeader
         icon="🗑️"
@@ -83,8 +87,9 @@ const DeleteMessageNodeComponent = ({
                 <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 p-2 rounded-md">
                   <AlertCircle className="h-4 w-4" />
                   <span>
-                    Xabar ulangan: {connectedMessageNode.type === "SendTextMessageNode" 
-                      ? "Matn xabari" 
+                    Xabar ulangan:{" "}
+                    {connectedMessageNode.type === "SendTextMessageNode"
+                      ? "Matn xabari"
                       : connectedMessageNode.type === "SendPhotoNode"
                       ? "Rasm xabari"
                       : connectedMessageNode.type === "SendVideoNode"
@@ -108,17 +113,19 @@ const DeleteMessageNodeComponent = ({
           {!isConfigured && (
             <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 p-2 rounded-md">
               <AlertCircle className="h-4 w-4" />
-              <span>Xabarni o'chirish uchun context yoki edge orqali xabar tanlanishi kerak</span>
+              <span>
+                Xabarni o'chirish uchun context yoki edge orqali xabar
+                tanlanishi kerak
+              </span>
             </div>
           )}
         </CardContent>
       )}
 
       <NodeFooter nodeId={id} />
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };
 
 export const DeleteMessageNode = memo(DeleteMessageNodeComponent);
-

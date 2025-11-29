@@ -24,7 +24,7 @@ import { ValueInput } from "@/features/bot-constructor/nodes/triggers/MessageTri
 import { ConstructorData } from "@/features/bot-constructor/data";
 import { MousePointerClick } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { KeyboardConfig } from "../../actions/TextMessageNode/types";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -69,7 +69,11 @@ const CallbackQueryTriggerNodeComponent = ({
     // Static va Collection callback tugmalarni olamiz
     for (const button of parentNodeData.keyboard.inline.flat()) {
       // Static callback button
-      if (button.type === "callback" && button.value && !button.collectionData) {
+      if (
+        button.type === "callback" &&
+        button.value &&
+        !button.collectionData
+      ) {
         callbacks.push({
           id: button.id,
           text: button.text,
@@ -77,13 +81,13 @@ const CallbackQueryTriggerNodeComponent = ({
           isCollection: false,
         });
       }
-      
+
       // Collection button (dynamic)
       if (button.collectionData) {
         const { collection, field } = button.collectionData;
         callbacks.push({
           id: button.id,
-          text: button.text.replace('📦 ', ''),
+          text: button.text.replace("📦 ", ""),
           value: `collection:${collection}:${field}`,
           isCollection: true,
           collectionName: collection,
@@ -104,10 +108,10 @@ const CallbackQueryTriggerNodeComponent = ({
   // Endi faqat filter === "equals" da emas, balki "collection" da ham ko'rsatamiz
   const showStaticSelector =
     isConnected && availableCallbacks.length > 0 && data.filter === "equals";
-  
+
   const showCollectionSelector =
-    isConnected && 
-    availableCallbacks.filter(c => c.isCollection).length > 0 && 
+    isConnected &&
+    availableCallbacks.filter((c) => c.isCollection).length > 0 &&
     data.filter === "collection";
 
   const handleUpdate = (update: Partial<CallbackQueryTriggerData>) => {
@@ -132,7 +136,7 @@ const CallbackQueryTriggerNodeComponent = ({
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
 
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center justify-between text-base">
@@ -257,7 +261,7 @@ const CallbackQueryTriggerNodeComponent = ({
         </div>
       </CardContent>
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

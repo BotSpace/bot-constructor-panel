@@ -25,8 +25,8 @@ import { FiMusic } from "react-icons/fi";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
-import { SourceHandler, TargetHandler } from "../../components";
-import { EditMessageTarget } from "../../components/shared/ReactFlowHandlers/EditMessageTarget";
+import { SourceHandles, TargetHandles } from "../../components";
+import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 
 const SendAudioNodeComponent = ({
   id,
@@ -101,8 +101,8 @@ const SendAudioNodeComponent = ({
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
-      <EditMessageTarget />
+      <TargetHandles />
+      <SelectedMessageTarget />
 
       <NodeHeader
         icon={<FiMusic className="text-primary" />}
@@ -270,7 +270,7 @@ const SendAudioNodeComponent = ({
         </>
       )}
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

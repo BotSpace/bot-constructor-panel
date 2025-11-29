@@ -2,7 +2,7 @@ import React from "react";
 import { CircleDot } from "lucide-react";
 import { Handle, Position } from "reactflow";
 
-export function TargetHandler() {
+export function TargetHandles() {
   return (
     <Handle
       type="target"

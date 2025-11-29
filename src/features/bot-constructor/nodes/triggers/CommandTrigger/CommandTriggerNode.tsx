@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Command } from "lucide-react";
 
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 
 const CommandTriggerNodeComponent = ({
   id,
@@ -30,7 +30,7 @@ const CommandTriggerNodeComponent = ({
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
 
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-base">
@@ -98,7 +98,7 @@ const CommandTriggerNodeComponent = ({
         </Label>
       </CardContent>
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

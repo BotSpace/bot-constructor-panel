@@ -1,1 +1,1 @@
-export * from "./ReactFlowHandlers";
+export * from "./ReactFlowHandles";

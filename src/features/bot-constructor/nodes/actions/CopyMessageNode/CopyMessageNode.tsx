@@ -6,12 +6,12 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 
 const CopyMessageNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
+      <TargetHandles />
       <NodeHeader
         icon="📋"
         title="Xabarni nusxalash"
@@ -22,7 +22,7 @@ const CopyMessageNodeComponent = ({ id, data, selected }: NodeProps) => {
         Xabarni nusxalab yuboradi
       </div>
       <NodeFooter nodeId={id} />
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

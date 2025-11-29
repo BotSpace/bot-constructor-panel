@@ -11,7 +11,7 @@ import { TriggerHeader } from "./components/TriggerHeader";
 import { TypeSelector } from "./components/TypeSelector";
 import { FilterSelector } from "./components/FilterSelector";
 import { ParameterInput } from "./components/ParameterInput";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 
@@ -61,7 +61,7 @@ const MessageTriggerNodeComponent = ({
         selected ? "border-sky-500/80" : "border-gray-600/50"
       }`}
     >
-      <TargetHandler />
+      <TargetHandles />
 
       <TriggerHeader
         isExpanded={isExpanded}
@@ -115,7 +115,7 @@ const MessageTriggerNodeComponent = ({
         </CardContent>
       )}
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };
