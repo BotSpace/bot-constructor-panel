@@ -19,7 +19,6 @@ import { useMousePosition } from "./hooks/useMousePosition";
 import { useParams } from "next/navigation";
 import useProjectStore from "./store/project";
 import { SaveStatusBadge } from "./components/save-status-badge";
-import { useCollectionStore } from "../collections/store/collection-list";
 
 function FlowchartInner() {
   const { id }: { id: string } = useParams();
@@ -67,7 +66,7 @@ function FlowchartInner() {
   useFlowKeyboardShortcuts({
     containerRef: reactFlowWrapper,
     mousePosition: mousePosition,
-    onOpenPalette: () => { },
+    onOpenPalette: () => {},
   });
 
   // Countdown ni kamaytirish va save qilish
