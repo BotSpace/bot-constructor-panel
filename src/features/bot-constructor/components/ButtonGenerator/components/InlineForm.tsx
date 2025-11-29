@@ -374,7 +374,11 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
                               | "text"
                               | "number"
                               | "bool"
-                              | "datetime",
+                              | "datetime"
+                              | "file"
+                              | "audio"
+                              | "video"
+                              | "photo",
                           }))
                         ]}
                         filters={filters}

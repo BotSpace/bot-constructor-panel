@@ -87,6 +87,10 @@ export function FilterBuilder({
 function getDefaultOperator(type: FilterField["type"]): Filter["operator"] {
   switch (type) {
     case "text":
+    case "file":
+    case "audio":
+    case "video":
+    case "photo":
       return "contains";
     case "number":
       return "equals";
@@ -100,6 +104,10 @@ function getDefaultOperator(type: FilterField["type"]): Filter["operator"] {
 function getDefaultValue(type: FilterField["type"]): Filter["value"] {
   switch (type) {
     case "text":
+    case "file":
+    case "audio":
+    case "video":
+    case "photo":
       return "";
     case "number":
       return 0;
