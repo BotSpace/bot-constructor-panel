@@ -6,7 +6,6 @@ import TextareaAutosize from "react-textarea-autosize";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -44,15 +43,15 @@ const SendAudioNodeComponent = ({
     updateNodeData(id, update);
   };
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleFileUpload = async (file: File) => {
     if (!file) return;
 
     setIsUploading(true);
     setUploadedFileName(file.name);
 
     try {
-      const response = await uploadFile(file, "audio");
+      // File type avtomatik aniqlanadi
+      const response = await uploadFile(file);
       handleUpdate({ uploadedFileUuid: response.data.uuid });
       setUploadedFileName(file.name);
     } catch (error) {
@@ -61,6 +60,35 @@ const SendAudioNodeComponent = ({
       alert("Fayl yuklashda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.");
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      await handleFileUpload(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      await handleFileUpload(file);
     }
   };
 
@@ -137,32 +165,50 @@ const SendAudioNodeComponent = ({
                     className="hidden"
                     id={`audio-upload-${id}`}
                   />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading}
-                    className="w-full"
-                  >
-                    {isUploading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Yuklanmoqda...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="mr-2 h-4 w-4" />
-                        Fayl tanlash
-                      </>
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={cn(
+                      "border-2 border-dashed rounded-lg p-6 transition-colors",
+                      "hover:border-primary/50 hover:bg-primary/5",
+                      "cursor-pointer",
+                      isUploading && "opacity-50 pointer-events-none"
                     )}
-                  </Button>
-                  {uploadedFileName && data.uploadedFileUuid && (
-                    <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span className="truncate">{uploadedFileName}</span>
+                    onClick={() =>
+                      !isUploading && fileInputRef.current?.click()
+                    }
+                  >
+                    <div className="flex flex-col items-center justify-center gap-2 text-center">
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                          <p className="text-sm font-medium">Yuklanmoqda...</p>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-8 w-8 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium">
+                              Fayl tanlash yoki bu yerga sudrab tashlang
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Audio fayllari (MP3, WAV, OGG, AAC)
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
-                  )}
-                  {data.uploadedFileUuid && (
+                  </div>
+                  {uploadedFileName &&
+                    data.uploadedFileUuid &&
+                    !isUploading && (
+                      <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span className="truncate">{uploadedFileName}</span>
+                      </div>
+                    )}
+                  {data.uploadedFileUuid && !isUploading && (
                     <div className="text-xs text-muted-foreground">
                       UUID: {data.uploadedFileUuid}
                     </div>

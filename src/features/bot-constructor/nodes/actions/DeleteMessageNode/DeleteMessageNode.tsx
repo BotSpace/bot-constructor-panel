@@ -1,19 +1,18 @@
 "use client";
 
-import { NodeProps } from "reactflow";
-import { memo, useState } from "react";
+import { NodeProps, useNodes, useEdges } from "reactflow";
+import { memo, useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandler, TargetHandler, DeleteMessageHandler } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { AlertCircle } from "lucide-react";
 
 interface DeleteMessageNodeData {
-  messageId?: number;
   deleteFromContext?: boolean;
 }
 
@@ -24,14 +23,39 @@ const DeleteMessageNodeComponent = ({
 }: NodeProps<DeleteMessageNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const nodes = useNodes();
+  const edges = useEdges();
 
   const handleUpdate = (update: Partial<DeleteMessageNodeData>) => {
     updateNodeData(id, update);
   };
 
+  // DeleteMessageHandler'dan chiqqan edge orqali DeleteMessageTarget'ga ulangan message node'ni topish
+  const connectedMessageNode = useMemo(() => {
+    // DeleteMessageHandler'dan chiqqan edge'ni topish
+    const deleteHandlerEdge = edges.find(
+      (edge) =>
+        edge.source === id && edge.sourceHandle === "delete-message-handler"
+    );
+    if (!deleteHandlerEdge) return null;
+
+    // Shu edge'ning target node'i (DeleteMessageTarget'ga ulangan message node)
+    const targetNode = nodes.find(
+      (node) => node.id === deleteHandlerEdge.target
+    );
+    return targetNode;
+  }, [nodes, edges, id]);
+
+  const deleteFromContext = data.deleteFromContext || false;
+  const isConfigured = deleteFromContext || !!connectedMessageNode;
+
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandler />
+      
+      {/* Custom Delete Source Handle (Right side) - O'chiriladigan messageni tanlash uchun */}
+      <DeleteMessageHandler />
+
       <NodeHeader
         icon="🗑️"
         title="Xabarni o'chirish"
@@ -46,27 +70,45 @@ const DeleteMessageNodeComponent = ({
           <div className="flex items-center justify-between">
             <Label>Contextdan xabarni o'chirish</Label>
             <Switch
-              checked={data.deleteFromContext || false}
+              checked={deleteFromContext}
               onCheckedChange={(checked) =>
                 handleUpdate({ deleteFromContext: checked })
               }
             />
           </div>
 
-          {!data.deleteFromContext && (
+          {!deleteFromContext && (
             <div className="flex flex-col gap-2">
-              <Label>Xabar ID</Label>
-              <Input
-                type="number"
-                placeholder="O'chiriladigan xabar ID"
-                value={data.messageId || ""}
-                onChange={(e) =>
-                  handleUpdate({ messageId: parseInt(e.target.value) || undefined })
-                }
-              />
-              <p className="text-xs text-muted-foreground">
-                O'chiriladigan xabarning ID raqamini kiriting
-              </p>
+              {connectedMessageNode ? (
+                <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 p-2 rounded-md">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>
+                    Xabar ulangan: {connectedMessageNode.type === "SendTextMessageNode" 
+                      ? "Matn xabari" 
+                      : connectedMessageNode.type === "SendPhotoNode"
+                      ? "Rasm xabari"
+                      : connectedMessageNode.type === "SendVideoNode"
+                      ? "Video xabari"
+                      : connectedMessageNode.type === "SendAudioNode"
+                      ? "Audio xabari"
+                      : connectedMessageNode.type === "SendFileNode"
+                      ? "Fayl xabari"
+                      : "Xabar"}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 p-2 rounded-md">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>O'chiriladigan xabarni edge orqali ulang</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!isConfigured && (
+            <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 p-2 rounded-md">
+              <AlertCircle className="h-4 w-4" />
+              <span>Xabarni o'chirish uchun context yoki edge orqali xabar tanlanishi kerak</span>
             </div>
           )}
         </CardContent>
