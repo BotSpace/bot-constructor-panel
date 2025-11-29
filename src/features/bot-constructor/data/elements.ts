@@ -212,6 +212,14 @@ export const Elements: ElementTypes[] = [
         triggerId: "UnpinMessageNode",
       },
       {
+        type: "delete_message",
+        name: "Xabarni o'chirish",
+        description: "Xabarni o'chiradi.",
+        icon: "🗑️",
+        color: "bg-red-500/10 text-red-400 border-red-500/20",
+        triggerId: "DeleteMessageNode",
+      },
+      {
         type: "chat_action",
         name: "Harakat ko'rsatish",
         description: "Typing yoki upload ko'rsatkichini ko'rsatadi.",
