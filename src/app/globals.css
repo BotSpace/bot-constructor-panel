@@ -133,34 +133,44 @@
 }
 
 /* Telegram Message Variable Chip Style - Enhanced */
+
+.ce-toolbar__plus {
+  color: #fff;
+  background-color: #667eea;
+}
+
+.ce-toolbar__plus:hover {
+  background-color: #556ee5;
+}
+
 .tg-variable-chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 4px 10px;
   margin: 0 2px;
-  
+
   /* Modern gradient background */
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  
+
   /* Smooth rounded corners */
   border-radius: 6px;
-  
+
   /* Subtle shadow for depth */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  
+
   /* Typography */
   font-size: 0.875rem;
   font-weight: 500;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
   letter-spacing: 0.025em;
-  
+
   /* Interactive */
   cursor: pointer;
   user-select: none;
   transition: all 0.2s ease;
-  
+
   /* Prevent line break */
   white-space: nowrap;
 }
@@ -178,7 +188,7 @@
 
 /* Optional: Add icon before variable */
 .tg-variable-chip::before {
-  content: '$';
+  content: "$";
   opacity: 0.8;
   margin-right: 2px;
 }

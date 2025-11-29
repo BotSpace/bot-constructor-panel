@@ -19,6 +19,7 @@ import {
   CopyMessageNode,
   PinMessageNode,
   UnpinMessageNode,
+  DeleteMessageNode,
   ChatActionNode,
 } from "./actions";
 import {
@@ -72,6 +73,7 @@ export const CustomNodes = {
   CopyMessageNode,
   PinMessageNode,
   UnpinMessageNode,
+  DeleteMessageNode,
   ChatActionNode,
   
   // Custom - Code and Data
