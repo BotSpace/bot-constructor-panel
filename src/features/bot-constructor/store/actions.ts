@@ -54,6 +54,10 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         deleteFromContext: false,
         messageId: undefined,
       };
+    case "DownloadFileNode":
+      return {
+        messageType: undefined,
+      };
     case "CustomCodeNode":
       return {}; // Custom code uchun alohida sozlamalar
 

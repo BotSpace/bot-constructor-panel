@@ -12,12 +12,7 @@ const PinMessageNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader
-        icon="📌"
-        title="Xabarni qadash"
-        nodeId={id}
-        color="bg-lime-500/10"
-      />
+      <NodeHeader icon="📌" title="Xabarni qadash" />
       <div className="p-4 text-sm text-muted-foreground text-center">
         Xabarni guruhda qadab qo'yadi
       </div>

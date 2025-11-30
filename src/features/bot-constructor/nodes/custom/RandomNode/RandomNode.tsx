@@ -12,12 +12,7 @@ const RandomNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader
-        icon="🎲"
-        title="Tasodifiy"
-        nodeId={id}
-        color="bg-teal-500/10"
-      />
+      <NodeHeader icon="🎲" title="Tasodifiy" />
       <div className="p-4 text-sm text-muted-foreground text-center">
         Tasodifiy yo'lni tanlaydi
       </div>

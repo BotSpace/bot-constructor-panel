@@ -12,12 +12,7 @@ const ForwardMessageNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader
-        icon="➡️"
-        title="Xabarni uzatish"
-        nodeId={id}
-        color="bg-sky-500/10"
-      />
+      <NodeHeader icon="➡️" title="Xabarni uzatish" />
       <div className="p-4 text-sm text-muted-foreground text-center">
         Xabarni boshqa chatga uzatadi
       </div>

@@ -65,8 +65,6 @@ const IfConditionNodeComponent = ({
       <NodeHeader
         icon="🔀"
         title="Shart (If/Else)"
-        nodeId={id}
-        color="bg-violet-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

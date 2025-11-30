@@ -21,6 +21,7 @@ import {
   UnpinMessageNode,
   DeleteMessageNode,
   ChatActionNode,
+  DownloadFileNode,
 } from "./actions";
 import {
   MessageTriggerNode,
@@ -49,7 +50,7 @@ export const CustomNodes = {
   MessageTriggerNode,
   CallbackQueryTriggerNode,
   CommandTriggerNode,
-  
+
   // Actions - Text and Media
   SendTextMessageNode,
   SendPhotoNode,
@@ -66,7 +67,7 @@ export const CustomNodes = {
   SendMediaGroupNode,
   SendVenueNode,
   SendDiceNode,
-  
+
   // Actions - Message Operations
   EditMessageNode,
   ForwardMessageNode,
@@ -75,20 +76,21 @@ export const CustomNodes = {
   UnpinMessageNode,
   DeleteMessageNode,
   ChatActionNode,
-  
+  DownloadFileNode,
+
   // Custom - Code and Data
   CustomCodeNode,
   StateNode,
   CollectionNode,
   LoadCollectionItemNode,
-  
+
   // Custom - Flow Control
   IfConditionNode,
   DelayNode,
   RandomNode,
   VariableNode,
   CheckMembershipNode,
-  
+
   // Custom - Integration
   HTTPRequestNode,
   CallbackQueryAnswerNode,

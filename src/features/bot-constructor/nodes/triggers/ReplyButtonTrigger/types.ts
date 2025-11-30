@@ -5,4 +5,6 @@ export interface ReplyButtonTriggerData {
   selectedButton?: ButtonConfig;
   global: boolean;
   context: {};
+  // Hech qanday tugma bosilmasa ham tutib olish
+  catchNoButton?: boolean;
 }

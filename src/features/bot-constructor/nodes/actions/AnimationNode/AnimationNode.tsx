@@ -12,12 +12,7 @@ const AnimationNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader
-        icon="🎬"
-        title="GIF yuborish"
-        nodeId={id}
-        color="bg-violet-500/10"
-      />
+      <NodeHeader icon="🎬" title="GIF yuborish" />
       <div className="p-4 text-sm text-muted-foreground text-center">
         GIF yoki MP4 animation yuboradi
       </div>

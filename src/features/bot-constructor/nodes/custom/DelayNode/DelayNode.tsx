@@ -30,8 +30,6 @@ const DelayNodeComponent = ({
       <NodeHeader
         icon="⏱️"
         title="Kutish"
-        nodeId={id}
-        color="bg-pink-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

@@ -143,6 +143,10 @@
       "chatAction": {
         "name": "Show action",
         "description": "Shows typing or upload indicator."
+      },
+      "downloadFile": {
+        "name": "Download file",
+        "description": "Downloads and saves a file."
       }
     },
     "flowControl": {

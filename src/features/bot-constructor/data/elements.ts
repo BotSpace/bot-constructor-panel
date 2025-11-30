@@ -227,6 +227,14 @@ export const Elements: ElementTypes[] = [
         color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
         triggerId: "ChatActionNode",
       },
+      {
+        type: "file",
+        name: "Fayl yuklab olish",
+        description: "Faylni yuklab oladi va saqlaydi.",
+        icon: "📥",
+        color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+        triggerId: "DownloadFileNode",
+      },
     ],
   },
   {

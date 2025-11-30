@@ -50,8 +50,6 @@ const ChatActionNodeInternal = ({
       <NodeHeader
         icon="⌨️"
         title="Harakat ko'rsatish"
-        nodeId={id}
-        color="bg-blue-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

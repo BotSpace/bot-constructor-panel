@@ -1,6 +1,6 @@
 {
   "common": {
-    "search": "Komponentlarni qidirish... (Ctrl+K)",
+    "search": "Qidirish... (Ctrl+K)",
     "noResults": "Hech narsa topilmadi.",
     "back": "Orqaga",
     "collections": "Kolleksiyalar",
@@ -143,6 +143,10 @@
       "chatAction": {
         "name": "Harakat ko'rsatish",
         "description": "Typing yoki upload ko'rsatkichini ko'rsatadi."
+      },
+      "downloadFile": {
+        "name": "Fayl yuklab olish",
+        "description": "Faylni yuklab oladi va saqlaydi."
       }
     },
     "flowControl": {

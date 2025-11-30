@@ -24,3 +24,4 @@ export { PinMessageNode } from "./PinMessageNode";
 export { UnpinMessageNode } from "./UnpinMessageNode";
 export { DeleteMessageNode } from "./DeleteMessageNode";
 export { ChatActionNode } from "./ChatActionNode";
+export { DownloadFileNode } from "./DownloadFileNode";

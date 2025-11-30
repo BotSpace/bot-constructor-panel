@@ -41,8 +41,6 @@ const VariableNodeComponent = ({
       <NodeHeader
         icon="🔢"
         title="O'zgaruvchi"
-        nodeId={id}
-        color="bg-yellow-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

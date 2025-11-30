@@ -221,10 +221,22 @@ export function useElements(): ElementTypes[] {
         {
           type: "chat_action",
           name: t("constructor.messageOperations.chatAction.name"),
-          description: t("constructor.messageOperations.chatAction.description"),
+          description: t(
+            "constructor.messageOperations.chatAction.description"
+          ),
           icon: "⌨️",
           color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
           triggerId: "ChatActionNode",
+        },
+        {
+          type: "file",
+          name: t("constructor.messageOperations.downloadFile.name"),
+          description: t(
+            "constructor.messageOperations.downloadFile.description"
+          ),
+          icon: "📥",
+          color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+          triggerId: "DownloadFileNode",
         },
       ],
     },
@@ -324,7 +336,9 @@ export function useElements(): ElementTypes[] {
         {
           type: "load_collection_item",
           name: t("constructor.customLogic.loadCollectionItem.name"),
-          description: t("constructor.customLogic.loadCollectionItem.description"),
+          description: t(
+            "constructor.customLogic.loadCollectionItem.description"
+          ),
           icon: "📥",
           color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
           triggerId: "LoadCollectionItemNode",
@@ -333,4 +347,3 @@ export function useElements(): ElementTypes[] {
     },
   ];
 }
-

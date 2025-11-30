@@ -12,12 +12,7 @@ const VoiceNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader
-        icon="🎤"
-        title="Ovozli xabar"
-        nodeId={id}
-        color="bg-cyan-500/10"
-      />
+      <NodeHeader icon="🎤" title="Ovozli xabar" />
       <div className="p-4 text-sm text-muted-foreground text-center">
         Voice message yuboradi
       </div>

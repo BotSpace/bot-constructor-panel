@@ -66,10 +66,14 @@ const ReplyButtonTriggerNodeComponent = ({
     );
 
     // Va shu obyektni state'ga yozamiz
-    updateNodeData(id, { selectedButton: selectedButtonObject });
+    // Agar tugma tanlansa, "catchNoButton" ni o'chirib qo'yamiz
+    updateNodeData(id, {
+      selectedButton: selectedButtonObject,
+      catchNoButton: false,
+    });
   };
 
-  const isConfigured = !!data.selectedButton;
+  const isConfigured = !!data.selectedButton || !!data.catchNoButton;
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -91,53 +95,84 @@ const ReplyButtonTriggerNodeComponent = ({
       </CardHeader>
 
       <CardContent className="flex flex-col gap-3">
-        {availableReplyButtons.length > 0 ? (
-          <div className="space-y-3">
-            <Label className="text-xs text-muted-foreground">
-              Qaysi tugma ushlansin?
-            </Label>
+        {!data.catchNoButton && (
+          <>
+            {availableReplyButtons.length > 0 ? (
+              <div className="space-y-3">
+                <Label className="text-xs text-muted-foreground">
+                  Qaysi tugma ushlansin?
+                </Label>
 
-            <RadioGroup
-              value={data.selectedButton?.id} // Tanlangan tugmaning ID'sini `value` sifatida beramiz
-              onValueChange={handleSelectionChange} // O'zgarish bo'lganda handler'ni chaqiramiz
-            >
-              {availableReplyButtons.map((button) => (
-                <div className="flex items-center gap-3" key={button.id}>
-                  <RadioGroupItem
-                    className="cursor-pointer"
-                    value={button.id}
-                    id={`r-${button.id}`}
-                  />
-                  <Label
-                    htmlFor={`r-${button.id}`}
-                    className="font-normal cursor-pointer"
-                  >
-                    {button.text}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
-        ) : (
-          <div className="p-3 text-center text-sm text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-md flex items-center gap-2">
+                <RadioGroup
+                  value={data.selectedButton?.id} // Tanlangan tugmaning ID'sini `value` sifatida beramiz
+                  onValueChange={handleSelectionChange} // O'zgarish bo'lganda handler'ni chaqiramiz
+                >
+                  {availableReplyButtons.map((button) => (
+                    <div className="flex items-center gap-3" key={button.id}>
+                      <RadioGroupItem
+                        className="cursor-pointer"
+                        value={button.id}
+                        id={`r-${button.id}`}
+                      />
+                      <Label
+                        htmlFor={`r-${button.id}`}
+                        className="font-normal cursor-pointer"
+                      >
+                        {button.text}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+            ) : (
+              <div className="p-3 text-center text-sm text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-md flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                <span>
+                  Iltimos, bu nodeni Reply-tugmalari mavjud bo'lgan node'ga
+                  ulang.
+                </span>
+              </div>
+            )}
+          </>
+        )}
+
+        {data.catchNoButton && (
+          <div className="p-3 text-center text-sm text-blue-500 bg-blue-500/10 border border-blue-500/20 rounded-md flex items-center gap-2">
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <span>
-              Iltimos, bu nodeni Reply-tugmalari mavjud bo'lgan node'ga ulang.
+              Bu node hech qanday tugma bosilmagan holda kelgan xabarlarni tutib
+              oladi.
             </span>
           </div>
         )}
 
-        <Label className="mt-2">
-          <Checkbox
-            checked={data.global}
-            onCheckedChange={(e) =>
-              updateNodeData(id, {
-                global: e as boolean,
-              })
-            }
-          />
-          Global
-        </Label>
+        <div className="space-y-2 mt-2">
+          <Label className="flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              checked={data.catchNoButton || false}
+              onCheckedChange={(e) =>
+                updateNodeData(id, {
+                  catchNoButton: e as boolean,
+                  // Agar "hech qanday tugma bosilmasa" tanlansa, tanlangan tugmani tozalash
+                  ...(e && { selectedButton: undefined }),
+                })
+              }
+            />
+            <span>Hech qanday tugma bosilmasa ham tutib ol</span>
+          </Label>
+
+          <Label className="flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              checked={data.global}
+              onCheckedChange={(e) =>
+                updateNodeData(id, {
+                  global: e as boolean,
+                })
+              }
+            />
+            Global
+          </Label>
+        </div>
       </CardContent>
       <SourceHandles />
     </Card>

@@ -12,12 +12,7 @@ const CopyMessageNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader
-        icon="📋"
-        title="Xabarni nusxalash"
-        nodeId={id}
-        color="bg-amber-500/10"
-      />
+      <NodeHeader icon="📋" title="Xabarni nusxalash" />
       <div className="p-4 text-sm text-muted-foreground text-center">
         Xabarni nusxalab yuboradi
       </div>
