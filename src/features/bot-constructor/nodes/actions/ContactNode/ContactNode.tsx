@@ -32,8 +32,6 @@ const ContactNodeComponent = ({
       <NodeHeader
         icon="👤"
         title="Kontakt"
-        nodeId={id}
-        color="bg-indigo-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

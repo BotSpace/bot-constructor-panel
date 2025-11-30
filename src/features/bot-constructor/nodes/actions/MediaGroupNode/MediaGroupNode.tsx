@@ -72,8 +72,6 @@ const MediaGroupNodeInternal = ({
       <NodeHeader
         icon="🖼️"
         title="Media guruh yuborish"
-        nodeId={id}
-        color="bg-indigo-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

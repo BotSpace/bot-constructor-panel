@@ -14,6 +14,7 @@ import { ParameterInput } from "./components/ParameterInput";
 import { SourceHandles, TargetHandles } from "../../components";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { ElseMessageSource } from "../../components/shared/ReactFlowHandles/ElseMessageSource";
 
 const MessageTriggerNodeComponent = ({
   id,
@@ -62,6 +63,7 @@ const MessageTriggerNodeComponent = ({
       }`}
     >
       <TargetHandles />
+      <ElseMessageSource />
 
       <TriggerHeader
         isExpanded={isExpanded}

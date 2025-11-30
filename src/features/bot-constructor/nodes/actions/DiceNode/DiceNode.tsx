@@ -45,8 +45,6 @@ const DiceNodeInternal = ({ id, data, selected }: NodeProps<DiceNodeData>) => {
       <NodeHeader
         icon="🎲"
         title="O'yin yuborish"
-        nodeId={id}
-        color="bg-green-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

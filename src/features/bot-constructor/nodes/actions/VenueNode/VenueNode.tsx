@@ -39,8 +39,6 @@ const VenueNodeInternal = ({
       <NodeHeader
         icon="📍"
         title="Joy yuborish (Venue)"
-        nodeId={id}
-        color="bg-red-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

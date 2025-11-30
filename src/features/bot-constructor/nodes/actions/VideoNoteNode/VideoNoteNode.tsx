@@ -12,12 +12,7 @@ const VideoNoteNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader
-        icon="📹"
-        title="Video xabar"
-        nodeId={id}
-        color="bg-emerald-500/10"
-      />
+      <NodeHeader icon="📹" title="Video xabar" />
       <div className="p-4 text-sm text-muted-foreground text-center">
         Dumaloq video xabar yuboradi
       </div>

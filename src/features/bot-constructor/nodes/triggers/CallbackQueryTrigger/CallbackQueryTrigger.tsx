@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
 import { KeyboardConfig } from "../../actions/TextMessageNode/types";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ElseMessageSource } from "../../components/shared/ReactFlowHandles/ElseMessageSource";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
 interface NodeWithKeyboardData {
@@ -137,6 +138,7 @@ const CallbackQueryTriggerNodeComponent = ({
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
+      <ElseMessageSource />
 
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center justify-between text-base">

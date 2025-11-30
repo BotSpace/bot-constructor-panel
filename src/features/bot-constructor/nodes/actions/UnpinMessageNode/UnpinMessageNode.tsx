@@ -35,8 +35,6 @@ const UnpinMessageNodeComponent = ({
       <NodeHeader
         icon="📌"
         title="Qadalni olib tashlash"
-        nodeId={id}
-        color="bg-orange-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

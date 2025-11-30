@@ -32,8 +32,6 @@ const LocationNodeComponent = ({
       <NodeHeader
         icon="📍"
         title="Joylashuv"
-        nodeId={id}
-        color="bg-rose-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

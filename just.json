@@ -1,0 +1,144 @@
+{
+  "edges": [
+    {
+      "id": "reactflow__edge-node_1764506935529_0else-message-source-node_1764506950731_1target-handler",
+      "type": "step",
+      "style": { "stroke": "#495057", "strokeWidth": 1.5 },
+      "source": "node_1764506935529_0",
+      "target": "node_1764506950731_1",
+      "animated": false,
+      "selected": false,
+      "markerEnd": {
+        "type": "arrow",
+        "color": "#495057",
+        "width": 30,
+        "height": 30
+      },
+      "sourceHandle": "else-message-source",
+      "targetHandle": "target-handler"
+    },
+    {
+      "id": "reactflow__edge-node_1764506950731_1source-handler-node_1764508573646_3target-handler",
+      "type": "step",
+      "style": { "stroke": "#495057", "strokeWidth": 1.5 },
+      "source": "node_1764506950731_1",
+      "target": "node_1764508573646_3",
+      "animated": false,
+      "selected": false,
+      "markerEnd": {
+        "type": "arrow",
+        "color": "#495057",
+        "width": 30,
+        "height": 30
+      },
+      "sourceHandle": "source-handler",
+      "targetHandle": "target-handler"
+    },
+    {
+      "id": "reactflow__edge-node_1764506950731_1source-handler-dndnode_1764508660398_0target-handler",
+      "type": "step",
+      "style": { "stroke": "#495057", "strokeWidth": 1.5 },
+      "source": "node_1764506950731_1",
+      "target": "dndnode_1764508660398_0",
+      "animated": false,
+      "markerEnd": {
+        "type": "arrow",
+        "color": "#495057",
+        "width": 30,
+        "height": 30
+      },
+      "sourceHandle": "source-handler",
+      "targetHandle": "target-handler"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "node_1764506935529_0",
+      "data": {
+        "type": "text",
+        "filter": "regex",
+        "global": false,
+        "context": { "value": "/d(*)/" },
+        "node_type": "MessageTriggerNode"
+      },
+      "type": "MessageTriggerNode",
+      "width": 320,
+      "height": 361,
+      "dragging": false,
+      "position": { "x": -498.51629771110294, "y": 1399.2069269842482 },
+      "selected": false,
+      "positionAbsolute": { "x": -498.51629771110294, "y": 1399.2069269842482 }
+    },
+    {
+      "id": "node_1764506950731_1",
+      "data": {
+        "keyboard": {
+          "reply": [
+            [
+              { "id": "btn-1764508588274", "text": "test", "type": "reply" },
+              { "id": "btn-1764508654903", "text": "test 2", "type": "reply" }
+            ]
+          ],
+          "active": "reply",
+          "inline": []
+        },
+        "parseMode": "None",
+        "recipients": { "sendToSender": true, "additionalIds": [] },
+        "messageText": {
+          "time": 1764506975718,
+          "blocks": [
+            {
+              "id": "E7YxuIfUw6",
+              "data": { "text": "Iltimos raqam kiriting" },
+              "type": "paragraph"
+            }
+          ],
+          "version": "2.31.0"
+        }
+      },
+      "type": "SendTextMessageNode",
+      "width": 400,
+      "height": 526,
+      "dragging": false,
+      "position": { "x": -151.56209807099196, "y": 1569.670235765845 },
+      "selected": false,
+      "positionAbsolute": { "x": -151.56209807099196, "y": 1569.670235765845 }
+    },
+    {
+      "id": "node_1764508573646_3",
+      "data": {
+        "global": false,
+        "context": {},
+        "node_type": "ReplyButtonTriggerNode",
+        "selectedButton": {
+          "id": "btn-1764508654903",
+          "text": "test 2",
+          "type": "reply"
+        }
+      },
+      "type": "ReplyButtonTriggerNode",
+      "width": 320,
+      "height": 248,
+      "dragging": false,
+      "position": { "x": -282.69141644232616, "y": 2170.9656051868724 },
+      "selected": false,
+      "positionAbsolute": { "x": -282.69141644232616, "y": 2170.9656051868724 }
+    },
+    {
+      "id": "dndnode_1764508660398_0",
+      "data": {
+        "global": false,
+        "context": {},
+        "node_type": "ReplyButtonTriggerNode",
+        "catchNoButton": true
+      },
+      "type": "ReplyButtonTriggerNode",
+      "width": 320,
+      "height": 261,
+      "dragging": false,
+      "position": { "x": 148.96751462553306, "y": 2170.5775825754513 },
+      "selected": true,
+      "positionAbsolute": { "x": 148.96751462553306, "y": 2170.5775825754513 }
+    }
+  ]
+}

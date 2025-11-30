@@ -61,8 +61,6 @@ const PollNodeComponent = ({
       <NodeHeader
         icon="📊"
         title="So'rovnoma"
-        nodeId={id}
-        color="bg-fuchsia-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

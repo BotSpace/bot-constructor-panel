@@ -63,8 +63,6 @@ const DeleteMessageNodeComponent = ({
       <NodeHeader
         icon="🗑️"
         title="Xabarni o'chirish"
-        nodeId={id}
-        color="bg-red-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

@@ -143,6 +143,10 @@
       "chatAction": {
         "name": "アクションを表示",
         "description": "入力中やアップロード中のインジケーターを表示します。"
+      },
+      "downloadFile": {
+        "name": "ファイルをダウンロード",
+        "description": "ファイルをダウンロードして保存します。"
       }
     },
     "flowControl": {

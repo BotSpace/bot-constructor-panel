@@ -22,6 +22,13 @@ export default function Page() {
   const { loadProject, project } = useProjectStore();
   const { loadCollections } = useCollectionStore();
 
+  // Write title
+  useEffect(() => {
+    if (project) {
+      document.title = `${project.name} | BotMother.uz`;
+    }
+  }, [project?.id]);
+
   useEffect(() => {
     // loading project
     loadProject(id);
@@ -86,6 +93,11 @@ export default function Page() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <head>
+        <title>{project?.name} | BotMother.uz</title>
+        {/* <title>salom olam</title> */}
+      </head>
+
       {/* Header */}
       <ConstructorPageHeader />
 

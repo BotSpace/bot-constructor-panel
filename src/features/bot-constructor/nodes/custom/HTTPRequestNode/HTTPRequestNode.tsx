@@ -39,8 +39,6 @@ const HTTPRequestNodeComponent = ({
       <NodeHeader
         icon="🌐"
         title="HTTP So'rov"
-        nodeId={id}
-        color="bg-purple-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

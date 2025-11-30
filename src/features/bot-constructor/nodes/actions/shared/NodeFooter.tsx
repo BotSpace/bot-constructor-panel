@@ -9,7 +9,10 @@ import {
   ButtonConfig,
 } from "@/features/bot-constructor/components/ButtonGenerator";
 
-import { KeyboardConfig, SendTextMessageNodeData } from "../TextMessageNode/types";
+import {
+  KeyboardConfig,
+  SendTextMessageNodeData,
+} from "../TextMessageNode/types";
 
 interface NodeFooterProps {
   nodeId: string;
@@ -82,8 +85,8 @@ export const NodeFooter = ({
         </div>
       </div>
 
-      <ButtonGenerator 
-        initialKeyboard={keyboard} 
+      <ButtonGenerator
+        initialKeyboard={keyboard}
         onSave={handleKeyboardUpdate}
         data={data}
       >

@@ -72,8 +72,6 @@ const CheckMembershipNodeComponent = ({
       <NodeHeader
         icon="👥"
         title="A'zolikni tekshirish"
-        nodeId={id}
-        color="bg-purple-500/10"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

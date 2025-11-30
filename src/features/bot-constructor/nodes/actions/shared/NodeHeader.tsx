@@ -12,7 +12,6 @@ interface NodeHeaderProps {
   /** Node ID (ixtiyoriy) */
   nodeId?: string;
   /** Color class (ixtiyoriy) */
-  color?: string;
   /** Tugmalar sonini ko'rsatish uchun (ixtiyoriy) */
   buttonCount?: number;
   /** Node yig'ilgan (collapsed) holatidami? */
@@ -24,14 +23,12 @@ interface NodeHeaderProps {
 export const NodeHeader = ({
   icon,
   title,
-  nodeId,
-  color,
   buttonCount = 0,
   isCollapsed = false,
   onToggleCollapse,
 }: NodeHeaderProps) => {
   return (
-    <CardHeader onClick={onToggleCollapse} className={cn(color)}>
+    <CardHeader onClick={onToggleCollapse}>
       <div
         className="h flex flex-row items-center justify-between p-3 cursor-pointer hover:bg-secondary rounded-md transition-colors"
         role="button"
