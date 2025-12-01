@@ -7,18 +7,17 @@ import { useParams } from "next/navigation";
 
 import { instanceAuth } from "@/services/instance";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 import useProjectStore from "@/features/bot-constructor/store/project";
-import { AddEnvDialog } from "../add-env";
 import { ButtonGroup } from "@/components/ui/button-group";
-import DebugBotEdit from "../debug-bot-edit";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import Link from "next/link";
 
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugActions() {
   const { id }: { id: string } = useParams();
-  const { project, changeDebug, changeProject } = useProjectStore();
+  const { project, changeDebug } = useProjectStore();
 
   // Store'dan kerakli qismlarni olamiz
   const { saveFlow } = useFlowStore();
@@ -73,9 +72,9 @@ export default function DebugActions() {
 
   if (project)
     return (
-      <div className="flex items-center gap-3">
+      <ButtonGroup>
         {project.debug.status === "running" ? (
-          <ButtonGroup className="flex">
+          <>
             <Button size={"icon"} onClick={handleStopBot} variant="outline">
               <StopCircle />
             </Button>
@@ -87,28 +86,24 @@ export default function DebugActions() {
             >
               <RotateCcw />
             </Button>
-            <DebugBotEdit>
-              <Button className="cursor-pointer" variant={"outline"}>
-                <BotMessageSquare />
-              </Button>
-            </DebugBotEdit>
-          </ButtonGroup>
+          </>
         ) : project.debug.status === "initializing" ? (
           <Button variant="outline" disabled>
             <span className="animate-pulse">Starting...</span>
           </Button>
         ) : (
-          <ButtonGroup>
-            <Button onClick={handleRunAndRelaodDebugBot} variant="outline">
-              <BugPlay />
-            </Button>
-            <DebugBotEdit>
-              <Button className="cursor-pointer" variant={"outline"}>
-                <BotMessageSquare />
-              </Button>
-            </DebugBotEdit>
-          </ButtonGroup>
+          <Button onClick={handleRunAndRelaodDebugBot} variant="outline">
+            <BugPlay />
+          </Button>
         )}
-      </div>
+        <Link
+          href={`https://t.me/botmother_test_robot?start=${project?.debug_uuid}`}
+          className={buttonVariants({ variant: "outline" })}
+          target="_blank"
+        >
+          <BotMessageSquare />
+          Open bot
+        </Link>
+      </ButtonGroup>
     );
 }
