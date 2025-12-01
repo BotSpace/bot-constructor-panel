@@ -46,7 +46,7 @@ const SendAudioNodeComponent = ({
   };
 
   const handleFileUpload = async (file: File) => {
-    if (!file) return;
+    if (!file && !project) return;
 
     setIsUploading(true);
     setUploadedFileName(file.name);

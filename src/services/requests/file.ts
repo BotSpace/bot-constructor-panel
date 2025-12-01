@@ -16,7 +16,7 @@ import { detectFileType } from "@/lib/file-utils";
 export async function uploadFile(
   file: File,
   filetype?: FileType,
-  projectId?: string
+  projectId?: number
 ): Promise<CreateFileResponse> {
   // Agar filetype berilmagan bo'lsa, avtomatik aniqlash
   const detectedFileType = filetype || detectFileType(file);
@@ -24,10 +24,10 @@ export async function uploadFile(
   const formData = new FormData();
   formData.append("file", file);
   formData.append("filetype", detectedFileType);
-  
+
   // Agar projectId berilgan bo'lsa, FormData'ga qo'shamiz
   if (projectId) {
-    formData.append("project", projectId);
+    formData.append("project", String(projectId));
   }
 
   const response = await instanceAuth.post<CreateFileResponse>(
