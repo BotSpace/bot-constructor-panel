@@ -20,6 +20,14 @@ import { useParams } from "next/navigation";
 import useProjectStore from "./store/project";
 import { SaveStatusBadge } from "./components/save-status-badge";
 
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { MessageCircleDashed, Text } from "lucide-react";
+
 function FlowchartInner() {
   const { id }: { id: string } = useParams();
 
@@ -232,8 +240,22 @@ function FlowchartInner() {
 
 export default function Flowchart() {
   return (
-    <ReactFlowProvider>
-      <FlowchartInner />
-    </ReactFlowProvider>
+    <ContextMenu>
+      <ContextMenuTrigger>
+        <ReactFlowProvider>
+          <FlowchartInner />
+        </ReactFlowProvider>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem>
+          <MessageCircleDashed />
+          <span>Comment</span>
+        </ContextMenuItem>
+        <ContextMenuItem>
+          <Text />
+          <span>Text message</span>
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
