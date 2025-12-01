@@ -18,6 +18,7 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendAudioNodeData, AudioSourceType } from "./types";
 import { uploadFile } from "@/services/requests/file";
 import { Upload, Loader2, CheckCircle2 } from "lucide-react";
+import useProjectStore from "@/features/bot-constructor/store/project";
 
 import { FiMusic } from "react-icons/fi";
 
@@ -34,6 +35,7 @@ const SendAudioNodeComponent = ({
   selected,
 }: NodeProps<SendAudioNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const project = useProjectStore((state) => state.project);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
@@ -51,7 +53,7 @@ const SendAudioNodeComponent = ({
 
     try {
       // File type avtomatik aniqlanadi
-      const response = await uploadFile(file);
+      const response = await uploadFile(file, undefined, project?.id);
       handleUpdate({ uploadedFileUuid: response.data.uuid });
       setUploadedFileName(file.name);
     } catch (error) {
