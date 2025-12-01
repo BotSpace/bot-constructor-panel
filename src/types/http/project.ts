@@ -18,6 +18,7 @@ export interface ProjectRetrive {
     status: Status;
     service_id: string | null;
   };
+  debug_uuid: string;
   release: {
     id: number;
     version: number;
