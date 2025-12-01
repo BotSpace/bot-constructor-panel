@@ -74,56 +74,40 @@ export default function DebugActions() {
   if (project)
     return (
       <div className="flex items-center gap-3">
-        {!project.debug_bot ? (
-          <AddEnvDialog
-            env_name="BOT_TOKEN"
-            project_id={+id}
-            dialog_title="Debug Bot qo‘shish"
-            dialog_description="Telegram debug bot tokenini kiriting"
-            onSuccess={() => {
-              changeProject({ ...project, debug_bot: true });
-            }}
-          >
-            <Button>Add Debug Bot</Button>
-          </AddEnvDialog>
-        ) : (
-          <>
-            {project.debug.status === "running" ? (
-              <ButtonGroup className="flex">
-                <Button size={"icon"} onClick={handleStopBot} variant="outline">
-                  <StopCircle />
-                </Button>
-                <Button
-                  onClick={handleRunAndRelaodDebugBot}
-                  variant="outline"
-                  className="cursor-pointer"
-                  size={"icon"}
-                >
-                  <RotateCcw />
-                </Button>
-                <DebugBotEdit>
-                  <Button className="cursor-pointer" variant={"outline"}>
-                    <BotMessageSquare />
-                  </Button>
-                </DebugBotEdit>
-              </ButtonGroup>
-            ) : project.debug.status === "initializing" ? (
-              <Button variant="outline" disabled>
-                <span className="animate-pulse">Starting...</span>
+        {project.debug.status === "running" ? (
+          <ButtonGroup className="flex">
+            <Button size={"icon"} onClick={handleStopBot} variant="outline">
+              <StopCircle />
+            </Button>
+            <Button
+              onClick={handleRunAndRelaodDebugBot}
+              variant="outline"
+              className="cursor-pointer"
+              size={"icon"}
+            >
+              <RotateCcw />
+            </Button>
+            <DebugBotEdit>
+              <Button className="cursor-pointer" variant={"outline"}>
+                <BotMessageSquare />
               </Button>
-            ) : (
-              <ButtonGroup>
-                <Button onClick={handleRunAndRelaodDebugBot} variant="outline">
-                  <BugPlay />
-                </Button>
-                <DebugBotEdit>
-                  <Button className="cursor-pointer" variant={"outline"}>
-                    <BotMessageSquare />
-                  </Button>
-                </DebugBotEdit>
-              </ButtonGroup>
-            )}
-          </>
+            </DebugBotEdit>
+          </ButtonGroup>
+        ) : project.debug.status === "initializing" ? (
+          <Button variant="outline" disabled>
+            <span className="animate-pulse">Starting...</span>
+          </Button>
+        ) : (
+          <ButtonGroup>
+            <Button onClick={handleRunAndRelaodDebugBot} variant="outline">
+              <BugPlay />
+            </Button>
+            <DebugBotEdit>
+              <Button className="cursor-pointer" variant={"outline"}>
+                <BotMessageSquare />
+              </Button>
+            </DebugBotEdit>
+          </ButtonGroup>
         )}
       </div>
     );
