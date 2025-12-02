@@ -13,6 +13,7 @@ import { WebSocketProvider } from "@/wss/web-socket-provider";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
+import Analytics from "@/components/common/analitics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,6 +49,9 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} suppressHydrationWarning>
+      <head>
+        <Analytics />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
