@@ -210,11 +210,17 @@ const SendAudioNodeComponent = ({
                         <span className="truncate">{uploadedFileName}</span>
                       </div>
                     )}
-                  {data.uploadedFileUuid && !isUploading && (
-                    <div className="text-xs text-muted-foreground">
-                      UUID: {data.uploadedFileUuid}
-                    </div>
-                  )}
+                  <div className="grid gap-1">
+                    <Label className="text-xs text-muted-foreground">UUID</Label>
+                    <Input
+                      placeholder="UUID ni kiriting yoki fayl yuklang..."
+                      value={data.uploadedFileUuid || ""}
+                      onChange={(e) =>
+                        handleUpdate({ uploadedFileUuid: e.target.value })
+                      }
+                      className="text-xs"
+                    />
+                  </div>
                 </div>
               )}
             </div>
