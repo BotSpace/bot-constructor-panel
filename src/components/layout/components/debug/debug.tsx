@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { BotMessageSquare, BugPlay, RotateCcw, StopCircle } from "lucide-react";
+import {
+  BotMessageSquare,
+  BugPlay,
+  RotateCcw,
+  StopCircle,
+  Copy,
+  Mail,
+  Share2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 
@@ -12,7 +20,12 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugActions() {
@@ -70,6 +83,48 @@ export default function DebugActions() {
       });
   }
 
+  /* --------------------------- Share bot link actions --------------------------- */
+  const botLink = project?.debug_uuid
+    ? `https://t.me/botmother_test_robot?start=${project.debug_uuid}`
+    : "";
+
+  function handleCopyLink() {
+    if (!botLink) {
+      toast.error("Bot linki mavjud emas.");
+      return;
+    }
+
+    navigator.clipboard.writeText(botLink);
+    toast.success("Link nusxalandi!");
+  }
+
+  function handleShareViaGmail() {
+    if (!botLink) {
+      toast.error("Bot linki mavjud emas.");
+      return;
+    }
+
+    const subject = encodeURIComponent("Debug Bot Link");
+    const body = encodeURIComponent(`Debug bot link:\n${botLink}`);
+    window.open(
+      `https://mail.google.com/mail/?view=cm&fs=1&to=&su=${subject}&body=${body}`,
+      "_blank"
+    );
+  }
+
+  function handleShareViaTelegram() {
+    if (!botLink) {
+      toast.error("Bot linki mavjud emas.");
+      return;
+    }
+
+    const text = encodeURIComponent(`Debug bot link: ${botLink}`);
+    window.open(
+      `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${text}`,
+      "_blank"
+    );
+  }
+
   if (project)
     return (
       <ButtonGroup>
@@ -96,14 +151,39 @@ export default function DebugActions() {
             <BugPlay />
           </Button>
         )}
-        <Link
-          href={`https://t.me/botmother_test_robot?start=${project?.debug_uuid}`}
-          className={buttonVariants({ variant: "outline" })}
+
+        <a
+          href={botLink}
           target="_blank"
+          rel="noopener noreferrer"
+          className={buttonVariants({ variant: "outline" })}
         >
-          <BotMessageSquare />
+          <BotMessageSquare className="mr-2 h-4 w-4" />
           Open bot
-        </Link>
+        </a>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <Share2 className="mr-2 h-4 w-4" />
+              Share
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleCopyLink}>
+              <Copy className="mr-2 h-4 w-4" />
+              Copy link
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleShareViaGmail}>
+              <Mail className="mr-2 h-4 w-4" />
+              Send via Gmail
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleShareViaTelegram}>
+              <BotMessageSquare className="mr-2 h-4 w-4" />
+              Send via Telegram
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </ButtonGroup>
     );
 }
