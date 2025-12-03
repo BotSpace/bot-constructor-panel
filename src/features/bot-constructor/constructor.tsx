@@ -13,7 +13,6 @@ import { ElementItemType } from "@/types/element-types";
 import { useFlowStore } from "./store";
 import { CustomNodes } from "./nodes";
 import { CustomEdge } from "./edges";
-import { QuickAddPalette } from "./components";
 import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
 import { useMousePosition } from "./hooks/useMousePosition";
 import { useParams } from "next/navigation";
@@ -228,12 +227,6 @@ function FlowchartInner() {
         <MiniMap />
         <Controls />
       </ReactFlow>
-
-      <QuickAddPalette
-        isOpen={isPaletteOpen}
-        onOpenChange={setIsPaletteOpen}
-        onSelect={handlePaletteSelect}
-      />
     </div>
   );
 }

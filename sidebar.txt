@@ -1,0 +1,4 @@
+- Tutilb qolish
+    - Xabar kelsa
+    - Buyruq kelganda
+    - Javob tugmasi bosilganda
