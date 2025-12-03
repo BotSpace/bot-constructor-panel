@@ -1,7 +1,7 @@
 "use client";
 
 import { NodeProps } from "reactflow";
-import { memo } from "react";
+import { memo, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,8 @@ const ForwardMessageNodeComponent = ({
 }: NodeProps<ForwardMessageNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const recipientIds = data.recipientIds || [""];
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const previousLengthRef = useRef(recipientIds.length);
 
   const handleUpdate = (update: Partial<ForwardMessageNodeData>) => {
     updateNodeData(id, update);
@@ -39,10 +41,32 @@ const ForwardMessageNodeComponent = ({
     handleUpdate({ recipientIds: [...recipientIds, ""] });
   };
 
+  // Yangi input qo'shilganda unga focus qilish
+  useEffect(() => {
+    if (recipientIds.length > previousLengthRef.current) {
+      // Yangi input qo'shilgan
+      const lastIndex = recipientIds.length - 1;
+      setTimeout(() => {
+        inputRefs.current[lastIndex]?.focus();
+      }, 0);
+    }
+    previousLengthRef.current = recipientIds.length;
+  }, [recipientIds.length]);
+
   const handleRemoveRecipient = (index: number) => {
     if (recipientIds.length > 1) {
       const newRecipientIds = recipientIds.filter((_, i) => i !== index);
       handleUpdate({ recipientIds: newRecipientIds });
+    }
+  };
+
+  const handleKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleAddRecipient();
     }
   };
 
@@ -59,9 +83,13 @@ const ForwardMessageNodeComponent = ({
             {recipientIds.map((recipientId, index) => (
               <div key={index} className="flex items-center gap-2">
                 <Input
+                  ref={(el) => {
+                    inputRefs.current[index] = el;
+                  }}
                   placeholder="User/Chat ID"
                   value={recipientId}
                   onChange={(e) => handleRecipientChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
                   className="flex-1"
                 />
                 {recipientIds.length > 1 && (

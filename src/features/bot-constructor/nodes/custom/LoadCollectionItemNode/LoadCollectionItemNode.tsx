@@ -25,6 +25,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useNodes } from "reactflow";
 import { StateNodeData } from "../StateNode/types";
+import { cn } from "@/lib/utils";
+import { NodeHeader } from "../../actions/shared/NodeHeader";
 
 function LoadCollectionItemNode({
   id,
@@ -67,19 +69,13 @@ function LoadCollectionItemNode({
     <>
       <TargetHandles />
       <Card
-        className={`min-w-[400px] shadow-lg border-2 ${
-          selected
-            ? "ring-2 ring-purple-500 border-purple-500"
-            : "border-purple-300"
-        }`}
+        className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}
       >
-        <CardHeader className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-t-lg">
-          <div className="flex items-center gap-2">
-            <Database className="w-5 h-5" />
-            <span className="font-semibold">Load Collection Item</span>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4 p-4">
+        <NodeHeader
+          icon={<Database className="text-primary" />}
+          title="Collectiondan item yuklash"
+        />
+        <CardContent className="space-y-4">
           {/* Collection Selection */}
           <div className="space-y-2">
             <Label>Collection</Label>
@@ -181,20 +177,18 @@ function LoadCollectionItemNode({
       {/* Found Output */}
       <Handle
         type="source"
-        position={Position.Left}
+        position={Position.Bottom}
         id="found"
-        style={{ right: "-8px" }}
-        className="!w-3 !h-3 !bg-green-500 !border-2 !border-white"
+        className="translate-x-[100px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
       />
 
       {/* Not Found Output */}
-      {/* <Handle
+      <Handle
         type="source"
         position={Position.Bottom}
         id="not_found"
-        style={{ right: "-25%" }}
-        className="!w-3 !h-3 !bg-red-500 !border-2 !border-white"
-      /> */}
+        className="translate-x-[-100px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
+      />
     </>
   );
 }
