@@ -11,12 +11,13 @@ import { Send, UserPlus, X, AlertCircle } from "lucide-react";
  */
 interface RecipientsManagerProps {
   recipients?: {
-    sendToSender: boolean;
+    sendToSender?: boolean;
     additionalIds: string[];
   };
   onUpdate: (update: {
     recipients: RecipientsManagerProps["recipients"];
   }) => void;
+  hideSendToSender?: boolean; // "Yuboruvchiga" toggle'ni yashirish uchun
 }
 
 /**
@@ -26,6 +27,7 @@ interface RecipientsManagerProps {
 export const RecipientsManager = ({
   recipients,
   onUpdate,
+  hideSendToSender = false,
 }: RecipientsManagerProps) => {
   // Standart qiymatlarni belgilaymiz
   const sendToSender = recipients?.sendToSender ?? true; // Agar belgilanmagan bo'lsa, 'true'
@@ -61,7 +63,7 @@ export const RecipientsManager = ({
       return;
     }
     updateRecipients({
-      sendToSender: sendToSender,
+      ...(hideSendToSender ? {} : { sendToSender: sendToSender }),
       additionalIds: [...additionalIds, newId],
     });
     setInputValue("");
@@ -70,7 +72,7 @@ export const RecipientsManager = ({
 
   const handleRemoveRecipient = (idToRemove: string) => {
     updateRecipients({
-      sendToSender: sendToSender,
+      ...(hideSendToSender ? {} : { sendToSender: sendToSender }),
       additionalIds: additionalIds.filter((id) => id !== idToRemove),
     });
   };
@@ -85,7 +87,9 @@ export const RecipientsManager = ({
     }
   };
 
-  const noRecipientsSelected = !sendToSender && additionalIds.length === 0;
+  const noRecipientsSelected = hideSendToSender
+    ? additionalIds.length === 0
+    : !sendToSender && additionalIds.length === 0;
 
   return (
     <div className="grid gap-2">
@@ -103,24 +107,28 @@ export const RecipientsManager = ({
       </div>
       <div className="flex flex-wrap items-center gap-2 rounded-lg border p-2 min-h-[40px]">
         {/* === "YUBORUVCHIGA" TOGGLE TUGMASI === */}
-        <button
-          type="button"
-          onClick={toggleSendToSender}
-          title={
-            sendToSender
-              ? "Yuboruvchiga yuborishni bekor qilish"
-              : "Yuboruvchiga ham yuborish"
-          }
-          className={cn(
-            "flex items-center gap-1.5 pl-2 pr-3 py-1 text-sm rounded-md transition-colors border",
-            sendToSender
-              ? "bg-secondary text-secondary-foreground"
-              : "bg-transparent text-muted-foreground hover:bg-muted/50 border-dashed"
-          )}
-        >
-          <Send className={cn("h-3.5 w-3.5", !sendToSender && "opacity-50")} />
-          Yuboruvchiga
-        </button>
+        {!hideSendToSender && (
+          <button
+            type="button"
+            onClick={toggleSendToSender}
+            title={
+              sendToSender
+                ? "Yuboruvchiga yuborishni bekor qilish"
+                : "Yuboruvchiga ham yuborish"
+            }
+            className={cn(
+              "flex items-center gap-1.5 pl-2 pr-3 py-1 text-sm rounded-md transition-colors border",
+              sendToSender
+                ? "bg-secondary text-secondary-foreground"
+                : "bg-transparent text-muted-foreground hover:bg-muted/50 border-dashed"
+            )}
+          >
+            <Send
+              className={cn("h-3.5 w-3.5", !sendToSender && "opacity-50")}
+            />
+            Yuboruvchiga
+          </button>
+        )}
 
         {/* Qo'shilgan ID'lar ro'yxati (chiplar) */}
         {additionalIds.map((id) => (
