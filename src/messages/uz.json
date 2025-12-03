@@ -190,16 +190,16 @@
         "description": "Murakkab amallar va shartlar uchun Python kodi yozish imkonini beradi."
       },
       "state": {
-        "name": "Ma'lumotlar yig'ish",
+        "name": "Statega ma'lumot qo'shish",
         "description": "Foydalanuvchidan ma'lumotlarni yig'ib borish uchun"
       },
       "collection": {
-        "name": "Ma'lumotlar ro'yxati",
+        "name": "Collectionga ma'lumot qo'shish",
         "description": "Collectionga ma'lumotlar qo'shish"
       },
       "loadCollectionItem": {
-        "name": "Ma'lumot yuklash",
-        "description": "Collectiondan bitta ma'lumotni yuklash va contextga saqlash"
+        "name": "Yuklab olish",
+        "description": "Foydalanuvchidan kelgan ma'lumot yuklab olish"
       }
     }
   },

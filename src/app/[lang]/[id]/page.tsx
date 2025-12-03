@@ -95,7 +95,6 @@ export default function Page() {
     <div className="flex flex-col min-h-screen">
       <head>
         <title>{project?.name} | BotMother.uz</title>
-        {/* <title>salom olam</title> */}
       </head>
 
       {/* Header */}

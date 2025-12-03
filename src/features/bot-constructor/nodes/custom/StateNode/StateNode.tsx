@@ -21,7 +21,6 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
   // --- O'ZGARTIRISH: Mantiq to'liq yangilandi va soddalashtirildi ---
   const availableTypes = useMemo<{
     dynamic: string[];
-    default: string[];
     custom: string[];
     all: string[];
   }>(() => {
@@ -47,17 +46,6 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
 
     const parentNodeData = parentNode.data as any;
 
-    const defaultFilters = [
-      `user_id`,
-      `first_name`,
-      `last_name`,
-      `username`,
-      `language_code`,
-      `is_bot`,
-      `is_premium`,
-      `message_id`,
-      `chat_id`,
-    ];
     let dynamicFilters: string[] = [];
 
     switch (parentNodeData.node_type) {
@@ -539,11 +527,10 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
         break;
     }
 
-    const allTypes = [...defaultFilters, ...dynamicFilters, "Custom"];
+    const allTypes = [...dynamicFilters, "Custom"];
 
     return {
       dynamic: dynamicFilters,
-      default: defaultFilters,
       custom: ["Custom"],
       all: allTypes,
     };
@@ -584,13 +571,6 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
   // Combobox uchun options
   const comboboxOptions = useMemo<ComboboxOption[]>(() => {
     const options: ComboboxOption[] = [];
-
-    // Default filters
-    if (availableTypes.default.length > 0) {
-      availableTypes.default.forEach((type) => {
-        options.push({ value: type, label: type, group: "Default" });
-      });
-    }
 
     // Dynamic filters
     if (availableTypes.dynamic.length > 0) {
