@@ -54,6 +54,10 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         deleteFromContext: false,
         messageId: undefined,
       };
+    case "ForwardMessageNode":
+      return {
+        recipientIds: [""],
+      };
     case "DownloadFileNode":
       return {
         messageType: undefined,

@@ -211,7 +211,9 @@ const SendAudioNodeComponent = ({
                       </div>
                     )}
                   <div className="grid gap-1">
-                    <Label className="text-xs text-muted-foreground">UUID</Label>
+                    <Label className="text-xs text-muted-foreground">
+                      UUID
+                    </Label>
                     <Input
                       placeholder="UUID ni kiriting yoki fayl yuklang..."
                       value={data.uploadedFileUuid || ""}
