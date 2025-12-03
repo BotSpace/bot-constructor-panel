@@ -177,35 +177,24 @@ function LoadCollectionItemNode({
           )}
         </CardContent>
       </Card>
+
       {/* Found Output */}
       <Handle
         type="source"
-        position={Position.Right}
+        position={Position.Left}
         id="found"
-        style={{ top: "35%", right: "-8px" }}
+        style={{ right: "-8px" }}
         className="!w-3 !h-3 !bg-green-500 !border-2 !border-white"
       />
+
       {/* Not Found Output */}
-      <Handle
+      {/* <Handle
         type="source"
-        position={Position.Right}
+        position={Position.Bottom}
         id="not_found"
-        style={{ top: "65%", right: "-8px" }}
+        style={{ right: "-25%" }}
         className="!w-3 !h-3 !bg-red-500 !border-2 !border-white"
-      />
-      {/* Labels for handles */}
-      <div
-        className="absolute text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded pointer-events-none"
-        style={{ right: "-70px", top: "33%" }}
-      >
-        Found
-      </div>
-      <div
-        className="absolute text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded pointer-events-none"
-        style={{ right: "-85px", top: "63%" }}
-      >
-        Not Found
-      </div>
+      /> */}
     </>
   );
 }
