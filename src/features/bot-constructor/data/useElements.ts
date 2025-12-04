@@ -189,7 +189,9 @@ export function useElements(): ElementTypes[] {
         {
           type: "send_to_admin",
           name: t("constructor.messageOperations.sendToAdmin.name"),
-          description: t("constructor.messageOperations.sendToAdmin.description"),
+          description: t(
+            "constructor.messageOperations.sendToAdmin.description"
+          ),
           icon: "👤",
           color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
           triggerId: "SenToAdminNode",

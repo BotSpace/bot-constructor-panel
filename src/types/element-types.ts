@@ -28,6 +28,7 @@ export interface ElementItemType {
     | "video_note"
     // Message operations
     | "forward_message"
+    | "send_to_admin"
     | "copy_message"
     | "pin_message"
     | "unpin_message"
