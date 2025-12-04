@@ -1,2 +1,1 @@
-export { SenToAdminNode } from "./SenToAdminNode";
-
+export { SendToAdminNode as SenToAdminNode } from "./SendToAdminNode";
