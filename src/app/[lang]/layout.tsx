@@ -14,6 +14,8 @@ import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
 import Analytics from "@/components/common/analitics";
+import { NotificationProvider } from "@/components/common/notification-provider";
+import { NotificationAlert } from "@/components/common/notification-alert";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -58,16 +60,19 @@ export default async function RootLayout({
         <ReactQueryProvider>
           <AuthProvider>
             <WebSocketProvider>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-              >
-                <NextIntlClientProvider messages={messages}>
-                  {children}
-                </NextIntlClientProvider>
-                <Toaster position="top-center" reverseOrder={false} />
-              </ThemeProvider>
+              <NotificationProvider>
+                <ThemeProvider
+                  attribute="class"
+                  defaultTheme="system"
+                  enableSystem
+                >
+                  <NextIntlClientProvider messages={messages}>
+                    {children}
+                    <NotificationAlert />
+                  </NextIntlClientProvider>
+                  <Toaster position="top-center" reverseOrder={false} />
+                </ThemeProvider>
+              </NotificationProvider>
             </WebSocketProvider>
           </AuthProvider>
         </ReactQueryProvider>
