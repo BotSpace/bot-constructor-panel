@@ -58,6 +58,8 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
       return {
         recipientIds: [""],
       };
+    case "SenToAdminNode":
+      return {};
     case "DownloadFileNode":
       return {
         messageType: undefined,

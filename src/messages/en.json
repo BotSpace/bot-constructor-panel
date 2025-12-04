@@ -124,6 +124,10 @@
         "name": "Forward message",
         "description": "Forwards message to another chat or group."
       },
+      "sendToAdmin": {
+        "name": "Send to admin",
+        "description": "Sends message to admin."
+      },
       "copy": {
         "name": "Copy message",
         "description": "Copies and sends message."
