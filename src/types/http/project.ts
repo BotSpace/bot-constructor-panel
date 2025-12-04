@@ -14,6 +14,8 @@ export interface ProjectRetrive {
   username: string | null;
   avatar: string | null;
   debug: {
+    created_at: Date;
+    updated_at: Date;
     id: number;
     status: Status;
     service_id: string | null;

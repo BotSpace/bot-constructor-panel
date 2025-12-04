@@ -42,3 +42,19 @@ declare module '@editorjs/code';
 declare module '@editorjs/inline-code';
 declare module '@editorjs/underline';
 declare module '@editorjs/marker';
+
+// Audio file type declarations
+declare module '*.mp3' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.wav' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.ogg' {
+  const src: string;
+  export default src;
+}

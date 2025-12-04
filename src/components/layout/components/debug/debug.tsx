@@ -26,11 +26,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import CoundDownButton from "@/components/common/count-down-button";
+import { useNotificationContext } from "@/components/common/notification-provider";
+import { createSimpleNotification } from "@/lib/notification-utils";
 
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugActions() {
   const { id }: { id: string } = useParams();
   const { project, changeDebug } = useProjectStore();
+  const { sendNotification } = useNotificationContext();
 
   // Store'dan kerakli qismlarni olamiz
   const { saveFlow } = useFlowStore();
@@ -130,8 +134,25 @@ export default function DebugActions() {
       <ButtonGroup>
         {project.debug.status === "running" ? (
           <>
-            <Button size={"icon"} onClick={handleStopBot} variant="outline">
+            <Button onClick={handleStopBot} variant="outline">
               <StopCircle />
+              <CoundDownButton
+                onComplete={() => {
+                  sendNotification(
+                    createSimpleNotification(
+                      "Debug bot o'chirildi",
+                      "Debug bot uchun ajiratilgan 30 daqiqa tugadi! Testni davom ettirish uchun debug botni qaytatdan ishga tushirign"
+                    )
+                  );
+                }}
+                date={
+                  new Date(
+                    new Date(project.debug.updated_at).getTime() +
+                      30 * 60 * 1000
+                  )
+                }
+                completed_component={null}
+              />
             </Button>
             <Button
               onClick={handleRunAndRelaodDebugBot}
