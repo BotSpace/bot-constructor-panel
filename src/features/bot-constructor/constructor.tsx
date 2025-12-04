@@ -137,11 +137,6 @@ function FlowchartInner() {
     startCountdown();
   }, [nodes, edges, isDirty, initialState, startCountdown, stopCountdown]);
 
-  const handlePaletteSelect = (element: ElementItemType) => {
-    const position = screenToFlowPosition(mousePosition);
-    addNode(element, position);
-  };
-
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
