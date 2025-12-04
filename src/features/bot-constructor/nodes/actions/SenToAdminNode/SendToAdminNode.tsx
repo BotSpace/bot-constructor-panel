@@ -8,7 +8,7 @@ import { NodeHeader } from "../shared/NodeHeader";
 import { NodeFooter } from "../shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 
-const SenToAdminNodeComponent = ({ id, data, selected }: NodeProps) => {
+const SendToAdminNodeComponent = ({ id, selected }: NodeProps) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
@@ -22,5 +22,4 @@ const SenToAdminNodeComponent = ({ id, data, selected }: NodeProps) => {
   );
 };
 
-export const SenToAdminNode = memo(SenToAdminNodeComponent);
-
+export const SendToAdminNode = memo(SendToAdminNodeComponent);
