@@ -107,21 +107,24 @@ const ReplyButtonTriggerNodeComponent = ({
                   value={data.selectedButton?.id} // Tanlangan tugmaning ID'sini `value` sifatida beramiz
                   onValueChange={handleSelectionChange} // O'zgarish bo'lganda handler'ni chaqiramiz
                 >
-                  {availableReplyButtons.map((button) => (
-                    <div className="flex items-center gap-3" key={button.id}>
-                      <RadioGroupItem
-                        className="cursor-pointer"
-                        value={button.id}
-                        id={`r-${button.id}`}
-                      />
-                      <Label
-                        htmlFor={`r-${button.id}`}
-                        className="font-normal cursor-pointer"
-                      >
-                        {button.text}
-                      </Label>
-                    </div>
-                  ))}
+                  {availableReplyButtons.map((button) => {
+                    const uniqueId = `r-${id}-${button.id}`;
+                    return (
+                      <div className="flex items-center gap-3" key={button.id}>
+                        <RadioGroupItem
+                          className="cursor-pointer"
+                          value={button.id}
+                          id={uniqueId}
+                        />
+                        <Label
+                          htmlFor={uniqueId}
+                          className="font-normal cursor-pointer"
+                        >
+                          {button.text}
+                        </Label>
+                      </div>
+                    );
+                  })}
                 </RadioGroup>
               </div>
             ) : (
