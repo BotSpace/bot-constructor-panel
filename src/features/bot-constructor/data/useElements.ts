@@ -187,6 +187,14 @@ export function useElements(): ElementTypes[] {
           triggerId: "ForwardMessageNode",
         },
         {
+          type: "send_to_admin",
+          name: t("constructor.messageOperations.sendToAdmin.name"),
+          description: t("constructor.messageOperations.sendToAdmin.description"),
+          icon: "👤",
+          color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+          triggerId: "SenToAdminNode",
+        },
+        {
           type: "copy_message",
           name: t("constructor.messageOperations.copy.name"),
           description: t("constructor.messageOperations.copy.description"),

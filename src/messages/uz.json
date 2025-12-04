@@ -124,6 +124,10 @@
         "name": "Xabarni uzatish",
         "description": "Xabarni boshqa chatga yoki guruhga uzatadi."
       },
+      "sendToAdmin": {
+        "name": "Admin'ga yuborish",
+        "description": "Xabarni admin'ga yuboradi."
+      },
       "copy": {
         "name": "Xabarni nusxalash",
         "description": "Xabarni nusxalab yuboradi."
