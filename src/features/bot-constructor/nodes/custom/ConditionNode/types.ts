@@ -22,7 +22,19 @@ export interface ConditionOperator {
   value?: string | number | boolean;
 }
 
-export interface IfConditionNodeData {
+export interface ConditionBranch {
+  type: "if" | "else_if" | "else";
+  label?: string;
   operator?: "AND" | "OR";
   conditions?: ConditionOperator[];
+}
+
+export interface IfConditionNodeData {
+  // Legacy format (simple if/else)
+  operator?: "AND" | "OR";
+  conditions?: ConditionOperator[];
+  
+  // New format (if/else if/else with multiple branches)
+  mode?: "simple" | "advanced";
+  branches?: ConditionBranch[];
 }

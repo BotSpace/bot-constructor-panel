@@ -32,8 +32,10 @@ const VariableNodeComponent = ({
     updateNodeData(id, update);
   };
 
-  const needsValue =
-    data.operation && !["delete", "toggle"].includes(data.operation);
+  // Default operation to 'set' if not provided
+  const currentOperation = data.operation || "set";
+  
+  const needsValue = !["delete", "toggle"].includes(currentOperation);
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -51,7 +53,7 @@ const VariableNodeComponent = ({
           <div className="flex flex-col gap-2">
             <Label>Operatsiya</Label>
             <Select
-              value={data.operation || "set"}
+              value={currentOperation}
               onValueChange={(value: VariableOperation) =>
                 handleUpdate({ operation: value })
               }
@@ -86,7 +88,7 @@ const VariableNodeComponent = ({
           {needsValue && (
             <div className="flex flex-col gap-2">
               <Label>Qiymat</Label>
-              {data.operation === "parse_json" ? (
+              {currentOperation === "parse_json" ? (
                 <Textarea
                   placeholder='{"key": "value"}'
                   value={data.value?.toString() || ""}
@@ -107,10 +109,10 @@ const VariableNodeComponent = ({
           <div className="text-xs text-muted-foreground space-y-1">
             <p className="font-medium">Masalan:</p>
             <ul className="list-disc list-inside space-y-0.5 ml-2">
-              {data.operation === "set" && <li>score = 100</li>}
-              {data.operation === "increment" && <li>score += 10</li>}
-              {data.operation === "decrement" && <li>lives -= 1</li>}
-              {data.operation === "append" && (
+              {currentOperation === "set" && <li>score = 100</li>}
+              {currentOperation === "increment" && <li>score += 10</li>}
+              {currentOperation === "decrement" && <li>lives -= 1</li>}
+              {currentOperation === "append" && (
                 <li>items.push("yangi element")</li>
               )}
             </ul>

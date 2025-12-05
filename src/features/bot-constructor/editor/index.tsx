@@ -5,9 +5,9 @@ import { useEffect, useRef } from "react"; // useEffect va useRef'ni import qila
 import { EditorSetup } from "./setup";
 import { useEditorSettings } from "./store";
 
-// Monokai mavzusini import qilamiz
-import monokaiTheme from "monaco-themes/themes/Monokai.json";
-import { ayuMirageTheme } from "./themes/ayu-mirage"; // YANGI IMPORT
+// Monaco themes
+import { monokaiTheme } from "./themes/monokai";
+import { ayuMirageTheme } from "./themes/ayu-mirage";
 import { botfatherTheme } from "./themes/botfather";
 import { CodeExecutionContext } from "@/features/bot-constructor/nodes/custom/CustomCodeNode/types";
 

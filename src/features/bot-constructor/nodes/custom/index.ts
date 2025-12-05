@@ -5,6 +5,8 @@ export * from "./LoadCollectionItemNode";
 
 // Flow control nodes
 export * from "./ConditionNode";
+export * from "./ElseIfNode";
+export * from "./ElseNode";
 export * from "./DelayNode";
 export * from "./RandomNode";
 export * from "./VariableNode";
