@@ -19,7 +19,7 @@ export { SendDiceNode } from "./DiceNode";
 
 // Message operations
 export { ForwardMessageNode } from "./ForwardMessageNode";
-export { SenToAdminNode } from "./SenToAdminNode";
+export { SendToAdminNode } from "./SendToAdminNode";
 export { CopyMessageNode } from "./CopyMessageNode";
 export { PinMessageNode } from "./PinMessageNode";
 export { UnpinMessageNode } from "./UnpinMessageNode";

@@ -16,7 +16,7 @@ import {
   SendVenueNode,
   SendDiceNode,
   ForwardMessageNode,
-  SenToAdminNode,
+  SendToAdminNode,
   CopyMessageNode,
   PinMessageNode,
   UnpinMessageNode,
@@ -72,7 +72,7 @@ export const CustomNodes = {
   // Actions - Message Operations
   EditMessageNode,
   ForwardMessageNode,
-  SenToAdminNode,
+  SendToAdminNode,
   CopyMessageNode,
   PinMessageNode,
   UnpinMessageNode,
