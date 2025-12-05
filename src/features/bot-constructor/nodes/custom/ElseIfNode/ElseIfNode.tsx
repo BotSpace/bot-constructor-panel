@@ -66,11 +66,10 @@ const ElseIfNodeComponent = ({
         id="target-handler"
         className="!w-4 !h-4 !bg-sky-500 !border-2 !border-gray-800"
       />
-      
+
       <NodeHeader
         icon="🔄"
         title="Else If (Aks holda agar)"
-        subtitle="If dan keyin qo'shimcha shart"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -163,20 +162,20 @@ const ElseIfNodeComponent = ({
                 {!["is_empty", "not_empty", "exists", "not_exists"].includes(
                   condition.operator
                 ) && (
-                  <div className="flex flex-col gap-1">
-                    <Input
-                      placeholder="Qiymat (masalan: 18, {{other_var}})"
-                      value={condition.value?.toString() || ""}
-                      onChange={(e) =>
-                        updateCondition(index, { value: e.target.value })
-                      }
-                      className="text-sm"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Kontekstdan qiymat olish uchun {"{{var_name}}"}
-                    </p>
-                  </div>
-                )}
+                    <div className="flex flex-col gap-1">
+                      <Input
+                        placeholder="Qiymat (masalan: 18, {{other_var}})"
+                        value={condition.value?.toString() || ""}
+                        onChange={(e) =>
+                          updateCondition(index, { value: e.target.value })
+                        }
+                        className="text-sm"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Kontekstdan qiymat olish uchun {"{{var_name}}"}
+                      </p>
+                    </div>
+                  )}
               </div>
             ))}
 
@@ -190,7 +189,7 @@ const ElseIfNodeComponent = ({
       )}
 
       <NodeFooter nodeId={id} />
-      
+
       {/* Input - chap tomonda (IF/ElseIf dan NEXT) */}
       <Handle
         type="target"
@@ -198,10 +197,10 @@ const ElseIfNodeComponent = ({
         id="target-handler"
         className="!w-4 !h-4 !bg-sky-500 !border-2 !border-gray-800"
       />
-      
+
       {/* TRUE - pastda (bu shart bajarilsa) */}
       <SourceHandles id="true" position={Position.Bottom} />
-      
+
       {/* NEXT - o'ng tomonda (keyingi ElseIf/Else ga) */}
       <SourceHandles id="next" position={Position.Right} />
     </Card>
