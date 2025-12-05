@@ -223,6 +223,7 @@
     "any": "Har qanday",
     "equals": "Teng",
     "contains": "Ichida",
+    "no-contains": "Ichida emas",
     "startsWith": "Boshlanadi",
     "regex": "Regex",
     "command": "Buyruq",

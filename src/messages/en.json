@@ -223,6 +223,7 @@
     "any": "Any",
     "equals": "Equals",
     "contains": "Contains",
+    "no-contains": "Not Contains",
     "startsWith": "Starts with",
     "regex": "Regex",
     "command": "Command",
