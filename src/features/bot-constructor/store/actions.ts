@@ -58,7 +58,7 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
       return {
         recipientIds: [""],
       };
-    case "SenToAdminNode":
+    case "SendToAdminNode":
       return {};
     case "DownloadFileNode":
       return {
@@ -115,10 +115,10 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
 ) => ({
   addNode: (element, position) => {
     const { saveToHistory } = get();
-    
+
     // History ga saqlash (undo/redo flag tekshiriladi ichida)
     saveToHistory();
-    
+
     const newNode: Node = {
       id: generateNodeId(),
       type: element.triggerId,
@@ -160,7 +160,7 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
 
   loadFlow: async (flow) => {
     const { clearHistory } = get();
-    
+
     set({ isLoading: true });
 
     // Avval initialState ni o'rnatamiz, keyin nodes va edges ni
