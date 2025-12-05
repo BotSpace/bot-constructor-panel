@@ -1,6 +1,6 @@
 "use client";
 
-import { NodeProps } from "reactflow";
+import { NodeProps, Position } from "reactflow";
 import { memo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -8,7 +8,7 @@ import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { NodeFooter } from "../../actions/shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { IfConditionNodeData, ConditionOperator } from "./types";
+import { IfConditionNodeData, ConditionOperator, ConditionBranch } from "./types";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -28,9 +28,59 @@ const IfConditionNodeComponent = ({
 }: NodeProps<IfConditionNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const mode = data.mode || "simple";
 
   const handleUpdate = (update: Partial<IfConditionNodeData>) => {
     updateNodeData(id, update);
+  };
+
+  const switchMode = (newMode: "simple" | "advanced") => {
+    if (newMode === "advanced") {
+      // Convert simple conditions to first branch
+      const firstBranch: ConditionBranch = {
+        type: "if",
+        label: "Agar",
+        operator: data.operator || "AND",
+        conditions: data.conditions || [],
+      };
+      handleUpdate({
+        mode: "advanced",
+        branches: [firstBranch],
+      });
+    } else {
+      // Convert first branch back to simple
+      const firstBranch = data.branches?.[0];
+      handleUpdate({
+        mode: "simple",
+        operator: firstBranch?.operator || "AND",
+        conditions: firstBranch?.conditions || [],
+        branches: undefined,
+      });
+    }
+  };
+
+  const addBranch = (type: "else_if" | "else") => {
+    const newBranch: ConditionBranch = {
+      type,
+      label: type === "else_if" ? "Aks holda agar" : "Aks holda",
+      operator: "AND",
+      conditions: type === "else" ? undefined : [],
+    };
+    handleUpdate({
+      branches: [...(data.branches || []), newBranch],
+    });
+  };
+
+  const removeBranch = (index: number) => {
+    const newBranches = [...(data.branches || [])];
+    newBranches.splice(index, 1);
+    handleUpdate({ branches: newBranches });
+  };
+
+  const updateBranch = (index: number, update: Partial<ConditionBranch>) => {
+    const newBranches = [...(data.branches || [])];
+    newBranches[index] = { ...newBranches[index], ...update };
+    handleUpdate({ branches: newBranches });
   };
 
   const addCondition = () => {
@@ -64,7 +114,8 @@ const IfConditionNodeComponent = ({
       <TargetHandles />
       <NodeHeader
         icon="🔀"
-        title="Shart (If/Else)"
+        title="If (Agar)"
+        subtitle="Shartni tekshiradi"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -123,14 +174,19 @@ const IfConditionNodeComponent = ({
                 </div>
 
                 {/* Variable */}
-                <Input
-                  placeholder="O'zgaruvchi nomi (masalan: user_age)"
-                  value={condition.variable || ""}
-                  onChange={(e) =>
-                    updateCondition(index, { variable: e.target.value })
-                  }
-                  className="text-sm"
-                />
+                <div className="flex flex-col gap-1">
+                  <Input
+                    placeholder="O'zgaruvchi nomi (masalan: first, user_age)"
+                    value={condition.variable || ""}
+                    onChange={(e) =>
+                      updateCondition(index, { variable: e.target.value })
+                    }
+                    className="text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Oddiy nom yozing. Template sintaksisi shart emas.
+                  </p>
+                </div>
 
                 {/* Operator */}
                 <Select
@@ -172,14 +228,19 @@ const IfConditionNodeComponent = ({
                 {!["is_empty", "not_empty", "exists", "not_exists"].includes(
                   condition.operator
                 ) && (
-                  <Input
-                    placeholder="Qiymat"
-                    value={condition.value?.toString() || ""}
-                    onChange={(e) =>
-                      updateCondition(index, { value: e.target.value })
-                    }
-                    className="text-sm"
-                  />
+                  <div className="flex flex-col gap-1">
+                    <Input
+                      placeholder="Qiymat (masalan: 1, John, {{other_var}})"
+                      value={condition.value?.toString() || ""}
+                      onChange={(e) =>
+                        updateCondition(index, { value: e.target.value })
+                      }
+                      className="text-sm"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Kontekstdan qiymat olish uchun {"{{var_name}}"}
+                    </p>
+                  </div>
                 )}
               </div>
             ))}
@@ -194,8 +255,15 @@ const IfConditionNodeComponent = ({
       )}
 
       <NodeFooter nodeId={id} />
-      <SourceHandles id="true" />
-      <SourceHandles id="false" />
+      
+      {/* Input - chap tomonda */}
+      <TargetHandles />
+      
+      {/* TRUE - pastda (shart bajarilsa) */}
+      <SourceHandles id="true" position={Position.Bottom} />
+      
+      {/* NEXT - o'ng tomonda (ElseIf/Else ga) */}
+      <SourceHandles id="next" position={Position.Right} />
     </Card>
   );
 };

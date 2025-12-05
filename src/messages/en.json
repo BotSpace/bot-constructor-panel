@@ -155,10 +155,6 @@
     },
     "flowControl": {
       "title": "🔀 Flow Control",
-      "condition": {
-        "name": "Condition (If/Else)",
-        "description": "Selects one of two paths based on condition."
-      },
       "delay": {
         "name": "Delay",
         "description": "Waits for a specified time."
@@ -174,6 +170,18 @@
       "checkMembership": {
         "name": "Check membership",
         "description": "Checks if user is a member of channel/group."
+      },
+      "elseif": {
+        "name": "Else If",
+        "description": "Additional condition check after If."
+      },
+      "else": {
+        "name": "Else",
+        "description": "Executes if no other conditions match."
+      },
+      "if": {
+        "name": "If",
+        "description": "Checks condition and routes to TRUE/FALSE/NEXT."
       }
     },
     "integrations": {

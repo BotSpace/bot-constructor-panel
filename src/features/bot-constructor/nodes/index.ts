@@ -37,6 +37,8 @@ import {
   CollectionNode,
   LoadCollectionItemNode,
   IfConditionNode,
+  ElseIfNode,
+  ElseNode,
   DelayNode,
   RandomNode,
   VariableNode,
@@ -88,6 +90,8 @@ export const CustomNodes = {
 
   // Custom - Flow Control
   IfConditionNode,
+  ElseIfNode,
+  ElseNode,
   DelayNode,
   RandomNode,
   VariableNode,

@@ -255,11 +255,27 @@ export function useElements(): ElementTypes[] {
       elements: [
         {
           type: "condition",
-          name: t("constructor.flowControl.condition.name"),
-          description: t("constructor.flowControl.condition.description"),
+          name: t("constructor.flowControl.if.name"),
+          description: t("constructor.flowControl.if.description"),
           icon: "🔀",
           color: "bg-violet-500/10 text-violet-400 border-violet-500/20",
           triggerId: "IfConditionNode",
+        },
+        {
+          type: "elseif",
+          name: t("constructor.flowControl.elseif.name"),
+          description: t("constructor.flowControl.elseif.description"),
+          icon: "🔄",
+          color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+          triggerId: "ElseIfNode",
+        },
+        {
+          type: "else",
+          name: t("constructor.flowControl.else.name"),
+          description: t("constructor.flowControl.else.description"),
+          icon: "➡️",
+          color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+          triggerId: "ElseNode",
         },
         {
           type: "delay",

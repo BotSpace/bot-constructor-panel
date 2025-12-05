@@ -155,10 +155,6 @@
     },
     "flowControl": {
       "title": "🔀 Mantiq Oqimi",
-      "condition": {
-        "name": "Shart (If/Else)",
-        "description": "Shartga qarab ikki yo'ldan birini tanlaydi."
-      },
       "delay": {
         "name": "Kutish",
         "description": "Belgilangan vaqt kutadi."
@@ -174,6 +170,18 @@
       "checkMembership": {
         "name": "A'zolikni tekshirish",
         "description": "Foydalanuvchi kanal/guruh a'zosi ekanligini tekshiradi."
+      },
+      "elseif": {
+        "name": "Else If (Aks holda agar)",
+        "description": "If dan keyin qo'shimcha shart tekshiradi."
+      },
+      "else": {
+        "name": "Else (Aks holda)",
+        "description": "Boshqa shartlar bajarilmasa ishga tushadi."
+      },
+      "if": {
+        "name": "If (Agar)",
+        "description": "Shartni tekshiradi va TRUE/FALSE/NEXT yo'nalishlarga ajratadi."
       }
     },
     "integrations": {
