@@ -6,6 +6,7 @@ export const textFilters = [
   ...anyFilter, // "Har qanday"ni qo'shamiz
   { value: "equals", label: "Teng" },
   { value: "contains", label: "Ichida" },
+  { value: "not-contains", label: "Ichida emas" },
   { value: "starts_with", label: "Boshlanadi" },
   { value: "regex", label: "Regex" },
   { value: "command", label: "Buyruq" },
