@@ -115,7 +115,6 @@ const IfConditionNodeComponent = ({
       <NodeHeader
         icon="🔀"
         title="If (Agar)"
-        subtitle="Shartni tekshiradi"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -228,20 +227,20 @@ const IfConditionNodeComponent = ({
                 {!["is_empty", "not_empty", "exists", "not_exists"].includes(
                   condition.operator
                 ) && (
-                  <div className="flex flex-col gap-1">
-                    <Input
-                      placeholder="Qiymat (masalan: 1, John, {{other_var}})"
-                      value={condition.value?.toString() || ""}
-                      onChange={(e) =>
-                        updateCondition(index, { value: e.target.value })
-                      }
-                      className="text-sm"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Kontekstdan qiymat olish uchun {"{{var_name}}"}
-                    </p>
-                  </div>
-                )}
+                    <div className="flex flex-col gap-1">
+                      <Input
+                        placeholder="Qiymat (masalan: 1, John, {{other_var}})"
+                        value={condition.value?.toString() || ""}
+                        onChange={(e) =>
+                          updateCondition(index, { value: e.target.value })
+                        }
+                        className="text-sm"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Kontekstdan qiymat olish uchun {"{{var_name}}"}
+                      </p>
+                    </div>
+                  )}
               </div>
             ))}
 
@@ -255,13 +254,13 @@ const IfConditionNodeComponent = ({
       )}
 
       <NodeFooter nodeId={id} />
-      
+
       {/* Input - chap tomonda */}
       <TargetHandles />
-      
+
       {/* TRUE - pastda (shart bajarilsa) */}
       <SourceHandles id="true" position={Position.Bottom} />
-      
+
       {/* NEXT - o'ng tomonda (ElseIf/Else ga) */}
       <SourceHandles id="next" position={Position.Right} />
     </Card>

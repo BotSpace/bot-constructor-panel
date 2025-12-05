@@ -25,11 +25,10 @@ const ElseNodeComponent = ({
         id="target-handler"
         className="!w-4 !h-4 !bg-sky-500 !border-2 !border-gray-800"
       />
-      
+
       <NodeHeader
         icon="➡️"
         title="Else (Aks holda)"
-        subtitle="Boshqa shartlar bajarilmasa"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
@@ -48,7 +47,7 @@ const ElseNodeComponent = ({
       )}
 
       <NodeFooter nodeId={id} />
-      
+
       {/* TRUE - pastda (doim bajariladi) */}
       <SourceHandles id="true" position={Position.Bottom} />
     </Card>
