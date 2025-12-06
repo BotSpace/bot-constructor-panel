@@ -2,7 +2,7 @@ import { KeyboardConfig, ParseMode } from "../TextMessageNode/types";
 
 export type EditMessageType = "text" | "caption" | "keyboard" | "media";
 
-export type MessageIdSource = "context" | "previous_node" | "manual";
+export type MessageIdSource = "this_message" | "connected_node" | "message_id";
 
 export interface EditMessageNodeData {
   // Message ID ni qayerdan olish

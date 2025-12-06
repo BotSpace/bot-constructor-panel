@@ -10,13 +10,13 @@ import { EditMessageSource } from "../../components/shared/ReactFlowHandles/Edit
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 import {
+  Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@radix-ui/react-select";
+} from "@/components/ui/select";
 import TextareaAutosize from "react-textarea-autosize";
 import { ParseMode, KeyboardConfig } from "../TextMessageNode/types";
 import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator";
@@ -75,7 +75,7 @@ export const EditMessageNode = memo(
     }, [connectedMessageNode]);
 
     // Message ID source tanlash
-    const messageIdSource = data.messageIdSource || "previous_node";
+    const messageIdSource = data.messageIdSource || "connected_node";
 
     // Edit type: avtomatik aniqlangan bo'lsa uni ishlatamiz, aks holda data'dan olamiz
     const editType = autoEditType || data.editType || "text";
@@ -88,8 +88,8 @@ export const EditMessageNode = memo(
 
     // Konfiguratsiya holatini tekshirish
     const isConfigured = useMemo(() => {
-      if (messageIdSource === "manual" && !data.messageId) return false;
-      if (messageIdSource === "previous_node" && !hasConnectedNode)
+      if (messageIdSource === "message_id" && !data.messageId) return false;
+      if (messageIdSource === "connected_node" && !hasConnectedNode)
         return false;
 
       switch (editType) {
@@ -115,8 +115,8 @@ export const EditMessageNode = memo(
       >
         {/* Standard Target Handle (Top) */}
         <TargetHandles />
-
         {/* Custom Edit Target Handle (Left side) - Tahrirlanadigan messageni qabul qiladi */}
+        {/* {messageIdSource === "connected_node" && <EditMessageSource />} */}
         <EditMessageSource />
 
         <NodeHeader
@@ -125,7 +125,6 @@ export const EditMessageNode = memo(
           isCollapsed={isCollapsed}
           onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
         />
-
         {!isCollapsed && (
           <CardContent className="flex flex-col gap-4">
             {/* Message ID Source Selection */}
@@ -137,20 +136,21 @@ export const EditMessageNode = memo(
                   handleUpdate({ messageIdSource: value })
                 }
               >
-                <SelectTrigger>
-                  <SelectValue />
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a fruit" />
                 </SelectTrigger>
+
                 <SelectContent>
-                  <SelectItem value="previous_node">
-                    Oldingi node'dan (ulangan)
+                  <SelectItem value="connected_node">
+                    Ulangan message node'dan
                   </SelectItem>
-                  <SelectItem value="context">Context'dan</SelectItem>
-                  <SelectItem value="manual">Qo'lda kiritish</SelectItem>
+                  <SelectItem value="this_message">Ushbu xabar</SelectItem>
+                  <SelectItem value="message_id">Qo'lda kiritish</SelectItem>
                 </SelectContent>
               </Select>
 
               {/* Manual message ID input */}
-              {messageIdSource === "manual" && (
+              {messageIdSource === "message_id" && (
                 <div className="grid gap-2">
                   <Label>Message ID</Label>
                   <Input
@@ -164,7 +164,7 @@ export const EditMessageNode = memo(
               )}
 
               {/* Connected message node status */}
-              {messageIdSource === "previous_node" && (
+              {messageIdSource === "connected_node" && (
                 <div className="flex items-center gap-2 text-sm">
                   {hasConnectedNode ? (
                     <Badge variant="secondary" className="gap-1">
@@ -191,7 +191,7 @@ export const EditMessageNode = memo(
                     handleUpdate({ editType: value })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -456,7 +456,6 @@ export const EditMessageNode = memo(
             )}
           </CardContent>
         )}
-
         {/* Standard Source Handle (Bottom) */}
         <SourceHandles />
       </Card>
