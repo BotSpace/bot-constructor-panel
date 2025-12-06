@@ -39,7 +39,7 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
       return { ...baseMessageData, fileSourceType: "url", caption: "" };
     case "EditMessageNode":
       return {
-        messageIdSource: "context",
+        messageIdSource: "connected_node",
         editType: "text",
         messageText: "",
         parseMode: "None",

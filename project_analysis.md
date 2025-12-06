@@ -1,71 +1,84 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 11/26/2025, 12:17:03 PM
+Sana: 12/6/2025, 4:05:20 PM
 
 ## 📁 Fayl Strukturasi
 
 ```
-bot-constructor-panel
-├── .cursor-free-vip
-│   └── config.ini
+constructorr
 ├── .env
 ├── .env.example
-├── .eslintrc.json
 ├── .github
 │   └── workflows
 │       └── deploy.yaml
 ├── .gitignore
+├── .husky
+│   ├── _
+│   │   ├── .gitignore
+│   │   ├── applypatch-msg
+│   │   ├── commit-msg
+│   │   ├── h
+│   │   ├── husky.sh
+│   │   ├── post-applypatch
+│   │   ├── post-checkout
+│   │   ├── post-commit
+│   │   ├── post-merge
+│   │   ├── post-rewrite
+│   │   ├── pre-applypatch
+│   │   ├── pre-auto-gc
+│   │   ├── pre-commit
+│   │   ├── pre-merge-commit
+│   │   ├── pre-push
+│   │   ├── pre-rebase
+│   │   └── prepare-commit-msg
+│   └── pre-push
 ├── Dockerfile
 ├── README.md
 ├── components.json
 ├── docs
-│   └── ARCHITECTURE.md
+│   ├── ARCHITECTURE.md
+│   └── COLLECTION_BUTTON_LAYOUT.md
+├── just.json
 ├── next-env.d.ts
-├── next-intl.config.js
 ├── next.config.ts
 ├── package.json
 ├── postcss.config.mjs
 ├── scripts
 │   ├── analyze-project.js
 │   └── install.sh
+├── sidebar.txt
 ├── src
 │   ├── app
-│   │   ├── AuthProvider.tsx
-│   │   ├── ReactQueryProvider.tsx
 │   │   ├── [lang]
-│   │   │   └── [id]
-│   │   │       ├── collection_not_working_on_hear
-│   │   │       │   ├── components
-│   │   │       │   │   ├── add-collection-modal.tsx
-│   │   │       │   │   ├── collection-modal.tsx
-│   │   │       │   │   ├── content-table.tsx
-│   │   │       │   │   ├── data-rows.tsx
-│   │   │       │   │   ├── empty-state.tsx
-│   │   │       │   │   ├── new-item-row.tsx
-│   │   │       │   │   ├── sidebar.tsx
-│   │   │       │   │   ├── table-header.tsx
-│   │   │       │   │   └── utils.ts
-│   │   │       │   └── page.tsx
-│   │   │       └── page.tsx
+│   │   │   ├── AuthProvider.tsx
+│   │   │   ├── ReactQueryProvider.tsx
+│   │   │   ├── [id]
+│   │   │   │   └── page.tsx
+│   │   │   ├── auth
+│   │   │   │   └── page.tsx
+│   │   │   ├── globals.css
+│   │   │   └── layout.tsx
 │   │   ├── api
 │   │   │   └── auth
 │   │   │       ├── [...nextauth]
 │   │   │       │   ├── option.ts
 │   │   │       │   └── route.ts
 │   │   │       └── next-auth.d.ts
-│   │   ├── auth
-│   │   │   └── page.tsx
-│   │   ├── favicon.ico
-│   │   ├── globals.css
-│   │   └── layout.tsx
+│   │   └── favicon.ico
+│   ├── assets
+│   │   └── notification.mp3
 │   ├── components
 │   │   ├── common
+│   │   │   ├── analitics.tsx
+│   │   │   ├── count-down-button.tsx
 │   │   │   ├── i18nLink.tsx
 │   │   │   ├── link-to-parrent.tsx
+│   │   │   ├── notification-alert.tsx
+│   │   │   ├── notification-provider.tsx
+│   │   │   ├── separetor.tsx
 │   │   │   ├── status-badge.tsx
 │   │   │   ├── theme-provider.tsx
 │   │   │   └── toggle-button.tsx
-│   │   ├── index.ts
 │   │   ├── layout
 │   │   │   ├── components
 │   │   │   │   ├── add-env-dialog.tsx
@@ -75,7 +88,6 @@ bot-constructor-panel
 │   │   │   │   ├── debug
 │   │   │   │   │   ├── debug.tsx
 │   │   │   │   │   └── index.ts
-│   │   │   │   ├── debug-bot-edit.tsx
 │   │   │   │   ├── debug-console.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   └── relas
@@ -93,6 +105,7 @@ bot-constructor-panel
 │   │       ├── checkbox.tsx
 │   │       ├── combobox.tsx
 │   │       ├── command.tsx
+│   │       ├── context-menu.tsx
 │   │       ├── dialog.tsx
 │   │       ├── dropdown-menu.tsx
 │   │       ├── hover-border-gradient.tsx
@@ -123,7 +136,9 @@ bot-constructor-panel
 │   │   │   │   │   ├── ButtonGenerator.tsx
 │   │   │   │   │   ├── components
 │   │   │   │   │   │   ├── ButtonRow.tsx
+│   │   │   │   │   │   ├── CollectionLayoutPreview.tsx
 │   │   │   │   │   │   ├── ControlPanel.tsx
+│   │   │   │   │   │   ├── EditButtonDialog.tsx
 │   │   │   │   │   │   ├── InlineForm.tsx
 │   │   │   │   │   │   ├── KeyboardPreview.tsx
 │   │   │   │   │   │   ├── LoginUrlForm.tsx
@@ -135,9 +150,6 @@ bot-constructor-panel
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── types.ts
 │   │   │   │   │   └── utils.tsx
-│   │   │   │   ├── QuickAddPalette
-│   │   │   │   │   ├── QuickAddPalette.tsx
-│   │   │   │   │   └── index.ts
 │   │   │   │   ├── RichTextEditor
 │   │   │   │   │   └── editor
 │   │   │   │   │       ├── EditorStyles.css
@@ -148,11 +160,12 @@ bot-constructor-panel
 │   │   │   │   └── save-status-badge.tsx
 │   │   │   ├── constructor.tsx
 │   │   │   ├── data
-│   │   │   │   ├── elements.ts
 │   │   │   │   ├── filters.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── messages.ts
-│   │   │   │   └── themes.ts
+│   │   │   │   ├── themes.ts
+│   │   │   │   ├── useElements.ts
+│   │   │   │   └── useMessageTypes.ts
 │   │   │   ├── edges
 │   │   │   │   ├── SelectableEdge.tsx
 │   │   │   │   ├── SmartEdge.tsx
@@ -204,10 +217,32 @@ bot-constructor-panel
 │   │   │   │   └── geometry.ts
 │   │   │   ├── nodes
 │   │   │   │   ├── actions
+│   │   │   │   │   ├── AnimationNode
+│   │   │   │   │   │   ├── AnimationNode.tsx
+│   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── AudioMessageNode
 │   │   │   │   │   │   ├── AudioMessageNode.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── ChatActionNode
+│   │   │   │   │   │   ├── ChatActionNode.tsx
+│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   ├── ContactNode
+│   │   │   │   │   │   ├── ContactNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── CopyMessageNode
+│   │   │   │   │   │   ├── CopyMessageNode.tsx
+│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   ├── DeleteMessageNode
+│   │   │   │   │   │   ├── DeleteMessageNode.tsx
+│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   ├── DiceNode
+│   │   │   │   │   │   ├── DiceNode.tsx
+│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   ├── DownloadFileNode
+│   │   │   │   │   │   ├── DownloadFileNode.tsx
+│   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── EditMessageNode
 │   │   │   │   │   │   ├── EditMessageNode.tsx
 │   │   │   │   │   │   ├── index.ts
@@ -216,10 +251,33 @@ bot-constructor-panel
 │   │   │   │   │   │   ├── FileMessageNode.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── ForwardMessageNode
+│   │   │   │   │   │   ├── ForwardMessageNode.tsx
+│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   ├── LocationNode
+│   │   │   │   │   │   ├── LocationNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── MediaGroupNode
+│   │   │   │   │   │   ├── MediaGroupNode.tsx
+│   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── PhotoMessageNode
 │   │   │   │   │   │   ├── PhotoMessageNode.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── PinMessageNode
+│   │   │   │   │   │   ├── PinMessageNode.tsx
+│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   ├── PollNode
+│   │   │   │   │   │   ├── PollNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── SendToAdminNode
+│   │   │   │   │   │   ├── SendToAdminNode.tsx
+│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   ├── StickerNode
+│   │   │   │   │   │   ├── StickerNode.tsx
+│   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── TextMessageNode
 │   │   │   │   │   │   ├── TextMessageNode.tsx
 │   │   │   │   │   │   ├── components
@@ -231,10 +289,22 @@ bot-constructor-panel
 │   │   │   │   │   │   │       └── types.ts
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── UnpinMessageNode
+│   │   │   │   │   │   ├── UnpinMessageNode.tsx
+│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   ├── VenueNode
+│   │   │   │   │   │   ├── VenueNode.tsx
+│   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── VideoMessageNode
 │   │   │   │   │   │   ├── VideoMessageNode.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── VideoNoteNode
+│   │   │   │   │   │   ├── VideoNoteNode.tsx
+│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   ├── VoiceNode
+│   │   │   │   │   │   ├── VoiceNode.tsx
+│   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── shared
 │   │   │   │   │       ├── NodeFooter.tsx
@@ -243,16 +313,28 @@ bot-constructor-panel
 │   │   │   │   ├── components
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── shared
-│   │   │   │   │       ├── ReactFlowHandlers
-│   │   │   │   │       │   ├── EditMessageHandler.tsx
-│   │   │   │   │       │   ├── EditMessageTarget.tsx
-│   │   │   │   │       │   ├── SourceHandler.tsx
-│   │   │   │   │       │   ├── TargetHandler.tsx
+│   │   │   │   │       ├── ReactFlowHandles
+│   │   │   │   │       │   ├── DeleteMessageSource.tsx
+│   │   │   │   │       │   ├── EditMessageSource.tsx
+│   │   │   │   │       │   ├── ElseMessageSource.tsx
+│   │   │   │   │       │   ├── SelectedMessageTarget.tsx
+│   │   │   │   │       │   ├── SourceHandles.tsx
+│   │   │   │   │       │   ├── TargetHandles.tsx
 │   │   │   │   │       │   └── index.ts
 │   │   │   │   │       └── index.ts
 │   │   │   │   ├── custom
+│   │   │   │   │   ├── CallbackAnswerNode
+│   │   │   │   │   │   ├── CallbackAnswerNode.tsx
+│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   ├── CheckMembershipNode
+│   │   │   │   │   │   ├── CheckMembershipNode.tsx
+│   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── CollectionNode
 │   │   │   │   │   │   ├── CollectionNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── ConditionNode
+│   │   │   │   │   │   ├── ConditionNode.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── CustomCodeNode
@@ -261,8 +343,27 @@ bot-constructor-panel
 │   │   │   │   │   │   │   └── CodeEditorDialog.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── DelayNode
+│   │   │   │   │   │   ├── DelayNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── HTTPRequestNode
+│   │   │   │   │   │   ├── HTTPRequestNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── LoadCollectionItemNode
+│   │   │   │   │   │   ├── LoadCollectionItemNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── RandomNode
+│   │   │   │   │   │   ├── RandomNode.tsx
+│   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── StateNode
 │   │   │   │   │   │   ├── StateNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── VariableNode
+│   │   │   │   │   │   ├── VariableNode.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   └── index.ts
@@ -299,6 +400,7 @@ bot-constructor-panel
 │   │   │       ├── actions.ts
 │   │   │       ├── clipboardSlice.ts
 │   │   │       ├── flowSlice.ts
+│   │   │       ├── historySlice.ts
 │   │   │       ├── index.ts
 │   │   │       ├── project.ts
 │   │   │       └── types.ts
@@ -309,16 +411,18 @@ bot-constructor-panel
 │   │   └── index.ts
 │   ├── hooks
 │   │   ├── use-debounces.tsx
-│   │   └── use-keyboard-shortcut.tsx
+│   │   ├── use-keyboard-shortcut.tsx
+│   │   └── use-notification.ts
 │   ├── i18n
 │   │   ├── request.ts
 │   │   └── routing.ts
-│   ├── index.ts
 │   ├── lib
 │   │   ├── constants.ts
 │   │   ├── env.ts
 │   │   ├── error-handler.ts
+│   │   ├── file-utils.ts
 │   │   ├── input-validators.ts
+│   │   ├── notification-utils.ts
 │   │   ├── query-generator.ts
 │   │   └── utils.ts
 │   ├── messages
@@ -326,6 +430,7 @@ bot-constructor-panel
 │   │   ├── jp.json
 │   │   ├── ru.json
 │   │   └── uz.json
+│   ├── middleware.ts
 │   ├── services
 │   │   ├── instance.ts
 │   │   ├── react-query
@@ -334,23 +439,27 @@ bot-constructor-panel
 │   │   │   └── use-scroll-query-action.ts
 │   │   └── requests
 │   │       ├── auth.ts
-│   │       └── bot.ts
+│   │       ├── bot.ts
+│   │       └── file.ts
 │   ├── types
 │   │   ├── auth
 │   │   │   ├── get-me.ts
 │   │   │   └── login.tsx
+│   │   ├── editorjs.d.ts
 │   │   ├── element-types.ts
 │   │   └── http
 │   │       ├── collection.ts
 │   │       ├── env.ts
 │   │       ├── error.ts
+│   │       ├── file.ts
 │   │       ├── flow.ts
 │   │       ├── project.ts
 │   │       └── response.ts
 │   └── wss
 │       └── web-socket-provider.tsx
 ├── stack.yaml
-└── tsconfig.json
+├── tsconfig.json
+└── tsconfig.tsbuildinfo
 ```
 
 ## 📄 Muhim Fayllar Tarkibi (içidan: constructor)
