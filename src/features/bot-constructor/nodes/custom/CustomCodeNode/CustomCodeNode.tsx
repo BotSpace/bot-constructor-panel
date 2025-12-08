@@ -14,27 +14,27 @@ import { CustomCodeNodeData } from "./types";
 import { CodeEditorDialog } from "./components/CodeEditorDialog";
 
 const DEFAULT_CODE = `
-// Ushbu kod handler ichida ishlaydi.
-// Sizga quyidagi o'zgaruvchilar taqdim etiladi:
-//
-// bot      - bot obyekti
-// ctx      - Telegraf/Aiogram.js konteksti (message yoki callback)
-// context  - Sxema konteksti (o'zgaruvchilarni saqlaydi)
-//
-// context ichiga yangi qiymatlar qo'shish mumkin.
+// Send messages
+send_message({text: "Hello", reply_markup: {...}});
+send_photo({photo: "url", caption: "text"});
 
-// Agar xabar bo'lsa
-if (ctx.message) {
-    context.user_name = ctx.message.from.first_name;
-    console.log(\`Foydalanuvchi \${context.user_name} kodni ishga tushirdi.\`);
-}
+// Edit/delete messages
+edit_message_text({node_id: 'node_id', text: "Updated"});
+delete_message({node_id: 'node_id'});
 
-// Bot orqali javob yuborish
-await bot.telegram.sendMessage(
-    ctx.chat.id,
-    \`Salom, \${context.user_name || 'Nomaʼlum'} !\`
-);
-`;
+// Context management
+set_context('key', value);
+var value = get_context('key');
+clear_context();
+
+// Access user data
+message.text, message.contact, message.location
+callback_query.data
+chat_id
+
+// Logging
+log("message");
+console.log("debug", data);`;
 
 // Kod prevyusini yaratuvchi yordamchi funksiya
 const generateCodePreview = (code: string | undefined): string => {

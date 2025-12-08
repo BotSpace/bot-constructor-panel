@@ -2,17 +2,16 @@
 
 import { NodeProps } from "reactflow";
 import { memo, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendLocationNodeData } from "./types";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
 
 const LocationNodeComponent = ({
   id,
@@ -133,7 +132,14 @@ const LocationNodeComponent = ({
         </CardContent>
       )}
 
-      <NodeFooter nodeId={id} />
+      <CardFooter>
+        <ButtonGenerator
+          initialKeyboard={data.keyboard}
+          data={data}
+          node_id={id}
+        />
+      </CardFooter>
+
       <SourceHandles />
     </Card>
   );

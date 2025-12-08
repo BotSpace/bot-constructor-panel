@@ -1,6 +1,6 @@
-import { KeyboardConfig, ParseMode } from "../TextMessageNode/types";
-
-export type EditMessageType = "text" | "caption" | "keyboard" | "media";
+import { OutputData } from "@editorjs/editorjs";
+import { ParseMode } from "../TextMessageNode/types";
+import { KeyboardConfig } from "@/features/bot-constructor/components";
 
 export type MessageIdSource = "this_message" | "connected_node" | "message_id";
 
@@ -9,18 +9,15 @@ export interface EditMessageNodeData {
   messageIdSource?: MessageIdSource;
   messageId?: string; // manual bo'lsa
 
-  // Edit qilish turi
-  editType?: EditMessageType;
-
   // Text edit uchun
-  newText?: string;
+  newText?: OutputData;
   parseMode?: ParseMode;
 
   // Caption edit uchun (media uchun)
   newCaption?: string;
 
   // Keyboard edit uchun
-  keyboard?: KeyboardConfig;
+  keyboard: KeyboardConfig;
 
   // Media edit uchun (photo, video, audio, file)
   mediaType?: "photo" | "video" | "audio" | "file";

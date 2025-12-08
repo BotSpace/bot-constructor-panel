@@ -411,11 +411,11 @@ function TelegramEditor({ initialData, onSave, data }: TelegramEditorProps) {
   }, [selectedMessageName, dynamicMessagesList]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-4">
+    <div className="w-full max-w-4xl mx-auto space-y-4 rounded-md border border-input bg-background text-sm">
       <div
         ref={editorContainerRef}
         className="w-full p-2 cursor-text min-h-[100px]"
-        onKeyUp={handleKeyUp} // Kuzatuvchi shu yerda
+        onKeyUp={handleKeyUp}
         tabIndex={0}
       />
 

@@ -8,7 +8,7 @@ import {
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { CodeExecutionContext } from "../types";
-import AiogramEditor from "@/features/bot-constructor/editor";
+import CodeEditor from "@/features/bot-constructor/editor";
 import EditorSettings from "@/features/bot-constructor/editor/settings";
 
 interface CodeEditorDialogProps {
@@ -54,7 +54,7 @@ export const CodeEditorDialog = ({
           <DialogTitle>Edit code</DialogTitle>
         </VisuallyHidden>
         <div className="grid overflow-hidden flex-grow">
-          <AiogramEditor
+          <CodeEditor
             contextType={contextType}
             initialCode={initialCode}
             onSave={onSave}
