@@ -11,6 +11,13 @@ services:
     networks:
       - botmother
     deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
       mode: replicated
       restart_policy:
         condition: any
