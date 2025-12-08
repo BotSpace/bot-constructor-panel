@@ -2,7 +2,7 @@ import { instanceAuth } from "@/services/instance";
 import { APIDetailCreateResponse } from "@/types/http/response";
 import { ProjectRetrive } from "@/types/http/project";
 import toast from "react-hot-toast";
-import create from "zustand";
+import { create } from "zustand";
 
 interface ProjectState {
   project: ProjectRetrive | null;

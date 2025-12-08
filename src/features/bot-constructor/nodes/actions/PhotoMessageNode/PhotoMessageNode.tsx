@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, memo, useRef } from "react";
-import { Handle, Position, NodeProps } from "reactflow";
+import { NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -24,10 +23,10 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 // Yaratgan andozamiz uchun kerakli importlar
 import { Camera } from "lucide-react";
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
+import { ButtonGenerator } from "@/features/bot-constructor/components";
 
 const SendPhotoNodeComponent = ({
   id,
@@ -214,7 +213,9 @@ const SendPhotoNodeComponent = ({
                       </div>
                     )}
                   <div className="grid gap-1">
-                    <Label className="text-xs text-muted-foreground">UUID</Label>
+                    <Label className="text-xs text-muted-foreground">
+                      UUID
+                    </Label>
                     <Input
                       placeholder="UUID ni kiriting yoki fayl yuklang..."
                       value={data.uploadedFileUuid || ""}
@@ -251,13 +252,9 @@ const SendPhotoNodeComponent = ({
             </div>
           </CardContent>
 
-          <NodeFooter
-            nodeId={id}
-            keyboard={data.keyboard}
-            disableNotification={data.disableNotification}
-            protectContent={data.protectContent}
-            onUpdate={handleUpdate}
-          />
+          <CardFooter>
+            <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+          </CardFooter>
         </>
       )}
 

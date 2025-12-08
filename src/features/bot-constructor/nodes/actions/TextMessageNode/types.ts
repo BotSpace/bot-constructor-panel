@@ -1,29 +1,22 @@
-import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import {
+  ButtonConfig,
+  KeyboardConfig,
+} from "@/features/bot-constructor/components/ButtonGenerator/types";
 import { CollectionListItem } from "@/types/http/collection";
 import { Filter } from "./components/filter/types";
 import { OutputData } from "@editorjs/editorjs";
 
-export type KeyboardType = "inline" | "reply";
-
-// --- Yengi qo'shiladigan struktura ---
-export interface KeyboardConfig {
-  active: KeyboardType;
-  inline: ButtonConfig[][];
-  reply: ButtonConfig[][];
-}
-
-export type ParseMode = "HTML" | "MarkdownV2" | "None";
+export type ParseMode = "HTML" | "None";
 
 export interface SendTextMessageNodeData {
-  recipients?: {
+  recipients: {
     sendToSender: boolean;
     additionalIds: string[];
   };
-  messageText?: OutputData;
-  parseMode?: ParseMode;
-  disableWebPagePreview?: boolean;
-  disableNotification?: boolean;
-  protectContent?: boolean;
+  messageText: OutputData | undefined;
+  parseMode: ParseMode;
+  disableNotification: boolean;
+  protectContent: boolean;
   dynamicMessages?: {
     name: string;
     // Qaysi collectiondan olish kerak
@@ -46,5 +39,5 @@ export interface SendTextMessageNodeData {
     messageText?: OutputData;
   }[];
   // `buttons` va `keyboardType` o'rniga bitta obyekt keladi
-  keyboard?: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
+  keyboard: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
 }

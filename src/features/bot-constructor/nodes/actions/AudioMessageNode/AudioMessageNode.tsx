@@ -3,7 +3,7 @@
 import { useState, memo, useRef } from "react";
 import { NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,10 +24,10 @@ import { FiMusic } from "react-icons/fi";
 
 // Bizning andozamiz uchun yangi importlar
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
+import { ButtonGenerator } from "@/features/bot-constructor/components";
 
 const SendAudioNodeComponent = ({
   id,
@@ -269,13 +269,13 @@ const SendAudioNodeComponent = ({
               </div>
             </div>
 
-            <NodeFooter
-              nodeId={id}
-              keyboard={data.keyboard}
-              disableNotification={data.disableNotification}
-              protectContent={data.protectContent}
-              onUpdate={handleUpdate}
-            />
+            {/* <CardFooter>
+              <ButtonGenerator
+                data={data}
+                initialKeyboard={data.keyboard}
+                node_id={id}
+              />
+            </CardFooter> */}
           </CardContent>
         </>
       )}

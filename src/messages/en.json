@@ -35,20 +35,20 @@
     "triggers": {
       "title": "🚀 Triggers",
       "message": {
-        "name": "When message received",
-        "description": "When user sends a message."
+        "name": "Message received",
+        "description": "user sends a message."
       },
       "command": {
-        "name": "When command received",
-        "description": "When user sends a command like /start or /help."
+        "name": "Command received",
+        "description": "User sends a command like /start or /help."
       },
       "replyButton": {
-        "name": "When reply button pressed",
-        "description": "When button is pressed."
+        "name": "Reply button pressed",
+        "description": "Button is pressed."
       },
       "callbackQuery": {
-        "name": "When inline button pressed",
-        "description": "When inline button is pressed."
+        "name": "Iinline button pressed",
+        "description": "Inline button is pressed."
       }
     },
     "actions": {
@@ -192,7 +192,7 @@
       },
       "callbackAnswer": {
         "name": "Callback Answer",
-        "description": "Answers when inline button is pressed."
+        "description": "Answers inline button is pressed."
       }
     },
     "customLogic": {
@@ -202,15 +202,15 @@
         "description": "Allows writing Python code for complex actions and conditions."
       },
       "state": {
-        "name": "Data Collection",
-        "description": "For collecting data from users"
+        "name": "State Management",
+        "description": "Set data to state"
       },
       "collection": {
-        "name": "Data List",
-        "description": "Get data list from Collection"
+        "name": "Set collection",
+        "description": "Set data to collection"
       },
       "loadCollectionItem": {
-        "name": "Load Data",
+        "name": "Get item from Collection",
         "description": "Load a single item from Collection and save to context"
       }
     }

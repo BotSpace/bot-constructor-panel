@@ -5,7 +5,6 @@ import { memo } from "react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 
 const SendToAdminNodeComponent = ({ id, selected }: NodeProps) => {
@@ -16,7 +15,6 @@ const SendToAdminNodeComponent = ({ id, selected }: NodeProps) => {
       <div className="p-4 text-sm text-muted-foreground text-center">
         Xabarni admin panelga yuboradi
       </div>
-      <NodeFooter nodeId={id} />
       <SourceHandles />
     </Card>
   );

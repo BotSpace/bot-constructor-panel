@@ -15,7 +15,6 @@ import {
 import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 
 interface StickerNodeData {
@@ -93,7 +92,6 @@ const StickerNodeInternal = ({
         </CardContent>
       )}
 
-      <NodeFooter nodeId={id} />
       <SourceHandles />
     </Card>
   );

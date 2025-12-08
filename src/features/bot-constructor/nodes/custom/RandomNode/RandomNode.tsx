@@ -2,11 +2,11 @@
 
 import { NodeProps } from "reactflow";
 import { memo } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
-import { NodeFooter } from "../../actions/shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
+import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
 
 const RandomNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
@@ -16,7 +16,15 @@ const RandomNodeComponent = ({ id, data, selected }: NodeProps) => {
       <div className="p-4 text-sm text-muted-foreground text-center">
         Tasodifiy yo'lni tanlaydi
       </div>
-      <NodeFooter nodeId={id} />
+
+      <CardFooter>
+        <ButtonGenerator
+          initialKeyboard={data.keyboard}
+          data={data}
+          node_id={id}
+        />
+      </CardFooter>
+
       <SourceHandles />
     </Card>
   );

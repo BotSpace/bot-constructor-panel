@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 import { Plus, X } from "lucide-react";
 
@@ -119,7 +118,6 @@ const ForwardMessageNodeComponent = ({
         </div>
       </CardContent>
 
-      <NodeFooter nodeId={id} />
       <SourceHandles />
     </Card>
   );

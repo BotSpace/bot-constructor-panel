@@ -14,7 +14,6 @@ import {
 import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 
 interface DiceNodeData {
@@ -75,7 +74,6 @@ const DiceNodeInternal = ({ id, data, selected }: NodeProps<DiceNodeData>) => {
         </CardContent>
       )}
 
-      <NodeFooter nodeId={id} />
       <SourceHandles />
     </Card>
   );

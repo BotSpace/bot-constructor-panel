@@ -81,7 +81,10 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
       <div className="mt-4 space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
         <div className="flex items-center justify-between">
           <div>
-            <Label htmlFor={`pagination-${collection.id}`} className="text-sm font-medium text-slate-900">
+            <Label
+              htmlFor={`pagination-${collection.id}`}
+              className="text-sm font-medium text-slate-900"
+            >
               Enable Pagination
             </Label>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -95,18 +98,25 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
               handleUpdate({
                 dynamicMessages: data.dynamicMessages?.map((message) =>
                   message.collection.id === collection.id
-                    ? { ...message, enablePagination: enabled, limit: enabled ? (message.limit || 10) : 0 }
+                    ? {
+                        ...message,
+                        enablePagination: enabled,
+                        limit: enabled ? message.limit || 10 : 0,
+                      }
                     : message
                 ),
               })
             }
           />
         </div>
-        
+
         {currentMessage?.enablePagination && (
           <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200 animate-in fade-in-50">
             <div className="space-y-1.5">
-              <Label htmlFor={`limit-${collection.id}`} className="text-xs font-medium text-slate-700">
+              <Label
+                htmlFor={`limit-${collection.id}`}
+                className="text-xs font-medium text-slate-700"
+              >
                 Items per page
               </Label>
               <Input
@@ -120,7 +130,10 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
                   handleUpdate({
                     dynamicMessages: data.dynamicMessages?.map((message) =>
                       message.collection.id === collection.id
-                        ? { ...message, limit: Math.min(Math.max(value, 1), 100) }
+                        ? {
+                            ...message,
+                            limit: Math.min(Math.max(value, 1), 100),
+                          }
                         : message
                     ),
                   });
@@ -129,7 +142,10 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor={`offset-${collection.id}`} className="text-xs font-medium text-slate-700">
+              <Label
+                htmlFor={`offset-${collection.id}`}
+                className="text-xs font-medium text-slate-700"
+              >
                 Start from (offset)
               </Label>
               <Input
@@ -155,7 +171,9 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
       </div>
 
       <div className="mt-4">
-        <Label className="text-xs font-medium text-slate-700 mb-2 block">Available Variables</Label>
+        <Label className="text-xs font-medium text-slate-700 mb-2 block">
+          Available Variables
+        </Label>
         <div className="flex flex-wrap gap-2">
           {fields.data.fields.map((field) => (
             <Badge
@@ -164,7 +182,9 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
               className="font-mono text-xs cursor-pointer hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-colors bg-slate-50 border-slate-300"
               onClick={() => {
                 // Copy to clipboard
-                navigator.clipboard.writeText(`\${${currentMessage?.name}.${field.name}}`);
+                navigator.clipboard.writeText(
+                  `\${${currentMessage?.name}.${field.name}}`
+                );
               }}
               title={`Click to copy: \${${currentMessage?.name}.${field.name}}`}
             >

@@ -17,7 +17,7 @@ type Props = {
   contextType: CodeExecutionContext;
 };
 
-export default function AiogramEditor({
+export default function CodeEditor({
   onSave,
   contextType,
   initialCode,
@@ -41,96 +41,125 @@ export default function AiogramEditor({
       monacoRef.current.editor.setTheme(theme);
     }
   }, [theme]);
-
   function handleEditorMount(editor: any, monaco: any) {
-    monacoRef.current = monaco; // Monaco instansiyasini saqlab qo'yamiz
+    monacoRef.current = monaco;
 
-    // Yangi mavzularni ro'yxatdan o'tkazamiz
+    // 1. Mavzularni ro'yxatdan o'tkazish (o'zgarishsiz)
     monaco.editor.defineTheme("monokai", monokaiTheme);
-    monaco.editor.defineTheme("ayu-mirage", ayuMirageTheme); // YANGI MAVZUNI RO'YXATDAN O'TKAZAMIZ
-    monaco.editor.defineTheme("botfather", botfatherTheme); // YANGI MAVZUNI RO'YXATDAN O'TKAZAMIZ
+    monaco.editor.defineTheme("ayu-mirage", ayuMirageTheme);
+    monaco.editor.defineTheme("botfather", botfatherTheme);
 
-    // Boshlang'ich mavzuni o'rnatamiz
     monaco.editor.setTheme(theme);
+
+    // ---------------------------------------------------------
+    // 2. GLOBAL FUNKSIYALARNI QO'SHISH (LSP)
+    // ---------------------------------------------------------
+
+    // Global funksiyalar va o'zgaruvchilar ta'rifi (Type Definition)
+    const libSource = `
+    /**
+     * Foydalanuvchiga xabar yuborish funksiyasi.
+     * 
+     * @param text - Yuboriladigan xabar matni
+     * @example
+     * send_message("Salom dunyo!");
+     */
+    declare function send_message(text: string): void;
+
+    /**
+     * Yana bir misol: Global o'zgaruvchi
+     */
+    declare const contextType: string;
+    
+    /**
+     * Konsolga ma'lumot chiqarish
+     */ 
+    declare const console: {
+        log(...args: any[]): void;
+        error(...args: any[]): void;
+    };
+  `;
+
+    // JavaScript va TypeScript sozlamalarini to'g'irlash
+    monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+      target: monaco.languages.typescript.ScriptTarget.ES6,
+      allowNonTsExtensions: true, // JS fayllarda ham ishlashi uchun
+    });
+
+    // Ta'rifni "kutubxona" sifatida qo'shish
+    // Eslatma: 'ts:filename/globals.d.ts' bu shunchaki unikal virtual yo'l
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(
+      libSource,
+      "ts:filename/globals.d.ts"
+    );
+    // ---------------------------------------------------------
 
     // Bizning Aiogram sozlamalarimizni ishga tushiramiz
     EditorSetup(monaco);
   }
-
   return (
-    <div className="h-screen flex flex-col bg-[#1E1E1E] rounded-3xl p-2 overflow-hidden relative">
-      <div className="flex-1 relative">
-        <div className="pl-10 text-gray-500 select-none pointer-events-none">
-          {contextType == "callback" ? (
-            <code>function customCode(callback: types.Callback)</code>
-          ) : (
-            <code>function customCode(message: types.Message)</code>
-          )}
-        </div>
-        <Editor
-          height="100%"
-          language="javascript"
-          defaultValue={initialCode}
-          onMount={handleEditorMount} // Yangi onMount funksiyamiz
-          onChange={(e) => onSave(e || "")}
-          options={{
-            minimap: {
-              enabled: minimap,
-            },
-            fontSize: fontSize,
-            fontFamily: fontFamily,
-            lineHeight: fontSize * 1.5,
-            wordWrap: wordWrap ? "on" : "off",
-            lineNumbers: lineNumbers ? "on" : "off",
-            folding: folding,
-            renderWhitespace: renderWhitespace ? "all" : "none",
-            automaticLayout: true,
-            scrollBeyondLastLine: true,
-            roundedSelection: false,
-            readOnly: false,
-            cursorStyle: "line",
-            scrollbar: {
-              vertical: "visible",
-              horizontal: "visible",
-            },
-            // Enhanced styling
-            padding: {
-              top: 16,
-              bottom: 16,
-            },
-            overviewRulerBorder: false,
-            overviewRulerLanes: 0,
-            hideCursorInOverviewRuler: true,
-            renderLineHighlight: "all",
-            selectOnLineNumbers: true,
-            foldingStrategy: "indentation",
-            showFoldingControls: "always",
-            foldingHighlight: true,
-            foldingImportsByDefault: true,
-            unfoldOnClickAfterEndOfLine: false,
-            links: true,
-            colorDecorators: true,
-            suggest: {
-              showKeywords: true,
-              showSnippets: true,
-              showClasses: true,
-              showFunctions: true,
-              showVariables: true,
-              showConstants: true,
-              showEnums: true,
-              showEnumMembers: true,
-              showColors: true,
-              showFiles: true,
-              showReferences: true,
-              showFolders: true,
-              showTypeParameters: true,
-              showWords: true,
-              showUsers: true,
-              showIssues: true,
-            },
-          }}
-        />
-      </div>
-    </div>
+    <Editor
+      height="100%"
+      language="javascript"
+      defaultValue={initialCode}
+      onMount={handleEditorMount} // Yangi onMount funksiyamiz
+      onChange={(e) => onSave(e || "")}
+      options={{
+        minimap: {
+          enabled: minimap,
+        },
+        fontSize: fontSize,
+        fontFamily: fontFamily,
+        lineHeight: fontSize * 1.5,
+        wordWrap: wordWrap ? "on" : "off",
+        lineNumbers: lineNumbers ? "on" : "off",
+        folding: folding,
+        renderWhitespace: renderWhitespace ? "all" : "none",
+        automaticLayout: true,
+        scrollBeyondLastLine: true,
+        roundedSelection: false,
+        readOnly: false,
+        cursorStyle: "line",
+        scrollbar: {
+          vertical: "visible",
+          horizontal: "visible",
+        },
+        // Enhanced styling
+        padding: {
+          top: 16,
+          bottom: 16,
+        },
+        overviewRulerBorder: false,
+        overviewRulerLanes: 0,
+        hideCursorInOverviewRuler: true,
+        renderLineHighlight: "all",
+        selectOnLineNumbers: true,
+        foldingStrategy: "indentation",
+        showFoldingControls: "always",
+        foldingHighlight: true,
+        foldingImportsByDefault: true,
+        unfoldOnClickAfterEndOfLine: false,
+        links: true,
+        colorDecorators: true,
+        suggest: {
+          showKeywords: true,
+          showSnippets: true,
+          showClasses: true,
+          showFunctions: true,
+          showVariables: true,
+          showConstants: true,
+          showEnums: true,
+          showEnumMembers: true,
+          showColors: true,
+          showFiles: true,
+          showReferences: true,
+          showFolders: true,
+          showTypeParameters: true,
+          showWords: true,
+          showUsers: true,
+          showIssues: true,
+        },
+      }}
+    />
   );
 }

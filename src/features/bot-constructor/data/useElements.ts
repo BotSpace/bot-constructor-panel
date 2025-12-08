@@ -150,14 +150,6 @@ export function useElements(): ElementTypes[] {
           triggerId: "SendMediaGroupNode",
         },
         {
-          type: "venue",
-          name: t("constructor.actions.venue.name"),
-          description: t("constructor.actions.venue.description"),
-          icon: "📍",
-          color: "bg-red-500/10 text-red-400 border-red-500/20",
-          triggerId: "SendVenueNode",
-        },
-        {
           type: "dice",
           name: t("constructor.actions.dice.name"),
           description: t("constructor.actions.dice.description"),

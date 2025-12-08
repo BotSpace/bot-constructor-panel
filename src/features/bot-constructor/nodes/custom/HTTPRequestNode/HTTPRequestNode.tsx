@@ -5,7 +5,6 @@ import { memo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
-import { NodeFooter } from "../../actions/shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { HTTPRequestNodeData, HTTPMethod } from "./types";
@@ -149,7 +148,6 @@ const HTTPRequestNodeComponent = ({
         </CardContent>
       )}
 
-      <NodeFooter nodeId={id} />
       <SourceHandles />
     </Card>
   );

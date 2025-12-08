@@ -3,7 +3,7 @@ import { Node } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
 import { ElementItemType } from "@/types/element-types";
 import { instanceAuth } from "@/services/instance";
-import toast from "react-hot-toast";
+import { SendTextMessageNodeData } from "../nodes/actions/TextMessageNode/types";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
@@ -26,9 +26,12 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
     case "SendTextMessageNode":
       return {
         ...baseMessageData,
-        messageText: "Yangi xabar",
-        parseMode: "None",
-      };
+        messageText: undefined,
+        parseMode: "HTML",
+        disableWebPagePreview: false,
+        disableNotification: false,
+        protectContent: false,
+      } as SendTextMessageNodeData;
     case "SendPhotoNode":
       return { ...baseMessageData, photoSourceType: "url", caption: "" };
     case "SendVideoNode":

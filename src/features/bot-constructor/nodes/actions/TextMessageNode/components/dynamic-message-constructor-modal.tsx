@@ -92,7 +92,8 @@ export function DynamicMessageConstructor({
         <DialogHeader>
           <DialogTitle>Dynamic Messages</DialogTitle>
           <DialogDescription>
-            Create dynamic messages that load data from collections. Use variables like ${"{"}name{"}"} in your message text.
+            Create dynamic messages that load data from collections. Use
+            variables like ${"{"}name{"}"} in your message text.
           </DialogDescription>
         </DialogHeader>
 
@@ -100,14 +101,21 @@ export function DynamicMessageConstructor({
           <>
             <Accordion type="single" collapsible className="w-full">
               {dynamicMessages.map((message, index) => (
-                <AccordionItem key={message.name} value={message.name} className="border rounded-lg mb-2 px-3">
+                <AccordionItem
+                  key={message.name}
+                  value={message.name}
+                  className="border rounded-lg mb-2 px-3"
+                >
                   <div className="flex items-center gap-2">
                     <AccordionTrigger className="flex-1 hover:no-underline">
                       <div className="flex items-center gap-3">
                         <Database className="h-4 w-4 text-blue-500" />
                         <div className="flex flex-col items-start">
                           <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="font-mono bg-blue-50 text-blue-700 border-blue-200">
+                            <Badge
+                              variant="secondary"
+                              className="font-mono bg-blue-50 text-blue-700 border-blue-200"
+                            >
                               ${message.name}
                             </Badge>
                             <span className="text-xs text-muted-foreground">
@@ -153,9 +161,12 @@ export function DynamicMessageConstructor({
         ) : (
           <div className="grid gap-2 items-center justify-center py-12 border-2 border-dashed rounded-lg">
             <Database className="h-12 w-12 text-muted-foreground mx-auto opacity-50" />
-            <p className="text-muted-foreground font-medium">No dynamic messages</p>
+            <p className="text-muted-foreground font-medium">
+              No dynamic messages
+            </p>
             <p className="text-xs text-muted-foreground max-w-xs text-center">
-              Add a dynamic message to load data from collections and use it in your bot messages
+              Add a dynamic message to load data from collections and use it in
+              your bot messages
             </p>
           </div>
         )}
@@ -200,7 +211,8 @@ export function DynamicMessageConstructor({
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            After adding, you can use ${"{"}name{"}"} in your message to display data from the collection.
+            After adding, you can use ${"{"}name{"}"} in your message to display
+            data from the collection.
           </p>
         </div>
 

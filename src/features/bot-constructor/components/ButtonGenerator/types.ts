@@ -22,8 +22,8 @@ export interface CollectionButtonData {
   filters?: Filter[];
   // Layout options - pagination uchun
   layout?: {
-    columns: number;      // Har bir qatorda nechta tugma (1-4)
-    rows: number;         // Har bir sahifada nechta qator (1-10)
+    columns: number; // Har bir qatorda nechta tugma (1-4)
+    rows: number; // Har bir sahifada nechta qator (1-10)
     // Jami: columns × rows = bir sahifada ko'rsatiladigan tugmalar soni
     // Qolgan tugmalar keyingi sahifalarda (pagination)
   };
@@ -58,4 +58,13 @@ export interface ButtonConfig {
 
   // Collection-based button uchun ma'lumotlar
   collectionData?: CollectionButtonData;
+}
+
+export type KeyboardType = "inline" | "reply";
+
+// --- Yengi qo'shiladigan struktura ---
+export interface KeyboardConfig {
+  active: KeyboardType;
+  inline: ButtonConfig[][];
+  reply: ButtonConfig[][];
 }
