@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { instanceAuth } from "@/services/instance";
+import { isTelegramTokenValid } from "@/lib/chech-bot-token";
 
 // TODO faqt add uchun qilish kerak
 export function AddEnvDialog({
@@ -48,6 +49,13 @@ export function AddEnvDialog({
     const trimmed = token.trim();
     if (!trimmed) {
       toast.error("Iltimos tokenni kiriting.");
+      return;
+    }
+
+    const isTokenValid = await isTelegramTokenValid(token);
+
+    if (!isTokenValid) {
+      toast.error("Noto'g'ri bot tokeni. Iltimos, qayta tekshiring.");
       return;
     }
 
