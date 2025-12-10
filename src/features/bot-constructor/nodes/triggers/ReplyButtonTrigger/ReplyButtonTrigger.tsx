@@ -10,8 +10,8 @@ import { AlertCircle, CornerDownLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { KeyboardConfig } from "../../actions/TextMessageNode/types";
 import { Checkbox } from "@/components/ui/checkbox";
+import { KeyboardConfig } from "@/features/bot-constructor/components";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
 // --- O'ZGARTIRISH: `keyboard` ixtiyoriy qilindi, xatolikdan saqlanish uchun ---

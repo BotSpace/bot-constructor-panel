@@ -12,7 +12,7 @@ import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import { Plus, X } from "lucide-react";
 
-interface ForwardMessageNodeData {
+export interface ForwardMessageNodeData {
   recipientIds?: string[];
 }
 

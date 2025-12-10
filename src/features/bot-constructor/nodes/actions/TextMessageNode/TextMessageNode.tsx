@@ -17,9 +17,9 @@ import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/
 import { DynamicMessageConstructor } from "./components/dynamic-message-constructor-modal";
 import { Button } from "@/components/ui/button";
 
-import TelegramEditor from "@/features/bot-constructor/components/RichTextEditor/editor/TelegramEditor";
 import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
 import ActionNodeSettings from "../shared/ActionNodeSettings";
+import TextArea from "../shared/text-area";
 
 const SendTextMessageNodeComponent = ({
   id,
@@ -67,17 +67,21 @@ const SendTextMessageNodeComponent = ({
               <div className="flex justify-between items-center">
                 <Label>Xabar matni</Label>
 
-                <DynamicMessageConstructor data={data} id={id}>
+                <DynamicMessageConstructor
+                  handleUpdate={handleUpdate}
+                  initialDynamicMessages={data.dynamicMessages}
+                  id={id}
+                >
                   <Button size={"icon-sm"} variant={"outline"}>
                     <ListPlus />
                   </Button>
                 </DynamicMessageConstructor>
               </div>
 
-              <TelegramEditor
-                initialData={data.messageText || undefined}
-                onSave={(data) => handleUpdate({ messageText: data })}
-                data={data}
+              <TextArea
+                placeholder="Xabar matni..."
+                defaultValue={data.messageText}
+                onChange={(e) => handleUpdate({ messageText: e })}
               />
             </div>
 
@@ -91,11 +95,7 @@ const SendTextMessageNodeComponent = ({
           </CardContent>
 
           <CardFooter>
-            <ButtonGenerator
-              initialKeyboard={data.keyboard}
-              data={data}
-              node_id={id}
-            />
+            <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
           </CardFooter>
         </>
       )}

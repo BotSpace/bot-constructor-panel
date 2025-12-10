@@ -28,6 +28,7 @@ import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { ButtonGenerator } from "@/features/bot-constructor/components";
+import TextArea from "../shared/text-area";
 
 const SendAudioNodeComponent = ({
   id,
@@ -132,7 +133,7 @@ const SendAudioNodeComponent = ({
                   handleUpdate({ audioSourceType: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Manbani tanlang..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -250,13 +251,13 @@ const SendAudioNodeComponent = ({
             {/* Caption */}
             <div className="grid gap-2">
               <Label>Izoh (Caption)</Label>
-              <TextareaAutosize
-                className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+
+              <TextArea
                 placeholder="Audio uchun izoh..."
-                value={data.caption || ""}
-                onChange={(e) => handleUpdate({ caption: e.target.value })}
-                maxLength={1024}
+                defaultValue={data.caption || ""}
+                onChange={(e) => handleUpdate({ caption: e })}
               />
+
               <div
                 className={cn(
                   "text-right text-xs",
@@ -269,13 +270,9 @@ const SendAudioNodeComponent = ({
               </div>
             </div>
 
-            {/* <CardFooter>
-              <ButtonGenerator
-                data={data}
-                initialKeyboard={data.keyboard}
-                node_id={id}
-              />
-            </CardFooter> */}
+            <CardFooter>
+              <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+            </CardFooter>
           </CardContent>
         </>
       )}

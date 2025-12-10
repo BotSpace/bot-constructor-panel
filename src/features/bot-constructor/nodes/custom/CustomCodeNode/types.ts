@@ -5,9 +5,9 @@ export type CodeExecutionContext = "message" | "callback";
 export interface CustomCodeNodeData {
   // --- YANGI MAYDONLAR ---
   /** Foydalanuvchi tomonidan berilgan maxsus nom */
-  nodeTitle?: string;
+  nodeTitle: string;
 
-  jsCode?: string;
+  jsCode: string;
   // Yangi maydon: foydalanuvchi tanlagan kontekst
   contextType?: CodeExecutionContext;
 }

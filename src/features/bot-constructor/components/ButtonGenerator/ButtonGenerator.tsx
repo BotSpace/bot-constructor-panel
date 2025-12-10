@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ReactNode, useEffect, useRef } from "react";
+import { useState, ReactNode, useEffect, useRef, useEffectEvent } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
@@ -13,19 +13,21 @@ import { ButtonConfig, KeyboardConfig } from "./types";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid } from "lucide-react";
 import { useFlowStore } from "../../store";
+import { Badge } from "@/components/ui/badge";
+import { calculateActiveButtonCount } from "./utils";
 
 interface ButtonGeneratorProps {
   initialKeyboard: KeyboardConfig;
-  data: SendTextMessageNodeData; // Collection ma'lumotlari uchun
   node_id: string; // Node ID uchun (agar kerak bo'lsa)
 }
 
 export function ButtonGenerator({
-  initialKeyboard,
-  data,
+  initialKeyboard: keyboards,
   node_id,
 }: ButtonGeneratorProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [buttonCount, setButtonCount] = useState(() => 0);
+
   const [editingButton, setEditingButton] = useState<{
     rowIndex: number;
     buttonId: string;
@@ -48,7 +50,7 @@ export function ButtonGenerator({
     handleRemoveRow,
     handleReorderRows,
     getFinalKeyboardConfig,
-  } = useButtonGeneratorState(isOpen, initialKeyboard);
+  } = useButtonGeneratorState(isOpen, keyboards);
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
@@ -77,6 +79,10 @@ export function ButtonGenerator({
     };
   }, [isOpen, currentButtons, activeTab]);
 
+  useEffect(() => {
+    setButtonCount(calculateActiveButtonCount(keyboards));
+  }, [keyboards]);
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -85,14 +91,14 @@ export function ButtonGenerator({
             <LayoutGrid className="mr-2 h-4 w-4" />
             Tugmalarni Sozlash
           </Button>
-          {/* {buttonCount > 0 && (
+          {buttonCount > 0 && (
             <Badge
               variant="destructive"
               className="absolute -top-2 -right-2 px-1.5"
             >
               {buttonCount}
             </Badge>
-          )} */}
+          )}
         </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[90%] md:max-w-[80%] lg:max-w-[90%] h-[90vh] overflow-y-auto">
@@ -105,7 +111,6 @@ export function ButtonGenerator({
             onTabChange={setActiveTab}
             onAddButton={handleAddButton}
             isCurrentRowFull={isCurrentRowFull}
-            data={data}
           />
           <KeyboardPreview
             buttons={currentButtons}

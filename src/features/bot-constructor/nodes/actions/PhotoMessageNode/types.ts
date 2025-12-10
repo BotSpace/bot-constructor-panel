@@ -1,6 +1,7 @@
-import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
-import { KeyboardConfig } from "../TextMessageNode/types";
-
+import {
+  ButtonConfig,
+  KeyboardConfig,
+} from "@/features/bot-constructor/components/ButtonGenerator/types";
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
  * 'sender' - xabarni yuborgan foydalanuvchining o'ziga.

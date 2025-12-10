@@ -25,9 +25,9 @@ import { ConstructorData } from "@/features/bot-constructor/data";
 import { MousePointerClick } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
-import { KeyboardConfig } from "../../actions/TextMessageNode/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ElseMessageSource } from "../../components/shared/ReactFlowHandles/ElseMessageSource";
+import { KeyboardConfig } from "@/features/bot-constructor/components";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
 interface NodeWithKeyboardData {

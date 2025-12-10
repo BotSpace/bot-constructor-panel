@@ -1,26 +1,26 @@
 import React, { useMemo } from "react";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
-import { FilterBuilder } from "./filter/filter";
+import { FilterBuilder } from "../../shared/filter/filter";
 import { useReactQueryAction } from "@/services/react-query";
 import { APIDetailCreateResponse } from "@/types/http/response";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendTextMessageNodeData } from "../types";
 import { Badge } from "@/components/ui/badge";
-import TelegramEditor from "@/features/bot-constructor/components/RichTextEditor/editor/TelegramEditor";
 import { useNodes } from "reactflow";
 import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
+import { DynamicMessage } from "../../shared/types";
 
 type Props = {
   collection: CollectionListItem;
-  data: SendTextMessageNodeData;
   id: string;
+  dynamicMessages: DynamicMessage[];
 };
 
-function AccordionItemWrapper({ data, collection, id }: Props) {
+function AccordionItemWrapper({ collection, id, dynamicMessages }: Props) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
   const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
@@ -51,7 +51,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
   if (!fields) return <Skeleton className="w-full h-10" />;
 
   // Collection'ga tegishli dynamic message'ni topish
-  const currentMessage = data.dynamicMessages?.find(
+  const currentMessage = dynamicMessages?.find(
     (message) => message.collection.id === collection.id
   );
 
@@ -67,7 +67,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
         filters={currentMessage?.filters ?? []}
         onChange={(filters) =>
           handleUpdate({
-            dynamicMessages: data.dynamicMessages?.map((message) =>
+            dynamicMessages: dynamicMessages?.map((message) =>
               message.collection.id === collection.id
                 ? { ...message, filters }
                 : message
@@ -78,16 +78,16 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
       />
 
       {/* Pagination Controls */}
-      <div className="mt-4 space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+      <div className="mt-4 space-y-3 p-4  rounded-lg border">
         <div className="flex items-center justify-between">
           <div>
             <Label
               htmlFor={`pagination-${collection.id}`}
-              className="text-sm font-medium text-slate-900"
+              className="text-sm font-medium"
             >
               Enable Pagination
             </Label>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Load data in pages instead of all at once
             </p>
           </div>
@@ -96,7 +96,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
             checked={currentMessage?.enablePagination ?? false}
             onCheckedChange={(enabled) =>
               handleUpdate({
-                dynamicMessages: data.dynamicMessages?.map((message) =>
+                dynamicMessages: dynamicMessages?.map((message) =>
                   message.collection.id === collection.id
                     ? {
                         ...message,
@@ -111,7 +111,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
         </div>
 
         {currentMessage?.enablePagination && (
-          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200 animate-in fade-in-50">
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t animate-in fade-in-50">
             <div className="space-y-1.5">
               <Label
                 htmlFor={`limit-${collection.id}`}
@@ -128,7 +128,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
                 onChange={(e) => {
                   const value = parseInt(e.target.value) || 10;
                   handleUpdate({
-                    dynamicMessages: data.dynamicMessages?.map((message) =>
+                    dynamicMessages: dynamicMessages?.map((message) =>
                       message.collection.id === collection.id
                         ? {
                             ...message,
@@ -144,7 +144,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
             <div className="space-y-1.5">
               <Label
                 htmlFor={`offset-${collection.id}`}
-                className="text-xs font-medium text-slate-700"
+                className="text-xs font-medium text-muted-foreground"
               >
                 Start from (offset)
               </Label>
@@ -156,7 +156,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
                 onChange={(e) => {
                   const value = parseInt(e.target.value) || 0;
                   handleUpdate({
-                    dynamicMessages: data.dynamicMessages?.map((message) =>
+                    dynamicMessages: dynamicMessages?.map((message) =>
                       message.collection.id === collection.id
                         ? { ...message, offset: Math.max(value, 0) }
                         : message
@@ -171,7 +171,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
       </div>
 
       <div className="mt-4">
-        <Label className="text-xs font-medium text-slate-700 mb-2 block">
+        <Label className="text-xs font-medium mb-2 block">
           Available Variables
         </Label>
         <div className="flex flex-wrap gap-2">
@@ -179,7 +179,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
             <Badge
               key={`badge-${field.id}`}
               variant="outline"
-              className="font-mono text-xs cursor-pointer hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-colors bg-slate-50 border-slate-300"
+              className="font-mono text-xs cursor-pointer  transition-colors"
               onClick={() => {
                 // Copy to clipboard
                 navigator.clipboard.writeText(
@@ -196,20 +196,6 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
           Click any variable to copy it to clipboard
         </p>
       </div>
-
-      <TelegramEditor
-        initialData={currentMessage?.messageText}
-        onSave={(editorData) =>
-          handleUpdate({
-            dynamicMessages: data.dynamicMessages?.map((message) =>
-              message.collection.id === collection.id
-                ? { ...message, messageText: editorData }
-                : message
-            ),
-          })
-        }
-        data={data}
-      />
     </>
   );
 }

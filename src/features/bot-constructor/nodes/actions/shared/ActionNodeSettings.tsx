@@ -60,7 +60,7 @@ function ActionNodeSettings({
               id="protect-content"
             />
             <label htmlFor="protect-content" className="ml-2 select-none">
-              Forward/copy qilishni taqiqlash
+              Forward/copy/yuklab olish qilishni taqiqlash
             </label>
           </div>
 
@@ -74,12 +74,12 @@ function ActionNodeSettings({
               value={parseMode}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a fruit" />
+                <SelectValue placeholder="Select a markdown type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Markdown type</SelectLabel>
-                  <SelectItem value="yo'q">Yo'q</SelectItem>
+                  <SelectItem value="None">Yo'q</SelectItem>
                   <SelectItem value="HTML">HTML</SelectItem>
                 </SelectGroup>
               </SelectContent>

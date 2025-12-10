@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { AlertCircle } from "lucide-react";
 
-interface DeleteMessageNodeData {
+export interface DeleteMessageNodeData {
   deleteFromContext?: boolean;
 }
 

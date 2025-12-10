@@ -18,8 +18,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { SendTextMessageNodeData } from "../types";
-import { useFlowStore } from "@/features/bot-constructor/store";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
@@ -34,31 +32,27 @@ import { CollectionListItem } from "@/types/http/collection";
 import AccordionItemWrapper from "./accordion-item-wrapper";
 import { Badge } from "@/components/ui/badge";
 import { Database, Trash2 } from "lucide-react";
+import { DynamicMessage } from "../../shared/types";
 
 export function DynamicMessageConstructor({
   children,
-  data,
   id,
+  handleUpdate,
+  initialDynamicMessages,
 }: {
   children: React.ReactNode;
-  data: SendTextMessageNodeData;
   id: string;
+  handleUpdate: ({}) => void;
+  initialDynamicMessages: DynamicMessage[];
 }) {
-  const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
-  const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
-    updateNodeData(id, update);
-  };
-
   // New dynamic message name
   const [name, setName] = useState<string>("");
   const [collection, setCollection] = useState<CollectionListItem | null>(null);
 
-  // TODO: Bu keyinroq ishlatilinadi.
   // Bu yerdan olib tashlash kerak agar bu yerda ishlatilinmasa
   const { data: collections } = useCollectionStore();
 
-  const dynamicMessages = data.dynamicMessages ?? [];
+  const dynamicMessages = initialDynamicMessages ?? [];
 
   // Reset form after adding message
   const handleAddMessage = () => {
@@ -130,27 +124,11 @@ export function DynamicMessageConstructor({
                         </div>
                       </div>
                     </AccordionTrigger>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleUpdate({
-                          dynamicMessages: dynamicMessages.filter(
-                            (_, i) => i !== index
-                          ),
-                        });
-                      }}
-                      title="Delete dynamic message"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
                   </div>
                   <AccordionContent className="pt-4">
                     <AccordionItemWrapper
+                      dynamicMessages={dynamicMessages}
                       collection={message.collection}
-                      data={data}
                       id={id}
                     />
                   </AccordionContent>

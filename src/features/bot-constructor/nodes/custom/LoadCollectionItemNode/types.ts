@@ -1,7 +1,7 @@
 // LoadCollectionItemNode types
 
 import { CollectionListItem } from "@/types/http/collection";
-import { Filter } from "../../actions/TextMessageNode/components/filter/types";
+import { Filter } from "../../actions/shared/filter/types";
 
 export interface LoadCollectionItemNodeData {
   collection: CollectionListItem | null;
