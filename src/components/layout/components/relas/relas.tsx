@@ -60,7 +60,7 @@ function ReleasePanel() {
           handleCreateRelease();
         }}
       >
-        <Button>Add Release Bot</Button>
+        <Button>Publish</Button>
       </AddEnvDialog>
     );
   }
@@ -115,7 +115,7 @@ function ReleaseDropDown({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button className="cursor-pointer bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200">
-            Publish
+            Version {project?.release?.version}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end">

@@ -26,6 +26,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { MessageCircleDashed, Text } from "lucide-react";
+import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 
 function FlowchartInner() {
   const { id }: { id: string } = useParams();
@@ -187,6 +188,14 @@ function FlowchartInner() {
   const handleNodeDragStop = useCallback(() => {
     setSnapToGrid(false);
   }, []);
+
+  useKeyboardShortcut(
+    ["Control", "s"],
+    () => {
+      if (isDirty) saveFlow(id);
+    },
+    { preventDefault: true } // Brauzerning manzil satriga o'tishini to'xtatadi
+  );
 
   return (
     <div
