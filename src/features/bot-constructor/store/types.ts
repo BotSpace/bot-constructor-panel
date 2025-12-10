@@ -1,11 +1,4 @@
-import {
-  Edge,
-  FitViewOptions,
-  Node,
-  OnConnect,
-  OnEdgesChange,
-  OnNodesChange,
-} from "reactflow";
+import { Edge, Node, OnConnect, OnEdgesChange, OnNodesChange } from "reactflow";
 import { ElementItemType } from "@/types/element-types";
 import { FlowData } from "@/types/http/flow";
 

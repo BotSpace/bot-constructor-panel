@@ -29,6 +29,8 @@ import {
 import { Text } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
+import { useSearchStore } from "./search/search-store";
+import { cn } from "@/lib/utils";
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
@@ -49,6 +51,8 @@ export default function Constructor() {
     stopCountdown,
     countdownRemaining,
   } = useFlowStore();
+
+  const { searchPanelIsOpen } = useSearchStore();
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
@@ -239,10 +243,15 @@ export default function Constructor() {
   return (
     <>
       <ContextMenu>
-        <ContextMenuTrigger>
+        <ContextMenuTrigger
+          className={cn({
+            "col-span-9": searchPanelIsOpen,
+            "col-span-12": !searchPanelIsOpen,
+          })}
+        >
           <div
             ref={reactFlowWrapper}
-            className="w-full h-[calc(100vh-56px)] outline-none relative" // `tabIndex` hook ichida o'rnatiladi
+            className="col-span-10 h-[calc(100vh-56px)] outline-none relative" // `tabIndex` hook ichida o'rnatiladi
             onDrop={onDrop}
             onDragOver={onDragOver}
             onMouseDown={handleContainerClick}
