@@ -72,7 +72,7 @@ export const EditMessageNode = memo(
           {data.messageIdSource === "message_id" ? (
             <>
               <Input
-                value={data.messageId}
+                value={data.messageId || ""}
                 onChange={(e) => handleUpdate({ messageId: e.target.value })}
                 placeholder="Enter message id"
               />
