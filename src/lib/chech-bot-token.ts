@@ -19,10 +19,3 @@ export async function isTelegramTokenValid(token: string): Promise<boolean> {
     return false;
   }
 }
-
-// Misol uchun ishlatish
-(async () => {
-  const token = "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11";
-  const isValid = await isTelegramTokenValid(token);
-  console.log("Token yaroqlimi?", isValid);
-})();
