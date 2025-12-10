@@ -23,12 +23,14 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { MessageCircleDashed, Text } from "lucide-react";
+import { Text } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
+import toast from "react-hot-toast";
 
-function FlowchartInner() {
+export default function Constructor() {
   const { id }: { id: string } = useParams();
 
   // Store'dan kerakli qismlarni olamiz
@@ -54,7 +56,7 @@ function FlowchartInner() {
   // First loading start on hear
   const { project, loading } = useProjectStore();
 
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, fitView } = useReactFlow();
   const [snapToGrid, setSnapToGrid] = useState(false);
   const mousePosition = useMousePosition();
 
@@ -208,63 +210,81 @@ function FlowchartInner() {
     localStorage.setItem("react-flow-viewport", JSON.stringify(viewport));
   }, []);
 
-  return (
-    <div
-      ref={reactFlowWrapper}
-      className="w-full h-[calc(100vh-56px)] outline-none relative" // `tabIndex` hook ichida o'rnatiladi
-      onDrop={onDrop}
-      onDragOver={onDragOver}
-      onMouseDown={handleContainerClick}
-    >
-      <ReactFlow
-        defaultViewport={getInitialViewport()}
-        onMoveEnd={onMoveEnd}
-        nodeTypes={CustomNodes}
-        edgeTypes={CustomEdge}
-        nodes={nodes}
-        edges={edges}
-        onConnect={onConnect}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onNodeDrag={handleNodeDrag}
-        onNodeDragStop={handleNodeDragStop}
-        panOnScroll
-        selectionOnDrag
-        multiSelectionKeyCode={["Shift"]}
-        deleteKeyCode={null} // O'zimizning handler'imizni ishlatamiz
-        minZoom={0.1}
-        maxZoom={2.5}
-        connectionRadius={50}
-        snapToGrid={snapToGrid}
-        snapGrid={snapToGrid ? [20, 20] : undefined}
-      >
-        <SaveStatusBadge className="absolute top-2 right-2 z-20" />
-        <Background gap={24} color="#666" />
-        <MiniMap />
-        <Controls />
-      </ReactFlow>
-    </div>
-  );
-}
+  // Store'dan kerakli qismlarni olamiz
+  const { formatFlow } = useFlowStore();
 
-export default function Flowchart() {
+  function handleFormating() {
+    const toastId = toast.loading("Formating ...");
+    formatFlow()
+      .then(() => {
+        // Animatsiya bilan chiroyli ko'rsatish
+        window.requestAnimationFrame(() => {
+          fitView();
+          toast.success("Successfuly formating", { id: toastId });
+        });
+      })
+      .catch(() => {
+        toast.error("Successfuly error", { id: toastId });
+      });
+  }
+
+  useKeyboardShortcut(
+    ["Control", "i"],
+    () => {
+      handleFormating();
+    },
+    { preventDefault: true }
+  );
+
   return (
-    <ContextMenu>
-      <ContextMenuTrigger>
-        <ReactFlowProvider>
-          <FlowchartInner />
-        </ReactFlowProvider>
-      </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem>
-          <MessageCircleDashed />
-          <span>Comment</span>
-        </ContextMenuItem>
-        <ContextMenuItem>
-          <Text />
-          <span>Text message</span>
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+    <>
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <div
+            ref={reactFlowWrapper}
+            className="w-full h-[calc(100vh-56px)] outline-none relative" // `tabIndex` hook ichida o'rnatiladi
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            onMouseDown={handleContainerClick}
+          >
+            <ReactFlow
+              defaultViewport={getInitialViewport()}
+              onMoveEnd={onMoveEnd}
+              nodeTypes={CustomNodes}
+              edgeTypes={CustomEdge}
+              nodes={nodes}
+              edges={edges}
+              onConnect={onConnect}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onNodeDrag={handleNodeDrag}
+              onNodeDragStop={handleNodeDragStop}
+              panOnScroll
+              selectionOnDrag
+              multiSelectionKeyCode={["Shift"]}
+              deleteKeyCode={null} // O'zimizning handler'imizni ishlatamiz
+              minZoom={0.1}
+              maxZoom={2.5}
+              connectionRadius={50}
+              snapToGrid={snapToGrid}
+              snapGrid={snapToGrid ? [20, 20] : undefined}
+            >
+              <SaveStatusBadge className="absolute top-2 right-2 z-20" />
+              <Background gap={24} color="#666" />
+              <MiniMap />
+              <Controls />
+            </ReactFlow>
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          {/* Format */}
+          <ContextMenuItem onClick={handleFormating}>
+            <Text />
+            Formating
+            <ContextMenuShortcut>⌘ i</ContextMenuShortcut>
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    </>
   );
 }

@@ -13,6 +13,7 @@ import { ConstructorPageHeader } from "@/components/layout/header";
 import { DebugConsole } from "@/components/layout/components/debug-console";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
 import { useTranslations } from "next-intl";
+import { ReactFlowProvider } from "reactflow";
 
 export default function Page() {
   const { id }: { id: string } = useParams();
@@ -176,7 +177,10 @@ export default function Page() {
         </ScrollArea>
         {project ? (
           <main className="flex-1 flex flex-col relative">
-            <Constructor />
+            <ReactFlowProvider>
+              <Constructor />
+            </ReactFlowProvider>
+
             <DebugConsole />
           </main>
         ) : (

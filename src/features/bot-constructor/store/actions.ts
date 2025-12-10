@@ -1,5 +1,5 @@
 import { StateCreator } from "zustand";
-import { Node } from "reactflow";
+import { Node, useReactFlow } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
 import { ElementItemType } from "@/types/element-types";
 import { instanceAuth } from "@/services/instance";
@@ -19,6 +19,7 @@ import { CallbackQueryTriggerData } from "../nodes/triggers/CallbackQueryTrigger
 import { StateNodeData } from "../nodes/custom/StateNode/types";
 import { SendLocationNodeData } from "../nodes/actions/LocationNode/types";
 import { CallbackAnswerNodeData } from "../nodes/custom/CallbackAnswerNode/types";
+import { getFormatFlow } from "../lib/format-flow";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
@@ -213,6 +214,13 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     } finally {
       set({ isLoading: false });
     }
+  },
+
+  formatFlow: async () => {
+    const { nodes, edges } = get();
+    const formated = getFormatFlow(nodes, edges);
+
+    set({ nodes: formated.nodes, edges: formated.edges }); // To avoid unused variable warning
   },
 
   loadFlow: async (flow) => {
