@@ -43,9 +43,13 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         ...baseMessageData,
         messageText: "",
         parseMode: "HTML",
-        disableWebPagePreview: false,
         disableNotification: false,
         protectContent: false,
+        keyboard: {
+          active: "inline",
+          inline: [],
+          reply: [],
+        },
       } as SendTextMessageNodeData;
     case "SendPhotoNode":
       return {

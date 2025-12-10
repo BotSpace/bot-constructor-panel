@@ -38,5 +38,5 @@ export interface SendPhotoNodeData {
   disableNotification?: boolean; // Foydalanuvchiga ovozsiz xabar yuborish.
   protectContent?: boolean; // Xabarni nusxalash va saqlashni taqiqlash.
 
-  keyboard?: KeyboardConfig;
+  keyboard: KeyboardConfig;
 }

@@ -43,7 +43,7 @@ export function DynamicMessageConstructor({
   children: React.ReactNode;
   id: string;
   handleUpdate: ({}) => void;
-  initialDynamicMessages: DynamicMessage[];
+  initialDynamicMessages?: DynamicMessage[];
 }) {
   // New dynamic message name
   const [name, setName] = useState<string>("");
