@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
-interface DownloadFileNodeData {
+export interface DownloadFileNodeData {
   messageType?: string; // Type of message from MessageTrigger (photo, video, audio, document)
 }
 

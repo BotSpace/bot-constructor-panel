@@ -7,10 +7,5 @@ export interface SendLocationNodeData {
   };
   latitude?: number;
   longitude?: number;
-  livePeriod?: number;
-  heading?: number;
-  horizontalAccuracy?: number;
-  proximityAlertRadius?: number;
-
   keyboard: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
 }

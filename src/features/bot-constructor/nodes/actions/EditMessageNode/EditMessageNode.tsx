@@ -1,21 +1,28 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { memo } from "react";
 import { NodeProps } from "reactflow";
-import { EditMessageNodeData } from "./types";
+import { EditMessageNodeData, MessageIdSource } from "./types";
 import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
 import { NodeHeader } from "../shared/NodeHeader";
 import { findNearestParentAction } from "@/features/bot-constructor/lib/findNearestParentAction";
 import { ElementItemType } from "@/types/element-types";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { DynamicMessageConstructor } from "../TextMessageNode/components/dynamic-message-constructor-modal";
-import { ListPlus } from "lucide-react";
-import TelegramEditor from "@/features/bot-constructor/components/RichTextEditor/editor/TelegramEditor";
+import { ButtonGenerator } from "@/features/bot-constructor/components";
+import { EditMessageSource } from "../../components/shared/ReactFlowHandles/EditMessageSource";
+import ForTextMessageNode from "./components/ForTextMessageNode";
+import ForVideoPhotoDocumentAudio from "./components/ForVideoPhotoDocumentAudio";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 export const EditMessageNode = memo(
-  ({ id, data, selected, isConnectable }: NodeProps<EditMessageNodeData>) => {
+  ({ id, data, selected }: NodeProps<EditMessageNodeData>) => {
     const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
     const nearestParentAction = findNearestParentAction(id);
@@ -38,6 +45,22 @@ export const EditMessageNode = memo(
         <NodeHeader icon="✍️" title="Edit Message" nodeId={id} />
 
         <CardContent>
+          <Select
+            onValueChange={(value) =>
+              handleUpdate({ messageIdSource: value as MessageIdSource })
+            }
+            value={data.messageIdSource}
+          >
+            <SelectTrigger className="w-full mb-4">
+              <SelectValue placeholder="Select an option" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="this_message">Yuqoridagi xabar</SelectItem>
+              <SelectItem value="connected_node">Ko'rsatilgan xabar</SelectItem>
+              <SelectItem value="message_id">Ko'rsatilgan xabar</SelectItem>
+            </SelectContent>
+          </Select>
+
           {nearestParentAction ? null : (
             <div>
               <p className="p-4 text-center text-red-500">
@@ -45,36 +68,41 @@ export const EditMessageNode = memo(
               </p>
             </div>
           )}
-          {/* Xabar matni */}
 
-          {parrentActionType === "SendTextMessageNode" ? (
-            <div className="grid gap-2">
-              <div className="flex justify-between items-center">
-                <Label>Yangi xabar matni</Label>
-
-                <DynamicMessageConstructor data={data} id={id}>
-                  <Button size={"icon-sm"} variant={"outline"}>
-                    <ListPlus />
-                  </Button>
-                </DynamicMessageConstructor>
-              </div>
-
-              <TelegramEditor
-                initialData={data.newText || undefined}
-                onSave={(data) => handleUpdate({ newText: data })}
-                data={data}
+          {data.messageIdSource === "message_id" ? (
+            <>
+              <Input
+                value={data.messageId}
+                onChange={(e) => handleUpdate({ messageId: e.target.value })}
+                placeholder="Enter message id"
               />
-            </div>
-          ) : null}
+            </>
+          ) : parrentActionType === "SendTextMessageNode" ? (
+            <ForTextMessageNode
+              data={data}
+              handleUpdate={handleUpdate}
+              id={id}
+            />
+          ) : (
+            parrentActionType === "SendPhotoNode" ||
+            parrentActionType === "SendVideoNode" ||
+            parrentActionType === "SendFileNode" ||
+            (parrentActionType === "SendAudioNode" && (
+              <ForVideoPhotoDocumentAudio
+                data={data}
+                handleUpdate={handleUpdate}
+                id={id}
+              />
+            ))
+          )}
         </CardContent>
-        {/* <ButtonCreator
-          nodeId={id}
-          keyboard={data.keyboard}
-          data={data}
-          onUpdate={handleUpdate}
-        /> */}
 
         <SourceHandles />
+        <EditMessageSource />
+
+        <CardFooter>
+          <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+        </CardFooter>
       </Card>
     );
   }

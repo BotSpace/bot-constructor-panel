@@ -132,7 +132,7 @@ const SendFileNodeComponent = ({
                   handleUpdate({ fileSourceType: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Manbani tanlang..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -223,33 +223,6 @@ const SendFileNodeComponent = ({
                 </div>
               )}
             </div>
-
-            {/* Maxsus muqova */}
-            <div className="flex items-center justify-between space-y-0 rounded-lg border p-3">
-              <div className="space-y-0.5">
-                <Label htmlFor={`custom-thumb-${id}`}>Maxsus muqova</Label>
-                <p className="text-xs text-muted-foreground">
-                  Fayl uchun rasmli muqova.
-                </p>
-              </div>
-              <Switch
-                id={`custom-thumb-${id}`}
-                checked={!!data.hasCustomThumbnail}
-                onCheckedChange={(checked) =>
-                  handleUpdate({ hasCustomThumbnail: checked })
-                }
-              />
-            </div>
-            {data.hasCustomThumbnail && (
-              <Input
-                placeholder="Muqova uchun File ID"
-                value={data.thumbnailFileId || ""}
-                onChange={(e) =>
-                  handleUpdate({ thumbnailFileId: e.target.value })
-                }
-                className="animate-in fade-in-50"
-              />
-            )}
 
             {/* Caption */}
             <div className="grid gap-2">

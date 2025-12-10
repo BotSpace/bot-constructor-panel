@@ -69,75 +69,11 @@ const LocationNodeComponent = ({
               />
             </div>
           </div>
-
-          <div className="flex flex-col gap-2">
-            <Label>Jonli joylashuv (soniya, ixtiyoriy)</Label>
-            <Input
-              type="number"
-              placeholder="3600"
-              value={data.livePeriod || ""}
-              onChange={(e) =>
-                handleUpdate({ livePeriod: parseInt(e.target.value) })
-              }
-            />
-            <p className="text-xs text-muted-foreground">
-              60-86400 oralig'ida. Joylashuv yangilanib turadi.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label>Yo'nalish (daraja, ixtiyoriy)</Label>
-            <Input
-              type="number"
-              min="1"
-              max="360"
-              placeholder="90"
-              value={data.heading || ""}
-              onChange={(e) =>
-                handleUpdate({ heading: parseInt(e.target.value) })
-              }
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label>Aniqlik radiusi (metr, ixtiyoriy)</Label>
-            <Input
-              type="number"
-              placeholder="100"
-              value={data.horizontalAccuracy || ""}
-              onChange={(e) =>
-                handleUpdate({
-                  horizontalAccuracy: parseFloat(e.target.value),
-                })
-              }
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label>Yaqinlik ogohlantirish (metr, ixtiyoriy)</Label>
-            <Input
-              type="number"
-              placeholder="500"
-              value={data.proximityAlertRadius || ""}
-              onChange={(e) =>
-                handleUpdate({
-                  proximityAlertRadius: parseInt(e.target.value),
-                })
-              }
-            />
-            <p className="text-xs text-muted-foreground">
-              Foydalanuvchi bu masofaga yaqinlashganda bildirishnoma
-            </p>
-          </div>
         </CardContent>
       )}
 
       <CardFooter>
-        <ButtonGenerator
-          initialKeyboard={data.keyboard}
-          data={data}
-          node_id={id}
-        />
+        <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
       </CardFooter>
 
       <SourceHandles />
