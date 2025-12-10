@@ -55,7 +55,6 @@ function FlowchartInner() {
   const { project, loading } = useProjectStore();
 
   const { screenToFlowPosition } = useReactFlow();
-  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(false);
   const mousePosition = useMousePosition();
 
@@ -197,6 +196,18 @@ function FlowchartInner() {
     { preventDefault: true } // Brauzerning manzil satriga o'tishini to'xtatadi
   );
 
+  // 1. Sahifa yuklanganda LocalStorage'dan holatni o'qib olish
+  const getInitialViewport = () => {
+    const savedViewport = localStorage.getItem("react-flow-viewport");
+    // Agar oldin saqlangan bo'lsa o'shani qaytaramiz, yo'qsa standart holat
+    return savedViewport ? JSON.parse(savedViewport) : { x: 0, y: 0, zoom: 1 };
+  };
+
+  // 2. Foydalanuvchi harakatni tugatganda (zoom yoki pan) saqlash
+  const onMoveEnd = useCallback((event: any, viewport: any) => {
+    localStorage.setItem("react-flow-viewport", JSON.stringify(viewport));
+  }, []);
+
   return (
     <div
       ref={reactFlowWrapper}
@@ -206,6 +217,8 @@ function FlowchartInner() {
       onMouseDown={handleContainerClick}
     >
       <ReactFlow
+        defaultViewport={getInitialViewport()}
+        onMoveEnd={onMoveEnd}
         nodeTypes={CustomNodes}
         edgeTypes={CustomEdge}
         nodes={nodes}
@@ -215,13 +228,12 @@ function FlowchartInner() {
         onEdgesChange={onEdgesChange}
         onNodeDrag={handleNodeDrag}
         onNodeDragStop={handleNodeDragStop}
-        fitView
         panOnScroll
         selectionOnDrag
         multiSelectionKeyCode={["Shift"]}
         deleteKeyCode={null} // O'zimizning handler'imizni ishlatamiz
         minZoom={0.1}
-        maxZoom={2}
+        maxZoom={2.5}
         connectionRadius={50}
         snapToGrid={snapToGrid}
         snapGrid={snapToGrid ? [20, 20] : undefined}
