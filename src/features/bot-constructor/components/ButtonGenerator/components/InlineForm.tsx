@@ -20,8 +20,8 @@ import { useReactQueryAction } from "@/services/react-query";
 import { APIDetailCreateResponse } from "@/types/http/response";
 import { CollectionDetail } from "@/types/http/collection";
 import { Separator } from "@/components/ui/separator";
-import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/filter";
-import { Filter } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/types";
+import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
+import { Filter } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
 import {
   Accordion,
   AccordionContent,
@@ -75,7 +75,7 @@ const inlineOptions: {
   },
 ];
 
-export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
+export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
   const [text, setText] = useState("");
   const [actionType, setActionType] = useState<InlineType>("callback");
   const [value, setValue] = useState("");

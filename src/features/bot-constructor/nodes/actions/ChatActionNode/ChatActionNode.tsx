@@ -5,7 +5,6 @@ import { memo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
@@ -81,7 +80,6 @@ const ChatActionNodeInternal = ({
         </CardContent>
       )}
 
-      <NodeFooter nodeId={id} />
       <SourceHandles />
     </Card>
   );

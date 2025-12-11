@@ -10,7 +10,7 @@ import {
   Repeat,
   BarChart3,
 } from "lucide-react";
-import { ButtonConfig } from "./types";
+import { ButtonConfig, KeyboardConfig } from "./types";
 
 export const getIconForButton = (button: ButtonConfig): ReactNode => {
   const commonClasses = "mr-2 h-4 w-4";
@@ -38,3 +38,9 @@ export const getIconForButton = (button: ButtonConfig): ReactNode => {
       return null;
   }
 };
+
+export function calculateActiveButtonCount(keyboards: KeyboardConfig): number {
+  const activeKeyboard = keyboards[keyboards.active]; // inline yoki reply massivini olamiz
+
+  return activeKeyboard.reduce((rowTotal, row) => rowTotal + row.length, 0);
+}

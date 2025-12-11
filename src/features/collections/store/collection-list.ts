@@ -1,10 +1,7 @@
 import { CollectionListItem } from "@/types/http/collection";
-import create from "zustand";
+import { create } from "zustand";
 import { instanceAuth } from "@/services/instance";
-import {
-  APIDetailCreateResponse,
-  APIListResponse,
-} from "@/types/http/response";
+import { APIListResponse } from "@/types/http/response";
 import toast from "react-hot-toast";
 
 type CollectionStore = {

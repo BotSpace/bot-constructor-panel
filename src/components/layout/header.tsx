@@ -8,11 +8,14 @@ import { useLinkToParent } from "../common/link-to-parrent";
 import { ArrowLeft, Database } from "lucide-react";
 import { Button } from "../ui/button";
 import { useTranslations } from "next-intl";
+import { useSearchStore } from "@/features/bot-constructor/search/search-store";
 
 // Asosiy Header komponenti
 export function ConstructorPageHeader() {
   const { id } = useParams();
   const t = useTranslations();
+
+  const { toggleSearchPanel } = useSearchStore();
 
   const { handleClick: backToCollection } = useLinkToParent({
     href: `/bot/${id}/collection`,
@@ -38,6 +41,13 @@ export function ConstructorPageHeader() {
         <div className="flex items-center gap-2">
           {/* <PromptInterface /> */}
           <DebugActions />
+          <Button
+            onClick={() => {
+              toggleSearchPanel();
+            }}
+          >
+            Search
+          </Button>
           <ReleasePanel />
           <Button onClick={backToCollection}>
             <Database />

@@ -1,9 +1,25 @@
 import { StateCreator } from "zustand";
-import { Node } from "reactflow";
+import { Node, useReactFlow } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
 import { ElementItemType } from "@/types/element-types";
 import { instanceAuth } from "@/services/instance";
-import toast from "react-hot-toast";
+import { SendTextMessageNodeData } from "../nodes/actions/TextMessageNode/types";
+import { SendPhotoNodeData } from "../nodes/actions/PhotoMessageNode/types";
+import { SendAudioNodeData } from "../nodes/actions/AudioMessageNode/types";
+import { SendFileNodeData } from "../nodes/actions/FileMessageNode/types";
+import { EditMessageNodeData } from "../nodes/actions/EditMessageNode";
+import { DeleteMessageNodeData } from "../nodes/actions/DeleteMessageNode/DeleteMessageNode";
+import { ForwardMessageNodeData } from "../nodes/actions/ForwardMessageNode/ForwardMessageNode";
+import { DownloadFileNodeData } from "../nodes/actions/DownloadFileNode/DownloadFileNode";
+import { CustomCodeNodeData } from "../nodes/custom/CustomCodeNode/types";
+import { MessageTriggerNodeData } from "../nodes/triggers/MessageTrigger/types";
+import { ReplyButtonTriggerData } from "../nodes/triggers/ReplyButtonTrigger/types";
+import { CommandTriggerNodeData } from "../nodes/triggers/CommandTrigger/types";
+import { CallbackQueryTriggerData } from "../nodes/triggers/CallbackQueryTrigger/types";
+import { StateNodeData } from "../nodes/custom/StateNode/types";
+import { SendLocationNodeData } from "../nodes/actions/LocationNode/types";
+import { CallbackAnswerNodeData } from "../nodes/custom/CallbackAnswerNode/types";
+import { getFormatFlow } from "../lib/format-flow";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
@@ -26,64 +42,106 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
     case "SendTextMessageNode":
       return {
         ...baseMessageData,
-        messageText: "Yangi xabar",
-        parseMode: "None",
-      };
-    case "SendPhotoNode":
-      return { ...baseMessageData, photoSourceType: "url", caption: "" };
-    case "SendVideoNode":
-      return { ...baseMessageData, videoSourceType: "url", caption: "" };
-    case "SendAudioNode":
-      return { ...baseMessageData, audioSourceType: "url", caption: "" };
-    case "SendFileNode":
-      return { ...baseMessageData, fileSourceType: "url", caption: "" };
-    case "EditMessageNode":
-      return {
-        messageIdSource: "connected_node",
-        editType: "text",
         messageText: "",
-        parseMode: "None",
+        parseMode: "HTML",
+        disableNotification: false,
+        protectContent: false,
         keyboard: {
           active: "inline",
           inline: [],
           reply: [],
         },
-      };
+      } as SendTextMessageNodeData;
+    case "SendPhotoNode":
+      return {
+        ...baseMessageData,
+        photoSourceType: "url",
+        caption: "",
+      } as SendPhotoNodeData;
+    case "SendVideoNode":
+      return {
+        ...baseMessageData,
+        videoSourceType: "url",
+        caption: "",
+      } as SendPhotoNodeData;
+    case "SendAudioNode":
+      return {
+        ...baseMessageData,
+        audioSourceType: "url",
+        caption: "",
+      } as SendAudioNodeData;
+    case "SendFileNode":
+      return {
+        ...baseMessageData,
+        fileSourceType: "url",
+        caption: "",
+      } as SendFileNodeData;
+    case "EditMessageNode":
+      return {
+        messageIdSource: "this_message",
+        messageId: null,
+        newText: "",
+        parseMode: "HTML",
+        newCaption: "",
+        keyboard: {
+          active: "inline",
+          inline: [],
+          reply: [],
+        },
+      } as EditMessageNodeData;
     case "DeleteMessageNode":
       return {
         deleteFromContext: false,
         messageId: undefined,
-      };
+      } as DeleteMessageNodeData;
     case "ForwardMessageNode":
       return {
         recipientIds: [""],
-      };
+      } as ForwardMessageNodeData;
     case "SendToAdminNode":
-      return {};
+      return {}; // Maxsus sozlamalar yo'q
     case "DownloadFileNode":
       return {
         messageType: undefined,
-      };
+      } as DownloadFileNodeData;
     case "CustomCodeNode":
-      return {}; // Custom code uchun alohida sozlamalar
+      return {
+        nodeTitle: "Custom Code",
+      } as CustomCodeNodeData; // Custom code uchun alohida sozlamalar
+    case "SendLocationNode":
+      return {
+        keyboard: {
+          active: "inline",
+          inline: [],
+          reply: [],
+        },
+      } as SendLocationNodeData;
+    case "CallbackQueryAnswerNode":
+      return {
+        keyboard: {
+          active: "inline",
+          inline: [],
+          reply: [],
+        },
+      } as CallbackAnswerNodeData;
 
     // Triggers
     case "MessageTriggerNode":
       return {
         ...baseTriggerData,
         global: false,
-      };
+      } as MessageTriggerNodeData;
     case "ReplyButtonTriggerNode":
       return {
         ...baseTriggerData,
         global: false,
-      };
+      } as ReplyButtonTriggerData;
     case "CommandTriggerNode":
       return {
         ...baseTriggerData,
         global: true,
         command: "/start",
-      };
+      } as CommandTriggerNodeData;
     case "CallbackQueryTriggerNode":
       return {
         ...baseTriggerData,
@@ -92,14 +150,14 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         context: {
           value: "",
         },
-      };
+      } as CallbackQueryTriggerData;
     // Custom Nodes
     case "StateNode":
       return {
         key: "state_key",
         type: "user_id",
         node_type: nodeType,
-      };
+      } as StateNodeData;
 
     default:
       return {};
@@ -107,7 +165,7 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
 };
 
 let nodeIdCounter = 0;
-const generateNodeId = () => `node_${Date.now()}_${nodeIdCounter++}`;
+const generateNodeId = () => `node_${nodeIdCounter++}`;
 
 export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   set,
@@ -156,6 +214,13 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     } finally {
       set({ isLoading: false });
     }
+  },
+
+  formatFlow: async () => {
+    const { nodes, edges } = get();
+    const formated = getFormatFlow(nodes, edges);
+
+    set({ nodes: formated.nodes, edges: formated.edges }); // To avoid unused variable warning
   },
 
   loadFlow: async (flow) => {

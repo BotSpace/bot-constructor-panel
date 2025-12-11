@@ -13,6 +13,8 @@ import { ConstructorPageHeader } from "@/components/layout/header";
 import { DebugConsole } from "@/components/layout/components/debug-console";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
 import { useTranslations } from "next-intl";
+import { ReactFlowProvider } from "reactflow";
+import SearchPanel from "@/features/bot-constructor/search/search-panel";
 
 export default function Page() {
   const { id }: { id: string } = useParams();
@@ -175,9 +177,13 @@ export default function Page() {
           </div>
         </ScrollArea>
         {project ? (
-          <main className="flex-1 flex flex-col relative">
-            <Constructor />
-            <DebugConsole />
+          <main className="grid grid-cols-12 relative w-full">
+            <ReactFlowProvider>
+              {/* constructor */}
+              <Constructor />
+              <SearchPanel />
+              <DebugConsole />
+            </ReactFlowProvider>
           </main>
         ) : (
           <ConstructorLoadingSkeletions />

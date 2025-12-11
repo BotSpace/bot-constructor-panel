@@ -29,8 +29,8 @@ import { APIDetailCreateResponse } from "@/types/http/response";
 import { CollectionDetail } from "@/types/http/collection";
 import { Separator } from "@/components/ui/separator";
 import SeparatorWithTitle from "@/components/common/separetor";
-import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/filter";
-import { Filter } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/types";
+import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
+import { Filter } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
 import {
   Accordion,
   AccordionContent,
@@ -73,7 +73,7 @@ const replyOptions: {
   },
 ];
 
-export const ReplyForm = ({ onAdd, disabled, data }: ReplyFormProps) => {
+export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
   const [text, setText] = useState("");
   const [actionType, setActionType] = useState<ReplyType>("reply");
   const [webAppUrl, setWebAppUrl] = useState("");

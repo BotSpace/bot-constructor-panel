@@ -1,8 +1,7 @@
 // FAYL: constructor/components/ButtonGenerator/hooks/useButtonGeneratorState.ts (YANGI HOOK)
 
 import { useState, useEffect, useMemo } from "react";
-import { ButtonConfig } from "../types";
-import { KeyboardConfig } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
+import { ButtonConfig, KeyboardConfig } from "../types";
 
 const MAX_BUTTONS_PER_ROW = 10;
 
@@ -63,10 +62,14 @@ export const useButtonGeneratorState = (
 
     // Tanlangan qatorda collection button bor-yo'qligini tekshirish
     const selectedRow = currentButtons[selectedRowIndex] || [];
-    const hasCollectionButton = selectedRow.some(btn => btn.collectionData?.layout);
-    
+    const hasCollectionButton = selectedRow.some(
+      (btn) => btn.collectionData?.layout
+    );
+
     if (hasCollectionButton) {
-      alert("Collection buttonlar bo'lgan qatorga boshqa button qo'shib bo'lmaydi.");
+      alert(
+        "Collection buttonlar bo'lgan qatorga boshqa button qo'shib bo'lmaydi."
+      );
       return;
     }
 
@@ -132,7 +135,11 @@ export const useButtonGeneratorState = (
     });
   };
 
-  const handleEditButton = (rowIndex: number, buttonId: string, updatedButton: Partial<ButtonConfig>) => {
+  const handleEditButton = (
+    rowIndex: number,
+    buttonId: string,
+    updatedButton: Partial<ButtonConfig>
+  ) => {
     setCurrentButtons((current) => {
       return current.map((row, rIdx) => {
         if (rIdx === rowIndex) {
@@ -148,7 +155,10 @@ export const useButtonGeneratorState = (
     });
   };
 
-  const handleReorderButtons = (rowIndex: number, reorderedButtons: ButtonConfig[]) => {
+  const handleReorderButtons = (
+    rowIndex: number,
+    reorderedButtons: ButtonConfig[]
+  ) => {
     setCurrentButtons((current) => {
       return current.map((row, rIdx) => {
         if (rIdx === rowIndex) {
@@ -162,7 +172,7 @@ export const useButtonGeneratorState = (
   const handleRemoveRow = (rowIndex: number) => {
     setCurrentButtons((current) => {
       const newButtons = current.filter((_, idx) => idx !== rowIndex);
-      
+
       if (newButtons.length === 0) {
         if (selectedRowIndex !== 0) setSelectedRowIndex(0);
         return [[]];
@@ -173,7 +183,7 @@ export const useButtonGeneratorState = (
       } else if (selectedRowIndex === rowIndex && selectedRowIndex > 0) {
         setSelectedRowIndex(selectedRowIndex - 1);
       }
-      
+
       return newButtons;
     });
   };

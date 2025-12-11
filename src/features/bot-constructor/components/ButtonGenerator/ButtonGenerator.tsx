@@ -1,33 +1,33 @@
 "use client";
 
-import { useState, ReactNode, useEffect, useRef } from "react";
+import { useState, ReactNode, useEffect, useRef, useEffectEvent } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import {
-  KeyboardConfig,
-  SendTextMessageNodeData,
-} from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
+import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
 import { useButtonGeneratorState } from "./hook/useButtonGeneratorState";
 import { ControlPanel } from "./components/ControlPanel";
 import { KeyboardPreview } from "./components/KeyboardPreview";
 import { EditButtonDialog } from "./components/EditButtonDialog";
-import { ButtonConfig } from "./types";
+import { ButtonConfig, KeyboardConfig } from "./types";
+import { Button } from "@/components/ui/button";
+import { LayoutGrid } from "lucide-react";
+import { useFlowStore } from "../../store";
+import { Badge } from "@/components/ui/badge";
+import { calculateActiveButtonCount } from "./utils";
 
 interface ButtonGeneratorProps {
-  initialKeyboard?: KeyboardConfig;
-  onSave: (keyboard: KeyboardConfig) => void;
-  children: ReactNode;
-  data?: SendTextMessageNodeData; // Collection ma'lumotlari uchun
+  initialKeyboard: KeyboardConfig;
+  node_id: string; // Node ID uchun (agar kerak bo'lsa)
 }
 
 export function ButtonGenerator({
-  initialKeyboard,
-  onSave,
-  children,
-  data,
+  initialKeyboard: keyboards,
+  node_id,
 }: ButtonGeneratorProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [buttonCount, setButtonCount] = useState(() => 0);
+
   const [editingButton, setEditingButton] = useState<{
     rowIndex: number;
     buttonId: string;
@@ -50,7 +50,14 @@ export function ButtonGenerator({
     handleRemoveRow,
     handleReorderRows,
     getFinalKeyboardConfig,
-  } = useButtonGeneratorState(isOpen, initialKeyboard);
+  } = useButtonGeneratorState(isOpen, keyboards);
+
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
+
+  // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
+  const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
+    updateNodeData(node_id, update);
+  };
 
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -62,7 +69,7 @@ export function ButtonGenerator({
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      onSave(getFinalKeyboardConfig());
+      handleUpdate({ keyboard: getFinalKeyboardConfig() });
     }, 500);
 
     return () => {
@@ -72,9 +79,28 @@ export function ButtonGenerator({
     };
   }, [isOpen, currentButtons, activeTab]);
 
+  useEffect(() => {
+    setButtonCount(calculateActiveButtonCount(keyboards));
+  }, [keyboards]);
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger asChild>
+        <div className="relative w-full">
+          <Button variant="outline" className="w-full">
+            <LayoutGrid className="mr-2 h-4 w-4" />
+            Tugmalarni Sozlash
+          </Button>
+          {buttonCount > 0 && (
+            <Badge
+              variant="destructive"
+              className="absolute -top-2 -right-2 px-1.5"
+            >
+              {buttonCount}
+            </Badge>
+          )}
+        </div>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[90%] md:max-w-[80%] lg:max-w-[90%] h-[90vh] overflow-y-auto">
         <VisuallyHidden>
           <DialogTitle>Tugmalarni Sozlash</DialogTitle>
@@ -85,7 +111,6 @@ export function ButtonGenerator({
             onTabChange={setActiveTab}
             onAddButton={handleAddButton}
             isCurrentRowFull={isCurrentRowFull}
-            data={data}
           />
           <KeyboardPreview
             buttons={currentButtons}
@@ -96,7 +121,9 @@ export function ButtonGenerator({
             onRemoveButton={handleRemoveButton}
             onEditButton={(rowIndex, buttonId) => {
               // Find button to edit
-              const button = currentButtons[rowIndex]?.find(b => b.id === buttonId);
+              const button = currentButtons[rowIndex]?.find(
+                (b) => b.id === buttonId
+              );
               if (button) {
                 setEditingButton({ rowIndex, buttonId, button });
               }
@@ -106,7 +133,7 @@ export function ButtonGenerator({
             onReorderRows={handleReorderRows}
           />
         </div>
-        
+
         {/* Edit Button Dialog */}
         <EditButtonDialog
           button={editingButton?.button || null}

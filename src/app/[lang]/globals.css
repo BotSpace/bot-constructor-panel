@@ -193,6 +193,25 @@
   margin-right: 2px;
 }
 
+/* ctr + / button */
+.ce-toolbar__settings-btn {
+  color: #fff;
+  background-color: #667eea;
+}
+
 .codex-editor__redactor {
   padding: 0 !important;
+}
+
+/* Bitta qator */
+.cdx-block {
+  padding: 0 !important;
+}
+
+/* Editorda matin select bo'lganda ishlaydigan css lar */
+.codex-editor ::selection,
+.codex-editor ::-moz-selection,
+.ce-block--selected .ce-block__content {
+  background: #123998; /* Orqa fon sariq */
+  color: white; /* Matn qora */
 }

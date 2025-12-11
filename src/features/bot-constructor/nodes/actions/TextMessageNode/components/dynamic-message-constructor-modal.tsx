@@ -18,8 +18,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { SendTextMessageNodeData } from "../types";
-import { useFlowStore } from "@/features/bot-constructor/store";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
@@ -34,31 +32,27 @@ import { CollectionListItem } from "@/types/http/collection";
 import AccordionItemWrapper from "./accordion-item-wrapper";
 import { Badge } from "@/components/ui/badge";
 import { Database, Trash2 } from "lucide-react";
+import { DynamicMessage } from "../../shared/types";
 
 export function DynamicMessageConstructor({
   children,
-  data,
   id,
+  handleUpdate,
+  initialDynamicMessages,
 }: {
   children: React.ReactNode;
-  data: SendTextMessageNodeData;
   id: string;
+  handleUpdate: ({}) => void;
+  initialDynamicMessages?: DynamicMessage[];
 }) {
-  const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
-  const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
-    updateNodeData(id, update);
-  };
-
   // New dynamic message name
   const [name, setName] = useState<string>("");
   const [collection, setCollection] = useState<CollectionListItem | null>(null);
 
-  // TODO: Bu keyinroq ishlatilinadi.
   // Bu yerdan olib tashlash kerak agar bu yerda ishlatilinmasa
   const { data: collections } = useCollectionStore();
 
-  const dynamicMessages = data.dynamicMessages ?? [];
+  const dynamicMessages = initialDynamicMessages ?? [];
 
   // Reset form after adding message
   const handleAddMessage = () => {
@@ -92,7 +86,8 @@ export function DynamicMessageConstructor({
         <DialogHeader>
           <DialogTitle>Dynamic Messages</DialogTitle>
           <DialogDescription>
-            Create dynamic messages that load data from collections. Use variables like ${"{"}name{"}"} in your message text.
+            Create dynamic messages that load data from collections. Use
+            variables like ${"{"}name{"}"} in your message text.
           </DialogDescription>
         </DialogHeader>
 
@@ -100,14 +95,21 @@ export function DynamicMessageConstructor({
           <>
             <Accordion type="single" collapsible className="w-full">
               {dynamicMessages.map((message, index) => (
-                <AccordionItem key={message.name} value={message.name} className="border rounded-lg mb-2 px-3">
+                <AccordionItem
+                  key={message.name}
+                  value={message.name}
+                  className="border rounded-lg mb-2 px-3"
+                >
                   <div className="flex items-center gap-2">
                     <AccordionTrigger className="flex-1 hover:no-underline">
                       <div className="flex items-center gap-3">
                         <Database className="h-4 w-4 text-blue-500" />
                         <div className="flex flex-col items-start">
                           <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="font-mono bg-blue-50 text-blue-700 border-blue-200">
+                            <Badge
+                              variant="secondary"
+                              className="font-mono bg-blue-50 text-blue-700 border-blue-200"
+                            >
                               ${message.name}
                             </Badge>
                             <span className="text-xs text-muted-foreground">
@@ -122,27 +124,11 @@ export function DynamicMessageConstructor({
                         </div>
                       </div>
                     </AccordionTrigger>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleUpdate({
-                          dynamicMessages: dynamicMessages.filter(
-                            (_, i) => i !== index
-                          ),
-                        });
-                      }}
-                      title="Delete dynamic message"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
                   </div>
                   <AccordionContent className="pt-4">
                     <AccordionItemWrapper
+                      dynamicMessages={dynamicMessages}
                       collection={message.collection}
-                      data={data}
                       id={id}
                     />
                   </AccordionContent>
@@ -153,9 +139,12 @@ export function DynamicMessageConstructor({
         ) : (
           <div className="grid gap-2 items-center justify-center py-12 border-2 border-dashed rounded-lg">
             <Database className="h-12 w-12 text-muted-foreground mx-auto opacity-50" />
-            <p className="text-muted-foreground font-medium">No dynamic messages</p>
+            <p className="text-muted-foreground font-medium">
+              No dynamic messages
+            </p>
             <p className="text-xs text-muted-foreground max-w-xs text-center">
-              Add a dynamic message to load data from collections and use it in your bot messages
+              Add a dynamic message to load data from collections and use it in
+              your bot messages
             </p>
           </div>
         )}
@@ -200,7 +189,8 @@ export function DynamicMessageConstructor({
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            After adding, you can use ${"{"}name{"}"} in your message to display data from the collection.
+            After adding, you can use ${"{"}name{"}"} in your message to display
+            data from the collection.
           </p>
         </div>
 

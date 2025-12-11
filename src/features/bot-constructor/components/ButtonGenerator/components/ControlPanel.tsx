@@ -11,7 +11,6 @@ interface ControlPanelProps {
   onTabChange: (tab: "inline" | "reply") => void;
   onAddButton: (button: ButtonConfig) => void;
   isCurrentRowFull: boolean;
-  data?: SendTextMessageNodeData;
 }
 
 export const ControlPanel = ({
@@ -19,7 +18,6 @@ export const ControlPanel = ({
   onTabChange,
   onAddButton,
   isCurrentRowFull,
-  data,
 }: ControlPanelProps) => {
   return (
     <div className="md:col-span-5 flex flex-col gap-6 sticky top-0">
@@ -32,18 +30,10 @@ export const ControlPanel = ({
           <TabsTrigger value="reply">Reply Keyboard</TabsTrigger>
         </TabsList>
         <TabsContent value="inline">
-          <InlineForm
-            onAdd={onAddButton}
-            disabled={isCurrentRowFull}
-            data={data}
-          />
+          <InlineForm onAdd={onAddButton} disabled={isCurrentRowFull} />
         </TabsContent>
         <TabsContent value="reply">
-          <ReplyForm
-            onAdd={onAddButton}
-            disabled={isCurrentRowFull}
-            data={data}
-          />
+          <ReplyForm onAdd={onAddButton} disabled={isCurrentRowFull} />
         </TabsContent>
       </Tabs>
       {isCurrentRowFull && (

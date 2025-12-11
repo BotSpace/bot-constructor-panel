@@ -2,17 +2,16 @@
 
 import { NodeProps } from "reactflow";
 import { memo, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendLocationNodeData } from "./types";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
 
 const LocationNodeComponent = ({
   id,
@@ -70,70 +69,13 @@ const LocationNodeComponent = ({
               />
             </div>
           </div>
-
-          <div className="flex flex-col gap-2">
-            <Label>Jonli joylashuv (soniya, ixtiyoriy)</Label>
-            <Input
-              type="number"
-              placeholder="3600"
-              value={data.livePeriod || ""}
-              onChange={(e) =>
-                handleUpdate({ livePeriod: parseInt(e.target.value) })
-              }
-            />
-            <p className="text-xs text-muted-foreground">
-              60-86400 oralig'ida. Joylashuv yangilanib turadi.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label>Yo'nalish (daraja, ixtiyoriy)</Label>
-            <Input
-              type="number"
-              min="1"
-              max="360"
-              placeholder="90"
-              value={data.heading || ""}
-              onChange={(e) =>
-                handleUpdate({ heading: parseInt(e.target.value) })
-              }
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label>Aniqlik radiusi (metr, ixtiyoriy)</Label>
-            <Input
-              type="number"
-              placeholder="100"
-              value={data.horizontalAccuracy || ""}
-              onChange={(e) =>
-                handleUpdate({
-                  horizontalAccuracy: parseFloat(e.target.value),
-                })
-              }
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label>Yaqinlik ogohlantirish (metr, ixtiyoriy)</Label>
-            <Input
-              type="number"
-              placeholder="500"
-              value={data.proximityAlertRadius || ""}
-              onChange={(e) =>
-                handleUpdate({
-                  proximityAlertRadius: parseInt(e.target.value),
-                })
-              }
-            />
-            <p className="text-xs text-muted-foreground">
-              Foydalanuvchi bu masofaga yaqinlashganda bildirishnoma
-            </p>
-          </div>
         </CardContent>
       )}
 
-      <NodeFooter nodeId={id} />
+      <CardFooter>
+        <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+      </CardFooter>
+
       <SourceHandles />
     </Card>
   );

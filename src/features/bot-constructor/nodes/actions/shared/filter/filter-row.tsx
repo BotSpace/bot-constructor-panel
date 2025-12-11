@@ -4,6 +4,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -39,8 +40,16 @@ export function FilterRow({
   const selectedField = fields.find((f) => f.id === filter.field);
   const valueSource = filter.valueSource || "static";
 
+  const EmptySelector = ({ placeholder }: { placeholder: string }) => (
+    <Select>
+      <SelectTrigger>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+    </Select>
+  );
+
   const renderOperatorSelect = () => {
-    if (!selectedField) return null;
+    if (!selectedField) return <EmptySelector placeholder="Select operator" />;
 
     const operators = getOperatorsForType(selectedField.type);
 
@@ -52,7 +61,7 @@ export function FilterRow({
         }
       >
         <SelectTrigger className="w-[120px]">
-          <SelectValue />
+          <SelectValue placeholder="Select operator" />
         </SelectTrigger>
         <SelectContent>
           {operators.map((op) => (
@@ -66,8 +75,6 @@ export function FilterRow({
   };
 
   const renderValueSourceSelector = () => {
-    if (stateKeys.length === 0) return null;
-
     return (
       <Select
         value={valueSource}
@@ -103,7 +110,8 @@ export function FilterRow({
   };
 
   const renderStateKeySelect = () => {
-    if (valueSource !== "state" || stateKeys.length === 0) return null;
+    if (valueSource !== "state")
+      return <EmptySelector placeholder="Select operator" />;
 
     return (
       <Select
@@ -114,14 +122,22 @@ export function FilterRow({
           <SelectValue placeholder="State key tanlang..." />
         </SelectTrigger>
         <SelectContent>
-          {stateKeys.map((key) => (
-            <SelectItem key={key} value={key}>
-              <div className="flex items-center gap-2">
-                <Key className="h-3 w-3" />
-                {key}
+          {stateKeys.length ? (
+            stateKeys.map((key) => (
+              <SelectItem key={key} value={key}>
+                <div className="flex items-center gap-2">
+                  <Key className="h-3 w-3" />
+                  {key}
+                </div>
+              </SelectItem>
+            ))
+          ) : (
+            <>
+              <div className="px-3 py-2 text-sm text-muted-foreground">
+                Hech narsa topilmadi
               </div>
-            </SelectItem>
-          ))}
+            </>
+          )}
         </SelectContent>
       </Select>
     );
@@ -211,12 +227,15 @@ export function FilterRow({
 
   return (
     <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-card hover:bg-filter-hover transition-all group">
+      {/* Select for sorting element
+        Example: chat_id, name, age, created at, etc.
+      */}
       <Select
         value={filter.field}
         onValueChange={(value) => onUpdate({ field: value })}
       >
         <SelectTrigger className="w-[120px]">
-          <SelectValue />
+          <SelectValue placeholder="Field" />
         </SelectTrigger>
         <SelectContent>
           {fields.map((field) => (
@@ -227,8 +246,13 @@ export function FilterRow({
         </SelectContent>
       </Select>
 
+      {/* Operation select */}
       {renderOperatorSelect()}
+
+      {/* Value source select (static or state) */}
       {renderValueSourceSelector()}
+
+      {/* Value input (text, number, date picker, etc.) */}
       {renderValueInput()}
 
       <Button

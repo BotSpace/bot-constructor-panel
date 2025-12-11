@@ -1,5 +1,4 @@
-import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator";
-import { KeyboardConfig } from "../TextMessageNode/types";
+import { KeyboardConfig } from "@/features/bot-constructor/components";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -40,5 +39,5 @@ export interface SendAudioNodeData {
   disableNotification?: boolean;
   protectContent?: boolean;
 
-  keyboard?: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
+  keyboard: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
 }

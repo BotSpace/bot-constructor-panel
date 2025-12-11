@@ -5,15 +5,10 @@ import { memo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
-import { NodeFooter } from "../../actions/shared/NodeFooter";
 import { SourceHandles } from "../../components";
 import { ElseNodeData } from "./types";
 
-const ElseNodeComponent = ({
-  id,
-  data,
-  selected,
-}: NodeProps<ElseNodeData>) => {
+const ElseNodeComponent = ({ id, data, selected }: NodeProps<ElseNodeData>) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -45,8 +40,6 @@ const ElseNodeComponent = ({
           </div>
         </CardContent>
       )}
-
-      <NodeFooter nodeId={id} />
 
       {/* TRUE - pastda (doim bajariladi) */}
       <SourceHandles id="true" position={Position.Bottom} />

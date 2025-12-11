@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, memo, useRef } from "react";
-import { NodeProps } from "reactflow";
+import { NodeProps, useUpdateNodeInternals } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
 import { FiHelpCircle } from "react-icons/fi";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -32,10 +32,12 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 
 // Andozamiz uchun yangi importlar
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
+import { ButtonGenerator } from "@/features/bot-constructor/components";
+import TextArea from "../shared/text-area";
+import ActionNodeSettings from "../shared/ActionNodeSettings";
 
 const SendVideoNodeComponent = ({
   id,
@@ -140,7 +142,7 @@ const SendVideoNodeComponent = ({
                   handleUpdate({ videoSourceType: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Manbani tanlang..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -235,94 +237,14 @@ const SendVideoNodeComponent = ({
               )}
             </div>
 
-            {/* Video parametrlari */}
-            <div className="grid gap-2">
-              <Label>Video parametrlari (ixtiyoriy)</Label>
-              <div className="grid grid-cols-3 gap-2">
-                <Input
-                  type="text"
-                  placeholder="Davomiyligi (s)"
-                  value={data.duration || ""}
-                  onChange={(e) => handleUpdate({ duration: e.target.value })}
-                />
-                <Input
-                  type="text"
-                  placeholder="Eni (px)"
-                  value={data.width || ""}
-                  onChange={(e) => handleUpdate({ width: e.target.value })}
-                />
-                <Input
-                  type="text"
-                  placeholder="Bo'yi (px)"
-                  value={data.height || ""}
-                  onChange={(e) => handleUpdate({ height: e.target.value })}
-                />
-              </div>
-            </div>
-
-            {/* Qo'shimcha sozlamalar */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label
-                  htmlFor={`custom-thumb-${id}`}
-                  className="cursor-pointer"
-                >
-                  Maxsus muqova
-                </Label>
-                <Switch
-                  id={`custom-thumb-${id}`}
-                  checked={!!data.hasCustomThumbnail}
-                  onCheckedChange={(checked) =>
-                    handleUpdate({ hasCustomThumbnail: checked })
-                  }
-                />
-              </div>
-              {data.hasCustomThumbnail && (
-                <Input
-                  placeholder="Muqova uchun File ID"
-                  value={data.thumbnailFileId || ""}
-                  onChange={(e) =>
-                    handleUpdate({ thumbnailFileId: e.target.value })
-                  }
-                  className="animate-in fade-in-50"
-                />
-              )}
-              <div className="flex items-center justify-between">
-                <Label
-                  htmlFor={`streaming-${id}`}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  Striming
-                  <TooltipProvider delayDuration={100}>
-                    <Tooltip>
-                      <TooltipTrigger type="button">
-                        <FiHelpCircle className="text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Videoni to'liq yuklamasdan ko'rish.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </Label>
-                <Switch
-                  id={`streaming-${id}`}
-                  checked={!!data.supportsStreaming}
-                  onCheckedChange={(checked) =>
-                    handleUpdate({ supportsStreaming: checked })
-                  }
-                />
-              </div>
-            </div>
-
             {/* Caption */}
             <div className="grid gap-2">
               <Label>Video matni (Caption)</Label>
-              <TextareaAutosize
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+
+              <TextArea
                 placeholder="Video uchun matn kiriting..."
-                value={data.caption || ""}
-                onChange={(e) => handleUpdate({ caption: e.target.value })}
-                maxLength={1024}
+                defaultValue={data.caption}
+                onChange={(value) => handleUpdate({ caption: value })}
               />
               <div
                 className={cn(
@@ -335,15 +257,18 @@ const SendVideoNodeComponent = ({
                 {captionLength}/1024
               </div>
             </div>
+
+            <ActionNodeSettings
+              contentProtected={data.protectContent}
+              notificationDisabled={data.disableNotification}
+              parseMode={data.parseMode}
+              handleUpdate={handleUpdate}
+            />
           </CardContent>
 
-          <NodeFooter
-            nodeId={id}
-            keyboard={data.keyboard}
-            disableNotification={data.disableNotification}
-            protectContent={data.protectContent}
-            onUpdate={handleUpdate}
-          />
+          <CardFooter>
+            <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+          </CardFooter>
         </>
       )}
 

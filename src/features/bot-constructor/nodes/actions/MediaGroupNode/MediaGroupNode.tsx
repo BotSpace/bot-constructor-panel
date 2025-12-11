@@ -2,7 +2,7 @@
 
 import { useState, memo } from "react";
 import { NodeProps } from "reactflow";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,22 +16,10 @@ import {
 import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 import { Plus, Trash2 } from "lucide-react";
-
-interface MediaItem {
-  type: "photo" | "video" | "audio" | "document";
-  sourceType: "file_id" | "url";
-  fileId?: string;
-  url?: string;
-  caption?: string;
-}
-
-interface MediaGroupNodeData {
-  mediaItems?: MediaItem[];
-  disableNotification?: boolean;
-}
+import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
+import { MediaGroupNodeData, MediaItem } from "./types";
 
 const MediaGroupNodeInternal = ({
   id,
@@ -202,7 +190,10 @@ const MediaGroupNodeInternal = ({
         </CardContent>
       )}
 
-      <NodeFooter nodeId={id} />
+      <CardFooter>
+        <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+      </CardFooter>
+
       <SourceHandles />
     </Card>
   );

@@ -3,7 +3,7 @@
 import { useState, memo, useRef } from "react";
 import { NodeProps } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,12 +22,12 @@ import { uploadFile } from "@/services/requests/file";
 import { Upload, Loader2, CheckCircle2 } from "lucide-react";
 import useProjectStore from "@/features/bot-constructor/store/project";
 
-import { NodeFooter } from "../shared/NodeFooter";
 import { NodeHeader } from "../shared/NodeHeader";
 import { FileText } from "lucide-react";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
+import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
 
 const SendFileNodeComponent = ({
   id,
@@ -132,7 +132,7 @@ const SendFileNodeComponent = ({
                   handleUpdate({ fileSourceType: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Manbani tanlang..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -208,7 +208,9 @@ const SendFileNodeComponent = ({
                       </div>
                     )}
                   <div className="grid gap-1">
-                    <Label className="text-xs text-muted-foreground">UUID</Label>
+                    <Label className="text-xs text-muted-foreground">
+                      UUID
+                    </Label>
                     <Input
                       placeholder="UUID ni kiriting yoki fayl yuklang..."
                       value={data.uploadedFileUuid || ""}
@@ -221,33 +223,6 @@ const SendFileNodeComponent = ({
                 </div>
               )}
             </div>
-
-            {/* Maxsus muqova */}
-            <div className="flex items-center justify-between space-y-0 rounded-lg border p-3">
-              <div className="space-y-0.5">
-                <Label htmlFor={`custom-thumb-${id}`}>Maxsus muqova</Label>
-                <p className="text-xs text-muted-foreground">
-                  Fayl uchun rasmli muqova.
-                </p>
-              </div>
-              <Switch
-                id={`custom-thumb-${id}`}
-                checked={!!data.hasCustomThumbnail}
-                onCheckedChange={(checked) =>
-                  handleUpdate({ hasCustomThumbnail: checked })
-                }
-              />
-            </div>
-            {data.hasCustomThumbnail && (
-              <Input
-                placeholder="Muqova uchun File ID"
-                value={data.thumbnailFileId || ""}
-                onChange={(e) =>
-                  handleUpdate({ thumbnailFileId: e.target.value })
-                }
-                className="animate-in fade-in-50"
-              />
-            )}
 
             {/* Caption */}
             <div className="grid gap-2">
@@ -272,13 +247,9 @@ const SendFileNodeComponent = ({
             </div>
           </CardContent>
 
-          <NodeFooter
-            nodeId={id}
-            keyboard={data.keyboard}
-            disableNotification={data.disableNotification}
-            protectContent={data.protectContent}
-            onUpdate={handleUpdate}
-          />
+          <CardFooter>
+            <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+          </CardFooter>
         </>
       )}
 

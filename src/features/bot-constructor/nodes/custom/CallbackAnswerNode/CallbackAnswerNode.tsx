@@ -2,13 +2,18 @@
 
 import { NodeProps } from "reactflow";
 import { memo } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
-import { NodeFooter } from "../../actions/shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
+import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
+import { CallbackAnswerNodeData } from "./types";
 
-const CallbackAnswerNodeComponent = ({ id, data, selected }: NodeProps) => {
+const CallbackAnswerNodeComponent = ({
+  id,
+  data,
+  selected,
+}: NodeProps<CallbackAnswerNodeData>) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
@@ -16,7 +21,10 @@ const CallbackAnswerNodeComponent = ({ id, data, selected }: NodeProps) => {
       <div className="p-4 text-sm text-muted-foreground text-center">
         Inline tugmaga javob beradi
       </div>
-      <NodeFooter nodeId={id} />
+
+      <CardFooter>
+        <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+      </CardFooter>
       <SourceHandles />
     </Card>
   );
