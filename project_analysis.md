@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 12/6/2025, 4:05:20 PM
+Sana: 12/8/2025, 10:28:08 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -46,7 +46,6 @@ constructorr
 ├── scripts
 │   ├── analyze-project.js
 │   └── install.sh
-├── sidebar.txt
 ├── src
 │   ├── app
 │   │   ├── [lang]
@@ -168,7 +167,6 @@ constructorr
 │   │   │   │   └── useMessageTypes.ts
 │   │   │   ├── edges
 │   │   │   │   ├── SelectableEdge.tsx
-│   │   │   │   ├── SmartEdge.tsx
 │   │   │   │   ├── components
 │   │   │   │   │   └── EdgeContextMenu.tsx
 │   │   │   │   └── index.ts
@@ -208,12 +206,14 @@ constructorr
 │   │   │   │   │   └── settings.ts
 │   │   │   │   └── themes
 │   │   │   │       ├── ayu-mirage.ts
-│   │   │   │       └── botfather.ts
+│   │   │   │       ├── botfather.ts
+│   │   │   │       └── monokai.ts
 │   │   │   ├── hooks
 │   │   │   │   ├── useFlowKeyboardShortcuts.ts
 │   │   │   │   └── useMousePosition.ts
 │   │   │   ├── lib
 │   │   │   │   ├── edge-utils.ts
+│   │   │   │   ├── findNearestParentAction.ts
 │   │   │   │   └── geometry.ts
 │   │   │   ├── nodes
 │   │   │   │   ├── actions
@@ -244,7 +244,9 @@ constructorr
 │   │   │   │   │   │   ├── DownloadFileNode.tsx
 │   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── EditMessageNode
+│   │   │   │   │   │   ├── EditMessageNode copy.tsx
 │   │   │   │   │   │   ├── EditMessageNode.tsx
+│   │   │   │   │   │   ├── components
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── FileMessageNode
@@ -260,7 +262,8 @@ constructorr
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── MediaGroupNode
 │   │   │   │   │   │   ├── MediaGroupNode.tsx
-│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── PhotoMessageNode
 │   │   │   │   │   │   ├── PhotoMessageNode.tsx
 │   │   │   │   │   │   ├── index.ts
@@ -292,9 +295,6 @@ constructorr
 │   │   │   │   │   ├── UnpinMessageNode
 │   │   │   │   │   │   ├── UnpinMessageNode.tsx
 │   │   │   │   │   │   └── index.ts
-│   │   │   │   │   ├── VenueNode
-│   │   │   │   │   │   ├── VenueNode.tsx
-│   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── VideoMessageNode
 │   │   │   │   │   │   ├── VideoMessageNode.tsx
 │   │   │   │   │   │   ├── index.ts
@@ -307,9 +307,10 @@ constructorr
 │   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── shared
-│   │   │   │   │       ├── NodeFooter.tsx
+│   │   │   │   │       ├── ActionNodeSettings.tsx
 │   │   │   │   │       ├── NodeHeader.tsx
-│   │   │   │   │       └── RecipientSelector.tsx
+│   │   │   │   │       ├── RecipientSelector.tsx
+│   │   │   │   │       └── SettingsAction.tsx
 │   │   │   │   ├── components
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── shared
@@ -335,6 +336,7 @@ constructorr
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── ConditionNode
 │   │   │   │   │   │   ├── ConditionNode.tsx
+│   │   │   │   │   │   ├── ConditionNode.tsx.backup
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── CustomCodeNode
@@ -345,6 +347,14 @@ constructorr
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── DelayNode
 │   │   │   │   │   │   ├── DelayNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── ElseIfNode
+│   │   │   │   │   │   ├── ElseIfNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── ElseNode
+│   │   │   │   │   │   ├── ElseNode.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── HTTPRequestNode
@@ -458,6 +468,7 @@ constructorr
 │   └── wss
 │       └── web-socket-provider.tsx
 ├── stack.yaml
+├── todolsit.md
 ├── tsconfig.json
 └── tsconfig.tsbuildinfo
 ```

@@ -5,7 +5,6 @@ import { memo, useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import {
   SourceHandles,
   TargetHandles,
@@ -16,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { AlertCircle } from "lucide-react";
 
-interface DeleteMessageNodeData {
+export interface DeleteMessageNodeData {
   deleteFromContext?: boolean;
 }
 
@@ -120,7 +119,6 @@ const DeleteMessageNodeComponent = ({
         </CardContent>
       )}
 
-      <NodeFooter nodeId={id} />
       <SourceHandles />
     </Card>
   );

@@ -14,7 +14,6 @@ export { SendContactNode } from "./ContactNode";
 export { SendPollNode } from "./PollNode";
 export { SendStickerNode } from "./StickerNode";
 export { SendMediaGroupNode } from "./MediaGroupNode";
-export { SendVenueNode } from "./VenueNode";
 export { SendDiceNode } from "./DiceNode";
 
 // Message operations

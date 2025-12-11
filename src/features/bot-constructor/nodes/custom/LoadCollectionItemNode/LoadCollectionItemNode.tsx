@@ -17,11 +17,10 @@ import {
 import { useCollectionStore } from "@/features/collections/store/collection-list";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FilterBuilder } from "../../actions/TextMessageNode/components/filter/filter";
+import { FilterBuilder } from "../../actions/shared/filter/filter";
 import { useReactQueryAction } from "@/services/react-query";
 import { APIDetailCreateResponse } from "@/types/http/response";
 import { CollectionDetail } from "@/types/http/collection";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useNodes } from "reactflow";
 import { StateNodeData } from "../StateNode/types";
@@ -69,7 +68,7 @@ function LoadCollectionItemNode({
     <>
       <TargetHandles />
       <Card
-        className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}
+        className={cn("w-[700px] shadow-lg", selected && "ring-2 ring-primary")}
       >
         <NodeHeader
           icon={<Database className="text-primary" />}

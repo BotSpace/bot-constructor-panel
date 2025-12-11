@@ -13,7 +13,6 @@ import {
   SendPollNode,
   SendStickerNode,
   SendMediaGroupNode,
-  SendVenueNode,
   SendDiceNode,
   ForwardMessageNode,
   SendToAdminNode,
@@ -24,6 +23,7 @@ import {
   ChatActionNode,
   DownloadFileNode,
 } from "./actions";
+
 import {
   MessageTriggerNode,
   ReplyButtonTriggerNode,
@@ -47,13 +47,14 @@ import {
   CheckMembershipNode,
 } from "./custom";
 
-export const CustomNodes = {
-  // Triggers
+export const Triggers = {
   ReplyButtonTriggerNode,
   MessageTriggerNode,
   CallbackQueryTriggerNode,
   CommandTriggerNode,
+};
 
+export const ActionsTextAndMedia = {
   // Actions - Text and Media
   SendTextMessageNode,
   SendPhotoNode,
@@ -68,10 +69,10 @@ export const CustomNodes = {
   SendPollNode,
   SendStickerNode,
   SendMediaGroupNode,
-  SendVenueNode,
   SendDiceNode,
+};
 
-  // Actions - Message Operations
+export const ActionsMessageOperations = {
   EditMessageNode,
   ForwardMessageNode,
   SendToAdminNode,
@@ -81,14 +82,16 @@ export const CustomNodes = {
   DeleteMessageNode,
   ChatActionNode,
   DownloadFileNode,
+};
 
-  // Custom - Code and Data
+export const CustomNodesCodeAndData = {
   CustomCodeNode,
   StateNode,
   CollectionNode,
   LoadCollectionItemNode,
+};
 
-  // Custom - Flow Control
+export const CustomNodesFlowControl = {
   IfConditionNode,
   ElseIfNode,
   ElseNode,
@@ -96,8 +99,29 @@ export const CustomNodes = {
   RandomNode,
   VariableNode,
   CheckMembershipNode,
+};
 
-  // Custom - Integration
+export const CustomIntegration = {
   HTTPRequestNode,
   CallbackQueryAnswerNode,
+};
+
+export const CustomNodes = {
+  // Triggers
+  ...Triggers,
+
+  // Actions - Text and Media
+  ...ActionsTextAndMedia,
+
+  // Actions - Message Operations
+  ...ActionsMessageOperations,
+
+  // Custom - Code and Data
+  ...CustomNodesCodeAndData,
+
+  // Custom - Flow Control
+  ...CustomNodesFlowControl,
+
+  // Custom - Integration
+  ...CustomIntegration,
 };

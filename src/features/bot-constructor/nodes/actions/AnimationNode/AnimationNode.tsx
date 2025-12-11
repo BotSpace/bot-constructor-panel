@@ -2,21 +2,20 @@
 
 import { NodeProps } from "reactflow";
 import { memo } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
+import ComingSoonNodeContent from "../shared/ComingSoonNodeContent";
 
-const AnimationNodeComponent = ({ id, data, selected }: NodeProps) => {
+const AnimationNodeComponent = ({ selected }: NodeProps) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader icon="🎬" title="GIF yuborish" />
-      <div className="p-4 text-sm text-muted-foreground text-center">
-        GIF yoki MP4 animation yuboradi
-      </div>
-      <NodeFooter nodeId={id} />
+      <CardContent>
+        <ComingSoonNodeContent node_description="GIF yoki MP4 animation yuboradi" />
+      </CardContent>
       <SourceHandles />
     </Card>
   );

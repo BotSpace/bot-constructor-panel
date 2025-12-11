@@ -1,5 +1,4 @@
-import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator";
-import { KeyboardConfig } from "../TextMessageNode/types";
+import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -28,7 +27,6 @@ export interface SendFileNodeData {
   caption?: string;
 
   // Maxsus muqova (thumbnail)
-  hasCustomThumbnail?: boolean;
   thumbnailFileId?: string;
 
   // Faylga xos sozlamalar
@@ -38,5 +36,5 @@ export interface SendFileNodeData {
   disableNotification?: boolean;
   protectContent?: boolean;
 
-  keyboard?: KeyboardConfig;
+  keyboard: KeyboardConfig;
 }

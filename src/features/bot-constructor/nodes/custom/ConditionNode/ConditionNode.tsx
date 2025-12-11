@@ -5,10 +5,13 @@ import { memo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
-import { NodeFooter } from "../../actions/shared/NodeFooter";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { IfConditionNodeData, ConditionOperator, ConditionBranch } from "./types";
+import {
+  IfConditionNodeData,
+  ConditionOperator,
+  ConditionBranch,
+} from "./types";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -227,20 +230,20 @@ const IfConditionNodeComponent = ({
                 {!["is_empty", "not_empty", "exists", "not_exists"].includes(
                   condition.operator
                 ) && (
-                    <div className="flex flex-col gap-1">
-                      <Input
-                        placeholder="Qiymat (masalan: 1, John, {{other_var}})"
-                        value={condition.value?.toString() || ""}
-                        onChange={(e) =>
-                          updateCondition(index, { value: e.target.value })
-                        }
-                        className="text-sm"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Kontekstdan qiymat olish uchun {"{{var_name}}"}
-                      </p>
-                    </div>
-                  )}
+                  <div className="flex flex-col gap-1">
+                    <Input
+                      placeholder="Qiymat (masalan: 1, John, {{other_var}})"
+                      value={condition.value?.toString() || ""}
+                      onChange={(e) =>
+                        updateCondition(index, { value: e.target.value })
+                      }
+                      className="text-sm"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Kontekstdan qiymat olish uchun {"{{var_name}}"}
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
 
@@ -252,8 +255,6 @@ const IfConditionNodeComponent = ({
           </div>
         </CardContent>
       )}
-
-      <NodeFooter nodeId={id} />
 
       {/* Input - chap tomonda */}
       <TargetHandles />

@@ -40,11 +40,16 @@ export interface Actions {
     position: { x: number; y: number }
   ) => void;
   saveFlow: (project_id: string) => Promise<void>;
+  formatFlow: () => Promise<void>;
   loadFlow: (flow: FlowData["flow"]) => Promise<void>;
 }
 
 // Barcha qismlarni birlashtirgan yakuniy store tipi
-export interface FlowStoreState extends FlowSlice, ClipboardSlice, HistorySlice, Actions {
+export interface FlowStoreState
+  extends FlowSlice,
+    ClipboardSlice,
+    HistorySlice,
+    Actions {
   // UI holatlari
   initialState: { nodes: Node[]; edges: Edge[] } | null;
   isDirty: boolean;
