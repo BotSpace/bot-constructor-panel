@@ -1,0 +1,6 @@
+# minimumReleaseAge ni millisekundlarda belgilash
+minimumReleaseAge: 131400
+
+# pnpm-workspace.yaml yoki .npmrc ichida
+minimumReleaseAgeExclude:
+  - "next-auth"

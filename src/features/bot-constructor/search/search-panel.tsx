@@ -26,14 +26,14 @@ function SearchPanel({}: Props) {
     () => {
       toggleSearchPanel();
     },
-    { preventDefault: true }
+    { preventDefault: true },
   );
 
   // 👉 Best practice: useMemo bilan filterni optimallashtiramiz
   const filteredNodes = useMemo(() => {
     if (!search.trim()) return nodes; // bo‘sh bo‘lsa hamma node qaytadi
 
-    return nodes.filter((item) => {
+    return nodes.filter((item: any) => {
       const value = item.data.messageText || item.data.caption || "";
 
       return value.toLowerCase().includes(search.toLowerCase());
@@ -64,8 +64,8 @@ function SearchPanel({}: Props) {
         </InputGroupButton>
       </InputGroup>
 
-      <div className="mt-3 space-y-2">
-        {filteredNodes.map((item) => (
+      <div className="mt-3 space-y-2 h-full overflow-y-auto overflow-x-hidden">
+        {filteredNodes.map((item: any) => (
           <div
             onClick={() => {
               console.log(item);
