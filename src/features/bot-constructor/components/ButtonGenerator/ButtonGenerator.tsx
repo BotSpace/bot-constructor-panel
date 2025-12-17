@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ReactNode, useEffect, useRef, useEffectEvent } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
@@ -122,7 +122,7 @@ export function ButtonGenerator({
             onEditButton={(rowIndex, buttonId) => {
               // Find button to edit
               const button = currentButtons[rowIndex]?.find(
-                (b) => b.id === buttonId
+                (b) => b.id === buttonId,
               );
               if (button) {
                 setEditingButton({ rowIndex, buttonId, button });
@@ -144,7 +144,7 @@ export function ButtonGenerator({
               handleEditButton(
                 editingButton.rowIndex,
                 editingButton.buttonId,
-                updatedButton
+                updatedButton,
               );
               setEditingButton(null);
             }
