@@ -13,7 +13,7 @@ type Direction = "TB" | "LR"; // Top-Bottom yoki Left-Right
 export const getFormatFlow = (
   nodes: Node[],
   edges: Edge[],
-  direction: Direction = "TB"
+  direction: Direction = "TB",
 ) => {
   const isHorizontal = direction === "LR";
 
