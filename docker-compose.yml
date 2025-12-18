@@ -1,10 +1,11 @@
 services:
-  frontend:
+  next-app:
+    container_name: nextjs-node24
     build:
       context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - .:/app
-      - /app/node_modules
+      dockerfile: Dockerfile
+    restart: always
     ports:
       - "3000:3000"
+    environment:
+      - NODE_ENV=production

@@ -6,8 +6,11 @@ const isMono = process.env.MONO === "1";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = isMono
-  ? {}
+  ? {
+      output: 'standalone',
+  }
   : {
+      output: 'standalone',
       // switch when use port
       basePath: "/share",
       assetPrefix: "/share",
