@@ -31,6 +31,9 @@ import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
 import { useSearchStore } from "./search/search-store";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-is-mobile";
+import { OrientationGuard } from "@/components/common/OrientationGuard";
+import { isMotionValue } from "framer-motion";
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
@@ -80,7 +83,7 @@ export default function Constructor() {
   useFlowKeyboardShortcuts({
     containerRef: reactFlowWrapper,
     mousePosition: mousePosition,
-    onOpenPalette: () => {},
+    onOpenPalette: () => { },
   });
 
   // Countdown ni kamaytirish va save qilish
@@ -240,8 +243,14 @@ export default function Constructor() {
     { preventDefault: true }
   );
 
+  const isMobile = useIsMobile();
+
   return (
     <>
+      {
+        isMobile &&
+        <OrientationGuard />
+      }
       <ContextMenu>
         <ContextMenuTrigger
           className={cn({
@@ -280,7 +289,11 @@ export default function Constructor() {
             >
               <SaveStatusBadge className="absolute top-2 right-2 z-20" />
               <Background gap={24} color="#666" />
-              <MiniMap />
+              {
+                !isMobile && (
+                  <MiniMap />
+                )
+              }
               <Controls />
             </ReactFlow>
           </div>

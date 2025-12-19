@@ -20,6 +20,7 @@ import { StateNodeData } from "../nodes/custom/StateNode/types";
 import { SendLocationNodeData } from "../nodes/actions/LocationNode/types";
 import { CallbackAnswerNodeData } from "../nodes/custom/CallbackAnswerNode/types";
 import { getFormatFlow } from "../lib/format-flow";
+import { generateId } from "@/lib/utils";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
@@ -164,8 +165,7 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
   }
 };
 
-let nodeIdCounter = 0;
-const generateNodeId = () => `node_${nodeIdCounter++}`;
+const generateNodeId = () => `node_${generateId()}`;
 
 export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   set,
