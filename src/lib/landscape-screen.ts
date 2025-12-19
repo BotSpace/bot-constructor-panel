@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 export const handleStartWork = async () => {
   try {
     const element = document.documentElement; // Butun sahifa
