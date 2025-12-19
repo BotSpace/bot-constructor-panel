@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-export const handleStartWork = async () => {
+export const handleSetLandscape = async () => {
   try {
     const element = document.documentElement; // Butun sahifa
 
