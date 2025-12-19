@@ -32,8 +32,6 @@ import toast from "react-hot-toast";
 import { useSearchStore } from "./search/search-store";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import { OrientationGuard } from "@/components/common/OrientationGuard";
-import { isMotionValue } from "framer-motion";
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
@@ -247,10 +245,6 @@ export default function Constructor() {
 
   return (
     <>
-      {
-        isMobile &&
-        <OrientationGuard />
-      }
       <ContextMenu>
         <ContextMenuTrigger
           className={cn({

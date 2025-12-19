@@ -15,6 +15,8 @@ import { useCollectionStore } from "@/features/collections/store/collection-list
 import { useTranslations } from "next-intl";
 import { ReactFlowProvider } from "reactflow";
 import SearchPanel from "@/features/bot-constructor/search/search-panel";
+import { useIsMobile } from "@/hooks/use-is-mobile";
+import { OrientationGuard } from "@/components/common/OrientationGuard";
 
 export default function Page() {
   const { id }: { id: string } = useParams();
@@ -93,6 +95,10 @@ export default function Page() {
     };
   }, []); // Bo'sh massiv [] - bu effekt faqat bir marta, komponent yuklanganda ishga tushishini bildiradi
 
+  const isMobile = useIsMobile();
+  const [isOriented, setIsOriented] = useState(false)
+
+  if (isMobile && !isOriented) return <OrientationGuard handleOrientDevice={() => setIsOriented(true)} />
   return (
     <div className="flex flex-col min-h-screen">
       <head>
