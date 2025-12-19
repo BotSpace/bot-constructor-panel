@@ -130,8 +130,8 @@ export function AddEnvDialog({
                 ? "Yangilanmoqda..."
                 : "Qo'shilmoqda..."
               : isEdit
-              ? "Update Bot"
-              : "Add Bot"}
+                ? "Update Bot"
+                : "Add Bot"}
           </Button>
         </div>
       </DialogContent>
