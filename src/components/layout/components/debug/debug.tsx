@@ -9,6 +9,7 @@ import {
   Copy,
   Mail,
   Share2,
+  Play,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
@@ -131,7 +132,7 @@ export default function DebugActions() {
 
   if (project)
     return (
-      <ButtonGroup>
+      <ButtonGroup id="open-bot-btn">
         {project.debug.status === "running" ? (
           <>
             <Button onClick={handleStopBot} variant="outline">
@@ -148,7 +149,7 @@ export default function DebugActions() {
                 date={
                   new Date(
                     new Date(project.debug.updated_at).getTime() +
-                      30 * 60 * 1000
+                    30 * 60 * 1000
                   )
                 }
                 completed_component={null}
@@ -162,6 +163,42 @@ export default function DebugActions() {
             >
               <RotateCcw />
             </Button>
+
+            {/* open debug bot */}
+            <a
+              href={botLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <BotMessageSquare className="mr-2 h-4 w-4" />
+              Open bot
+            </a>
+
+            {/* share  */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Share
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleCopyLink}>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy link
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleShareViaGmail}>
+                  <Mail className="mr-2 h-4 w-4" />
+                  Send via Gmail
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleShareViaTelegram}>
+                  <BotMessageSquare className="mr-2 h-4 w-4" />
+                  Send via Telegram
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
           </>
         ) : project.debug.status === "initializing" ? (
           <Button variant="outline" disabled>
@@ -169,42 +206,10 @@ export default function DebugActions() {
           </Button>
         ) : (
           <Button onClick={handleRunAndRelaodDebugBot} variant="outline">
-            <BugPlay />
+            Run
+            <Play />
           </Button>
         )}
-
-        <a
-          href={botLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: "outline" })}
-        >
-          <BotMessageSquare className="mr-2 h-4 w-4" />
-          Open bot
-        </a>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <Share2 className="mr-2 h-4 w-4" />
-              Share
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleCopyLink}>
-              <Copy className="mr-2 h-4 w-4" />
-              Copy link
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleShareViaGmail}>
-              <Mail className="mr-2 h-4 w-4" />
-              Send via Gmail
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleShareViaTelegram}>
-              <BotMessageSquare className="mr-2 h-4 w-4" />
-              Send via Telegram
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </ButtonGroup>
     );
 }

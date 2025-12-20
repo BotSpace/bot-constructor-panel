@@ -7,6 +7,7 @@ export function useElements(): ElementTypes[] {
   return [
     {
       title: t("constructor.triggers.title"),
+      id: 'sidebar-triggers',
       elements: [
         {
           type: "message",
@@ -44,6 +45,7 @@ export function useElements(): ElementTypes[] {
     },
     {
       title: t("constructor.actions.title"),
+      id: "sidebar-actions",
       elements: [
         {
           type: "message",

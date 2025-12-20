@@ -60,7 +60,8 @@ function ReleasePanel() {
           handleCreateRelease();
         }}
       >
-        <Button>Publish</Button>
+        <Button id="version-switcher"
+        >Publish</Button>
       </AddEnvDialog>
     );
   }
@@ -69,6 +70,7 @@ function ReleasePanel() {
   if (!project?.release)
     return (
       <Button
+        id="version-switcher"
         onClick={() => handleCreateRelease()}
         className="cursor-pointer bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200"
       >
@@ -114,7 +116,9 @@ function ReleaseDropDown({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="cursor-pointer bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200">
+          <Button
+            id="version-switcher"
+            className="cursor-pointer bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200">
             Version {project?.release?.version}
           </Button>
         </DropdownMenuTrigger>
