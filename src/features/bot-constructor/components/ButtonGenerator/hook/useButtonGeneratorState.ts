@@ -219,5 +219,6 @@ export const useButtonGeneratorState = (
     handleRemoveRow,
     handleReorderRows,
     getFinalKeyboardConfig,
+    setCurrentButtons
   };
 };
