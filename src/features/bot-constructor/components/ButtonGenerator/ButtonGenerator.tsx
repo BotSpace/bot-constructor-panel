@@ -1,5 +1,3 @@
-// FAYL: constructor/components/ButtonGenerator/ButtonGenerator.tsx
-
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";

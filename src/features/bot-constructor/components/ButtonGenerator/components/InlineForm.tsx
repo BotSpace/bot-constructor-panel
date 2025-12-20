@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, Database, LayoutGrid, List } from "lucide-react";
+import { PlusCircle, Database, LayoutGrid } from "lucide-react";
 import { ButtonConfig, ButtonType, LoginUrlConfig } from "../types";
 import { WebAppForm } from "./WebAppForm";
 import { LoginUrlForm } from "./LoginUrlForm";
@@ -30,7 +30,6 @@ import {
 } from "@/components/ui/accordion";
 import { useNodes } from "reactflow";
 import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
@@ -38,7 +37,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CollectionLayoutPreview } from "./CollectionLayoutPreview";
+import SeparatorWithTitle from "@/components/common/separetor";
 
 interface InlineFormProps {
   onAdd: (button: ButtonConfig) => void;
@@ -59,19 +58,45 @@ const inlineOptions: {
   label: string;
   placeholder?: string;
 }[] = [
-  { value: "callback", label: "Callback Data", placeholder: "buyruq_nomi" },
-  { value: "url", label: "URL (Havola)", placeholder: "https://example.com" },
-  { value: "web_app", label: "Web App" },
-  { value: "login_url", label: "Login URL" },
+    { value: "callback", label: "Callback Data", placeholder: "buyruq_nomi" },
+    { value: "url", label: "URL (Havola)", placeholder: "https://example.com" },
+    { value: "web_app", label: "Web App" },
+    { value: "login_url", label: "Login URL" },
+    {
+      value: "switch_inline_query",
+      label: "Switch Inline (Global)",
+      placeholder: "qidiruv so`rovi...",
+    },
+    {
+      value: "switch_inline_query_current_chat",
+      label: "Switch Inline (Hozirgi chat)",
+      placeholder: "qidiruv so`rovi...",
+    },
+  ];
+
+// Common buttons configuration (Best Practice: Configuration over Code)
+const commonButtonGroups = [
   {
-    value: "switch_inline_query",
-    label: "Switch Inline (Global)",
-    placeholder: "qidiruv so`rovi...",
+    title: "Navigatsiya",
+    buttons: [
+      { label: "⬅️ Ortga", value: "back", variant: "outline" as const },
+      { label: "Oldinga ➡️", value: "next", variant: "outline" as const },
+      { label: "⏭ O'tkazib yuborish", value: "skip", variant: "outline" as const },
+    ],
   },
   {
-    value: "switch_inline_query_current_chat",
-    label: "Switch Inline (Hozirgi chat)",
-    placeholder: "qidiruv so`rovi...",
+    title: "Tasdiqlash",
+    buttons: [
+      { label: "✅ Tasdiqlash", value: "confirm", variant: "default" as const },
+      { label: "❌ Bekor qilish", value: "cancel", variant: "destructive" as const },
+    ],
+  },
+  {
+    title: "Menyu",
+    buttons: [
+      { label: "🏠 Bosh menyu", value: "main_menu", variant: "secondary" as const },
+      { label: "📋 Menyu", value: "menu", variant: "secondary" as const },
+    ],
   },
 ];
 
@@ -89,9 +114,9 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
   const [filters, setFilters] = useState<Filter[]>([]);
 
   // Layout settings - pagination uchun
-  const [columns, setColumns] = useState<number>(2); // Har qatorda 2 ta
-  const [rows, setRows] = useState<number>(5); // 5 qator
-  const [enablePagination, setEnablePagination] = useState<boolean>(true); // Pagination yoqilgan/o'chirilgan
+  const [columns, setColumns] = useState<number>(2);
+  const [rows, setRows] = useState<number>(5);
+  const [enablePagination, setEnablePagination] = useState<boolean>(true);
 
   // Collection field'larini olish
   const { data: collectionFields } = useReactQueryAction<
@@ -123,7 +148,6 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
     setSelectedCollection(collectionName);
     setSelectedField("");
     setFilters([]);
-    // Reset layout to default
     setColumns(2);
     setRows(5);
     setEnablePagination(true);
@@ -157,7 +181,7 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
         }
         newButton.webApp = { url: webAppUrl };
         break;
-      default: // url, callback, switch_*
+      default:
         if (!value) {
           alert("Iltimos, amal uchun qiymat kiriting.");
           return;
@@ -189,23 +213,19 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
 
     if (!field) return;
 
-    // Field nomini button text sifatida ishlatish
     const buttonText = `📦 ${field.name}`;
 
-    // Collection ma'lumotlarini object ko'rinishida saqlash
     const collectionData = {
       collection: selectedCollection,
       field: field.name,
       ...(filters.length > 0 && { filters }),
       layout: {
-        columns, // Har qatorda nechta tugma
-        rows, // Har sahifada nechta qator
-        // Jami: columns × rows = bir sahifada tugmalar soni
+        columns,
+        rows,
       },
-      enablePagination, // Pagination yoqilgan/o'chirilgan
+      enablePagination,
     };
 
-    // Callback data - backward compatibility uchun
     const callbackData = `collection_${selectedCollection}_field_${field.name}`;
 
     onAdd({
@@ -216,13 +236,24 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
       collectionData,
     });
 
-    // Tozalash
     setSelectedCollection("");
     setSelectedField("");
     setFilters([]);
     setColumns(2);
     setRows(5);
     setEnablePagination(true);
+  };
+
+  // Common buttonlarni qo'shish funksiyasi
+  const handleAddCommonButton = (btnLabel: string, btnValue: string) => {
+    const newButton: ButtonConfig = {
+      id: `btn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Unikal ID
+      text: btnLabel,
+      type: "callback",
+      value: btnValue,
+    };
+
+    onAdd(newButton);
   };
 
   return (
@@ -267,21 +298,49 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
         {(actionType === "url" ||
           actionType === "callback" ||
           actionType.startsWith("switch_")) && (
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="inline-value">{selectedOption?.label}</Label>
-            <Input
-              id="inline-value"
-              placeholder={selectedOption?.placeholder}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-            />
-          </div>
-        )}
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="inline-value">{selectedOption?.label}</Label>
+              <Input
+                id="inline-value"
+                placeholder={selectedOption?.placeholder}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+              />
+            </div>
+          )}
       </div>
 
       <Button type="submit" className="w-full" disabled={disabled}>
         <PlusCircle className="mr-2 h-4 w-4" /> Inline Tugma Qo'shish
       </Button>
+
+      <SeparatorWithTitle>Tezkor Tugmalar (Common)</SeparatorWithTitle>
+
+      {/* Common buttons section */}
+      <div className="space-y-3">
+        {commonButtonGroups.map((group, index) => (
+          <div key={index} className="space-y-2">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              {group.title}
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {group.buttons.map((btn, btnIndex) => (
+                <Button
+                  key={btnIndex}
+                  type="button"
+                  onClick={() => handleAddCommonButton(btn.label, btn.value)}
+                  variant={btn.variant}
+                  size="sm"
+                  disabled={disabled}
+                  className="shadow-sm"
+                >
+                  {btn.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Collection-based button yaratish */}
       {collections && collections.length > 0 && (
@@ -378,25 +437,15 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
                       <AccordionContent className="pt-4">
                         <FilterBuilder
                           fields={[
-                            // Default _id field
                             {
                               id: "_id",
                               label: "id",
                               type: "text" as const,
                             },
-                            // Collection field'lari
                             ...collectionFields.data.fields.map((field) => ({
-                              id: field.name, // Field nomini id sifatida ishlatish
+                              id: field.name,
                               label: field.name,
-                              type: field.type as
-                                | "text"
-                                | "number"
-                                | "bool"
-                                | "datetime"
-                                | "file"
-                                | "audio"
-                                | "video"
-                                | "photo",
+                              type: field.type as any,
                             })),
                           ]}
                           filters={filters}
@@ -515,12 +564,6 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
                           />
                         </div>
                       </div>
-
-                      <p className="text-xs text-muted-foreground">
-                        {enablePagination
-                          ? "Qolgan tugmalar keyingi sahifalarda ko'rsatiladi"
-                          : "Barcha tugmalar bir vaqtda ko'rsatiladi"}
-                      </p>
                     </CardContent>
                   </Card>
 
