@@ -260,6 +260,7 @@ export default function Constructor() {
             onMouseDown={handleContainerClick}
           >
             <ReactFlow
+              id="canvas-area"
               defaultViewport={getInitialViewport()}
               onMoveEnd={onMoveEnd}
               nodeTypes={CustomNodes}

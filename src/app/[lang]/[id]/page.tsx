@@ -17,6 +17,7 @@ import { ReactFlowProvider } from "reactflow";
 import SearchPanel from "@/features/bot-constructor/search/search-panel";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { OrientationGuard } from "@/components/common/OrientationGuard";
+import { TourWelcomeModal } from "@/features/bot-constructor/guide-tour/tour-welcome";
 
 export default function Page() {
   const { id }: { id: string } = useParams();
@@ -108,13 +109,15 @@ export default function Page() {
       {/* Header */}
       <ConstructorPageHeader />
 
+      <TourWelcomeModal />
+
       <div className="flex">
         {/* Components Panel */}
         <ScrollArea className="relative h-[calc(100vh-56px)] flex flex-col w-72 border-r border-white/[0.08]">
           {/* Panel Header */}
           <div className="border-b border-white/[0.08] p-4 sticky top-0 bg-background">
             {/* Search */}
-            <div className="relative">
+            <div className="relative search-components-input">
               <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
               <Input
                 // Ref'ni inputga bog'laymiz
@@ -138,7 +141,7 @@ export default function Page() {
                   (group) =>
                     // Guruh null bo'lishi mumkinligi uchun qo'shimcha tekshiruv
                     group && (
-                      <div key={group.title} className="mb-4">
+                      <div id={group.id} key={group.title} className="mb-4">
                         <h3 className="text-xs font-semibold mb-2">
                           {group.title}
                         </h3>

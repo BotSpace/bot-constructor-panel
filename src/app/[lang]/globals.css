@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+body,
+* {
+  scroll-behavior: smooth;
+}
+
 /* customizatio */
 .editorText {
   font-family: "Fira Code", monospace, "Droid Sans Mono", "monospace", monospace;
@@ -127,6 +132,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -212,6 +218,8 @@
 .codex-editor ::selection,
 .codex-editor ::-moz-selection,
 .ce-block--selected .ce-block__content {
-  background: #123998; /* Orqa fon sariq */
-  color: white; /* Matn qora */
+  background: #123998;
+  /* Orqa fon sariq */
+  color: white;
+  /* Matn qora */
 }
