@@ -19,6 +19,13 @@ import {
   Database,
   LayoutGrid,
   TextIcon,
+  CheckCircle2,
+  XCircle,
+  Menu,
+  ArrowLeft,
+  ArrowRight,
+  SkipForward,
+  Home,
 } from "lucide-react";
 import { ButtonConfig } from "../types";
 import { WebAppForm } from "./WebAppForm";
@@ -60,18 +67,45 @@ const replyOptions: {
   label: string;
   icon?: React.ReactNode;
 }[] = [
+    {
+      value: "reply",
+      label: "Matnli tugma",
+      icon: <TextIcon className="h-4 w-4" />,
+    },
+    { value: "web_app", label: "Web App", icon: <Globe className="h-4 w-4" /> },
+    {
+      value: "request_poll",
+      label: "So'rovnoma",
+      icon: <BarChart3 className="h-4 w-4" />,
+    },
+  ];
+
+// Common buttons configuration (Reply tugmalar uchun text = value bo'ladi)
+const commonButtonGroups = [
   {
-    value: "reply",
-    label: "Matnli tugma",
-    icon: <TextIcon className="h-4 w-4" />,
+    title: "Navigatsiya",
+    buttons: [
+      { label: "⬅️ Ortga", variant: "outline" as const },
+      { label: "Oldinga ➡️", variant: "outline" as const },
+      { label: "⏭ O'tkazib yuborish", variant: "outline" as const },
+    ],
   },
-  { value: "web_app", label: "Web App", icon: <Globe className="h-4 w-4" /> },
   {
-    value: "request_poll",
-    label: "So'rovnoma",
-    icon: <BarChart3 className="h-4 w-4" />,
+    title: "Tasdiqlash",
+    buttons: [
+      { label: "✅ Tasdiqlash", variant: "default" as const },
+      { label: "❌ Bekor qilish", variant: "destructive" as const },
+    ],
+  },
+  {
+    title: "Menyu",
+    buttons: [
+      { label: "🏠 Bosh menyu", variant: "secondary" as const },
+      { label: "📋 Menyu", variant: "secondary" as const },
+    ],
   },
 ];
+
 
 export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
   const [text, setText] = useState("");
@@ -85,10 +119,10 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
   const [selectedField, setSelectedField] = useState<string>("");
   const [filters, setFilters] = useState<Filter[]>([]);
 
-  // Layout settings - pagination uchun
-  const [columns, setColumns] = useState<number>(2); // Har qatorda 2 ta
-  const [rows, setRows] = useState<number>(5); // 5 qator
-  const [enablePagination, setEnablePagination] = useState<boolean>(true); // Pagination yoqilgan/o'chirilgan
+  // Layout settings
+  const [columns, setColumns] = useState<number>(2);
+  const [rows, setRows] = useState<number>(5);
+  const [enablePagination, setEnablePagination] = useState<boolean>(true);
 
   // Collection field'larini olish
   const { data: collectionFields } = useReactQueryAction<
@@ -115,12 +149,10 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
     return Array.from(stateKeys).sort();
   }, [nodes]);
 
-  // Collection o'zgarganda filter'larni tozalash
   const handleCollectionChange = (collectionName: string) => {
     setSelectedCollection(collectionName);
     setSelectedField("");
     setFilters([]);
-    // Reset layout to default
     setColumns(2);
     setRows(5);
     setEnablePagination(true);
@@ -152,50 +184,62 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
         newButton.pollType = pollType;
         break;
       case "reply":
-        // Oddiy reply button, hech qanday qo'shimcha ma'lumot kerak emas
         break;
     }
 
     onAdd(newButton as ButtonConfig);
-    // Formalarni tozalash
     setText("");
     setWebAppUrl("");
     setActionType("reply");
     setPollType("regular");
   };
 
+  // Maxsus so'rovlar (Contact, Location, Poll)
   const handleAddSpecial = (
     type: "request_contact" | "request_location" | "request_poll"
   ) => {
     let newButton: ButtonConfig;
+    const uniqueId = `btn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     switch (type) {
       case "request_contact":
         newButton = {
-          id: `btn-${Date.now()}`,
+          id: uniqueId,
           text: "📱 Kontaktimni yuborish",
           type,
         };
         break;
       case "request_location":
         newButton = {
-          id: `btn-${Date.now()}`,
+          id: uniqueId,
           text: "📍 Joylashuvimni yuborish",
           type,
         };
         break;
       case "request_poll":
         newButton = {
-          id: `btn-${Date.now()}`,
-          text: `📊 So'rovnoma yaratish (${pollType})`,
+          id: uniqueId,
+          text: `📊 So'rovnoma yaratish (${pollType === 'quiz' ? 'Viktorina' : 'Oddiy'})`,
           type,
           pollType,
         };
         break;
+      default:
+        return;
     }
     onAdd(newButton);
   };
 
-  // Collection-based button yaratish
+  // Common Text Buttons qo'shish
+  const handleAddCommonButton = (btnLabel: string) => {
+    const newButton: ButtonConfig = {
+      id: `btn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      text: btnLabel,
+      type: "reply",
+    };
+    onAdd(newButton);
+  };
+
   const handleAddCollectionButton = () => {
     if (!selectedCollection || !selectedField) {
       alert("Iltimos, collection va field tanlang.");
@@ -208,20 +252,17 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
 
     if (!field) return;
 
-    // Field nomini button text sifatida ishlatish
     const buttonText = `📦 ${field.name}`;
 
-    // Collection ma'lumotlarini object ko'rinishida saqlash
     const collectionData = {
       collection: selectedCollection,
       field: field.name,
       ...(filters.length > 0 && { filters }),
       layout: {
-        columns, // Har qatorda nechta tugma
-        rows, // Har sahifada nechta qator
-        // Jami: columns × rows = bir sahifada tugmalar soni
+        columns,
+        rows,
       },
-      enablePagination, // Pagination yoqilgan/o'chirilgan
+      enablePagination,
     };
 
     onAdd({
@@ -231,7 +272,6 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
       collectionData,
     });
 
-    // Tozalash
     setSelectedCollection("");
     setSelectedField("");
     setFilters([]);
@@ -304,10 +344,38 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
         </Button>
       </form>
 
+      <SeparatorWithTitle>Tezkor Tugmalar (Common)</SeparatorWithTitle>
+
+      {/* Common Buttons Section */}
+      <div className="space-y-3">
+        {commonButtonGroups.map((group, index) => (
+          <div key={index} className="space-y-2">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              {group.title}
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {group.buttons.map((btn, btnIndex) => (
+                <Button
+                  key={btnIndex}
+                  type="button"
+                  onClick={() => handleAddCommonButton(btn.label)}
+                  variant={btn.variant}
+                  size="sm"
+                  disabled={disabled}
+                  className="shadow-sm"
+                >
+                  {btn.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
       <SeparatorWithTitle>Maxsus so'rovlar</SeparatorWithTitle>
 
       {/* Maxsus so'rov tugmalari */}
-      <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
         <Button
           variant="outline"
           className="w-full justify-start"
@@ -315,7 +383,7 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
           onClick={() => handleAddSpecial("request_contact")}
           disabled={disabled}
         >
-          <Smartphone className="mr-2 h-4 w-4" /> Kontakt so'rash
+          <Smartphone className="mr-2 h-4 w-4" /> Kontakt
         </Button>
         <Button
           variant="outline"
@@ -324,17 +392,17 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
           onClick={() => handleAddSpecial("request_location")}
           disabled={disabled}
         >
-          <MapPin className="mr-2 h-4 w-4" /> Joylashuv so'rash
+          <MapPin className="mr-2 h-4 w-4" /> Joylashuv
         </Button>
 
-        <div className="flex gap-2 items-end">
-          <div className="flex-grow space-y-2">
-            <Label>So'rovnoma turi</Label>
+        <div className="col-span-2 flex gap-2 items-center bg-muted/40 p-2 rounded-md border">
+          <div className="flex-grow space-y-1">
+            <Label className="text-xs">So'rovnoma turi</Label>
             <Select
               value={pollType}
               onValueChange={(v: "quiz" | "regular") => setPollType(v)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-8">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -346,10 +414,11 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
           <Button
             variant="outline"
             type="button"
+            className="self-end"
             onClick={() => handleAddSpecial("request_poll")}
             disabled={disabled}
           >
-            <BarChart3 className="mr-2 h-4 w-4" /> Qo'shish
+            <BarChart3 className="mr-2 h-4 w-4" /> Poll Qo'shish
           </Button>
         </div>
       </div>
@@ -452,25 +521,15 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
                       <AccordionContent className="pt-4">
                         <FilterBuilder
                           fields={[
-                            // Default _id field
                             {
                               id: "_id",
                               label: "id",
                               type: "text" as const,
                             },
-                            // Collection field'lari
                             ...collectionFields.data.fields.map((field) => ({
-                              id: field.name, // Field nomini id sifatida ishlatish
+                              id: field.name,
                               label: field.name,
-                              type: field.type as
-                                | "text"
-                                | "number"
-                                | "bool"
-                                | "datetime"
-                                | "file"
-                                | "audio"
-                                | "video"
-                                | "photo",
+                              type: field.type as any,
                             })),
                           ]}
                           filters={filters}
@@ -589,12 +648,6 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
                           />
                         </div>
                       </div>
-
-                      <p className="text-xs text-muted-foreground">
-                        {enablePagination
-                          ? "Qolgan tugmalar keyingi sahifalarda ko'rsatiladi"
-                          : "Barcha tugmalar bir vaqtda ko'rsatiladi"}
-                      </p>
                     </CardContent>
                   </Card>
 
