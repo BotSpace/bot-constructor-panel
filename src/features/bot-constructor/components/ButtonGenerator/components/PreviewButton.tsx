@@ -24,7 +24,7 @@ export const PreviewButton = ({
   isDraggable = true,
 }: PreviewButtonProps) => {
   const isCollectionButton = !!button.collectionData;
-  
+
   const {
     attributes,
     listeners,
@@ -38,19 +38,19 @@ export const PreviewButton = ({
     transform: CSS.Transform.toString(transform),
     transition,
   };
-  
+
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        "relative group overflow-hidden",
+        "relative group",
         isFullWidth ? "flex-grow" : "flex-1",
         isDragging && "opacity-50 z-50"
       )}
     >
-      <Button 
-        variant="outline" 
+      <Button
+        variant="outline"
         className={cn(
           "w-full truncate pr-16 pl-8",
           isCollectionButton && "border-primary/40 bg-primary/5",
@@ -59,21 +59,21 @@ export const PreviewButton = ({
       >
         {/* Drag Handle */}
         {isDraggable && (
-          <div 
-            {...attributes} 
+          <div
+            {...attributes}
             {...listeners}
             className="absolute left-1 top-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
           >
             <GripVertical className="h-4 w-4" />
           </div>
         )}
-        
+
         {getIconForButton(button)}
         <span className="truncate">{button.text}</span>
-        
+
         {isCollectionButton && button.collectionData?.layout && (
-          <Badge 
-            variant="outline" 
+          <Badge
+            variant="outline"
             className="ml-auto mr-2 text-[10px] px-1.5 py-0 h-4 bg-primary/10 border-primary/30"
           >
             <Database className="h-2.5 w-2.5 mr-0.5" />
@@ -81,7 +81,7 @@ export const PreviewButton = ({
           </Badge>
         )}
       </Button>
-      
+
       {/* Action Buttons */}
       <div className="absolute -top-1 -right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         {onEdit && !isCollectionButton && (

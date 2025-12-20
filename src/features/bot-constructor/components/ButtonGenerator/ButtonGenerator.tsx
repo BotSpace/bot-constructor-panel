@@ -1,6 +1,8 @@
+// FAYL: constructor/components/ButtonGenerator/ButtonGenerator.tsx
+
 "use client";
 
-import { useState, ReactNode, useEffect, useRef, useEffectEvent } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
@@ -18,7 +20,7 @@ import { calculateActiveButtonCount } from "./utils";
 
 interface ButtonGeneratorProps {
   initialKeyboard: KeyboardConfig;
-  node_id: string; // Node ID uchun (agar kerak bo'lsa)
+  node_id: string;
 }
 
 export function ButtonGenerator({
@@ -26,7 +28,7 @@ export function ButtonGenerator({
   node_id,
 }: ButtonGeneratorProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [buttonCount, setButtonCount] = useState(() => 0);
+  const [buttonCount, setButtonCount] = useState(0);
 
   const [editingButton, setEditingButton] = useState<{
     rowIndex: number;
@@ -40,27 +42,26 @@ export function ButtonGenerator({
     selectedRowIndex,
     setSelectedRowIndex,
     currentButtons,
+    setCurrentButtons, // Hookdan qaytishi kerak
     isCurrentRowFull,
     MAX_BUTTONS_PER_ROW,
     handleAddButton,
     handleAddRow,
     handleRemoveButton,
     handleEditButton,
-    handleReorderButtons,
     handleRemoveRow,
-    handleReorderRows,
     getFinalKeyboardConfig,
   } = useButtonGeneratorState(isOpen, keyboards);
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
-  // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
   const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
     updateNodeData(node_id, update);
   };
 
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // 1. Avtosave logikasi
   useEffect(() => {
     if (!isOpen) return;
 
@@ -79,9 +80,18 @@ export function ButtonGenerator({
     };
   }, [isOpen, currentButtons, activeTab]);
 
+  // 2. Button count logikasi (TUZATILDI)
   useEffect(() => {
-    setButtonCount(calculateActiveButtonCount(keyboards));
+    const newCount = calculateActiveButtonCount(keyboards);
+    // Faqat qiymat haqiqatan o'zgarganda state yangilanadi
+    setButtonCount((prev) => (prev !== newCount ? newCount : prev));
   }, [keyboards]);
+
+  // 3. Layout o'zgarishini boshqarish (TUZATILDI)
+  // useCallback ishlatildi va state yangilash callback orqali bajarildi
+  const handleLayoutChange = useCallback((newLayout: ButtonConfig[][]) => {
+    setCurrentButtons(() => newLayout);
+  }, [setCurrentButtons]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -119,8 +129,8 @@ export function ButtonGenerator({
             onSelectRow={setSelectedRowIndex}
             onAddRow={handleAddRow}
             onRemoveButton={handleRemoveButton}
+            onChangeLayout={handleLayoutChange}
             onEditButton={(rowIndex, buttonId) => {
-              // Find button to edit
               const button = currentButtons[rowIndex]?.find(
                 (b) => b.id === buttonId
               );
@@ -128,13 +138,10 @@ export function ButtonGenerator({
                 setEditingButton({ rowIndex, buttonId, button });
               }
             }}
-            onReorderButtons={handleReorderButtons}
             onRemoveRow={handleRemoveRow}
-            onReorderRows={handleReorderRows}
           />
         </div>
 
-        {/* Edit Button Dialog */}
         <EditButtonDialog
           button={editingButton?.button || null}
           isOpen={!!editingButton}
