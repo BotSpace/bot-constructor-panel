@@ -11,6 +11,7 @@ export const textFilters = [
   { value: "regex", label: "Regex" },
   { value: "command", label: "Buyruq" },
 ];
+export type TextFilterValueTypes = (typeof textFilters)[number]['value']
 
 // Callback Query uchun maxsus filtrlar
 export const callbackFilters = [
@@ -21,24 +22,31 @@ export const callbackFilters = [
   { value: "starts_with", label: "Boshlanadi" },
   { value: "regex", label: "Regex" },
 ];
+export type CallbackFilterValueTypes = (typeof callbackFilters)[number]['value']
+
 
 // Joylashuv uchun filtrlar
 export const locationFilters = [
   ...anyFilter,
   { value: "radius", label: "Radius (ichida)" },
 ];
+export type locationFilterValueTypes = (typeof locationFilters)[number]['value']
+
 
 // Fayllar (rasm, video, audio, hujjat) uchun filtrlar
 export const fileFilters = [
   ...anyFilter,
   { value: "size", label: "Hajm (MB)" },
 ];
+export type fileFilterValueTypes = (typeof fileFilters)[number]['value']
+
 
 // Hujjatlar uchun maxsus qo'shimcha filtr
 export const documentFilters = [
   ...fileFilters,
   { value: "extension", label: "Kengaytmasi" },
 ];
+export type documentFilterValueTypes = (typeof documentFilters)[number]['value']
 
 // Barcha filtrlar to'plami
 export const Filters = {
@@ -49,3 +57,4 @@ export const Filters = {
   documentFilters,
   anyFilter, // Faqat "Har qanday" kerak bo'lganda ishlatish uchun
 };
+

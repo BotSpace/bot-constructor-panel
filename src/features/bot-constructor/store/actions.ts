@@ -131,6 +131,8 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
       return {
         ...baseTriggerData,
         global: false,
+        type: "text",
+        filter: "any",
       } as MessageTriggerNodeData;
     case "ReplyButtonTriggerNode":
       return {

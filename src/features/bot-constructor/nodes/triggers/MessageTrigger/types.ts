@@ -1,3 +1,6 @@
+import { ConstructorData } from "@/features/bot-constructor/data";
+import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
+
 // Murakkab context'lar uchun tiplar
 interface RadiusContext {
   lat?: string; // Faqat string
@@ -10,10 +13,11 @@ interface SizeContext {
   max?: string;
 }
 
+
 // Bizning node saqlaydigan asosiy ma'lumotlar strukturasi
 export interface MessageTriggerNodeData {
-  type?: string;
-  filter?: string;
+  type: MessageTriggerValueTypes;
+  filter?: "any" | string;
   global: boolean;
 
   context?: {
