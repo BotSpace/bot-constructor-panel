@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css"; // CSSni unutmaslik kerak!
-import { Sparkles, Map, X } from "lucide-react";
+import { Sparkles, Map } from "lucide-react";
 import { tourConfig } from "@/lib/tour-steps";
 
 export function TourWelcomeModal() {
@@ -20,7 +20,8 @@ export function TourWelcomeModal() {
 
   useEffect(() => {
     const hasSeenTour = localStorage.getItem("hasSeenTour");
-    if (hasSeenTour) {
+
+    if (!hasSeenTour) {
       const timer = setTimeout(() => setOpen(true), 1500);
       return () => clearTimeout(timer);
     }
