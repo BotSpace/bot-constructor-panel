@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   constructor:
-    image: registry.jscorp.uz/botmother-constructor:86
+    image: registry.jscorp.uz/botmother-constructor:87
     ports:
       - mode: ingress
         target: 3000
