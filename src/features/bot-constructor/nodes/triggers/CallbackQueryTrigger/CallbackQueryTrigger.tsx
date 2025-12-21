@@ -85,14 +85,14 @@ const CallbackQueryTriggerNodeComponent = ({
 
       // Collection button (dynamic)
       if (button.collectionData) {
-        const { collection, text } = button.collectionData;
+        const { collection, field } = button.collectionData;
         callbacks.push({
           id: button.id,
           text: button.text.replace("📦 ", ""),
-          value: `collection:${collection}:${text}`,
+          value: `collection:${collection}:${field}`,
           isCollection: true,
           collectionName: collection,
-          fieldName: text,
+          fieldName: field,
         });
       }
     }
