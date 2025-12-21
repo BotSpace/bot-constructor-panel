@@ -10,13 +10,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useParams } from "next/navigation";
 import React from "react";
-import { AddEnvDialog } from "../add-env";
+import { AddEditEnvDialog } from "../add-env";
 import {
   Activity,
   Bot,
   ChevronRight,
   ExternalLink,
   ListTree,
+  RotateCcwKey,
 } from "lucide-react";
 import { instanceAuth } from "@/services/instance";
 import toast from "react-hot-toast";
@@ -50,7 +51,7 @@ function ReleasePanel() {
   // relase uchun bot tayinlash
   if (!project?.release_bot) {
     return (
-      <AddEnvDialog
+      <AddEditEnvDialog
         env_name="RELEASE_BOT_TOKEN"
         project_id={id}
         dialog_title="Release Bot qo‘shish"
@@ -60,9 +61,8 @@ function ReleasePanel() {
           handleCreateRelease();
         }}
       >
-        <Button id="version-switcher"
-        >Publish</Button>
-      </AddEnvDialog>
+        <Button id="version-switcher">Publish</Button>
+      </AddEditEnvDialog>
     );
   }
 
@@ -118,7 +118,8 @@ function ReleaseDropDown({
         <DropdownMenuTrigger asChild>
           <Button
             id="version-switcher"
-            className="cursor-pointer bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200">
+            className="cursor-pointer bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200"
+          >
             Version {project?.release?.version}
           </Button>
         </DropdownMenuTrigger>
@@ -145,10 +146,18 @@ function ReleaseDropDown({
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem>
-              <Activity />
-              12 changes
-            </DropdownMenuItem>
+            <AddEditEnvDialog
+              env_name="RELEASE_BOT_TOKEN"
+              project_id={id}
+              dialog_title="Release Bot yangilash"
+              dialog_description="Yangi bot tokenini kiriting"
+              isEdit={true}
+            >
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <RotateCcwKey className="h-4 w-4" />
+                <span>Token yangilash</span>
+              </DropdownMenuItem>
+            </AddEditEnvDialog>
             <DropdownMenuSeparator className="my-2" />
             <DropdownMenuItem asChild>
               <Button
