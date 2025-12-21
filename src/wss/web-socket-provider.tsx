@@ -33,12 +33,13 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             if (
               version > (project.release?.version || 0) &&
               project.id === message["data"]["project"]
-            )
+            ) {
+              changeProject({
+                ...project,
+                release_bot: true,
+              });
               changeRelease(message["data"]);
-            changeProject({
-              ...project,
-              release_bot: true,
-            });
+            }
             break;
           case "debug_status":
             if (project.id === message["data"]["project"])
