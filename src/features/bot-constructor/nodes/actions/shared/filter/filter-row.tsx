@@ -170,7 +170,7 @@ export function FilterRow({
       case "number":
         return (
           <Input
-            type="number"
+            type="text" // it's for dynamic message
             value={filter.value as number}
             onChange={(e) =>
               onUpdate({ value: parseFloat(e.target.value) || 0 })
