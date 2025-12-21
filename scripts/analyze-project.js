@@ -5,7 +5,7 @@ const path = require("path");
 // Skript ishga tushiriladigan asosiy papka
 const ROOT_DIR = process.cwd();
 // Tahlil natijalari saqlanadigan fayl nomi
-const OUTPUT_FILE = "project_analysis.md";
+const OUTPUT_FILE = "./docs/project_analysis.md";
 // E'tibor berilmaydigan papka va fayllar ro'yxati
 const IGNORE_LIST = [
   "node_modules",
@@ -34,7 +34,7 @@ function analyzeDirectory(dir, prefix = "") {
 
   const entries = fs.readdirSync(dir);
   const filteredEntries = entries.filter(
-    (entry) => !IGNORE_LIST.includes(entry),
+    (entry) => !IGNORE_LIST.includes(entry)
   );
 
   for (let i = 0; i < filteredEntries.length; i++) {
@@ -107,7 +107,7 @@ function main() {
   fs.writeFileSync(OUTPUT_FILE, markdownContent);
 
   console.log(
-    `✅ Tahlil muvaffaqiyatli yakunlandi! Natijalar "${OUTPUT_FILE}" fayliga saqlandi.`,
+    `✅ Tahlil muvaffaqiyatli yakunlandi! Natijalar "${OUTPUT_FILE}" fayliga saqlandi.`
   );
 }
 
