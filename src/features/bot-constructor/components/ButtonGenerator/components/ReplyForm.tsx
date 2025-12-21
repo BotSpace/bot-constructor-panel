@@ -53,6 +53,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CollectionButtonForm } from "./CollectionButtonForm";
 
 interface ReplyFormProps {
   onAdd: (button: ButtonConfig) => void;
@@ -67,18 +68,18 @@ const replyOptions: {
   label: string;
   icon?: React.ReactNode;
 }[] = [
-    {
-      value: "reply",
-      label: "Matnli tugma",
-      icon: <TextIcon className="h-4 w-4" />,
-    },
-    { value: "web_app", label: "Web App", icon: <Globe className="h-4 w-4" /> },
-    {
-      value: "request_poll",
-      label: "So'rovnoma",
-      icon: <BarChart3 className="h-4 w-4" />,
-    },
-  ];
+  {
+    value: "reply",
+    label: "Matnli tugma",
+    icon: <TextIcon className="h-4 w-4" />,
+  },
+  { value: "web_app", label: "Web App", icon: <Globe className="h-4 w-4" /> },
+  {
+    value: "request_poll",
+    label: "So'rovnoma",
+    icon: <BarChart3 className="h-4 w-4" />,
+  },
+];
 
 // Common buttons configuration (Reply tugmalar uchun text = value bo'ladi)
 const commonButtonGroups = [
@@ -105,7 +106,6 @@ const commonButtonGroups = [
     ],
   },
 ];
-
 
 export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
   const [text, setText] = useState("");
@@ -199,7 +199,9 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
     type: "request_contact" | "request_location" | "request_poll"
   ) => {
     let newButton: ButtonConfig;
-    const uniqueId = `btn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const uniqueId = `btn-${Date.now()}-${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
 
     switch (type) {
       case "request_contact":
@@ -219,7 +221,9 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
       case "request_poll":
         newButton = {
           id: uniqueId,
-          text: `📊 So'rovnoma yaratish (${pollType === 'quiz' ? 'Viktorina' : 'Oddiy'})`,
+          text: `📊 So'rovnoma yaratish (${
+            pollType === "quiz" ? "Viktorina" : "Oddiy"
+          })`,
           type,
           pollType,
         };
@@ -238,46 +242,6 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
       type: "reply",
     };
     onAdd(newButton);
-  };
-
-  const handleAddCollectionButton = () => {
-    if (!selectedCollection || !selectedField) {
-      alert("Iltimos, collection va field tanlang.");
-      return;
-    }
-
-    const field = collectionFields?.data.fields.find(
-      (f) => f.id.toString() === selectedField
-    );
-
-    if (!field) return;
-
-    const buttonText = `📦 ${field.name}`;
-
-    const collectionData = {
-      collection: selectedCollection,
-      field: field.name,
-      ...(filters.length > 0 && { filters }),
-      layout: {
-        columns,
-        rows,
-      },
-      enablePagination,
-    };
-
-    onAdd({
-      id: `btn-${Date.now()}`,
-      text: buttonText,
-      type: "reply",
-      collectionData,
-    });
-
-    setSelectedCollection("");
-    setSelectedField("");
-    setFilters([]);
-    setColumns(2);
-    setRows(5);
-    setEnablePagination(true);
   };
 
   return (
@@ -423,249 +387,11 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
         </div>
       </div>
 
-      {/* Collection-based button yaratish */}
-      {collections && collections.length > 0 && (
-        <>
-          <Separator className="my-6" />
-
-          <Card className="border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base flex items-center gap-2">
-                <div className="p-2 bg-primary/20 rounded-lg">
-                  <Database className="h-5 w-5 text-primary" />
-                </div>
-                Collection'dan tugma yaratish
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Collection ma'lumotlaridan avtomatik tugmalar yaratish
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label
-                  htmlFor="reply-collection-select"
-                  className="text-sm font-medium"
-                >
-                  Collection
-                </Label>
-                <Select
-                  value={selectedCollection}
-                  onValueChange={handleCollectionChange}
-                >
-                  <SelectTrigger
-                    id="reply-collection-select"
-                    className="mt-1.5"
-                  >
-                    <SelectValue placeholder="Collection tanlang..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {collections.map((collection) => (
-                      <SelectItem key={collection.id} value={collection.name}>
-                        <div className="flex items-center gap-2">
-                          <Database className="h-3.5 w-3.5" />
-                          {collection.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {selectedCollection && collectionFields && (
-                <>
-                  <div>
-                    <Label
-                      htmlFor="reply-field-select"
-                      className="text-sm font-medium"
-                    >
-                      Field
-                    </Label>
-                    <Select
-                      value={selectedField}
-                      onValueChange={setSelectedField}
-                    >
-                      <SelectTrigger id="reply-field-select" className="mt-1.5">
-                        <SelectValue placeholder="Field tanlang..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {collectionFields.data.fields.map((field) => (
-                          <SelectItem
-                            key={field.id}
-                            value={field.id.toString()}
-                          >
-                            <div className="flex items-center justify-between w-full gap-2">
-                              <span>{field.name}</span>
-                              <span className="text-xs text-muted-foreground">
-                                ({field.type})
-                              </span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Filter Builder */}
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem
-                      value="filters"
-                      className="border rounded-lg px-4 bg-muted/30"
-                    >
-                      <AccordionTrigger className="text-sm font-medium hover:no-underline">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
-                            Ixtiyoriy
-                          </span>
-                          Filter qo'shish
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="pt-4">
-                        <FilterBuilder
-                          fields={[
-                            {
-                              id: "_id",
-                              label: "id",
-                              type: "text" as const,
-                            },
-                            ...collectionFields.data.fields.map((field) => ({
-                              id: field.name,
-                              label: field.name,
-                              type: field.type as any,
-                            })),
-                          ]}
-                          filters={filters}
-                          onChange={setFilters}
-                          stateKeys={availableStateKeys}
-                        />
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-
-                  {/* Layout Settings */}
-                  <Card className="border-dashed">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <LayoutGrid className="h-4 w-4" />
-                        Pagination Sozlamalari
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        Har bir sahifada nechta tugma chiqishini belgilang
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {/* Columns */}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="reply-columns" className="text-sm">
-                            Har bir qatorda
-                          </Label>
-                          <span className="text-sm font-medium text-primary">
-                            {columns} ta tugma
-                          </span>
-                        </div>
-                        <div className="flex gap-2">
-                          {[1, 2, 3, 4].map((num) => (
-                            <Button
-                              key={num}
-                              type="button"
-                              variant={columns === num ? "default" : "outline"}
-                              size="sm"
-                              className="flex-1"
-                              onClick={() => setColumns(num)}
-                            >
-                              {num}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Rows */}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="reply-rows" className="text-sm">
-                            Har bir sahifada
-                          </Label>
-                          <span className="text-sm font-medium text-primary">
-                            {rows} ta qator
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            id="reply-rows"
-                            type="number"
-                            min={1}
-                            max={10}
-                            value={rows}
-                            onChange={(e) =>
-                              setRows(
-                                Math.min(
-                                  10,
-                                  Math.max(1, parseInt(e.target.value) || 1)
-                                )
-                              )
-                            }
-                            className="flex-1"
-                          />
-                          <span className="text-xs text-muted-foreground whitespace-nowrap">
-                            qator
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Calculation */}
-                      <div className="p-3 bg-primary/10 border border-primary/30 rounded-md">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">
-                            Bir sahifada:
-                          </span>
-                          <span className="font-bold text-primary">
-                            {columns} × {rows} = {columns * rows} ta tugma
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Enable Pagination Toggle */}
-                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-md border">
-                        <div className="space-y-0.5">
-                          <Label
-                            htmlFor="reply-enable-pagination"
-                            className="text-sm font-medium cursor-pointer"
-                          >
-                            Pagination yoqish
-                          </Label>
-                          <p className="text-xs text-muted-foreground">
-                            Ko'p ma'lumotlar bo'lsa sahifalarga bo'lish
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <input
-                            id="reply-enable-pagination"
-                            type="checkbox"
-                            checked={enablePagination}
-                            onChange={(e) =>
-                              setEnablePagination(e.target.checked)
-                            }
-                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary cursor-pointer"
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Button
-                    type="button"
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md"
-                    onClick={handleAddCollectionButton}
-                    disabled={disabled || !selectedCollection || !selectedField}
-                  >
-                    <Database className="mr-2 h-4 w-4" /> Collection Tugmasi
-                    Qo'shish
-                  </Button>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </>
-      )}
+      <CollectionButtonForm
+        onAdd={onAdd}
+        buttonType="inline"
+        disabled={disabled}
+      />
     </div>
   );
 };
