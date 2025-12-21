@@ -39,6 +39,7 @@ const useProjectStore = create<ProjectState>((set, get) => ({
   changeProject: (project: ProjectRetrive) => {
     set({ project: project });
   },
+
   // change release
   changeRelease: (release) => {
     const project = get().project;

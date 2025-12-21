@@ -108,6 +108,9 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
     case "CustomCodeNode":
       return {
         nodeTitle: "Custom Code",
+        code: "// Your code here",
+        label: "custom_code_node",
+        language: "javascript",
       } as CustomCodeNodeData; // Custom code uchun alohida sozlamalar
     case "SendLocationNode":
       return {
