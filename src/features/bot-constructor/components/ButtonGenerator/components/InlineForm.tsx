@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PlusCircle, Database, LayoutGrid } from "lucide-react";
-import { ButtonConfig, ButtonType, LoginUrlConfig } from "../types";
+import { ButtonConfig, LoginUrlConfig } from "../types";
 import { WebAppForm } from "./WebAppForm";
 import { LoginUrlForm } from "./LoginUrlForm";
 import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
@@ -38,6 +38,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import SeparatorWithTitle from "@/components/common/separetor";
+import { Badge } from "@/components/ui/badge";
 
 interface InlineFormProps {
   onAdd: (button: ButtonConfig) => void;
@@ -58,21 +59,21 @@ const inlineOptions: {
   label: string;
   placeholder?: string;
 }[] = [
-    { value: "callback", label: "Callback Data", placeholder: "buyruq_nomi" },
-    { value: "url", label: "URL (Havola)", placeholder: "https://example.com" },
-    { value: "web_app", label: "Web App" },
-    { value: "login_url", label: "Login URL" },
-    {
-      value: "switch_inline_query",
-      label: "Switch Inline (Global)",
-      placeholder: "qidiruv so`rovi...",
-    },
-    {
-      value: "switch_inline_query_current_chat",
-      label: "Switch Inline (Hozirgi chat)",
-      placeholder: "qidiruv so`rovi...",
-    },
-  ];
+  { value: "callback", label: "Callback Data", placeholder: "buyruq_nomi" },
+  { value: "url", label: "URL (Havola)", placeholder: "https://example.com" },
+  { value: "web_app", label: "Web App" },
+  { value: "login_url", label: "Login URL" },
+  {
+    value: "switch_inline_query",
+    label: "Switch Inline (Global)",
+    placeholder: "qidiruv so`rovi...",
+  },
+  {
+    value: "switch_inline_query_current_chat",
+    label: "Switch Inline (Hozirgi chat)",
+    placeholder: "qidiruv so`rovi...",
+  },
+];
 
 // Common buttons configuration (Best Practice: Configuration over Code)
 const commonButtonGroups = [
@@ -81,20 +82,32 @@ const commonButtonGroups = [
     buttons: [
       { label: "⬅️ Ortga", value: "back", variant: "outline" as const },
       { label: "Oldinga ➡️", value: "next", variant: "outline" as const },
-      { label: "⏭ O'tkazib yuborish", value: "skip", variant: "outline" as const },
+      {
+        label: "⏭ O'tkazib yuborish",
+        value: "skip",
+        variant: "outline" as const,
+      },
     ],
   },
   {
     title: "Tasdiqlash",
     buttons: [
       { label: "✅ Tasdiqlash", value: "confirm", variant: "default" as const },
-      { label: "❌ Bekor qilish", value: "cancel", variant: "destructive" as const },
+      {
+        label: "❌ Bekor qilish",
+        value: "cancel",
+        variant: "destructive" as const,
+      },
     ],
   },
   {
     title: "Menyu",
     buttons: [
-      { label: "🏠 Bosh menyu", value: "main_menu", variant: "secondary" as const },
+      {
+        label: "🏠 Bosh menyu",
+        value: "main_menu",
+        variant: "secondary" as const,
+      },
       { label: "📋 Menyu", value: "menu", variant: "secondary" as const },
     ],
   },
@@ -298,16 +311,16 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
         {(actionType === "url" ||
           actionType === "callback" ||
           actionType.startsWith("switch_")) && (
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="inline-value">{selectedOption?.label}</Label>
-              <Input
-                id="inline-value"
-                placeholder={selectedOption?.placeholder}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-              />
-            </div>
-          )}
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="inline-value">{selectedOption?.label}</Label>
+            <Input
+              id="inline-value"
+              placeholder={selectedOption?.placeholder}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+            />
+          </div>
+        )}
       </div>
 
       <Button type="submit" className="w-full" disabled={disabled}>
@@ -388,36 +401,15 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
               </div>
               {selectedCollection && collectionFields && (
                 <>
-                  <div>
-                    <Label
-                      htmlFor="field-select"
-                      className="text-sm font-medium"
-                    >
-                      Field
-                    </Label>
-                    <Select
-                      value={selectedField}
-                      onValueChange={setSelectedField}
-                    >
-                      <SelectTrigger id="field-select" className="mt-1.5">
-                        <SelectValue placeholder="Field tanlang..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {collectionFields.data.fields.map((field) => (
-                          <SelectItem
-                            key={field.id}
-                            value={field.id.toString()}
-                          >
-                            <div className="flex items-center justify-between w-full gap-2">
-                              <span>{field.name}</span>
-                              <span className="text-xs text-muted-foreground">
-                                ({field.type})
-                              </span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="">
+                    <div className="flex gap-1.5 flex-wrap">
+                      {collectionFields.data.fields.map((field) => (
+                        <Badge variant={"outline"} key={field.id}>
+                          {field.name}
+                        </Badge>
+                      ))}
+                    </div>
+                    <Input />
                   </div>
 
                   {/* Filter Builder */}

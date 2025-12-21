@@ -1,11 +1,11 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 12/8/2025, 10:28:08 PM
+Sana: 12/21/2025, 6:07:21 PM
 
 ## 📁 Fayl Strukturasi
 
 ```
-constructorr
+bot-constructor-panel
 ├── .env
 ├── .env.example
 ├── .github
@@ -37,8 +37,8 @@ constructorr
 ├── components.json
 ├── docs
 │   ├── ARCHITECTURE.md
-│   └── COLLECTION_BUTTON_LAYOUT.md
-├── just.json
+│   ├── COLLECTION_BUTTON_LAYOUT.md
+│   └── project_analysis.md
 ├── next-env.d.ts
 ├── next.config.ts
 ├── package.json
@@ -68,6 +68,7 @@ constructorr
 │   │   └── notification.mp3
 │   ├── components
 │   │   ├── common
+│   │   │   ├── OrientationGuard.tsx
 │   │   │   ├── analitics.tsx
 │   │   │   ├── count-down-button.tsx
 │   │   │   ├── i18nLink.tsx
@@ -108,8 +109,10 @@ constructorr
 │   │       ├── dialog.tsx
 │   │       ├── dropdown-menu.tsx
 │   │       ├── hover-border-gradient.tsx
+│   │       ├── input-group.tsx
 │   │       ├── input-otp.tsx
 │   │       ├── input.tsx
+│   │       ├── kbd.tsx
 │   │       ├── label.tsx
 │   │       ├── popover.tsx
 │   │       ├── progress.tsx
@@ -149,12 +152,6 @@ constructorr
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── types.ts
 │   │   │   │   │   └── utils.tsx
-│   │   │   │   ├── RichTextEditor
-│   │   │   │   │   └── editor
-│   │   │   │   │       ├── EditorStyles.css
-│   │   │   │   │       ├── TelegramEditor.tsx
-│   │   │   │   │       └── tools
-│   │   │   │   │           └── VariableTool.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── save-status-badge.tsx
 │   │   │   ├── constructor.tsx
@@ -171,49 +168,17 @@ constructorr
 │   │   │   │   │   └── EdgeContextMenu.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── editor
-│   │   │   │   ├── index.tsx
-│   │   │   │   ├── settings
-│   │   │   │   │   └── index.tsx
-│   │   │   │   ├── setup
-│   │   │   │   │   ├── aiogram
-│   │   │   │   │   │   ├── bot
-│   │   │   │   │   │   │   ├── edit.ts
-│   │   │   │   │   │   │   ├── index.ts
-│   │   │   │   │   │   │   └── send.ts
-│   │   │   │   │   │   ├── buttons
-│   │   │   │   │   │   │   ├── index.ts
-│   │   │   │   │   │   │   ├── inline.ts
-│   │   │   │   │   │   │   └── reply.ts
-│   │   │   │   │   │   ├── callback
-│   │   │   │   │   │   │   ├── context.ts
-│   │   │   │   │   │   │   ├── edit.ts
-│   │   │   │   │   │   │   ├── index.ts
-│   │   │   │   │   │   │   └── send.ts
-│   │   │   │   │   │   ├── globals.ts
-│   │   │   │   │   │   ├── index.ts
-│   │   │   │   │   │   ├── message
-│   │   │   │   │   │   │   ├── context.ts
-│   │   │   │   │   │   │   ├── edit.ts
-│   │   │   │   │   │   │   ├── index.ts
-│   │   │   │   │   │   │   └── send.ts
-│   │   │   │   │   │   └── types
-│   │   │   │   │   │       └── user.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── python
-│   │   │   │   │       └── keywords.ts
-│   │   │   │   ├── store
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── settings.ts
-│   │   │   │   └── themes
-│   │   │   │       ├── ayu-mirage.ts
-│   │   │   │       ├── botfather.ts
-│   │   │   │       └── monokai.ts
+│   │   │   │   └── index.tsx
+│   │   │   ├── guide-tour
+│   │   │   │   ├── index.ts
+│   │   │   │   └── tour-welcome.tsx
 │   │   │   ├── hooks
 │   │   │   │   ├── useFlowKeyboardShortcuts.ts
 │   │   │   │   └── useMousePosition.ts
 │   │   │   ├── lib
 │   │   │   │   ├── edge-utils.ts
 │   │   │   │   ├── findNearestParentAction.ts
+│   │   │   │   ├── format-flow.ts
 │   │   │   │   └── geometry.ts
 │   │   │   ├── nodes
 │   │   │   │   ├── actions
@@ -244,9 +209,10 @@ constructorr
 │   │   │   │   │   │   ├── DownloadFileNode.tsx
 │   │   │   │   │   │   └── index.ts
 │   │   │   │   │   ├── EditMessageNode
-│   │   │   │   │   │   ├── EditMessageNode copy.tsx
 │   │   │   │   │   │   ├── EditMessageNode.tsx
 │   │   │   │   │   │   ├── components
+│   │   │   │   │   │   │   ├── ForTextMessageNode.tsx
+│   │   │   │   │   │   │   └── ForVideoPhotoDocumentAudio.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── FileMessageNode
@@ -285,11 +251,7 @@ constructorr
 │   │   │   │   │   │   ├── TextMessageNode.tsx
 │   │   │   │   │   │   ├── components
 │   │   │   │   │   │   │   ├── accordion-item-wrapper.tsx
-│   │   │   │   │   │   │   ├── dynamic-message-constructor-modal.tsx
-│   │   │   │   │   │   │   └── filter
-│   │   │   │   │   │   │       ├── filter-row.tsx
-│   │   │   │   │   │   │       ├── filter.tsx
-│   │   │   │   │   │   │       └── types.ts
+│   │   │   │   │   │   │   └── dynamic-message-constructor-modal.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── UnpinMessageNode
@@ -308,9 +270,15 @@ constructorr
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── shared
 │   │   │   │   │       ├── ActionNodeSettings.tsx
+│   │   │   │   │       ├── ComingSoonNodeContent.tsx
 │   │   │   │   │       ├── NodeHeader.tsx
 │   │   │   │   │       ├── RecipientSelector.tsx
-│   │   │   │   │       └── SettingsAction.tsx
+│   │   │   │   │       ├── filter
+│   │   │   │   │       │   ├── filter-row.tsx
+│   │   │   │   │       │   ├── filter.tsx
+│   │   │   │   │       │   └── types.ts
+│   │   │   │   │       ├── text-area.tsx
+│   │   │   │   │       └── types.ts
 │   │   │   │   ├── components
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── shared
@@ -326,7 +294,8 @@ constructorr
 │   │   │   │   ├── custom
 │   │   │   │   │   ├── CallbackAnswerNode
 │   │   │   │   │   │   ├── CallbackAnswerNode.tsx
-│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── CheckMembershipNode
 │   │   │   │   │   │   ├── CheckMembershipNode.tsx
 │   │   │   │   │   │   └── index.ts
@@ -406,6 +375,9 @@ constructorr
 │   │   │   │       │   ├── index.ts
 │   │   │   │       │   └── types.ts
 │   │   │   │       └── index.ts
+│   │   │   ├── search
+│   │   │   │   ├── search-panel.tsx
+│   │   │   │   └── search-store.ts
 │   │   │   └── store
 │   │   │       ├── actions.ts
 │   │   │       ├── clipboardSlice.ts
@@ -421,19 +393,23 @@ constructorr
 │   │   └── index.ts
 │   ├── hooks
 │   │   ├── use-debounces.tsx
+│   │   ├── use-is-mobile.tsx
 │   │   ├── use-keyboard-shortcut.tsx
 │   │   └── use-notification.ts
 │   ├── i18n
 │   │   ├── request.ts
 │   │   └── routing.ts
 │   ├── lib
+│   │   ├── chech-bot-token.ts
 │   │   ├── constants.ts
 │   │   ├── env.ts
 │   │   ├── error-handler.ts
 │   │   ├── file-utils.ts
 │   │   ├── input-validators.ts
+│   │   ├── landscape-screen.ts
 │   │   ├── notification-utils.ts
 │   │   ├── query-generator.ts
+│   │   ├── tour-steps.ts
 │   │   └── utils.ts
 │   ├── messages
 │   │   ├── en.json
@@ -468,9 +444,7 @@ constructorr
 │   └── wss
 │       └── web-socket-provider.tsx
 ├── stack.yaml
-├── todolsit.md
-├── tsconfig.json
-└── tsconfig.tsbuildinfo
+└── tsconfig.json
 ```
 
 ## 📄 Muhim Fayllar Tarkibi (içidan: constructor)
