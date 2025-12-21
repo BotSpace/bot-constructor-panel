@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { FormEvent, memo, useMemo } from "react";
 import { NodeProps, useNodes, useEdges } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +11,10 @@ import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { KeyboardConfig } from "@/features/bot-constructor/components";
+import {
+  ButtonConfig,
+  KeyboardConfig,
+} from "@/features/bot-constructor/components";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
 // --- O'ZGARTIRISH: `keyboard` ixtiyoriy qilindi, xatolikdan saqlanish uchun ---
@@ -73,7 +76,35 @@ const ReplyButtonTriggerNodeComponent = ({
     });
   };
 
-  const isConfigured = !!data.selectedButton || !!data.catchNoButton;
+  const isConfigured = !!data.selectedButtons || !!data.catchNoButton;
+
+  function handleToggle(isChecked: boolean, button: ButtonConfig) {
+    if (isChecked) {
+      // Tugma tanlangan bo'lsa, selectedButtons ga qo'shamiz
+      const selectedButtonObject = availableReplyButtons.find(
+        (btn) => btn.id === button.id
+      );
+
+      const updatedButtons = data.selectedButtons
+        ? [...data.selectedButtons, selectedButtonObject!]
+        : [selectedButtonObject!];
+
+      updateNodeData(id, {
+        selectedButtons: updatedButtons,
+        catchNoButton: false,
+      });
+      return;
+    } else {
+      // Tugma tanlanmagan bo'lsa, selectedButtons dan olib tashlaymiz
+      const updatedButtons = data.selectedButtons?.filter(
+        (btn) => btn.id !== button.id
+      );
+      updateNodeData(id, {
+        selectedButtons: updatedButtons,
+      });
+      return;
+    }
+  }
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -86,8 +117,9 @@ const ReplyButtonTriggerNodeComponent = ({
             <span>Reply Tugma Handleri</span>
           </div>
           <div
-            className={`w-2.5 h-2.5 rounded-full transition-all ${isConfigured ? "bg-green-500" : "bg-destructive/50"
-              }`}
+            className={`w-2.5 h-2.5 rounded-full transition-all ${
+              isConfigured ? "bg-green-500" : "bg-destructive/50"
+            }`}
             title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
           />
         </CardTitle>
@@ -102,29 +134,27 @@ const ReplyButtonTriggerNodeComponent = ({
                   Qaysi tugma ushlansin?
                 </Label>
 
-                <RadioGroup
-                  value={data.selectedButton?.id} // Tanlangan tugmaning ID'sini `value` sifatida beramiz
-                  onValueChange={handleSelectionChange} // O'zgarish bo'lganda handler'ni chaqiramiz
-                >
+                <div className="space-y-2">
                   {availableReplyButtons.map((button) => {
                     const uniqueId = `r-${id}-${button.id}`;
                     return (
-                      <div className="flex items-center gap-3" key={button.id}>
-                        <RadioGroupItem
-                          className="cursor-pointer"
-                          value={button.id}
-                          id={uniqueId}
+                      <div key={uniqueId} className="flex items-center gap-3">
+                        <Checkbox
+                          // onChange={(e) => handleToggle(e, button)}
+                          onCheckedChange={(toggle) =>
+                            handleToggle(toggle as boolean, button)
+                          }
+                          checked={
+                            data.selectedButtons?.some(
+                              (btn) => btn.id === button.id
+                            ) || false
+                          }
                         />
-                        <Label
-                          htmlFor={uniqueId}
-                          className="font-normal cursor-pointer"
-                        >
-                          {button.text}
-                        </Label>
+                        <Label htmlFor={uniqueId}>{button.text}</Label>
                       </div>
                     );
                   })}
-                </RadioGroup>
+                </div>
               </div>
             ) : (
               <div className="p-3 text-center text-sm text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-md flex items-center gap-2">

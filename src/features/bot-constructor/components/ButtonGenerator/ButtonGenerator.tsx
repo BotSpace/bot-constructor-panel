@@ -87,9 +87,12 @@ export function ButtonGenerator({
 
   // 3. Layout o'zgarishini boshqarish (TUZATILDI)
   // useCallback ishlatildi va state yangilash callback orqali bajarildi
-  const handleLayoutChange = useCallback((newLayout: ButtonConfig[][]) => {
-    setCurrentButtons(() => newLayout);
-  }, [setCurrentButtons]);
+  const handleLayoutChange = useCallback(
+    (newLayout: ButtonConfig[][]) => {
+      setCurrentButtons(() => newLayout);
+    },
+    [setCurrentButtons]
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
