@@ -1,4 +1,362 @@
 {
-  "hello": "こんにちは (Konnichiwa)",
-  "world": "世界 (Sekai)"
+  "common": {
+    "search": "コンポーネントを検索... (Ctrl+K)",
+    "noResults": "何も見つかりませんでした。",
+    "back": "戻る",
+    "collections": "コレクション",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "add": "追加",
+    "remove": "削除",
+    "close": "閉じる",
+    "loading": "読み込み中...",
+    "select": "選択",
+    "submit": "送信",
+    "send": "送信"
+  },
+  "auth": {
+    "title": "コードを入力",
+    "description": "にアクセス",
+    "telegramBot": "@bot_mather_auth_bot",
+    "getCode": "Telegramボットで1分間のコードを取得してください。",
+    "sendCode": "コードを送信",
+    "debugLogin": "DEBUG ログイン",
+    "loginLoading": "ログイン中...",
+    "loginSuccess": "ログイン成功",
+    "loginError": "ログインエラー"
+  },
+  "header": {
+    "back": "戻る",
+    "collections": "コレクション"
+  },
+  "constructor": {
+    "triggers": {
+      "title": "🚀 トリガー",
+      "message": {
+        "name": "メッセージ受信時",
+        "description": "ユーザーがメッセージを送信したとき。"
+      },
+      "command": {
+        "name": "コマンド受信時",
+        "description": "ユーザーが/startや/helpなどのコマンドを送信したとき。"
+      },
+      "replyButton": {
+        "name": "返信ボタン押下時",
+        "description": "ボタンが押されたとき。"
+      },
+      "callbackQuery": {
+        "name": "インラインボタン押下時",
+        "description": "インラインボタンが押されたとき。"
+      }
+    },
+    "actions": {
+      "title": "⚙️ アクション",
+      "textMessage": {
+        "name": "テキストを送信",
+        "description": "ユーザーにテキストメッセージを送信します。"
+      },
+      "photo": {
+        "name": "写真を送信",
+        "description": "ユーザーに写真を送信します。"
+      },
+      "video": {
+        "name": "動画を送信",
+        "description": "ユーザーに動画を送信します。"
+      },
+      "audio": {
+        "name": "音声を送信",
+        "description": "ユーザーに音声ファイルを送信します。"
+      },
+      "file": {
+        "name": "ファイルを送信",
+        "description": "ユーザーに文書やその他のファイルタイプを送信します。"
+      },
+      "animation": {
+        "name": "GIFを送信",
+        "description": "GIFまたはMP4アニメーションを送信します。"
+      },
+      "voice": {
+        "name": "音声メッセージ",
+        "description": "音声メッセージを送信します。"
+      },
+      "videoNote": {
+        "name": "動画メッセージ",
+        "description": "丸い動画メッセージを送信します。"
+      },
+      "location": {
+        "name": "位置情報",
+        "description": "地理的位置情報を送信します。"
+      },
+      "contact": {
+        "name": "連絡先",
+        "description": "連絡先情報を送信します。"
+      },
+      "poll": {
+        "name": "投票",
+        "description": "投票やクイズを作成します。"
+      },
+      "sticker": {
+        "name": "ステッカー",
+        "description": "ステッカーを送信します。"
+      },
+      "mediaGroup": {
+        "name": "メディアグループ",
+        "description": "複数の写真/動画をまとめて送信します（2-10アイテム）。"
+      },
+      "venue": {
+        "name": "会場",
+        "description": "位置情報+会場情報（名前、住所）を送信します。"
+      },
+      "dice": {
+        "name": "ゲーム",
+        "description": "ランダムゲーム（サイコロ、ダーツ、バスケットボールなど）。"
+      },
+      "editMessage": {
+        "name": "メッセージを編集",
+        "description": "送信されたメッセージを編集します（テキスト、キャプション、ボタン、メディア）。"
+      }
+    },
+    "messageOperations": {
+      "title": "📨 メッセージ操作",
+      "forward": {
+        "name": "メッセージを転送",
+        "description": "メッセージを別のチャットやグループに転送します。"
+      },
+      "sendToAdmin": {
+        "name": "管理者に送信",
+        "description": "メッセージを管理者に送信します。"
+      },
+      "copy": {
+        "name": "メッセージをコピー",
+        "description": "メッセージをコピーして送信します。"
+      },
+      "pin": {
+        "name": "メッセージをピン留め",
+        "description": "グループでメッセージをピン留めします。"
+      },
+      "unpin": {
+        "name": "ピン留めを解除",
+        "description": "ピン留めされたメッセージを解除します。"
+      },
+      "delete": {
+        "name": "メッセージを削除",
+        "description": "メッセージを削除します。"
+      },
+      "chatAction": {
+        "name": "アクションを表示",
+        "description": "入力中やアップロード中のインジケーターを表示します。"
+      },
+      "downloadFile": {
+        "name": "ファイルをダウンロード",
+        "description": "ファイルをダウンロードして保存します。"
+      }
+    },
+    "flowControl": {
+      "title": "🔀 フロー制御",
+      "condition": {
+        "name": "条件 (If/Else)",
+        "description": "条件に基づいて2つのパスのいずれかを選択します。"
+      },
+      "delay": {
+        "name": "遅延",
+        "description": "指定された時間待機します。"
+      },
+      "random": {
+        "name": "ランダム",
+        "description": "ランダムなパスを選択します。"
+      },
+      "variable": {
+        "name": "変数",
+        "description": "変数を管理します（設定、増分など）。"
+      },
+      "checkMembership": {
+        "name": "メンバーシップを確認",
+        "description": "ユーザーがチャンネル/グループのメンバーかどうかを確認します。"
+      }
+    },
+    "integrations": {
+      "title": "🌐 統合",
+      "httpRequest": {
+        "name": "HTTPリクエスト",
+        "description": "外部APIにリクエストを送信します。"
+      },
+      "callbackAnswer": {
+        "name": "コールバック応答",
+        "description": "インラインボタンが押されたときに応答します。"
+      }
+    },
+    "customLogic": {
+      "title": "🧩 カスタムロジック",
+      "code": {
+        "name": "カスタムコード",
+        "description": "複雑なアクションや条件のためにPythonコードを書くことができます。"
+      },
+      "state": {
+        "name": "データ収集",
+        "description": "ユーザーからデータを収集するため"
+      },
+      "collection": {
+        "name": "データリスト",
+        "description": "コレクションからデータリストを取得"
+      },
+      "loadCollectionItem": {
+        "name": "データを読み込む",
+        "description": "コレクションから単一のアイテムを読み込み、コンテキストに保存"
+      }
+    }
+  },
+  "messageTypes": {
+    "any": "任意のメッセージ",
+    "text": "テキスト",
+    "location": "位置情報",
+    "contact": "連絡先",
+    "phone": "電話",
+    "document": "文書",
+    "photo": "写真",
+    "video": "動画",
+    "audio": "音声",
+    "sticker": "ステッカー"
+  },
+  "filters": {
+    "any": "任意",
+    "equals": "等しい",
+    "contains": "含む",
+    "startsWith": "で始まる",
+    "regex": "正規表現",
+    "command": "コマンド",
+    "radius": "半径（内側）",
+    "size": "サイズ（MB）",
+    "extension": "拡張子",
+    "equalsStatic": "等しい（静的）",
+    "collection": "コレクション（動的）"
+  },
+  "chatActions": {
+    "typing": "入力中...",
+    "uploadPhoto": "写真をアップロード中...",
+    "uploadVideo": "動画をアップロード中...",
+    "uploadVoice": "音声メッセージをアップロード中...",
+    "uploadDocument": "文書をアップロード中...",
+    "findLocation": "位置情報を特定中...",
+    "recordVideo": "動画を録画中...",
+    "recordVoice": "音声を録音中..."
+  },
+  "errors": {
+    "networkError": "インターネット接続がありません。もう一度お試しください。",
+    "badRequest": "無効なリクエストです。データを確認してもう一度お試しください。",
+    "unauthorized": "セッションが期限切れです。再度ログインしてください。",
+    "forbidden": "この操作を実行する権限がありません。",
+    "notFound": "データが見つかりません。",
+    "validationError": "無効なデータです。",
+    "rateLimited": "リクエストが多すぎます。少し待ってからもう一度お試しください。",
+    "serverError": "サーバーエラーです。後でもう一度お試しください。",
+    "unknownError": "エラーが発生しました。もう一度お試しください。",
+    "genericError": "不明なエラーが発生しました。",
+    "fileUploadError": "ファイルのアップロードエラーです。もう一度お試しください。"
+  },
+  "buttons": {
+    "textButton": "テキストボタン",
+    "webApp": "Web App",
+    "poll": "投票",
+    "inlineButton": "インラインボタン",
+    "replyButton": "返信ボタン"
+  },
+  "nodes": {
+    "placeholder": {
+      "selectCollection": "コレクションを選択",
+      "selectField": "フィールドを選択",
+      "selectMessage": "メッセージを選択",
+      "enterVariableName": "変数名（例：user_age）",
+      "enterValue": "値を入力",
+      "enterCode": "例：ユーザーを確認",
+      "enterSeconds": "5",
+      "enterUrl": "https://api.example.com/endpoint",
+      "enterHeaders": "{\"Authorization\": \"Bearer {{token}}\"}",
+      "enterBody": "{\"key\": \"value\", \"user_id\": \"{{user_id}}\"}",
+      "enterTimeout": "30",
+      "enterMessageId": "メッセージIDを入力",
+      "selectParseMode": "パースモード",
+      "selectMediaType": "メディアタイプ",
+      "enterMediaUrl": "https://example.com/image.jpg または file_id",
+      "selectSource": "ソースを選択...",
+      "enterFileId": "file_id...",
+      "enterVideoUrl": "https://example.com/video.mp4",
+      "enterDuration": "長さ（秒）",
+      "enterWidth": "幅（px）",
+      "enterHeight": "高さ（px）",
+      "enterThumbnail": "サムネイルのFile ID",
+      "enterCaption": "動画のキャプションを入力...",
+      "enterPhone": "+998901234567",
+      "enterFirstName": "Alisher",
+      "enterLastName": "Navoiy",
+      "enterVCard": "BEGIN:VCARD&#10;VERSION:3.0&#10;...",
+      "enterLatitude": "41.311151",
+      "enterLongitude": "69.279737",
+      "enterLivePeriod": "3600",
+      "enterHeading": "90",
+      "enterProximityRadius": "500",
+      "selectActionType": "アクションタイプを選択",
+      "selectCallbackType": "コールバックを選択...",
+      "selectCollectionCallback": "コレクションコールバックを選択...",
+      "selectStateKey": "状態キー...",
+      "enterCustomStateKey": "カスタム状態キー...",
+      "selectMemberType": "メンバータイプを選択"
+    },
+    "label": {
+      "variableName": "変数名",
+      "variableValue": "変数の値",
+      "variableType": "変数の型",
+      "stateKey": "状態キー",
+      "collection": "コレクション",
+      "field": "フィールド",
+      "messageId": "メッセージID",
+      "text": "テキスト",
+      "parseMode": "パースモード",
+      "mediaType": "メディアタイプ",
+      "mediaUrl": "メディアURL",
+      "source": "ソース",
+      "fileId": "File ID",
+      "url": "URL",
+      "duration": "長さ",
+      "width": "幅",
+      "height": "高さ",
+      "thumbnail": "サムネイル",
+      "caption": "キャプション",
+      "phone": "電話",
+      "firstName": "名",
+      "lastName": "姓",
+      "vCard": "vCard",
+      "latitude": "緯度",
+      "longitude": "経度",
+      "livePeriod": "ライブ期間",
+      "heading": "方向",
+      "proximityRadius": "近接アラート半径",
+      "actionType": "アクションタイプ",
+      "callbackType": "コールバックタイプ",
+      "memberType": "メンバータイプ",
+      "delay": "遅延（秒）",
+      "timeout": "タイムアウト（秒）",
+      "headers": "ヘッダー",
+      "body": "ボディ",
+      "responseKey": "応答キー"
+    },
+    "variableValue": "変数の値",
+    "enterVariableValue": "動的メッセージの値を入力：",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "buttonRowLimit": "この行の制限に達しました（{maxButtons}ボタン）。",
+    "collectionRowNote": "コレクション行 - 他のボタンを追加できません",
+    "enterButtonText": "ボタンテキストを入力してください。",
+    "enterLoginUrl": "ログインURLを入力してください。",
+    "enterWebAppUrl": "Web App URLを入力してください。",
+    "enterActionValue": "アクション値を入力してください。",
+    "selectCollectionAndField": "コレクションとフィールドを選択してください。",
+    "fileUploadError": "ファイルのアップロードエラーです。もう一度お試しください。"
+  },
+  "editor": {
+    "selectModel": "モデルを選択",
+    "yourPrompt": "プロンプト",
+    "enterPrompt": "プロンプトをここに入力...（送信は Cmd/Ctrl + Enter）"
+  }
 }

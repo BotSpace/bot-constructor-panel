@@ -1,8 +1,7 @@
 // FAYL: constructor/components/ButtonGenerator/hooks/useButtonGeneratorState.ts (YANGI HOOK)
 
 import { useState, useEffect, useMemo } from "react";
-import { ButtonConfig } from "../types";
-import { KeyboardConfig } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
+import { ButtonConfig, KeyboardConfig } from "../types";
 
 const MAX_BUTTONS_PER_ROW = 10;
 
@@ -48,6 +47,32 @@ export const useButtonGeneratorState = (
   );
 
   const handleAddButton = (newButton: ButtonConfig) => {
+    // Collection button bo'lsa, alohida qatorga qo'shish
+    if (newButton.collectionData?.layout) {
+      setCurrentButtons((current) => {
+        const updated = [...current];
+        // Yangi qator yaratish va collection buttonni qo'shish
+        updated.push([newButton]);
+        return updated;
+      });
+      // Yangi qatorni tanlash
+      setSelectedRowIndex(currentButtons.length);
+      return;
+    }
+
+    // Tanlangan qatorda collection button bor-yo'qligini tekshirish
+    const selectedRow = currentButtons[selectedRowIndex] || [];
+    const hasCollectionButton = selectedRow.some(
+      (btn) => btn.collectionData?.layout
+    );
+
+    if (hasCollectionButton) {
+      alert(
+        "Collection buttonlar bo'lgan qatorga boshqa button qo'shib bo'lmaydi."
+      );
+      return;
+    }
+
     if (isCurrentRowFull) {
       alert(
         `Bu qatorda maksimal tugmalar soniga (${MAX_BUTTONS_PER_ROW} ta) yetilgan.`
@@ -110,6 +135,63 @@ export const useButtonGeneratorState = (
     });
   };
 
+  const handleEditButton = (
+    rowIndex: number,
+    buttonId: string,
+    updatedButton: Partial<ButtonConfig>
+  ) => {
+    setCurrentButtons((current) => {
+      return current.map((row, rIdx) => {
+        if (rIdx === rowIndex) {
+          return row.map((button) => {
+            if (button.id === buttonId) {
+              return { ...button, ...updatedButton };
+            }
+            return button;
+          });
+        }
+        return row;
+      });
+    });
+  };
+
+  const handleReorderButtons = (
+    rowIndex: number,
+    reorderedButtons: ButtonConfig[]
+  ) => {
+    setCurrentButtons((current) => {
+      return current.map((row, rIdx) => {
+        if (rIdx === rowIndex) {
+          return reorderedButtons;
+        }
+        return row;
+      });
+    });
+  };
+
+  const handleRemoveRow = (rowIndex: number) => {
+    setCurrentButtons((current) => {
+      const newButtons = current.filter((_, idx) => idx !== rowIndex);
+
+      if (newButtons.length === 0) {
+        if (selectedRowIndex !== 0) setSelectedRowIndex(0);
+        return [[]];
+      }
+
+      if (selectedRowIndex >= newButtons.length) {
+        setSelectedRowIndex(newButtons.length - 1);
+      } else if (selectedRowIndex === rowIndex && selectedRowIndex > 0) {
+        setSelectedRowIndex(selectedRowIndex - 1);
+      }
+
+      return newButtons;
+    });
+  };
+
+  const handleReorderRows = (reorderedRows: ButtonConfig[][]) => {
+    setCurrentButtons(() => reorderedRows);
+  };
+
   const getFinalKeyboardConfig = (): KeyboardConfig => {
     return {
       active: activeTab,
@@ -132,6 +214,11 @@ export const useButtonGeneratorState = (
     handleAddButton,
     handleAddRow,
     handleRemoveButton,
+    handleEditButton,
+    handleReorderButtons,
+    handleRemoveRow,
+    handleReorderRows,
     getFinalKeyboardConfig,
+    setCurrentButtons
   };
 };

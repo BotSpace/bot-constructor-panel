@@ -20,7 +20,6 @@ export function useFlowKeyboardShortcuts({
     paste,
     duplicateSelection,
     deleteSelectedElements,
-    setCtrlPressed,
     undo,
     redo,
   } = useFlowStore((state) => ({
@@ -29,7 +28,6 @@ export function useFlowKeyboardShortcuts({
     paste: state.paste,
     duplicateSelection: state.duplicateSelection,
     deleteSelectedElements: state.deleteSelectedElements,
-    setCtrlPressed: state.setCtrlPressed,
     undo: state.undo,
     redo: state.redo,
   }));
@@ -46,10 +44,6 @@ export function useFlowKeyboardShortcuts({
         target.isContentEditable
       ) {
         return;
-      }
-
-      if (event.key === "Control") {
-        setCtrlPressed(true);
       }
 
       const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
@@ -86,25 +80,11 @@ export function useFlowKeyboardShortcuts({
       }
     };
 
-    const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === "Control") {
-        setCtrlPressed(false);
-      }
-    };
-
-    const handleBlur = () => {
-      setCtrlPressed(false);
-    };
-
     containerElement.setAttribute("tabIndex", "0");
     containerElement.addEventListener("keydown", handleKeyDown);
-    containerElement.addEventListener("keyup", handleKeyUp);
-    containerElement.addEventListener("blur", handleBlur);
 
     return () => {
       containerElement.removeEventListener("keydown", handleKeyDown);
-      containerElement.removeEventListener("keyup", handleKeyUp);
-      containerElement.removeEventListener("blur", handleBlur);
     };
   }, [
     selectAll,
@@ -116,7 +96,6 @@ export function useFlowKeyboardShortcuts({
     redo,
     mousePosition,
     screenToFlowPosition,
-    setCtrlPressed,
     containerRef,
     onOpenPalette,
   ]);

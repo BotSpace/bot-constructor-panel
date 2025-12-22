@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, memo } from "react";
-import { NodeProps } from "reactflow";
+import { useState, memo, useRef } from "react";
+import { NodeProps, useUpdateNodeInternals } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
 import { FiHelpCircle } from "react-icons/fi";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -24,14 +25,19 @@ import {
 import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendVideoNodeData, RecipientType, VideoSourceType } from "./types";
+import { uploadFile } from "@/services/requests/file";
+import { Upload, Loader2, CheckCircle2 } from "lucide-react";
 import { Video } from "lucide-react";
+import useProjectStore from "@/features/bot-constructor/store/project";
 
 // Andozamiz uchun yangi importlar
 import { NodeHeader } from "../shared/NodeHeader";
-import { NodeFooter } from "../shared/NodeFooter";
 import { RecipientsManager } from "../shared/RecipientSelector";
-import { SourceHandler, TargetHandler } from "../../components";
-import { EditMessageTarget } from "../../components/shared/ReactFlowHandlers/EditMessageTarget";
+import { SourceHandles, TargetHandles } from "../../components";
+import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
+import { ButtonGenerator } from "@/features/bot-constructor/components";
+import TextArea from "../shared/text-area";
+import ActionNodeSettings from "../shared/ActionNodeSettings";
 
 const SendVideoNodeComponent = ({
   id,
@@ -39,10 +45,63 @@ const SendVideoNodeComponent = ({
   selected,
 }: NodeProps<SendVideoNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const project = useProjectStore((state) => state.project);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpdate = (update: Partial<SendVideoNodeData>) => {
     updateNodeData(id, update);
+  };
+
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadedFileName(file.name);
+
+    try {
+      // File type avtomatik aniqlanadi
+      const response = await uploadFile(file, undefined, project?.id);
+      handleUpdate({ uploadedFileUuid: response.data.uuid });
+      setUploadedFileName(file.name);
+    } catch (error) {
+      console.error("Fayl yuklashda xatolik:", error);
+      setUploadedFileName(null);
+      alert("Fayl yuklashda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      await handleFileUpload(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      await handleFileUpload(file);
+    }
   };
 
   const captionLength = data.caption?.length || 0;
@@ -55,8 +114,8 @@ const SendVideoNodeComponent = ({
 
   return (
     <Card className={cn("w-96 shadow-lg", selected && "ring-2 ring-primary")}>
-      <TargetHandler />
-      <EditMessageTarget />
+      <TargetHandles />
+      <SelectedMessageTarget />
 
       <NodeHeader
         icon={<Video className="text-primary" />}
@@ -83,7 +142,7 @@ const SendVideoNodeComponent = ({
                   handleUpdate({ videoSourceType: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Manbani tanlang..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -108,96 +167,84 @@ const SendVideoNodeComponent = ({
                   onChange={(e) => handleUpdate({ videoUrl: e.target.value })}
                 />
               )}
-            </div>
-
-            {/* Video parametrlari */}
-            <div className="grid gap-2">
-              <Label>Video parametrlari (ixtiyoriy)</Label>
-              <div className="grid grid-cols-3 gap-2">
-                <Input
-                  type="text"
-                  placeholder="Davomiyligi (s)"
-                  value={data.duration || ""}
-                  onChange={(e) => handleUpdate({ duration: e.target.value })}
-                />
-                <Input
-                  type="text"
-                  placeholder="Eni (px)"
-                  value={data.width || ""}
-                  onChange={(e) => handleUpdate({ width: e.target.value })}
-                />
-                <Input
-                  type="text"
-                  placeholder="Bo'yi (px)"
-                  value={data.height || ""}
-                  onChange={(e) => handleUpdate({ height: e.target.value })}
-                />
-              </div>
-            </div>
-
-            {/* Qo'shimcha sozlamalar */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label
-                  htmlFor={`custom-thumb-${id}`}
-                  className="cursor-pointer"
-                >
-                  Maxsus muqova
-                </Label>
-                <Switch
-                  id={`custom-thumb-${id}`}
-                  checked={!!data.hasCustomThumbnail}
-                  onCheckedChange={(checked) =>
-                    handleUpdate({ hasCustomThumbnail: checked })
-                  }
-                />
-              </div>
-              {data.hasCustomThumbnail && (
-                <Input
-                  placeholder="Muqova uchun File ID"
-                  value={data.thumbnailFileId || ""}
-                  onChange={(e) =>
-                    handleUpdate({ thumbnailFileId: e.target.value })
-                  }
-                  className="animate-in fade-in-50"
-                />
+              {data.videoSourceType === "upload" && (
+                <div className="space-y-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="video/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id={`video-upload-${id}`}
+                  />
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={cn(
+                      "border-2 border-dashed rounded-lg p-6 transition-colors",
+                      "hover:border-primary/50 hover:bg-primary/5",
+                      "cursor-pointer",
+                      isUploading && "opacity-50 pointer-events-none"
+                    )}
+                    onClick={() =>
+                      !isUploading && fileInputRef.current?.click()
+                    }
+                  >
+                    <div className="flex flex-col items-center justify-center gap-2 text-center">
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                          <p className="text-sm font-medium">Yuklanmoqda...</p>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-8 w-8 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium">
+                              Fayl tanlash yoki bu yerga sudrab tashlang
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Video fayllari (MP4, MOV, AVI, WebM)
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {uploadedFileName &&
+                    data.uploadedFileUuid &&
+                    !isUploading && (
+                      <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span className="truncate">{uploadedFileName}</span>
+                      </div>
+                    )}
+                  <div className="grid gap-1">
+                    <Label className="text-xs text-muted-foreground">
+                      UUID
+                    </Label>
+                    <Input
+                      placeholder="UUID ni kiriting yoki fayl yuklang..."
+                      value={data.uploadedFileUuid || ""}
+                      onChange={(e) =>
+                        handleUpdate({ uploadedFileUuid: e.target.value })
+                      }
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
               )}
-              <div className="flex items-center justify-between">
-                <Label
-                  htmlFor={`streaming-${id}`}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  Striming
-                  <TooltipProvider delayDuration={100}>
-                    <Tooltip>
-                      <TooltipTrigger type="button">
-                        <FiHelpCircle className="text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Videoni to'liq yuklamasdan ko'rish.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </Label>
-                <Switch
-                  id={`streaming-${id}`}
-                  checked={!!data.supportsStreaming}
-                  onCheckedChange={(checked) =>
-                    handleUpdate({ supportsStreaming: checked })
-                  }
-                />
-              </div>
             </div>
 
             {/* Caption */}
             <div className="grid gap-2">
               <Label>Video matni (Caption)</Label>
-              <TextareaAutosize
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+
+              <TextArea
                 placeholder="Video uchun matn kiriting..."
-                value={data.caption || ""}
-                onChange={(e) => handleUpdate({ caption: e.target.value })}
-                maxLength={1024}
+                defaultValue={data.caption}
+                onChange={(value) => handleUpdate({ caption: value })}
               />
               <div
                 className={cn(
@@ -210,19 +257,22 @@ const SendVideoNodeComponent = ({
                 {captionLength}/1024
               </div>
             </div>
+
+            <ActionNodeSettings
+              contentProtected={data.protectContent}
+              notificationDisabled={data.disableNotification}
+              parseMode={data.parseMode}
+              handleUpdate={handleUpdate}
+            />
           </CardContent>
 
-          <NodeFooter
-            nodeId={id}
-            keyboard={data.keyboard}
-            disableNotification={data.disableNotification}
-            protectContent={data.protectContent}
-            onUpdate={handleUpdate}
-          />
+          <CardFooter>
+            <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+          </CardFooter>
         </>
       )}
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

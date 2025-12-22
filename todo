@@ -1,0 +1,79 @@
+Loyiha strukturasi va fayllar tizimi bilan tanishib chiqdim. Bu juda keng ko'lamli va jiddiy loyiha ekanligi ko'rinib turibdi. Next.js, React Flow (ehtimol, node-based bo'lgani uchun), Zustand/Redux (store'lar mavjudligi uchun) va Tailwind CSS ishlatilgan.
+
+Loyiha arxitekturasini tahlil qilib, "rasvo" (yomon) yozilgan bo'lishi mumkin bo'lgan yoki kelajakda muammo tug'diradigan joylarni belgilab beraman.
+
+1. Kodning takrorlanishi (Code Duplication) - "Node"lar arxitekturasi
+
+src/features/bot-constructor/nodes/actions papkasida 20 ga yaqin har xil Node'lar bor (AnimationNode, AudioMessageNode, PhotoMessageNode va h.k.).
+
+Muammo: Har bir node uchun alohida papka va deyarli bir xil index.ts, types.ts, Node.tsx fayllari ochilgan. Agar biror umumiy funksiyani (masalan, handle rangini yoki o'chirish tugmasini) o'zgartirmoqchi bo'lsangiz, 20 ta faylni tahrirlashingiz kerak.
+
+Yechim: "BaseNode" komponentini yaratish va qolganlarini shundan extend qilish (HOC yoki Composition orqali).
+
+2. "God Hook" muammosi (Haddan tashqari yuklangan hooklar)
+
+src/features/bot-constructor/components/ButtonGenerator/hook/useButtonGeneratorState.ts
+
+Muammo: Tugmalar generatori juda murakkab logika. Agar bu hook 500+ qatordan oshib ketgan bo'lssa, uni boshqarish imkonsiz bo'ladi. Button layout, inline, reply, web_app logikalari bitta hook ichida bo'lishi "Spaghetti code"ga olib keladi.
+
+Yechim: Logikani kichikroq sub-hooklarga (masalan, useInlineButtons, useReplyButtons) ajratish.
+
+3. Frontendda Backend logikasining mavjudligi
+
+src/features/bot-constructor/editor/setup/aiogram
+
+Muammo: Loyiha ichida aiogram (Python) kodlarini generatsiya qiluvchi papka bor. Bu juda xavfli joy. Agar bot logikasi o'zgarsa yoki yangi versiya (Aiogram 3.x) chiqsa, frontend kodining yarmini qayta yozish kerak bo'ladi.
+
+Yechim: Kod generatsiyasini alohida lib/codegen ga chiqarish yoki buni backendda bajarish. Frontend faqat JSON (schema) qaytarishi kerak.
+
+4. Store (Holat boshqaruvi) chalkashligi
+
+src/features/bot-constructor/store/ ichida juda ko'p slice'lar bor (flowSlice, historySlice, project.ts, clipboardSlice).
+
+Muammo: Agar bu slice'lar bir-biri bilan undo/redo (history) vaqtida sinxron bo'lmasa, loyiha "crash" bo'ladi. Masalan, bitta nodeni o'chirib, "Undo" qilganda flowSlice o'zgaradi, lekin project store o'zgarmay qolishi mumkin.
+
+Yechim: "Single Source of Truth" (Yagona haqiqat manbai) prinsipiga amal qilish. flowSlice hamma narsaning markazi bo'lishi kerak.
+
+5. UI komponentlarning haddan tashqari ko'pligi
+
+src/components/ui ichida 40 dan ortiq komponent bor (Shadcn UI ishlatilgan bo'lsa kerak).
+
+Muammo: Ko'p hollarda bizga kerak bo'lmagan UI komponentlar ham o'sha yerda turadi (masalan, calendar, carousel ishlatilmasa ham). Bu bundle size'ni oshiradi va qidirishni qiyinlashtiradi.
+
+Yechim: Ishlatilmaydigan komponentlarni tozalash.
+
+6. "Prop Drilling" va Context muammosi
+
+src/app/[lang]/[id]/page.tsx ichida constructor joylashgan.
+
+Muammo: [id] (loyiha IDsi) hamma komponentga kerak. Agar siz uni prop orqali pastga uzatayotgan bo'lsangiz, bu juda yomon.
+
+Yechim: Loyiha ma'lumotlari uchun maxsus Context yoki Store yaratilgan bo'lishi kerak (lekin store borligini ko'rdim, shuni tekshirish kerak).
+
+7. Tipizatsiya (TypeScript) bo'shliqlari
+
+src/types/element-types.ts va types.ts fayllari tarqoq holatda.
+
+Muammo: Ko'p joylarda any ishlatilgan bo'lishi ehtimoli yuqori, ayniqsa React Flow'ning data: any xususiyati tufayli.
+
+Yechim: Qat'iy interfacelar yaratish.
+
+8. I18n (Ko'p tillilik) og'irligi
+
+messages/*.json fayllari juda katta bo'lib ketishi mumkin.
+
+Muammo: Hammasi bitta faylda bo'lsa, uni tahrirlash qiyin.
+
+Yechim: JSON fayllarni feature'lar bo'yicha bo'lish (masalan, constructor.json, auth.json).
+
+Keyingi qadamlar:
+
+Sizga qaysi qismning kodini tahlil qilib beray? Masalan:
+
+Node generatorining bazaviy kodini ko'rsating, uni optimallashtiramiz.
+
+Store (Zustand/Redux) kodini ko'rsating, arxitekturasini to'g'irlaymiz.
+
+ButtonGenerator logikasini ko'rib chiqamiz.
+
+Qaysi fayldan boshlaymiz? (Tavsiyam: src/features/bot-constructor/store/flowSlice.ts yoki src/features/bot-constructor/nodes/index.ts)

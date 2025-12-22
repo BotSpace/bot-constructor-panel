@@ -9,7 +9,8 @@ type WebSocketType = WebSocket | null;
 const WebSocketContext = createContext<WebSocketType>(null);
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
-  const { changeRelease, project, changeDebug } = useProjectStore();
+  const { changeRelease, project, changeDebug, changeProject } =
+    useProjectStore();
   const socketRef = useRef<WebSocketType>(null);
   const session = useSession();
 
@@ -25,10 +26,6 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       ws.onopen = () => console.log("WS connected");
       ws.onmessage = (msg) => {
         const message = JSON.parse(msg.data);
-        console.log(
-          "🚀 ~ file: web-socket-provider.tsx:28 ~ message:",
-          message
-        );
 
         switch (message["event"]) {
           case "release_status":
@@ -36,8 +33,13 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             if (
               version > (project.release?.version || 0) &&
               project.id === message["data"]["project"]
-            )
+            ) {
+              changeProject({
+                ...project,
+                release_bot: true,
+              });
               changeRelease(message["data"]);
+            }
             break;
           case "debug_status":
             if (project.id === message["data"]["project"])
@@ -46,11 +48,6 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
           default:
             break;
         }
-
-        console.log(
-          "🔍 ~ WebSocketProvider ~ src/wss/web-socket-provider.tsx:24 ~ data:",
-          message
-        );
       };
       ws.onclose = () => console.log("WS closed");
     }

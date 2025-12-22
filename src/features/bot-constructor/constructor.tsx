@@ -13,15 +13,27 @@ import { ElementItemType } from "@/types/element-types";
 import { useFlowStore } from "./store";
 import { CustomNodes } from "./nodes";
 import { CustomEdge } from "./edges";
-import { QuickAddPalette } from "./components";
 import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
 import { useMousePosition } from "./hooks/useMousePosition";
 import { useParams } from "next/navigation";
 import useProjectStore from "./store/project";
 import { SaveStatusBadge } from "./components/save-status-badge";
-import { useCollectionStore } from "../collections/store/collection-list";
 
-function FlowchartInner() {
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuShortcut,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { Text } from "lucide-react";
+import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
+import toast from "react-hot-toast";
+import { useSearchStore } from "./search/search-store";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-is-mobile";
+
+export default function Constructor() {
   const { id }: { id: string } = useParams();
 
   // Store'dan kerakli qismlarni olamiz
@@ -41,14 +53,16 @@ function FlowchartInner() {
     countdownRemaining,
   } = useFlowStore();
 
+  const { searchPanelIsOpen } = useSearchStore();
+
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   // Projectni loading qilish kerak
   // First loading start on hear
   const { project, loading } = useProjectStore();
 
-  const { screenToFlowPosition } = useReactFlow();
-  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const { screenToFlowPosition, fitView } = useReactFlow();
+  const [snapToGrid, setSnapToGrid] = useState(false);
   const mousePosition = useMousePosition();
 
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -130,11 +144,6 @@ function FlowchartInner() {
     startCountdown();
   }, [nodes, edges, isDirty, initialState, startCountdown, stopCountdown]);
 
-  const handlePaletteSelect = (element: ElementItemType) => {
-    const position = screenToFlowPosition(mousePosition);
-    addNode(element, position);
-  };
-
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
@@ -174,49 +183,125 @@ function FlowchartInner() {
     }
   };
 
-  return (
-    <div
-      ref={reactFlowWrapper}
-      className="w-full h-[calc(100vh-56px)] outline-none relative" // `tabIndex` hook ichida o'rnatiladi
-      onDrop={onDrop}
-      onDragOver={onDragOver}
-      onMouseDown={handleContainerClick}
-    >
-      <ReactFlow
-        nodeTypes={CustomNodes}
-        edgeTypes={CustomEdge}
-        nodes={nodes}
-        edges={edges}
-        onConnect={onConnect}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        fitView
-        panOnScroll
-        selectionOnDrag
-        multiSelectionKeyCode={["Shift"]}
-        deleteKeyCode={null} // O'zimizning handler'imizni ishlatamiz
-        minZoom={0.1}
-        maxZoom={2}
-      >
-        <SaveStatusBadge className="absolute top-2 right-2 z-20" />
-        <Background gap={24} color="#666" />
-        <MiniMap />
-        <Controls />
-      </ReactFlow>
+  // Ctrl bilan node drag qilganda grid snapping'ni yoqish
+  const handleNodeDrag = useCallback((event: React.MouseEvent, _node: any) => {
+    const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+    const isCtrlPressed = isMac ? event.metaKey : event.ctrlKey;
+    setSnapToGrid(isCtrlPressed);
+  }, []);
 
-      <QuickAddPalette
-        isOpen={isPaletteOpen}
-        onOpenChange={setIsPaletteOpen}
-        onSelect={handlePaletteSelect}
-      />
-    </div>
+  // Node drag tugaganda grid snapping'ni o'chirish
+  const handleNodeDragStop = useCallback(() => {
+    setSnapToGrid(false);
+  }, []);
+
+  useKeyboardShortcut(
+    ["Control", "s"],
+    () => {
+      if (isDirty) saveFlow(id);
+    },
+    { preventDefault: true } // Brauzerning manzil satriga o'tishini to'xtatadi
   );
-}
 
-export default function Flowchart() {
+  // 1. Sahifa yuklanganda LocalStorage'dan holatni o'qib olish
+  const getInitialViewport = () => {
+    const savedViewport = localStorage.getItem("react-flow-viewport");
+    // Agar oldin saqlangan bo'lsa o'shani qaytaramiz, yo'qsa standart holat
+    return savedViewport ? JSON.parse(savedViewport) : { x: 0, y: 0, zoom: 1 };
+  };
+
+  // 2. Foydalanuvchi harakatni tugatganda (zoom yoki pan) saqlash
+  const onMoveEnd = useCallback((event: any, viewport: any) => {
+    localStorage.setItem("react-flow-viewport", JSON.stringify(viewport));
+  }, []);
+
+  // Store'dan kerakli qismlarni olamiz
+  const { formatFlow } = useFlowStore();
+
+  function handleFormating() {
+    const toastId = toast.loading("Formating ...");
+    formatFlow()
+      .then(() => {
+        // Animatsiya bilan chiroyli ko'rsatish
+        window.requestAnimationFrame(() => {
+          fitView();
+          toast.success("Successfuly formating", { id: toastId });
+        });
+      })
+      .catch(() => {
+        toast.error("Successfuly error", { id: toastId });
+      });
+  }
+
+  useKeyboardShortcut(
+    ["Control", "i"],
+    () => {
+      handleFormating();
+    },
+    { preventDefault: true }
+  );
+
+  const isMobile = useIsMobile();
+
   return (
-    <ReactFlowProvider>
-      <FlowchartInner />
-    </ReactFlowProvider>
+    <>
+      <ContextMenu>
+        <ContextMenuTrigger
+          className={cn({
+            "col-span-9": searchPanelIsOpen,
+            "col-span-12": !searchPanelIsOpen,
+          })}
+        >
+          <div
+            ref={reactFlowWrapper}
+            className="col-span-10 h-[calc(100vh-56px)] outline-none relative" // `tabIndex` hook ichida o'rnatiladi
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            onMouseDown={handleContainerClick}
+          >
+            <ReactFlow
+              id="canvas-area"
+              defaultViewport={getInitialViewport()}
+              onMoveEnd={onMoveEnd}
+              nodeTypes={CustomNodes}
+              edgeTypes={CustomEdge}
+              nodes={nodes}
+              edges={edges}
+              onConnect={onConnect}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onNodeDrag={handleNodeDrag}
+              onNodeDragStop={handleNodeDragStop}
+              panOnScroll
+              selectionOnDrag
+              multiSelectionKeyCode={["Shift"]}
+              deleteKeyCode={null} // O'zimizning handler'imizni ishlatamiz
+              minZoom={0.1}
+              maxZoom={2.5}
+              connectionRadius={50}
+              snapToGrid={snapToGrid}
+              snapGrid={snapToGrid ? [20, 20] : undefined}
+            >
+              <SaveStatusBadge className="absolute top-2 right-2 z-20" />
+              <Background gap={24} color="#666" />
+              {
+                !isMobile && (
+                  <MiniMap />
+                )
+              }
+              <Controls />
+            </ReactFlow>
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          {/* Format */}
+          <ContextMenuItem onClick={handleFormating}>
+            <Text />
+            Formating
+            <ContextMenuShortcut>⌘ i</ContextMenuShortcut>
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    </>
   );
 }

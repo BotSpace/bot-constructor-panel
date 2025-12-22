@@ -1,6 +1,6 @@
 // FAYL: constructor/components/ButtonGenerator/types.ts (YANGILANGAN)
 
-import { Filter } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/types";
+import { Filter } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
 
 // Login URL uchun maxsus konfiguratsiya
 export interface LoginUrlConfig {
@@ -20,6 +20,13 @@ export interface CollectionButtonData {
   collection: string;
   field: string;
   filters?: Filter[];
+  // Layout options - pagination uchun
+  layout?: {
+    columns: number; // Har bir qatorda nechta tugma (1-4)
+    rows: number; // Har bir sahifada nechta qator (1-10)
+    // Jami: columns × rows = bir sahifada ko'rsatiladigan tugmalar soni
+    // Qolgan tugmalar keyingi sahifalarda (pagination)
+  };
 }
 
 // Barcha mumkin bo'lgan tugma turlari
@@ -51,4 +58,13 @@ export interface ButtonConfig {
 
   // Collection-based button uchun ma'lumotlar
   collectionData?: CollectionButtonData;
+}
+
+export type KeyboardType = "inline" | "reply";
+
+// --- Yengi qo'shiladigan struktura ---
+export interface KeyboardConfig {
+  active: KeyboardType;
+  inline: ButtonConfig[][];
+  reply: ButtonConfig[][];
 }

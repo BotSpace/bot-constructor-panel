@@ -1,5 +1,4 @@
-import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator";
-import { KeyboardConfig } from "../TextMessageNode/types";
+import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -23,11 +22,11 @@ export interface SendFileNodeData {
   fileSourceType?: FileSourceType;
   fileId?: string;
   fileUrl?: string;
+  uploadedFileUuid?: string; // `fileSourceType` 'upload' bo'lganda ishlatiladi - backend'dan qaytgan UUID
 
   caption?: string;
 
   // Maxsus muqova (thumbnail)
-  hasCustomThumbnail?: boolean;
   thumbnailFileId?: string;
 
   // Faylga xos sozlamalar
@@ -37,5 +36,5 @@ export interface SendFileNodeData {
   disableNotification?: boolean;
   protectContent?: boolean;
 
-  keyboard?: KeyboardConfig;
+  keyboard: KeyboardConfig;
 }

@@ -1,23 +1,26 @@
 import React, { useMemo } from "react";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
-import { FilterBuilder } from "./filter/filter";
+import { FilterBuilder } from "../../shared/filter/filter";
 import { useReactQueryAction } from "@/services/react-query";
 import { APIDetailCreateResponse } from "@/types/http/response";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendTextMessageNodeData } from "../types";
 import { Badge } from "@/components/ui/badge";
-import TelegramEditor from "@/features/bot-constructor/components/RichTextEditor/editor/TelegramEditor";
 import { useNodes } from "reactflow";
 import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { DynamicMessage } from "../../shared/types";
 
 type Props = {
   collection: CollectionListItem;
-  data: SendTextMessageNodeData;
   id: string;
+  dynamicMessages: DynamicMessage[];
 };
 
-function AccordionItemWrapper({ data, collection, id }: Props) {
+function AccordionItemWrapper({ collection, id, dynamicMessages }: Props) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
   const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
@@ -48,7 +51,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
   if (!fields) return <Skeleton className="w-full h-10" />;
 
   // Collection'ga tegishli dynamic message'ni topish
-  const currentMessage = data.dynamicMessages?.find(
+  const currentMessage = dynamicMessages?.find(
     (message) => message.collection.id === collection.id
   );
 
@@ -64,7 +67,7 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
         filters={currentMessage?.filters ?? []}
         onChange={(filters) =>
           handleUpdate({
-            dynamicMessages: data.dynamicMessages?.map((message) =>
+            dynamicMessages: dynamicMessages?.map((message) =>
               message.collection.id === collection.id
                 ? { ...message, filters }
                 : message
@@ -74,27 +77,125 @@ function AccordionItemWrapper({ data, collection, id }: Props) {
         stateKeys={availableStateKeys}
       />
 
-      <div className="flex gap-2 mt-2">
-        {fields.data.fields.map((field) => (
-          <Badge key={`badge-${field.id}`} variant="outline">
-            ${field.name}
-          </Badge>
-        ))}
+      {/* Pagination Controls */}
+      <div className="mt-4 space-y-3 p-4  rounded-lg border">
+        <div className="flex items-center justify-between">
+          <div>
+            <Label
+              htmlFor={`pagination-${collection.id}`}
+              className="text-sm font-medium"
+            >
+              Enable Pagination
+            </Label>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Load data in pages instead of all at once
+            </p>
+          </div>
+          <Switch
+            id={`pagination-${collection.id}`}
+            checked={currentMessage?.enablePagination ?? false}
+            onCheckedChange={(enabled) =>
+              handleUpdate({
+                dynamicMessages: dynamicMessages?.map((message) =>
+                  message.collection.id === collection.id
+                    ? {
+                        ...message,
+                        enablePagination: enabled,
+                        limit: enabled ? message.limit || 10 : 0,
+                      }
+                    : message
+                ),
+              })
+            }
+          />
+        </div>
+
+        {currentMessage?.enablePagination && (
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t animate-in fade-in-50">
+            <div className="space-y-1.5">
+              <Label
+                htmlFor={`limit-${collection.id}`}
+                className="text-xs font-medium text-slate-700"
+              >
+                Items per page
+              </Label>
+              <Input
+                id={`limit-${collection.id}`}
+                type="number"
+                min="1"
+                max="100"
+                value={currentMessage?.limit || 10}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 10;
+                  handleUpdate({
+                    dynamicMessages: dynamicMessages?.map((message) =>
+                      message.collection.id === collection.id
+                        ? {
+                            ...message,
+                            limit: Math.min(Math.max(value, 1), 100),
+                          }
+                        : message
+                    ),
+                  });
+                }}
+                className="h-9"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label
+                htmlFor={`offset-${collection.id}`}
+                className="text-xs font-medium text-muted-foreground"
+              >
+                Start from (offset)
+              </Label>
+              <Input
+                id={`offset-${collection.id}`}
+                type="number"
+                min="0"
+                value={currentMessage?.offset || 0}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0;
+                  handleUpdate({
+                    dynamicMessages: dynamicMessages?.map((message) =>
+                      message.collection.id === collection.id
+                        ? { ...message, offset: Math.max(value, 0) }
+                        : message
+                    ),
+                  });
+                }}
+                className="h-9"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
-      <TelegramEditor
-        initialData={currentMessage?.messageText}
-        onSave={(editorData) =>
-          handleUpdate({
-            dynamicMessages: data.dynamicMessages?.map((message) =>
-              message.collection.id === collection.id
-                ? { ...message, messageText: editorData }
-                : message
-            ),
-          })
-        }
-        data={data}
-      />
+      <div className="mt-4">
+        <Label className="text-xs font-medium mb-2 block">
+          Available Variables
+        </Label>
+        <div className="flex flex-wrap gap-2">
+          {fields.data.fields.map((field) => (
+            <Badge
+              key={`badge-${field.id}`}
+              variant="outline"
+              className="font-mono text-xs cursor-pointer  transition-colors"
+              onClick={() => {
+                // Copy to clipboard
+                navigator.clipboard.writeText(
+                  `\${${currentMessage?.name}.${field.name}}`
+                );
+              }}
+              title={`Click to copy: \${${currentMessage?.name}.${field.name}}`}
+            >
+              ${currentMessage?.name}.{field.name}
+            </Badge>
+          ))}
+        </div>
+        <p className="text-xs text-slate-500 mt-2">
+          Click any variable to copy it to clipboard
+        </p>
+      </div>
     </>
   );
 }

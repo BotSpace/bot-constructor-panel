@@ -1,4 +1,362 @@
 {
-  "hello": "Привет",
-  "world": "Мир"
+  "common": {
+    "search": "Поиск компонентов... (Ctrl+K)",
+    "noResults": "Ничего не найдено.",
+    "back": "Назад",
+    "collections": "Коллекции",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "add": "Добавить",
+    "remove": "Удалить",
+    "close": "Закрыть",
+    "loading": "Загрузка...",
+    "select": "Выбрать",
+    "submit": "Отправить",
+    "send": "Отправить"
+  },
+  "auth": {
+    "title": "Введите код",
+    "description": "Перейдите в",
+    "telegramBot": "@bot_mather_auth_bot",
+    "getCode": "telegram бот и получите ваш одноразовый код.",
+    "sendCode": "Отправить код",
+    "debugLogin": "DEBUG Вход",
+    "loginLoading": "Вход...",
+    "loginSuccess": "Вход успешен",
+    "loginError": "Ошибка входа"
+  },
+  "header": {
+    "back": "Назад",
+    "collections": "Коллекции"
+  },
+  "constructor": {
+    "triggers": {
+      "title": "🚀 Триггеры",
+      "message": {
+        "name": "При получении сообщения",
+        "description": "Когда пользователь отправляет сообщение."
+      },
+      "command": {
+        "name": "При получении команды",
+        "description": "Когда пользователь отправляет команду вроде /start или /help."
+      },
+      "replyButton": {
+        "name": "При нажатии кнопки ответа",
+        "description": "Когда кнопка нажата."
+      },
+      "callbackQuery": {
+        "name": "При нажатии inline кнопки",
+        "description": "Когда inline кнопка нажата."
+      }
+    },
+    "actions": {
+      "title": "⚙️ Действия",
+      "textMessage": {
+        "name": "Отправить текст",
+        "description": "Отправляет текстовое сообщение пользователю."
+      },
+      "photo": {
+        "name": "Отправить фото",
+        "description": "Отправляет фото пользователю."
+      },
+      "video": {
+        "name": "Отправить видео",
+        "description": "Отправляет видео пользователю."
+      },
+      "audio": {
+        "name": "Отправить аудио",
+        "description": "Отправляет аудиофайл пользователю."
+      },
+      "file": {
+        "name": "Отправить файл",
+        "description": "Отправляет документ или другой тип файла пользователю."
+      },
+      "animation": {
+        "name": "Отправить GIF",
+        "description": "Отправляет GIF или MP4 анимацию."
+      },
+      "voice": {
+        "name": "Голосовое сообщение",
+        "description": "Отправляет голосовое сообщение."
+      },
+      "videoNote": {
+        "name": "Видео сообщение",
+        "description": "Отправляет круглое видео сообщение."
+      },
+      "location": {
+        "name": "Местоположение",
+        "description": "Отправляет географическое местоположение."
+      },
+      "contact": {
+        "name": "Контакт",
+        "description": "Отправляет контактную информацию."
+      },
+      "poll": {
+        "name": "Опрос",
+        "description": "Создает опрос или викторину."
+      },
+      "sticker": {
+        "name": "Стикер",
+        "description": "Отправляет стикер."
+      },
+      "mediaGroup": {
+        "name": "Группа медиа",
+        "description": "Отправляет несколько фото/видео вместе (2-10 элементов)."
+      },
+      "venue": {
+        "name": "Место",
+        "description": "Отправляет местоположение + информацию о месте (название, адрес)."
+      },
+      "dice": {
+        "name": "Игра",
+        "description": "Случайная игра (кубик, дартс, баскетбол и т.д.)."
+      },
+      "editMessage": {
+        "name": "Редактировать сообщение",
+        "description": "Редактирует отправленное сообщение (текст, подпись, кнопки, медиа)."
+      }
+    },
+    "messageOperations": {
+      "title": "📨 Операции с сообщениями",
+      "forward": {
+        "name": "Переслать сообщение",
+        "description": "Пересылает сообщение в другой чат или группу."
+      },
+      "sendToAdmin": {
+        "name": "Отправить администратору",
+        "description": "Отправляет сообщение администратору."
+      },
+      "copy": {
+        "name": "Копировать сообщение",
+        "description": "Копирует и отправляет сообщение."
+      },
+      "pin": {
+        "name": "Закрепить сообщение",
+        "description": "Закрепляет сообщение в группе."
+      },
+      "unpin": {
+        "name": "Открепить сообщение",
+        "description": "Открепляет закрепленное сообщение."
+      },
+      "delete": {
+        "name": "Удалить сообщение",
+        "description": "Удаляет сообщение."
+      },
+      "chatAction": {
+        "name": "Показать действие",
+        "description": "Показывает индикатор печати или загрузки."
+      },
+      "downloadFile": {
+        "name": "Скачать файл",
+        "description": "Скачивает и сохраняет файл."
+      }
+    },
+    "flowControl": {
+      "title": "🔀 Управление потоком",
+      "condition": {
+        "name": "Условие (If/Else)",
+        "description": "Выбирает один из двух путей на основе условия."
+      },
+      "delay": {
+        "name": "Задержка",
+        "description": "Ожидает указанное время."
+      },
+      "random": {
+        "name": "Случайный",
+        "description": "Выбирает случайный путь."
+      },
+      "variable": {
+        "name": "Переменная",
+        "description": "Управляет переменными (установить, увеличить и т.д.)."
+      },
+      "checkMembership": {
+        "name": "Проверить членство",
+        "description": "Проверяет, является ли пользователь участником канала/группы."
+      }
+    },
+    "integrations": {
+      "title": "🌐 Интеграции",
+      "httpRequest": {
+        "name": "HTTP Запрос",
+        "description": "Отправляет запрос к внешнему API."
+      },
+      "callbackAnswer": {
+        "name": "Ответ на callback",
+        "description": "Отвечает при нажатии inline кнопки."
+      }
+    },
+    "customLogic": {
+      "title": "🧩 Пользовательская логика",
+      "code": {
+        "name": "Пользовательский код",
+        "description": "Позволяет писать код на Python для сложных действий и условий."
+      },
+      "state": {
+        "name": "Сбор данных",
+        "description": "Для сбора данных от пользователей"
+      },
+      "collection": {
+        "name": "Список данных",
+        "description": "Получить список данных из коллекции"
+      },
+      "loadCollectionItem": {
+        "name": "Загрузить данные",
+        "description": "Загрузить один элемент из коллекции и сохранить в контекст"
+      }
+    }
+  },
+  "messageTypes": {
+    "any": "Любое сообщение",
+    "text": "Текст",
+    "location": "Местоположение",
+    "contact": "Контакт",
+    "phone": "Телефон",
+    "document": "Документ",
+    "photo": "Фото",
+    "video": "Видео",
+    "audio": "Аудио",
+    "sticker": "Стикер"
+  },
+  "filters": {
+    "any": "Любой",
+    "equals": "Равно",
+    "contains": "Содержит",
+    "startsWith": "Начинается с",
+    "regex": "Regex",
+    "command": "Команда",
+    "radius": "Радиус (внутри)",
+    "size": "Размер (МБ)",
+    "extension": "Расширение",
+    "equalsStatic": "Равно (Статический)",
+    "collection": "Коллекция (Динамический)"
+  },
+  "chatActions": {
+    "typing": "Печатает...",
+    "uploadPhoto": "Загружает фото...",
+    "uploadVideo": "Загружает видео...",
+    "uploadVoice": "Загружает голосовое сообщение...",
+    "uploadDocument": "Загружает документ...",
+    "findLocation": "Определяет местоположение...",
+    "recordVideo": "Записывает видео...",
+    "recordVoice": "Записывает голос..."
+  },
+  "errors": {
+    "networkError": "Нет подключения к интернету. Пожалуйста, попробуйте снова.",
+    "badRequest": "Неверный запрос. Пожалуйста, проверьте данные и попробуйте снова.",
+    "unauthorized": "Ваша сессия истекла. Пожалуйста, войдите снова.",
+    "forbidden": "У вас нет разрешения на выполнение этого действия.",
+    "notFound": "Данные не найдены.",
+    "validationError": "Неверные данные.",
+    "rateLimited": "Слишком много запросов. Пожалуйста, подождите немного и попробуйте снова.",
+    "serverError": "Ошибка сервера. Пожалуйста, попробуйте позже.",
+    "unknownError": "Произошла ошибка. Пожалуйста, попробуйте снова.",
+    "genericError": "Произошла неизвестная ошибка.",
+    "fileUploadError": "Ошибка загрузки файла. Пожалуйста, попробуйте снова."
+  },
+  "buttons": {
+    "textButton": "Текстовая кнопка",
+    "webApp": "Web App",
+    "poll": "Опрос",
+    "inlineButton": "Inline кнопка",
+    "replyButton": "Кнопка ответа"
+  },
+  "nodes": {
+    "placeholder": {
+      "selectCollection": "Выбрать коллекцию",
+      "selectField": "Выбрать поле",
+      "selectMessage": "Выбрать сообщение",
+      "enterVariableName": "Имя переменной (например: user_age)",
+      "enterValue": "Введите значение",
+      "enterCode": "например, Проверить пользователя",
+      "enterSeconds": "5",
+      "enterUrl": "https://api.example.com/endpoint",
+      "enterHeaders": "{\"Authorization\": \"Bearer {{token}}\"}",
+      "enterBody": "{\"key\": \"value\", \"user_id\": \"{{user_id}}\"}",
+      "enterTimeout": "30",
+      "enterMessageId": "Введите ID сообщения",
+      "selectParseMode": "Режим парсинга",
+      "selectMediaType": "Тип медиа",
+      "enterMediaUrl": "https://example.com/image.jpg или file_id",
+      "selectSource": "Выбрать источник...",
+      "enterFileId": "file_id...",
+      "enterVideoUrl": "https://example.com/video.mp4",
+      "enterDuration": "Длительность (с)",
+      "enterWidth": "Ширина (px)",
+      "enterHeight": "Высота (px)",
+      "enterThumbnail": "File ID для миниатюры",
+      "enterCaption": "Введите подпись к видео...",
+      "enterPhone": "+998901234567",
+      "enterFirstName": "Алишер",
+      "enterLastName": "Навои",
+      "enterVCard": "BEGIN:VCARD&#10;VERSION:3.0&#10;...",
+      "enterLatitude": "41.311151",
+      "enterLongitude": "69.279737",
+      "enterLivePeriod": "3600",
+      "enterHeading": "90",
+      "enterProximityRadius": "500",
+      "selectActionType": "Выбрать тип действия",
+      "selectCallbackType": "Выбрать callback...",
+      "selectCollectionCallback": "Выбрать callback коллекции...",
+      "selectStateKey": "Ключ состояния...",
+      "enterCustomStateKey": "Пользовательский ключ состояния...",
+      "selectMemberType": "Выбрать тип участника"
+    },
+    "label": {
+      "variableName": "Имя переменной",
+      "variableValue": "Значение переменной",
+      "variableType": "Тип переменной",
+      "stateKey": "Ключ состояния",
+      "collection": "Коллекция",
+      "field": "Поле",
+      "messageId": "ID сообщения",
+      "text": "Текст",
+      "parseMode": "Режим парсинга",
+      "mediaType": "Тип медиа",
+      "mediaUrl": "URL медиа",
+      "source": "Источник",
+      "fileId": "File ID",
+      "url": "URL",
+      "duration": "Длительность",
+      "width": "Ширина",
+      "height": "Высота",
+      "thumbnail": "Миниатюра",
+      "caption": "Подпись",
+      "phone": "Телефон",
+      "firstName": "Имя",
+      "lastName": "Фамилия",
+      "vCard": "vCard",
+      "latitude": "Широта",
+      "longitude": "Долгота",
+      "livePeriod": "Период жизни",
+      "heading": "Направление",
+      "proximityRadius": "Радиус оповещения о приближении",
+      "actionType": "Тип действия",
+      "callbackType": "Тип callback",
+      "memberType": "Тип участника",
+      "delay": "Задержка (секунды)",
+      "timeout": "Таймаут (секунды)",
+      "headers": "Заголовки",
+      "body": "Тело",
+      "responseKey": "Ключ ответа"
+    },
+    "variableValue": "Значение переменной",
+    "enterVariableValue": "Введите значение динамического сообщения:",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "buttonRowLimit": "Лимит этой строки достигнут ({maxButtons} кнопок).",
+    "collectionRowNote": "Строка коллекции - нельзя добавить другие кнопки",
+    "enterButtonText": "Пожалуйста, введите текст кнопки.",
+    "enterLoginUrl": "Пожалуйста, введите URL входа.",
+    "enterWebAppUrl": "Пожалуйста, введите URL Web App.",
+    "enterActionValue": "Пожалуйста, введите значение действия.",
+    "selectCollectionAndField": "Пожалуйста, выберите коллекцию и поле.",
+    "fileUploadError": "Ошибка загрузки файла. Пожалуйста, попробуйте снова."
+  },
+  "editor": {
+    "selectModel": "Выбрать модель",
+    "yourPrompt": "Ваш запрос",
+    "enterPrompt": "Введите ваш запрос здесь... (Cmd/Ctrl + Enter для отправки)"
+  }
 }
