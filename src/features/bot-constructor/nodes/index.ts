@@ -29,6 +29,7 @@ import {
   ReplyButtonTriggerNode,
   CallbackQueryTriggerNode,
   CommandTriggerNode,
+  CronTriggerNode,
 } from "./triggers";
 
 import {
@@ -52,6 +53,7 @@ export const Triggers = {
   MessageTriggerNode,
   CallbackQueryTriggerNode,
   CommandTriggerNode,
+  CronTriggerNode,
 };
 
 export const ActionsTextAndMedia = {

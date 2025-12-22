@@ -86,8 +86,9 @@ const ReplyButtonTriggerNodeComponent = ({
             <span>Reply Tugma Handleri</span>
           </div>
           <div
-            className={`w-2.5 h-2.5 rounded-full transition-all ${isConfigured ? "bg-green-500" : "bg-destructive/50"
-              }`}
+            className={`w-2.5 h-2.5 rounded-full transition-all ${
+              isConfigured ? "bg-green-500" : "bg-destructive/50"
+            }`}
             title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
           />
         </CardTitle>
