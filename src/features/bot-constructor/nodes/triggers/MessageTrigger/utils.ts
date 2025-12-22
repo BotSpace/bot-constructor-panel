@@ -43,7 +43,6 @@ export const getFiltersForType = (type?: string) => {
 
     // === "Har qanday" turi ===
     case "any": // <-- YANGI
-    case "any_text":
       return []; // Bu turlar uchun filtr yo'q.
 
     // === Qolgan barcha holatlar ===

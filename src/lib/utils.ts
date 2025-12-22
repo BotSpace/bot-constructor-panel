@@ -6,6 +6,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Generate a unique ID (compatible with all environments)
+ */
+export function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+}
+
+/**
  * Berilgan ob'ektni JSON fayl sifatida yuklab olish uchun brauzerda so'rov yaratadi.
  * @param data Yuklanadigan ma'lumotlar (JavaScript ob'ekti).
  * @param filename Fayl nomi (masalan, 'my-flow.json').

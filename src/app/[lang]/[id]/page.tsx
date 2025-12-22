@@ -5,19 +5,34 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Constructor from "@/features/bot-constructor/constructor";
-import { Elements } from "@/features/bot-constructor/data/elements";
+import { useElements } from "@/features/bot-constructor/data/useElements";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConstructorPageHeader } from "@/components/layout/header";
 import { DebugConsole } from "@/components/layout/components/debug-console";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
+import { useTranslations } from "next-intl";
+import { ReactFlowProvider } from "reactflow";
+import SearchPanel from "@/features/bot-constructor/search/search-panel";
+import { useIsMobile } from "@/hooks/use-is-mobile";
+import { OrientationGuard } from "@/components/common/OrientationGuard";
+import { TourWelcomeModal } from "@/features/bot-constructor/guide-tour/tour-welcome";
 
 export default function Page() {
   const { id }: { id: string } = useParams();
+  const t = useTranslations();
+  const Elements = useElements();
 
   const { loadProject, project } = useProjectStore();
   const { loadCollections } = useCollectionStore();
+
+  // Write title
+  useEffect(() => {
+    if (project) {
+      document.title = `${project.name} | BotMother.uz`;
+    }
+  }, [project?.id]);
 
   useEffect(() => {
     // loading project
@@ -81,10 +96,20 @@ export default function Page() {
     };
   }, []); // Bo'sh massiv [] - bu effekt faqat bir marta, komponent yuklanganda ishga tushishini bildiradi
 
+  const isMobile = useIsMobile();
+  const [isOriented, setIsOriented] = useState(false)
+
+  if (isMobile && !isOriented) return <OrientationGuard handleOrientDevice={() => setIsOriented(true)} />
   return (
     <div className="flex flex-col min-h-screen">
+      <head>
+        <title>{project?.name} | BotMother.uz</title>
+      </head>
+
       {/* Header */}
       <ConstructorPageHeader />
+
+      <TourWelcomeModal />
 
       <div className="flex">
         {/* Components Panel */}
@@ -92,12 +117,12 @@ export default function Page() {
           {/* Panel Header */}
           <div className="border-b border-white/[0.08] p-4 sticky top-0 bg-background">
             {/* Search */}
-            <div className="relative">
+            <div className="relative search-components-input">
               <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
               <Input
                 // Ref'ni inputga bog'laymiz
                 ref={searchInputRef}
-                placeholder="Search components... (Ctrl+K)" // Foydalanuvchiga ishora
+                placeholder={t("common.search")} // Foydalanuvchiga ishora
                 className="h-8 pl-9 text-sm placeholder:text-slate-400 focus-visible:border-white/20 focus-visible:ring-0"
                 // State'ni yangilaymiz
                 value={searchTerm}
@@ -116,7 +141,7 @@ export default function Page() {
                   (group) =>
                     // Guruh null bo'lishi mumkinligi uchun qo'shimcha tekshiruv
                     group && (
-                      <div key={group.title} className="mb-4">
+                      <div id={group.id} key={group.title} className="mb-4">
                         <h3 className="text-xs font-semibold mb-2">
                           {group.title}
                         </h3>
@@ -155,15 +180,19 @@ export default function Page() {
               </div>
             ) : (
               <div className="text-center text-sm mt-8">
-                Hech narsa topilmadi.
+                {t("common.noResults")}
               </div>
             )}
           </div>
         </ScrollArea>
         {project ? (
-          <main className="flex-1 flex flex-col relative">
-            <Constructor />
-            <DebugConsole />
+          <main className="grid grid-cols-12 relative w-full">
+            <ReactFlowProvider>
+              {/* constructor */}
+              <Constructor />
+              <SearchPanel />
+              <DebugConsole />
+            </ReactFlowProvider>
           </main>
         ) : (
           <ConstructorLoadingSkeletions />

@@ -1,5 +1,5 @@
-import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator";
-import { KeyboardConfig } from "../TextMessageNode/types";
+import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { ParseMode } from "../shared/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -23,8 +23,9 @@ export interface SendVideoNodeData {
   videoSourceType?: VideoSourceType;
   videoFileId?: string;
   videoUrl?: string;
+  uploadedFileUuid?: string; // `videoSourceType` 'upload' bo'lganda ishlatiladi - backend'dan qaytgan UUID
 
-  caption?: string;
+  caption: string;
 
   // Video-spetsifik parametrlar
   duration?: string; // soniyalarda
@@ -37,8 +38,8 @@ export interface SendVideoNodeData {
   thumbnailFileId?: string;
 
   // Umumiy sozlamalar
-  disableNotification?: boolean;
+  disableNotification: boolean;
   protectContent?: boolean;
-
-  keyboard?: KeyboardConfig;
+  parseMode: ParseMode;
+  keyboard: KeyboardConfig;
 }

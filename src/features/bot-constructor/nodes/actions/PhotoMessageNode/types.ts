@@ -1,6 +1,7 @@
-import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
-import { KeyboardConfig } from "../TextMessageNode/types";
-
+import {
+  ButtonConfig,
+  KeyboardConfig,
+} from "@/features/bot-constructor/components/ButtonGenerator/types";
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
  * 'sender' - xabarni yuborgan foydalanuvchining o'ziga.
@@ -30,12 +31,12 @@ export interface SendPhotoNodeData {
   photoSourceType?: PhotoSourceType;
   photoFileId?: string; // `photoSourceType` 'file_id' bo'lganda ishlatiladi.
   photoUrl?: string; // `photoSourceType` 'url' bo'lganda ishlatiladi.
-  // 'upload' uchun alohida maydon qo'shish mumkin, masalan: `uploadedFile?: File`
+  uploadedFileUuid?: string; // `photoSourceType` 'upload' bo'lganda ishlatiladi - backend'dan qaytgan UUID
 
   caption?: string; // Rasm ostidagi matn (1024 belgacha).
 
   disableNotification?: boolean; // Foydalanuvchiga ovozsiz xabar yuborish.
   protectContent?: boolean; // Xabarni nusxalash va saqlashni taqiqlash.
 
-  keyboard?: KeyboardConfig;
+  keyboard: KeyboardConfig;
 }

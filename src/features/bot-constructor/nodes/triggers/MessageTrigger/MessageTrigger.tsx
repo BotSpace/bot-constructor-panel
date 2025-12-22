@@ -11,9 +11,10 @@ import { TriggerHeader } from "./components/TriggerHeader";
 import { TypeSelector } from "./components/TypeSelector";
 import { FilterSelector } from "./components/FilterSelector";
 import { ParameterInput } from "./components/ParameterInput";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import { ElseMessageSource } from "../../components/shared/ReactFlowHandles/ElseMessageSource";
+import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
 
 const MessageTriggerNodeComponent = ({
   id,
@@ -28,9 +29,10 @@ const MessageTriggerNodeComponent = ({
   };
 
   const onTypeChange = (newType: string) => {
+
     handleUpdate({
-      type: newType,
-      filter: undefined,
+      type: newType as MessageTriggerValueTypes,
+      filter: 'any',
     });
   };
 
@@ -43,7 +45,6 @@ const MessageTriggerNodeComponent = ({
 
     const configured =
       data.type === "any" ||
-      data.type === "any_text" ||
       (!!data.type && !!data.filter);
 
     return {
@@ -53,15 +54,14 @@ const MessageTriggerNodeComponent = ({
   }, [data.type, data.filter]);
 
   const showFilterSection =
-    data.type && data.type !== "any" && data.type !== "any_text";
-
+    data.type && data.type !== "any"
   return (
     <Card
-      className={`w-80 rounded-lg shadow-xl border-2 ${
-        selected ? "border-sky-500/80" : "border-gray-600/50"
-      }`}
+      className={`w-80 rounded-lg shadow-xl border-2 ${selected ? "border-sky-500/80" : "border-gray-600/50"
+        }`}
     >
-      <TargetHandler />
+      <TargetHandles />
+      <ElseMessageSource />
 
       <TriggerHeader
         isExpanded={isExpanded}
@@ -115,7 +115,7 @@ const MessageTriggerNodeComponent = ({
         </CardContent>
       )}
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 };

@@ -8,7 +8,7 @@ import React, { useMemo, useState } from "react";
 import { NodeProps, useEdges, useNodes } from "reactflow";
 import { Database, ChevronDown, Key, Type } from "lucide-react";
 import { StateNodeData } from "./types";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 
 export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
@@ -21,7 +21,6 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
   // --- O'ZGARTIRISH: Mantiq to'liq yangilandi va soddalashtirildi ---
   const availableTypes = useMemo<{
     dynamic: string[];
-    default: string[];
     custom: string[];
     all: string[];
   }>(() => {
@@ -47,17 +46,6 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
 
     const parentNodeData = parentNode.data as any;
 
-    const defaultFilters = [
-      `user_id`,
-      `first_name`,
-      `last_name`,
-      `username`,
-      `language_code`,
-      `is_bot`,
-      `is_premium`,
-      `message_id`,
-      `chat_id`,
-    ];
     let dynamicFilters: string[] = [];
 
     switch (parentNodeData.node_type) {
@@ -500,7 +488,9 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
           "callback_query_id",
           "from_user_id",
           "chat_instance",
-          "data",
+          "data", // Collection button value (only the actual data, not full callback)
+          "callback", // Full callback data
+          "collection_id", // NEW: Extract ID from collection callback format
           "inline_message_id",
           "game_short_name",
         ];
@@ -537,11 +527,10 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
         break;
     }
 
-    const allTypes = [...defaultFilters, ...dynamicFilters, "Custom"];
+    const allTypes = [...dynamicFilters, "Custom"];
 
     return {
       dynamic: dynamicFilters,
-      default: defaultFilters,
       custom: ["Custom"],
       all: allTypes,
     };
@@ -582,13 +571,6 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
   // Combobox uchun options
   const comboboxOptions = useMemo<ComboboxOption[]>(() => {
     const options: ComboboxOption[] = [];
-
-    // Default filters
-    if (availableTypes.default.length > 0) {
-      availableTypes.default.forEach((type) => {
-        options.push({ value: type, label: type, group: "Default" });
-      });
-    }
 
     // Dynamic filters
     if (availableTypes.dynamic.length > 0) {
@@ -634,7 +616,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
           : "border-gray-700/50 shadow-md"
       }`}
     >
-      <TargetHandler />
+      <TargetHandles />
 
       <CardHeader className="pb-3 px-6 pt-6">
         <div
@@ -753,7 +735,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
         </CardContent>
       )}
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 }

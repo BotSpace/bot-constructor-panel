@@ -7,4 +7,6 @@ export interface StateNodeData {
   type: string;
   customType?: string;
   node_type: ElementItemType["triggerId"];
+  // For collection dynamic button data
+  collectionField?: string; // e.g., "category.name" from dynamic button
 }

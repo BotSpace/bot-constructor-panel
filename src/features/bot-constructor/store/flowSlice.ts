@@ -20,56 +20,18 @@ export const createFlowSlice: StateCreator<
 
   // --- Yaxshilangan onNodesChange ---
   onNodesChange: (changes: NodeChange[]) => {
-    const { isCtrlPressed, initialState, isLoading, saveToHistory } = get(); // Asosiy store'dan holatni olamiz
-    const gridSize = 10; // 10px'lik to'r
+    const { initialState, isLoading, saveToHistory } = get();
 
     // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
     if (isLoading) {
-      const updatedChanges = changes.map((change) => {
-        if (
-          isCtrlPressed &&
-          change.type === "position" &&
-          change.dragging &&
-          change.position
-        ) {
-          const snappedPosition = {
-            x: Math.round(change.position.x / gridSize) * gridSize,
-            y: Math.round(change.position.y / gridSize) * gridSize,
-          };
-          return { ...change, position: snappedPosition };
-        }
-        return change;
-      });
       set({
-        nodes: applyNodeChanges(updatedChanges, get().nodes),
+        nodes: applyNodeChanges(changes, get().nodes),
         // isLoading bo'lsa, isDirty ni o'zgartirmaymiz
       });
       return;
     }
 
-    // Har bir o'zgarishni tekshirib chiqamiz
-    const updatedChanges = changes.map((change) => {
-      // Agar Ctrl bosilgan, node siljiyotgan va bu pozitsiya o'zgarishi bo'lsa
-      if (
-        isCtrlPressed &&
-        change.type === "position" &&
-        change.dragging &&
-        change.position
-      ) {
-        // Yangi pozitsiyani 10ga karrali songa yaxlitlaymiz
-        const snappedPosition = {
-          x: Math.round(change.position.x / gridSize) * gridSize,
-          y: Math.round(change.position.y / gridSize) * gridSize,
-        };
-
-        // O'zgartirilgan 'change' obyektini qaytaramiz
-        return { ...change, position: snappedPosition };
-      }
-      // Agar shartlar bajarilmasa, o'zgarishsiz qaytaramiz
-      return change;
-    });
-
-    const newNodes = applyNodeChanges(updatedChanges, get().nodes);
+    const newNodes = applyNodeChanges(changes, get().nodes);
 
     // Haqiqiy o'zgarishlarni tekshirish
     const hasRealChanges =
@@ -96,8 +58,8 @@ export const createFlowSlice: StateCreator<
       isDirty: hasRealChanges,
     });
   },
-  // --- onNodesChange tugadi ---
 
+  // --- onNodesChange tugadi ---
   onEdgesChange: (changes) => {
     const { initialState, isLoading, saveToHistory } = get();
 

@@ -7,10 +7,15 @@ import { useParams } from "next/navigation";
 import { useLinkToParent } from "../common/link-to-parrent";
 import { ArrowLeft, Database } from "lucide-react";
 import { Button } from "../ui/button";
+import { useTranslations } from "next-intl";
+import { useSearchStore } from "@/features/bot-constructor/search/search-store";
 
 // Asosiy Header komponenti
 export function ConstructorPageHeader() {
   const { id } = useParams();
+  const t = useTranslations();
+
+  const { toggleSearchPanel } = useSearchStore();
 
   const { handleClick: backToCollection } = useLinkToParent({
     href: `/bot/${id}/collection`,
@@ -30,16 +35,23 @@ export function ConstructorPageHeader() {
             onClick={backToBotPanel}
             className="flex items-center cursor-pointer gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Back
+            <ArrowLeft className="w-4 h-4" /> {t("header.back")}
           </button>
         </div>
         <div className="flex items-center gap-2">
           {/* <PromptInterface /> */}
           <DebugActions />
+          <Button
+            onClick={() => {
+              toggleSearchPanel();
+            }}
+          >
+            Search
+          </Button>
           <ReleasePanel />
           <Button onClick={backToCollection}>
             <Database />
-            Collections
+            {t("header.collections")}
           </Button>
         </div>
       </header>

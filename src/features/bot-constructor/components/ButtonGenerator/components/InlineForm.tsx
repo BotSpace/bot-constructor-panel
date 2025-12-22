@@ -10,8 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, Database } from "lucide-react";
-import { ButtonConfig, ButtonType, LoginUrlConfig } from "../types";
+import { PlusCircle, Database, LayoutGrid } from "lucide-react";
+import { ButtonConfig, LoginUrlConfig } from "../types";
 import { WebAppForm } from "./WebAppForm";
 import { LoginUrlForm } from "./LoginUrlForm";
 import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
@@ -20,8 +20,8 @@ import { useReactQueryAction } from "@/services/react-query";
 import { APIDetailCreateResponse } from "@/types/http/response";
 import { CollectionDetail } from "@/types/http/collection";
 import { Separator } from "@/components/ui/separator";
-import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/filter";
-import { Filter } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/filter/types";
+import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
+import { Filter } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
 import {
   Accordion,
   AccordionContent,
@@ -30,6 +30,15 @@ import {
 } from "@/components/ui/accordion";
 import { useNodes } from "reactflow";
 import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import SeparatorWithTitle from "@/components/common/separetor";
+import { Badge } from "@/components/ui/badge";
 
 interface InlineFormProps {
   onAdd: (button: ButtonConfig) => void;
@@ -66,7 +75,45 @@ const inlineOptions: {
   },
 ];
 
-export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
+// Common buttons configuration (Best Practice: Configuration over Code)
+const commonButtonGroups = [
+  {
+    title: "Navigatsiya",
+    buttons: [
+      { label: "⬅️ Ortga", value: "back", variant: "outline" as const },
+      { label: "Oldinga ➡️", value: "next", variant: "outline" as const },
+      {
+        label: "⏭ O'tkazib yuborish",
+        value: "skip",
+        variant: "outline" as const,
+      },
+    ],
+  },
+  {
+    title: "Tasdiqlash",
+    buttons: [
+      { label: "✅ Tasdiqlash", value: "confirm", variant: "default" as const },
+      {
+        label: "❌ Bekor qilish",
+        value: "cancel",
+        variant: "destructive" as const,
+      },
+    ],
+  },
+  {
+    title: "Menyu",
+    buttons: [
+      {
+        label: "🏠 Bosh menyu",
+        value: "main_menu",
+        variant: "secondary" as const,
+      },
+      { label: "📋 Menyu", value: "menu", variant: "secondary" as const },
+    ],
+  },
+];
+
+export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
   const [text, setText] = useState("");
   const [actionType, setActionType] = useState<InlineType>("callback");
   const [value, setValue] = useState("");
@@ -78,6 +125,11 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
   const [selectedCollection, setSelectedCollection] = useState<string>("");
   const [selectedField, setSelectedField] = useState<string>("");
   const [filters, setFilters] = useState<Filter[]>([]);
+
+  // Layout settings - pagination uchun
+  const [columns, setColumns] = useState<number>(2);
+  const [rows, setRows] = useState<number>(5);
+  const [enablePagination, setEnablePagination] = useState<boolean>(true);
 
   // Collection field'larini olish
   const { data: collectionFields } = useReactQueryAction<
@@ -109,9 +161,13 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
     setSelectedCollection(collectionName);
     setSelectedField("");
     setFilters([]);
+    setColumns(2);
+    setRows(5);
+    setEnablePagination(true);
   };
 
-  const handleAddClick = () => {
+  const handleAddClick = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!text) {
       alert("Iltimos, tugma matnini kiriting.");
       return;
@@ -138,7 +194,7 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
         }
         newButton.webApp = { url: webAppUrl };
         break;
-      default: // url, callback, switch_*
+      default:
         if (!value) {
           alert("Iltimos, amal uchun qiymat kiriting.");
           return;
@@ -170,17 +226,19 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
 
     if (!field) return;
 
-    // Field nomini button text sifatida ishlatish
-    const buttonText = field.name;
+    const buttonText = `📦 ${field.name}`;
 
-    // Collection ma'lumotlarini object ko'rinishida saqlash
     const collectionData = {
       collection: selectedCollection,
       field: field.name,
       ...(filters.length > 0 && { filters }),
+      layout: {
+        columns,
+        rows,
+      },
+      enablePagination,
     };
 
-    // Callback data - backward compatibility uchun
     const callbackData = `collection_${selectedCollection}_field_${field.name}`;
 
     onAdd({
@@ -191,40 +249,56 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
       collectionData,
     });
 
-    // Tozalash
     setSelectedCollection("");
     setSelectedField("");
     setFilters([]);
+    setColumns(2);
+    setRows(5);
+    setEnablePagination(true);
+  };
+
+  // Common buttonlarni qo'shish funksiyasi
+  const handleAddCommonButton = (btnLabel: string, btnValue: string) => {
+    const newButton: ButtonConfig = {
+      id: `btn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Unikal ID
+      text: btnLabel,
+      type: "callback",
+      value: btnValue,
+    };
+
+    onAdd(newButton);
   };
 
   return (
-    <div className="mt-4 space-y-4">
-      <div>
-        <Label htmlFor="inline-text">Tugma matni</Label>
-        <Input
-          id="inline-text"
-          placeholder="Masalan, Bizning sayt"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-      </div>
-      <div>
-        <Label>Amal turi</Label>
-        <Select
-          value={actionType}
-          onValueChange={(v: InlineType) => setActionType(v)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Amal turini tanlang..." />
-          </SelectTrigger>
-          <SelectContent>
-            {inlineOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <form onSubmit={handleAddClick} className="mt-4 space-y-4">
+      <div className="grid grid-cols-6 gap-2">
+        <div className="col-span-4 flex flex-col gap-1.5">
+          <Label htmlFor="inline-text">Tugma matni</Label>
+          <Input
+            id="inline-text"
+            placeholder="Masalan, Bizning sayt"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+        </div>
+        <div className="col-span-2 flex flex-col gap-1.5">
+          <Label>Amal turi</Label>
+          <Select
+            value={actionType}
+            onValueChange={(v: InlineType) => setActionType(v)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Amal turini tanlang..." />
+            </SelectTrigger>
+            <SelectContent>
+              {inlineOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="animate-in fade-in-50">
@@ -237,7 +311,7 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
         {(actionType === "url" ||
           actionType === "callback" ||
           actionType.startsWith("switch_")) && (
-          <div>
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="inline-value">{selectedOption?.label}</Label>
             <Input
               id="inline-value"
@@ -249,101 +323,257 @@ export const InlineForm = ({ onAdd, disabled, data }: InlineFormProps) => {
         )}
       </div>
 
-      <Button
-        type="button"
-        className="w-full"
-        onClick={handleAddClick}
-        disabled={disabled}
-      >
+      <Button type="submit" className="w-full" disabled={disabled}>
         <PlusCircle className="mr-2 h-4 w-4" /> Inline Tugma Qo'shish
       </Button>
+
+      <SeparatorWithTitle>Tezkor Tugmalar (Common)</SeparatorWithTitle>
+
+      {/* Common buttons section */}
+      <div className="space-y-3">
+        {commonButtonGroups.map((group, index) => (
+          <div key={index} className="space-y-2">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              {group.title}
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {group.buttons.map((btn, btnIndex) => (
+                <Button
+                  key={btnIndex}
+                  type="button"
+                  onClick={() => handleAddCommonButton(btn.label, btn.value)}
+                  variant={btn.variant}
+                  size="sm"
+                  disabled={disabled}
+                  className="shadow-sm"
+                >
+                  {btn.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Collection-based button yaratish */}
       {collections && collections.length > 0 && (
         <>
-          <Separator className="my-4" />
-          <div className="space-y-3">
-            <Label className="flex items-center gap-2">
-              <Database className="h-4 w-4" />
-              Collection'dan tugma yaratish
-            </Label>
-            <div>
-              <Label htmlFor="collection-select">Collection</Label>
-              <Select
-                value={selectedCollection}
-                onValueChange={handleCollectionChange}
-              >
-                <SelectTrigger id="collection-select">
-                  <SelectValue placeholder="Collection tanlang..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {collections.map((collection) => (
-                    <SelectItem key={collection.id} value={collection.name}>
-                      {collection.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {selectedCollection && collectionFields && (
-              <>
-                <div>
-                  <Label htmlFor="field-select">Field</Label>
-                  <Select
-                    value={selectedField}
-                    onValueChange={setSelectedField}
-                  >
-                    <SelectTrigger id="field-select">
-                      <SelectValue placeholder="Field tanlang..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {collectionFields.data.fields.map((field) => (
-                        <SelectItem key={field.id} value={field.id.toString()}>
-                          {field.name} ({field.type})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          <Separator className="my-6" />
 
-                {/* Filter Builder */}
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="filters">
-                    <AccordionTrigger className="text-sm">
-                      Filter qo'shish (ixtiyoriy)
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <FilterBuilder
-                        fields={collectionFields.data.fields.map((field) => ({
-                          id: field.name, // Field nomini id sifatida ishlatish
-                          label: field.name,
-                          type: field.type as
-                            | "text"
-                            | "number"
-                            | "bool"
-                            | "datetime",
-                        }))}
-                        filters={filters}
-                        onChange={setFilters}
-                        stateKeys={availableStateKeys}
-                      />
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </>
-            )}
-            <Button
-              type="button"
-              className="w-full"
-              onClick={handleAddCollectionButton}
-              disabled={disabled || !selectedCollection || !selectedField}
-              variant="outline"
-            >
-              <Database className="mr-2 h-4 w-4" /> Collection Tugmasi Qo'shish
-            </Button>
-          </div>
+          <Card className="border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base flex items-center gap-2">
+                <div className="p-2 bg-primary/20 rounded-lg">
+                  <Database className="h-5 w-5 text-primary" />
+                </div>
+                Collection'dan tugma yaratish
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Collection ma'lumotlaridan avtomatik tugmalar yaratish
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label
+                  htmlFor="collection-select"
+                  className="text-sm font-medium"
+                >
+                  Collection
+                </Label>
+                <Select
+                  value={selectedCollection}
+                  onValueChange={handleCollectionChange}
+                >
+                  <SelectTrigger id="collection-select" className="mt-1.5">
+                    <SelectValue placeholder="Collection tanlang..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {collections.map((collection) => (
+                      <SelectItem key={collection.id} value={collection.name}>
+                        <div className="flex items-center gap-2">
+                          <Database className="h-3.5 w-3.5" />
+                          {collection.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {selectedCollection && collectionFields && (
+                <>
+                  <div className="">
+                    <div className="flex gap-1.5 flex-wrap">
+                      {collectionFields.data.fields.map((field) => (
+                        <Badge variant={"outline"} key={field.id}>
+                          {field.name}
+                        </Badge>
+                      ))}
+                    </div>
+                    <Input />
+                  </div>
+
+                  {/* Filter Builder */}
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem
+                      value="filters"
+                      className="border rounded-lg px-4 bg-muted/30"
+                    >
+                      <AccordionTrigger className="text-sm font-medium hover:no-underline">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
+                            Ixtiyoriy
+                          </span>
+                          Filter qo'shish
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-4">
+                        <FilterBuilder
+                          fields={[
+                            {
+                              id: "_id",
+                              label: "id",
+                              type: "text" as const,
+                            },
+                            ...collectionFields.data.fields.map((field) => ({
+                              id: field.name,
+                              label: field.name,
+                              type: field.type as any,
+                            })),
+                          ]}
+                          filters={filters}
+                          onChange={setFilters}
+                          stateKeys={availableStateKeys}
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+
+                  {/* Layout Settings */}
+                  <Card className="border-dashed">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <LayoutGrid className="h-4 w-4" />
+                        Pagination Sozlamalari
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Har bir sahifada nechta tugma chiqishini belgilang
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* Columns */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="columns" className="text-sm">
+                            Har bir qatorda
+                          </Label>
+                          <span className="text-sm font-medium text-primary">
+                            {columns} ta tugma
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          {[1, 2, 3, 4].map((num) => (
+                            <Button
+                              key={num}
+                              type="button"
+                              variant={columns === num ? "default" : "outline"}
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => setColumns(num)}
+                            >
+                              {num}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Rows */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="rows" className="text-sm">
+                            Har bir sahifada
+                          </Label>
+                          <span className="text-sm font-medium text-primary">
+                            {rows} ta qator
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            id="rows"
+                            type="number"
+                            min={1}
+                            max={10}
+                            value={rows}
+                            onChange={(e) =>
+                              setRows(
+                                Math.min(
+                                  10,
+                                  Math.max(1, parseInt(e.target.value) || 1)
+                                )
+                              )
+                            }
+                            className="flex-1"
+                          />
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                            qator
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Calculation */}
+                      <div className="p-3 bg-primary/10 border border-primary/30 rounded-md">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            Bir sahifada:
+                          </span>
+                          <span className="font-bold text-primary">
+                            {columns} × {rows} = {columns * rows} ta tugma
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Enable Pagination Toggle */}
+                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-md border">
+                        <div className="space-y-0.5">
+                          <Label
+                            htmlFor="enable-pagination"
+                            className="text-sm font-medium cursor-pointer"
+                          >
+                            Pagination yoqish
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            Ko'p ma'lumotlar bo'lsa sahifalarga bo'lish
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            id="enable-pagination"
+                            type="checkbox"
+                            checked={enablePagination}
+                            onChange={(e) =>
+                              setEnablePagination(e.target.checked)
+                            }
+                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Button
+                    type="button"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md"
+                    onClick={handleAddCollectionButton}
+                    disabled={disabled || !selectedCollection || !selectedField}
+                  >
+                    <Database className="mr-2 h-4 w-4" /> Collection Tugmasi
+                    Qo'shish
+                  </Button>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </>
       )}
-    </div>
+    </form>
   );
 };

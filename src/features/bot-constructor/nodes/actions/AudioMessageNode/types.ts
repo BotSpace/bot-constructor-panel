@@ -1,5 +1,4 @@
-import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator";
-import { KeyboardConfig } from "../TextMessageNode/types";
+import { KeyboardConfig } from "@/features/bot-constructor/components";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -23,6 +22,7 @@ export interface SendAudioNodeData {
   audioSourceType?: AudioSourceType;
   audioFileId?: string;
   audioUrl?: string;
+  uploadedFileUuid?: string; // `audioSourceType` 'upload' bo'lganda ishlatiladi - backend'dan qaytgan UUID
 
   caption?: string;
 
@@ -39,5 +39,5 @@ export interface SendAudioNodeData {
   disableNotification?: boolean;
   protectContent?: boolean;
 
-  keyboard?: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
+  keyboard: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
 }

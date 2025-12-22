@@ -11,17 +11,18 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { instanceAuth } from "@/services/instance";
+import { isTelegramTokenValid } from "@/lib/chech-bot-token";
 
 // TODO faqt add uchun qilish kerak
-export function AddEnvDialog({
+export function AddEditEnvDialog({
   dialog_title,
   dialog_description,
   env_name,
   project_id,
   children,
   onSuccess,
-  envId, // optional: if provided -> update mode
   initialValue, // optional: prefills token when editing
+  isEdit,
 }: {
   dialog_title: string;
   dialog_description: string;
@@ -29,10 +30,9 @@ export function AddEnvDialog({
   project_id: number | string;
   children: React.ReactNode;
   onSuccess?: () => void;
-  envId?: number | string;
   initialValue?: string;
+  isEdit?: boolean;
 }) {
-  const isEdit = typeof envId !== "undefined";
   const [open, setOpen] = useState(false);
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,13 +51,23 @@ export function AddEnvDialog({
       return;
     }
 
+    const isTokenValid = await isTelegramTokenValid(token);
+
+    if (!isTokenValid) {
+      toast.error("Noto'g'ri bot tokeni. Iltimos, qayta tekshiring.");
+      return;
+    }
+
     setLoading(true);
     try {
       if (isEdit) {
         // update existing env
-        await instanceAuth.patch(`/enviroment/${envId}/`, {
-          value: trimmed,
-        });
+        await instanceAuth.patch(
+          `/enviroment/${env_name}/?project=${project_id}`,
+          {
+            value: trimmed,
+          }
+        );
         toast.success("Bot token muvaffaqiyatli yangilandi!");
       } else {
         // create new env

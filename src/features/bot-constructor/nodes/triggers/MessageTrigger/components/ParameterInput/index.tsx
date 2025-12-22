@@ -17,6 +17,7 @@ export const ParameterInput = ({
   switch (filter) {
     case "equals":
     case "contains":
+    case "not-contains":
     case "starts_with":
     case "regex":
     case "command":

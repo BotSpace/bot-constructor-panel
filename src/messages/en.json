@@ -1,4 +1,371 @@
 {
-  "hello": "Hello",
-  "world": "World"
+  "common": {
+    "search": "Search components... (Ctrl+K)",
+    "noResults": "Nothing found.",
+    "back": "Back",
+    "collections": "Collections",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "remove": "Remove",
+    "close": "Close",
+    "loading": "Loading...",
+    "select": "Select",
+    "submit": "Submit",
+    "send": "Send"
+  },
+  "auth": {
+    "title": "Enter Code",
+    "description": "Go to",
+    "telegramBot": "@bot_mather_auth_bot",
+    "getCode": "telegram bot and get your 1-minute code.",
+    "sendCode": "Send Code",
+    "debugLogin": "DEBUG Login",
+    "loginLoading": "Login...",
+    "loginSuccess": "Login success",
+    "loginError": "Login error"
+  },
+  "header": {
+    "back": "Back",
+    "collections": "Collections"
+  },
+  "constructor": {
+    "triggers": {
+      "title": "🚀 Triggers",
+      "message": {
+        "name": "Message received",
+        "description": "user sends a message."
+      },
+      "command": {
+        "name": "Command received",
+        "description": "User sends a command like /start or /help."
+      },
+      "replyButton": {
+        "name": "Reply button pressed",
+        "description": "Button is pressed."
+      },
+      "callbackQuery": {
+        "name": "Iinline button pressed",
+        "description": "Inline button is pressed."
+      }
+    },
+    "actions": {
+      "title": "⚙️ Actions",
+      "textMessage": {
+        "name": "Send text",
+        "description": "Sends a text message to user."
+      },
+      "photo": {
+        "name": "Send photo",
+        "description": "Sends a photo to user."
+      },
+      "video": {
+        "name": "Send video",
+        "description": "Sends a video to user."
+      },
+      "audio": {
+        "name": "Send audio",
+        "description": "Sends an audio file to user."
+      },
+      "file": {
+        "name": "Send file",
+        "description": "Sends a document or other file type to user."
+      },
+      "animation": {
+        "name": "Send GIF",
+        "description": "Sends a GIF or MP4 animation."
+      },
+      "voice": {
+        "name": "Voice message",
+        "description": "Sends a voice message."
+      },
+      "videoNote": {
+        "name": "Video message",
+        "description": "Sends a round video message."
+      },
+      "location": {
+        "name": "Location",
+        "description": "Sends a geographical location."
+      },
+      "contact": {
+        "name": "Contact",
+        "description": "Sends contact information."
+      },
+      "poll": {
+        "name": "Poll",
+        "description": "Creates a poll or quiz."
+      },
+      "sticker": {
+        "name": "Sticker",
+        "description": "Sends a sticker."
+      },
+      "mediaGroup": {
+        "name": "Media group",
+        "description": "Sends multiple photos/videos together (2-10 items)."
+      },
+      "venue": {
+        "name": "Venue",
+        "description": "Sends location + venue info (name, address)."
+      },
+      "dice": {
+        "name": "Game",
+        "description": "Random game (dice, darts, basketball, etc.)."
+      },
+      "editMessage": {
+        "name": "Edit message",
+        "description": "Edits a sent message (text, caption, buttons, media)."
+      }
+    },
+    "messageOperations": {
+      "title": "📨 Message Operations",
+      "forward": {
+        "name": "Forward message",
+        "description": "Forwards message to another chat or group."
+      },
+      "sendToAdmin": {
+        "name": "Send to admin",
+        "description": "Sends message to admin."
+      },
+      "copy": {
+        "name": "Copy message",
+        "description": "Copies and sends message."
+      },
+      "pin": {
+        "name": "Pin message",
+        "description": "Pins message in group."
+      },
+      "unpin": {
+        "name": "Unpin message",
+        "description": "Unpins a pinned message."
+      },
+      "delete": {
+        "name": "Delete message",
+        "description": "Deletes a message."
+      },
+      "chatAction": {
+        "name": "Show action",
+        "description": "Shows typing or upload indicator."
+      },
+      "downloadFile": {
+        "name": "Download file",
+        "description": "Downloads and saves a file."
+      }
+    },
+    "flowControl": {
+      "title": "🔀 Flow Control",
+      "delay": {
+        "name": "Delay",
+        "description": "Waits for a specified time."
+      },
+      "random": {
+        "name": "Random",
+        "description": "Selects a random path."
+      },
+      "variable": {
+        "name": "Variable",
+        "description": "Manages variables (set, increment, etc.)."
+      },
+      "checkMembership": {
+        "name": "Check membership",
+        "description": "Checks if user is a member of channel/group."
+      },
+      "elseif": {
+        "name": "Else If",
+        "description": "Additional condition check after If."
+      },
+      "else": {
+        "name": "Else",
+        "description": "Executes if no other conditions match."
+      },
+      "if": {
+        "name": "If",
+        "description": "Checks condition and routes to TRUE/FALSE/NEXT."
+      }
+    },
+    "integrations": {
+      "title": "🌐 Integrations",
+      "httpRequest": {
+        "name": "HTTP Request",
+        "description": "Sends a request to external API."
+      },
+      "callbackAnswer": {
+        "name": "Callback Answer",
+        "description": "Answers inline button is pressed."
+      }
+    },
+    "customLogic": {
+      "title": "🧩 Custom Logic",
+      "code": {
+        "name": "Custom Code",
+        "description": "Allows writing Python code for complex actions and conditions."
+      },
+      "state": {
+        "name": "State Management",
+        "description": "Set data to state"
+      },
+      "collection": {
+        "name": "Set collection",
+        "description": "Set data to collection"
+      },
+      "loadCollectionItem": {
+        "name": "Get item from Collection",
+        "description": "Load a single item from Collection and save to context"
+      }
+    }
+  },
+  "messageTypes": {
+    "any": "Any message",
+    "text": "Text",
+    "location": "Location",
+    "contact": "Contact",
+    "phone": "Phone",
+    "document": "Document",
+    "photo": "Photo",
+    "video": "Video",
+    "audio": "Audio",
+    "sticker": "Sticker"
+  },
+  "filters": {
+    "any": "Any",
+    "equals": "Equals",
+    "contains": "Contains",
+    "no-contains": "Not Contains",
+    "startsWith": "Starts with",
+    "regex": "Regex",
+    "command": "Command",
+    "radius": "Radius (inside)",
+    "size": "Size (MB)",
+    "extension": "Extension",
+    "equalsStatic": "Equals (Static)",
+    "collection": "Collection (Dynamic)"
+  },
+  "chatActions": {
+    "typing": "Typing...",
+    "uploadPhoto": "Uploading photo...",
+    "uploadVideo": "Uploading video...",
+    "uploadVoice": "Uploading voice message...",
+    "uploadDocument": "Uploading document...",
+    "findLocation": "Finding location...",
+    "recordVideo": "Recording video...",
+    "recordVoice": "Recording voice..."
+  },
+  "errors": {
+    "networkError": "No internet connection. Please try again.",
+    "badRequest": "Invalid request. Please check the data and try again.",
+    "unauthorized": "Your session has expired. Please login again.",
+    "forbidden": "You don't have permission to perform this action.",
+    "notFound": "Data not found.",
+    "validationError": "Invalid data.",
+    "rateLimited": "Too many requests. Please wait a bit and try again.",
+    "serverError": "Server error. Please try again later.",
+    "unknownError": "An error occurred. Please try again.",
+    "genericError": "An unknown error occurred.",
+    "fileUploadError": "File upload error. Please try again."
+  },
+  "buttons": {
+    "textButton": "Text button",
+    "webApp": "Web App",
+    "poll": "Poll",
+    "inlineButton": "Inline button",
+    "replyButton": "Reply button"
+  },
+  "nodes": {
+    "placeholder": {
+      "selectCollection": "Select collection",
+      "selectField": "Select field",
+      "selectMessage": "Select message",
+      "enterVariableName": "Variable name (e.g: user_age)",
+      "enterValue": "Enter value",
+      "enterCode": "e.g., Check user",
+      "enterSeconds": "5",
+      "enterUrl": "https://api.example.com/endpoint",
+      "enterHeaders": "{\"Authorization\": \"Bearer {{token}}\"}",
+      "enterBody": "{\"key\": \"value\", \"user_id\": \"{{user_id}}\"}",
+      "enterTimeout": "30",
+      "enterMessageId": "Enter Message ID",
+      "selectParseMode": "Parse Mode",
+      "selectMediaType": "Media type",
+      "enterMediaUrl": "https://example.com/image.jpg or file_id",
+      "selectSource": "Select source...",
+      "enterFileId": "file_id...",
+      "enterVideoUrl": "https://example.com/video.mp4",
+      "enterDuration": "Duration (s)",
+      "enterWidth": "Width (px)",
+      "enterHeight": "Height (px)",
+      "enterThumbnail": "File ID for thumbnail",
+      "enterCaption": "Enter caption for video...",
+      "enterPhone": "+998901234567",
+      "enterFirstName": "Alisher",
+      "enterLastName": "Navoiy",
+      "enterVCard": "BEGIN:VCARD&#10;VERSION:3.0&#10;...",
+      "enterLatitude": "41.311151",
+      "enterLongitude": "69.279737",
+      "enterLivePeriod": "3600",
+      "enterHeading": "90",
+      "enterProximityRadius": "500",
+      "selectActionType": "Select action type",
+      "selectCallbackType": "Select callback...",
+      "selectCollectionCallback": "Select collection callback...",
+      "selectStateKey": "State key...",
+      "enterCustomStateKey": "Custom state key...",
+      "selectMemberType": "Select member type"
+    },
+    "label": {
+      "variableName": "Variable Name",
+      "variableValue": "Variable Value",
+      "variableType": "Variable Type",
+      "stateKey": "State Key",
+      "collection": "Collection",
+      "field": "Field",
+      "messageId": "Message ID",
+      "text": "Text",
+      "parseMode": "Parse Mode",
+      "mediaType": "Media Type",
+      "mediaUrl": "Media URL",
+      "source": "Source",
+      "fileId": "File ID",
+      "url": "URL",
+      "duration": "Duration",
+      "width": "Width",
+      "height": "Height",
+      "thumbnail": "Thumbnail",
+      "caption": "Caption",
+      "phone": "Phone",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "vCard": "vCard",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "livePeriod": "Live Period",
+      "heading": "Heading",
+      "proximityRadius": "Proximity Alert Radius",
+      "actionType": "Action Type",
+      "callbackType": "Callback Type",
+      "memberType": "Member Type",
+      "delay": "Delay (seconds)",
+      "timeout": "Timeout (seconds)",
+      "headers": "Headers",
+      "body": "Body",
+      "responseKey": "Response Key"
+    },
+    "variableValue": "Variable Value",
+    "enterVariableValue": "Enter dynamic message value:",
+    "cancel": "Cancel",
+    "save": "Save",
+    "buttonRowLimit": "This row's limit is reached ({maxButtons} buttons).",
+    "collectionRowNote": "Collection row - cannot add other buttons",
+    "enterButtonText": "Please enter button text.",
+    "enterLoginUrl": "Please enter login URL.",
+    "enterWebAppUrl": "Please enter Web App URL.",
+    "enterActionValue": "Please enter action value.",
+    "selectCollectionAndField": "Please select collection and field.",
+    "fileUploadError": "File upload error. Please try again."
+  },
+  "editor": {
+    "selectModel": "Select Model",
+    "yourPrompt": "Your Prompt",
+    "enterPrompt": "Enter your prompt here... (Cmd/Ctrl + Enter to submit)"
+  }
 }

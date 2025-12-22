@@ -63,7 +63,7 @@ export function SaveStatusBadge({ className }: SaveStatusBadgeProps) {
   const config = statusConfigs[status];
 
   return (
-    <div className={cn(config.styles, "pointer-events-none", className)}>
+    <div id="save-status" className={cn(config.styles, "pointer-events-none", className)}>
       {config.icon}
       <span>{config.text}</span>
       {status === "countdown" && countdownSeconds !== null && (

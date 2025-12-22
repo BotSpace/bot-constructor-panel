@@ -23,7 +23,7 @@ import { NodeProps, useNodes } from "reactflow";
 
 import { CollectionNodeData } from "./types";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { SourceHandler, TargetHandler } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { StateNodeData } from "../StateNode/types";
 
 export function CollectionNode({
@@ -126,7 +126,7 @@ export function CollectionNode({
           : "border-gray-700/50 shadow-md"
       }`}
     >
-      <TargetHandler />
+      <TargetHandles />
 
       <CardHeader className="pb-3 px-6 pt-6">
         <div
@@ -329,7 +329,7 @@ export function CollectionNode({
         </CardContent>
       )}
 
-      <SourceHandler />
+      <SourceHandles />
     </Card>
   );
 }

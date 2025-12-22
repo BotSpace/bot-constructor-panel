@@ -22,4 +22,8 @@ export const MessageTypes = [
   { value: "video", label: "Video", icon: Video },
   { value: "audio", label: "Audio", icon: Music },
   { value: "sticker", label: "Stiker", icon: Archive },
-];
+]
+
+export type MessageTriggerValueTypes =
+  (typeof MessageTypes)[number]['value'];
+
