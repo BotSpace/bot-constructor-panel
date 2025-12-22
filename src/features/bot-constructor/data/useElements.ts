@@ -7,7 +7,7 @@ export function useElements(): ElementTypes[] {
   return [
     {
       title: t("constructor.triggers.title"),
-      id: 'sidebar-triggers',
+      id: "sidebar-triggers",
       elements: [
         {
           type: "message",
@@ -40,6 +40,14 @@ export function useElements(): ElementTypes[] {
           icon: "🕸️",
           color: "bg-teal-500/10 text-teal-400 border-teal-500/20",
           triggerId: "CallbackQueryTriggerNode",
+        },
+        {
+          type: "cron",
+          name: "Cron triggeri",
+          description: "Belgilangan vaqtda bajariladigan ishlar.",
+          icon: "⏰",
+          color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+          triggerId: "CronTriggerNode",
         },
       ],
     },
