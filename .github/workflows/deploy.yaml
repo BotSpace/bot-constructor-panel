@@ -1,132 +1,48 @@
-
-name: Build and Push to Docker Hub
+name: Build and Push Docker Image (tag + latest)
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "*-prod"
+      - "*-dev"
 
 env:
   PROJECT_NAME: botmother-constructor
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  build-test-push:
+  build-push:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Copy env
+      - name: Prepare .env
         run: |
           cp .env.example .env
-
-      - name: update env
-        run: |
-          update_env() {
-              local env_file=".env"
-              cp .env.example "$env_file"
-
-              for kv in "$@"; do
-                  local key="${kv%%=*}"
-                  local value="${kv#*=}"
-                  sed -i "s|^$key=.*|$key=$value|" "$env_file"
-              done
-          }
-
-          update_env \
-            "NEXTAUTH_SECRET=${{ secrets.NEXT_SECRET }}" \
-            "NEXT_PUBLIC_API=${{ secrets.API_URL }}"
-
+          sed -i "s|^NEXTAUTH_SECRET=.*|NEXTAUTH_SECRET=${{ secrets.NEXT_SECRET }}|" .env
+          sed -i "s|^NEXT_PUBLIC_API=.*|NEXT_PUBLIC_API=${{ secrets.API_URL }}|" .env
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
+      - name: Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile
-          push: false
-          load: true
-          tags: ${{ env.PROJECT_NAME }}:test
+          push: true
           no-cache: true
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          registry: ${{ vars.DOCKER_REGISTRY }}
-
-      - name: Tag and push to Docker Hub
-        run: |
-          docker tag ${{ env.PROJECT_NAME }}:test ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:latest
-          docker tag ${{ env.PROJECT_NAME }}:test ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}
-          docker push ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:latest
-          docker push ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}
-          echo "SUCCESS TAGS: latest, ${{ github.run_number }}"
-
-      - name: stack.yaml updated
-        run: |
-          sed -i 's|image: ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:.*|image: ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}|' stack.yaml
-
-      - name: Commit and push updated version
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "🔄 image to ${{ github.run_number }} [CI SKIP]" || echo "No changes"
-          git pull origin main --rebase
-          git push origin main
-
-      - name: Execute remote SSH commands using SSH key
-        uses: appleboy/ssh-action@v1.2.2
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          script: |
-            PROJECTS=/opt/projects/
-            DIR=/opt/projects/${{ env.PROJECT_NAME }}/
-            
-            if [ -d "$PROJECTS" ]; then
-              echo "projects papkasi mavjud"
-            else
-              mkdir -p $PROJECTS
-              echo "projects papkasi yaratildi"
-            fi
-
-            if [ -d "$DIR" ]; then
-              echo "loyiha mavjud"
-            else
-              cd $PROJECTS
-              git clone git@github.com:${{ github.repository }}.git ${{ env.PROJECT_NAME }}
-              echo "Clone qilindi";
-            fi
-
-            cd $DIR
-            git fetch origin main
-            git reset --hard origin/main
-            cp .env.example .env
-
-            update_env() {
-                local env_file=".env"
-                cp .env.example "$env_file"
-
-                for kv in "$@"; do
-                    local key="${kv%%=*}"
-                    local value="${kv#*=}"
-                    sed -i "s|^$key=.*|$key=$value|" "$env_file"
-                done
-            }
-
-            update_env \
-              "NEXTAUTH_SECRET=${{ secrets.NEXT_SECRET }}" \
-              "NEXT_PUBLIC_API=${{ secrets.API_URL }}"
-
-            export PORT=${{ vars.PORT }}
-            docker stack deploy -c stack.yaml ${{ env.PROJECT_NAME }} --with-registry-auth
+          tags: |
+            ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.ref_name }}
+            ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:latest
