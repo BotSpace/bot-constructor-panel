@@ -18,8 +18,9 @@ export interface WebAppConfig {
 // Collection-based button uchun ma'lumotlar
 export interface CollectionButtonData {
   collection: string;
-  field: string;
+  text: string;
   filters?: Filter[];
+  enablePagination: boolean;
   // Layout options - pagination uchun
   layout?: {
     columns: number; // Har bir qatorda nechta tugma (1-4)
