@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 12/21/2025, 6:07:21 PM
+Sana: 12/28/2025, 11:11:40 AM
 
 ## 📁 Fayl Strukturasi
 
@@ -36,6 +36,9 @@ bot-constructor-panel
 ├── README.md
 ├── components.json
 ├── docs
+│   ├── AI_INTEGRATION_GUIDE.md
+│   ├── AI_QUOTA_FIX.md
+│   ├── AI_SETUP_INSTRUCTIONS.md
 │   ├── ARCHITECTURE.md
 │   ├── COLLECTION_BUTTON_LAYOUT.md
 │   └── project_analysis.md
@@ -58,6 +61,9 @@ bot-constructor-panel
 │   │   │   ├── globals.css
 │   │   │   └── layout.tsx
 │   │   ├── api
+│   │   │   ├── ai
+│   │   │   │   └── chat
+│   │   │   │       └── route.ts
 │   │   │   └── auth
 │   │   │       ├── [...nextauth]
 │   │   │       │   ├── option.ts
@@ -138,6 +144,7 @@ bot-constructor-panel
 │   │   │   │   │   ├── ButtonGenerator.tsx
 │   │   │   │   │   ├── components
 │   │   │   │   │   │   ├── ButtonRow.tsx
+│   │   │   │   │   │   ├── CollectionButtonForm.tsx
 │   │   │   │   │   │   ├── CollectionLayoutPreview.tsx
 │   │   │   │   │   │   ├── ControlPanel.tsx
 │   │   │   │   │   │   ├── EditButtonDialog.tsx
@@ -167,8 +174,6 @@ bot-constructor-panel
 │   │   │   │   ├── components
 │   │   │   │   │   └── EdgeContextMenu.tsx
 │   │   │   │   └── index.ts
-│   │   │   ├── editor
-│   │   │   │   └── index.tsx
 │   │   │   ├── guide-tour
 │   │   │   │   ├── index.ts
 │   │   │   │   └── tour-welcome.tsx
@@ -305,7 +310,6 @@ bot-constructor-panel
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── ConditionNode
 │   │   │   │   │   │   ├── ConditionNode.tsx
-│   │   │   │   │   │   ├── ConditionNode.tsx.backup
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── CustomCodeNode
@@ -356,6 +360,10 @@ bot-constructor-panel
 │   │   │   │       │   ├── CommandTriggerNode.tsx
 │   │   │   │       │   ├── index.ts
 │   │   │   │       │   └── types.ts
+│   │   │   │       ├── CronTriggerNode
+│   │   │   │       │   ├── CronTriggerNode.tsx
+│   │   │   │       │   ├── index.ts
+│   │   │   │       │   └── types.ts
 │   │   │   │       ├── MessageTrigger
 │   │   │   │       │   ├── MessageTrigger.tsx
 │   │   │   │       │   ├── components
@@ -392,6 +400,7 @@ bot-constructor-panel
 │   │   │       └── index.ts
 │   │   └── index.ts
 │   ├── hooks
+│   │   ├── use-ai-chat.ts
 │   │   ├── use-debounces.tsx
 │   │   ├── use-is-mobile.tsx
 │   │   ├── use-keyboard-shortcut.tsx
@@ -424,6 +433,7 @@ bot-constructor-panel
 │   │   │   ├── use-react-query-action.ts
 │   │   │   └── use-scroll-query-action.ts
 │   │   └── requests
+│   │       ├── ai.ts
 │   │       ├── auth.ts
 │   │       ├── bot.ts
 │   │       └── file.ts
@@ -444,6 +454,8 @@ bot-constructor-panel
 │   └── wss
 │       └── web-socket-provider.tsx
 ├── stack.yaml
+├── test.ts
+├── todo
 └── tsconfig.json
 ```
 
