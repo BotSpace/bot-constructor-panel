@@ -4,7 +4,6 @@ import { Node, Edge, Position } from "reactflow";
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-
 type Direction = "TB" | "LR";
 
 export const getFormatFlow = (
@@ -23,8 +22,8 @@ export const getFormatFlow = (
   nodes.forEach((node) => {
     // 1-QADAM: Nodingizning haqiqiy o'lchamini olish
     // React Flow nodeda width/height yoki measured xususiyatlarini saqlaydi
-    const width = node.width
-    const height = node.height
+    const width = node.width;
+    const height = node.height;
 
     dagreGraph.setNode(node.id, { width, height });
   });
