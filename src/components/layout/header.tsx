@@ -39,7 +39,7 @@ export function ConstructorPageHeader() {
           </button>
         </div>
         <div className="flex items-center gap-2">
-          {/* <PromptInterface /> */}
+          <PromptInterface />
           <DebugActions />
           <Button
             onClick={() => {

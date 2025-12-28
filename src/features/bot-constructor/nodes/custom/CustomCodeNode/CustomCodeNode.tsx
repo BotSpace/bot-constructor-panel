@@ -39,12 +39,12 @@ export const CustomCodeNode = ({ id, data }: NodeProps<CustomCodeNodeData>) => {
 
         <div className="bg-secondary/30 p-2 rounded-md border border-dashed border-muted-foreground/20">
           <pre className="text-[10px] w-full overflow-hidden truncate opacity-70">
-            {data.code?.slice(0, 30) || "// Bu yerga JS kod yoziladi..."}
+            {data.jsCode?.slice(0, 30) || "// Bu yerga JS kod yoziladi..."}
           </pre>
         </div>
 
         <CodeEditorDialog
-          code={data.code || ""}
+          code={data.jsCode || ""}
           onChange={handleCodeChange}
           globals={BOT_GLOBALS}
         />
