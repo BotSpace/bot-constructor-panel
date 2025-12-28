@@ -15,7 +15,7 @@ export const CustomCodeNode = ({ id, data }: NodeProps<CustomCodeNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
   const handleCodeChange = (newCode: string) => {
-    updateNodeData(id, { ...data, code: newCode });
+    updateNodeData(id, { ...data, jsCode: newCode });
   };
 
   return (
