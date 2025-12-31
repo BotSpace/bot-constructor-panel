@@ -26,6 +26,8 @@ export function DebugConsole() {
   const eventSourceRef = useRef<EventSource | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const resizeStartRef = useRef({ y: 0, height: 0 });
+  const logsContainerRef = useRef<HTMLDivElement>(null);
+  const shouldAutoScrollRef = useRef(true);
 
   // Ctrl + ` bilan toggle
   useEffect(() => {
@@ -40,9 +42,33 @@ export function DebugConsole() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Auto scroll to bottom
+  // Scroll position ni kuzatish
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen || !logsContainerRef.current) return;
+
+    const container = logsContainerRef.current;
+
+    // Birinchi marta scroll position ni tekshiramiz
+    const checkScrollPosition = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 50;
+      shouldAutoScrollRef.current = isNearBottom;
+    };
+
+    // Birinchi marta tekshiramiz
+    checkScrollPosition();
+
+    const handleScroll = () => {
+      checkScrollPosition();
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [isOpen]);
+
+  // Auto scroll to bottom (faqat foydalanuvchi pastda bo'lsa)
+  useEffect(() => {
+    if (isOpen && shouldAutoScrollRef.current) {
       logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [logs, isOpen]);
@@ -97,8 +123,9 @@ export function DebugConsole() {
       return;
     }
 
-    // Bot type o'zgarganda loglarni tozalaymiz
+    // Bot type o'zgarganda loglarni tozalaymiz va auto scroll ni yoqamiz
     setLogs([]);
+    shouldAutoScrollRef.current = true;
 
     // Bot type ga qarab service_id ni olamiz
     const serviceId =
@@ -170,6 +197,7 @@ export function DebugConsole() {
 
   const clearLogs = () => {
     setLogs([]);
+    shouldAutoScrollRef.current = true;
   };
 
   const copyLogs = () => {
@@ -217,10 +245,10 @@ export function DebugConsole() {
   const hasDebugBot = !!debugServiceId;
   const hasReleaseBot = !!releaseServiceId;
 
-
-  if (!isOpen) return (
-    <button
-      className="
+  if (!isOpen)
+    return (
+      <button
+        className="
       h-[50px] w-[50px] rounded-2xl 
       bg-gradient-to-br from-slate-800 to-slate-900
       flex items-center justify-center 
@@ -230,12 +258,11 @@ export function DebugConsole() {
       transition-all duration-200
       text-white
     "
-      onClick={() => setIsOpen(true)} // terminal toggle funksiyasini qo'shing
-    >
-      <TerminalIcon className="w-6 h-6" />
-    </button>
-  );
-
+        onClick={() => setIsOpen(true)} // terminal toggle funksiyasini qo'shing
+      >
+        <TerminalIcon className="w-6 h-6" />
+      </button>
+    );
 
   return (
     <div
@@ -329,16 +356,19 @@ export function DebugConsole() {
       </div>
 
       {/* Logs area */}
-      <div className="h-[calc(100%-40px)] overflow-y-auto overflow-x-auto px-4 py-2 font-mono text-xs leading-relaxed">
+      <div
+        ref={logsContainerRef}
+        className="h-[calc(100%-40px)] overflow-y-auto overflow-x-auto px-4 py-2 font-mono text-xs leading-relaxed"
+      >
         {logs.length === 0 ? (
           <div className="flex items-center justify-center h-full text-[#858585]">
             {!hasDebugBot && !hasReleaseBot
               ? "No bot configured. Add a debug or release bot to see logs."
               : selectedBot === "debug" && !hasDebugBot
-                ? "Debug bot is not configured."
-                : selectedBot === "release" && !hasReleaseBot
-                  ? "Release bot is not configured."
-                  : "Waiting for logs..."}
+              ? "Debug bot is not configured."
+              : selectedBot === "release" && !hasReleaseBot
+              ? "Release bot is not configured."
+              : "Waiting for logs..."}
           </div>
         ) : (
           <div className="space-y-0.5">

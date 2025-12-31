@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 export interface UseAIChatOptions {
   onSuccess?: (response: string) => void;
   onError?: (error: string) => void;
+  agent?: string; // AI agent model nomi
 }
 
 export function useAIChat(options?: UseAIChatOptions) {
@@ -25,6 +26,7 @@ export function useAIChat(options?: UseAIChatOptions) {
       const request: ChatRequest = {
         message,
         conversationHistory,
+        agent: options?.agent,
       };
 
       const response = await sendChatMessage(request);

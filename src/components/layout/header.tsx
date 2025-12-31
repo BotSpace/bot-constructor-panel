@@ -1,19 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import { PromptInterface } from "./components/ai-chat/prompt-interface";
+import { ChatWidget } from "./components/ai-chat/chat-widget";
 import { ReleasePanel } from "./components/relas/relas";
 import DebugActions from "./components/debug/debug";
 import { useParams } from "next/navigation";
 import { useLinkToParent } from "../common/link-to-parrent";
-import { ArrowLeft, Database } from "lucide-react";
+import { ArrowLeft, Database, Search } from "lucide-react";
 import { Button } from "../ui/button";
 import { useTranslations } from "next-intl";
 import { useSearchStore } from "@/features/bot-constructor/search/search-store";
+import Image from "next/image";
 
 // Asosiy Header komponenti
 export function ConstructorPageHeader() {
   const { id } = useParams();
   const t = useTranslations();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const { toggleSearchPanel } = useSearchStore();
 
@@ -41,20 +45,32 @@ export function ConstructorPageHeader() {
         <div className="flex items-center gap-2">
           <PromptInterface />
           <DebugActions />
+
+          <Button variant="outline" onClick={backToCollection}>
+            <Database />
+          </Button>
+
           <Button
             onClick={() => {
               toggleSearchPanel();
             }}
+            variant={"outline"}
           >
-            Search
+            <Search />
+          </Button>
+          <Button
+            variant={"default"}
+            size={"icon"}
+            onClick={() => setIsChatOpen(true)}
+            className="relative"
+            title="AI Chat Assistant"
+          >
+            <Image src={"/ai.png"} alt="AI" width={20} height={20} />
           </Button>
           <ReleasePanel />
-          <Button onClick={backToCollection}>
-            <Database />
-            {t("header.collections")}
-          </Button>
         </div>
       </header>
+      <ChatWidget open={isChatOpen} onOpenChange={setIsChatOpen} />
     </>
   );
 }
