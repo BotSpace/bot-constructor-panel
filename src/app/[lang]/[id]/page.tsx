@@ -97,15 +97,12 @@ export default function Page() {
   }, []); // Bo'sh massiv [] - bu effekt faqat bir marta, komponent yuklanganda ishga tushishini bildiradi
 
   const isMobile = useIsMobile();
-  const [isOriented, setIsOriented] = useState(false)
+  const [isOriented, setIsOriented] = useState(false);
 
-  if (isMobile && !isOriented) return <OrientationGuard handleOrientDevice={() => setIsOriented(true)} />
+  if (isMobile && !isOriented)
+    return <OrientationGuard handleOrientDevice={() => setIsOriented(true)} />;
   return (
     <div className="flex flex-col min-h-screen">
-      <head>
-        <title>{project?.name} | BotMother.uz</title>
-      </head>
-
       {/* Header */}
       <ConstructorPageHeader />
 
