@@ -9,6 +9,7 @@ export interface ChatMessage {
 export interface ChatRequest {
   message: string;
   conversationHistory?: ChatMessage[];
+  agent?: string; // AI agent model nomi
 }
 
 export interface ChatResponse {
