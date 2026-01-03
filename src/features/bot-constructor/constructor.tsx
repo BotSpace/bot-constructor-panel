@@ -81,7 +81,7 @@ export default function Constructor() {
   useFlowKeyboardShortcuts({
     containerRef: reactFlowWrapper,
     mousePosition: mousePosition,
-    onOpenPalette: () => { },
+    onOpenPalette: () => {},
   });
 
   // Countdown ni kamaytirish va save qilish
@@ -203,18 +203,6 @@ export default function Constructor() {
     { preventDefault: true } // Brauzerning manzil satriga o'tishini to'xtatadi
   );
 
-  // 1. Sahifa yuklanganda LocalStorage'dan holatni o'qib olish
-  const getInitialViewport = () => {
-    const savedViewport = localStorage.getItem("react-flow-viewport");
-    // Agar oldin saqlangan bo'lsa o'shani qaytaramiz, yo'qsa standart holat
-    return savedViewport ? JSON.parse(savedViewport) : { x: 0, y: 0, zoom: 1 };
-  };
-
-  // 2. Foydalanuvchi harakatni tugatganda (zoom yoki pan) saqlash
-  const onMoveEnd = useCallback((event: any, viewport: any) => {
-    localStorage.setItem("react-flow-viewport", JSON.stringify(viewport));
-  }, []);
-
   // Store'dan kerakli qismlarni olamiz
   const { formatFlow } = useFlowStore();
 
@@ -261,8 +249,6 @@ export default function Constructor() {
           >
             <ReactFlow
               id="canvas-area"
-              defaultViewport={getInitialViewport()}
-              onMoveEnd={onMoveEnd}
               nodeTypes={CustomNodes}
               edgeTypes={CustomEdge}
               nodes={nodes}
@@ -284,11 +270,7 @@ export default function Constructor() {
             >
               <SaveStatusBadge className="absolute top-2 right-2 z-20" />
               <Background gap={24} color="#666" />
-              {
-                !isMobile && (
-                  <MiniMap />
-                )
-              }
+              {!isMobile && <MiniMap />}
               <Controls />
             </ReactFlow>
           </div>

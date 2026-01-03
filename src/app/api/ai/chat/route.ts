@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { message, conversationHistory = [] } = body;
+    const { message, conversationHistory = [], agent } = body;
 
     if (!message || typeof message !== "string") {
       return NextResponse.json(
@@ -54,11 +54,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Model tanlash - Free tier uchun ishlaydigan modellar
+    // Model tanlash - agent parametri yoki default
     // gemini-1.5-flash - Tez va bepul tier'da ishlaydi
     // gemini-1.5-pro - Kuchliroq, lekin sekinroq
-    // gemini-2.5-flash - Yangi model (agar mavjud bo'lsa)
-    const modelName = process.env.AI_MODEL || "gemini-1.5-flash";
+    // gemini-2.0-flash-exp - Yangi model (agar mavjud bo'lsa)
+    const modelName = agent || process.env.AI_MODEL || "gemini-1.5-flash";
 
     // Full prompt
     const fullPrompt = `${SYSTEM_PROMPT}\n\nFoydalanuvchi: ${message}`;
