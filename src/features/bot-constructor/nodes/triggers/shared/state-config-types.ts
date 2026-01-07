@@ -8,6 +8,7 @@ export type StateType =
   | "callback"
   | "data"
   | "collection_id"
+  | "full_data"
   // File data
   | "file_id"
   // Contact data

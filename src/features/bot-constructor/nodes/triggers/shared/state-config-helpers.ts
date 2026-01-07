@@ -51,9 +51,13 @@ export function getStateTypesForMessageTrigger(
 
 /**
  * Get available state types for CallbackQueryTrigger
+ * @param isCollectionButton - Whether the selected callback is from a dynamic collection button
  */
-export function getStateTypesForCallbackQueryTrigger(): StateType[] {
-  return ["callback", "data", "collection_id"];
+export function getStateTypesForCallbackQueryTrigger(isCollectionButton: boolean = false): StateType[] {
+  if (isCollectionButton) {
+    return ["callback", "data", "collection_id", "full_data"];
+  }
+  return ["callback", "data"];
 }
 
 /**
