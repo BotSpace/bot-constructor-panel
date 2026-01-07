@@ -137,8 +137,11 @@ const CallbackQueryTriggerNodeComponent = ({
   );
 
   const availableStateTypes = useMemo(() => {
-    return getStateTypesForCallbackQueryTrigger();
-  }, []);
+    // Check if the selected callback value is from a collection button
+    const selectedValue = data.context?.value || "";
+    const isCollectionButton = selectedValue.startsWith("collection:");
+    return getStateTypesForCallbackQueryTrigger(isCollectionButton);
+  }, [data.context?.value]);
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
