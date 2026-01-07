@@ -108,23 +108,18 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
             const targetData = targetNode.data;
 
             // Ma'lumotlarni nusxalash uchun yangilanish obyekti
-            const dataUpdate: any = {};
+            const dataUpdate: Partial<{
+              newText: string;
+              newCaption: string;
+              parseMode: string;
+              keyboard: any;
+              dynamicMessages: any[];
+            }> = {};
 
             // SendTextMessageNode uchun
             if (targetNode.type === "SendTextMessageNode") {
               if (targetData.messageText) {
                 dataUpdate.newText = targetData.messageText;
-              }
-              if (targetData.parseMode) {
-                dataUpdate.parseMode = targetData.parseMode;
-              }
-              if (targetData.keyboard) {
-                dataUpdate.keyboard = JSON.parse(JSON.stringify(targetData.keyboard));
-              }
-              if (targetData.dynamicMessages) {
-                dataUpdate.dynamicMessages = JSON.parse(
-                  JSON.stringify(targetData.dynamicMessages)
-                );
               }
             }
             // SendPhotoNode, SendVideoNode, SendFileNode, SendAudioNode uchun
@@ -137,17 +132,17 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
               if (targetData.caption) {
                 dataUpdate.newCaption = targetData.caption;
               }
-              if (targetData.parseMode) {
-                dataUpdate.parseMode = targetData.parseMode;
-              }
-              if (targetData.keyboard) {
-                dataUpdate.keyboard = JSON.parse(JSON.stringify(targetData.keyboard));
-              }
-              if (targetData.dynamicMessages) {
-                dataUpdate.dynamicMessages = JSON.parse(
-                  JSON.stringify(targetData.dynamicMessages)
-                );
-              }
+            }
+
+            // Barcha xabar turlari uchun umumiy ma'lumotlar
+            if (targetData.parseMode) {
+              dataUpdate.parseMode = targetData.parseMode;
+            }
+            if (targetData.keyboard) {
+              dataUpdate.keyboard = structuredClone(targetData.keyboard);
+            }
+            if (targetData.dynamicMessages) {
+              dataUpdate.dynamicMessages = structuredClone(targetData.dynamicMessages);
             }
 
             // Agar nusxalanishi kerak bo'lgan ma'lumotlar bo'lsa, yangilash
