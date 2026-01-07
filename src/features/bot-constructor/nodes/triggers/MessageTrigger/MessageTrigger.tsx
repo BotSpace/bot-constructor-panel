@@ -15,6 +15,7 @@ import { SourceHandles, TargetHandles } from "../../components";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ElseMessageSource } from "../../components/shared/ReactFlowHandles/ElseMessageSource";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
+import { StateConfigUI, getStateTypesForMessageTrigger } from "../shared";
 
 const MessageTriggerNodeComponent = ({
   id,
@@ -55,6 +56,12 @@ const MessageTriggerNodeComponent = ({
 
   const showFilterSection =
     data.type && data.type !== "any"
+
+  // Get available state types based on message type
+  const availableStateTypes = useMemo(() => {
+    return getStateTypesForMessageTrigger(data.type);
+  }, [data.type]);
+
   return (
     <Card
       className={`w-80 rounded-lg shadow-xl border-2 ${selected ? "border-sky-500/80" : "border-gray-600/50"
@@ -112,6 +119,16 @@ const MessageTriggerNodeComponent = ({
             />
             Global
           </Label>
+
+          {/* State Configuration */}
+          {data.type && (
+            <StateConfigUI
+              state={data.state}
+              onStateChange={(state) => handleUpdate({ state })}
+              availableTypes={availableStateTypes}
+              nodeId={id}
+            />
+          )}
         </CardContent>
       )}
 
