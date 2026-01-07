@@ -77,16 +77,16 @@ export const EditMessageNode = memo(
               id={id}
             />
           ) : (
-            parrentActionType === "SendPhotoNode" ||
-            parrentActionType === "SendVideoNode" ||
-            parrentActionType === "SendFileNode" ||
-            (parrentActionType === "SendAudioNode" && (
+            (parrentActionType === "SendPhotoNode" ||
+              parrentActionType === "SendVideoNode" ||
+              parrentActionType === "SendFileNode" ||
+              parrentActionType === "SendAudioNode") && (
               <ForVideoPhotoDocumentAudio
                 data={data}
                 handleUpdate={handleUpdate}
                 id={id}
               />
-            ))
+            )
           )}
         </CardContent>
 
