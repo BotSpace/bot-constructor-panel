@@ -36,7 +36,7 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     ...createActions(set, get, {} as any),
 
     onConnect: (connection: Connection) => {
-      const { initialState, saveToHistory } = get();
+      const { initialState, saveToHistory, nodes, edges, updateNodeData } = get();
 
       // History ga saqlash (undo/redo flag tekshiriladi ichida)
       saveToHistory();
@@ -87,6 +87,77 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
         edges: newEdges,
         isDirty: hasRealChanges,
       });
+
+      // EditMessage nodedan boshqa nodega ulanish holatini tekshirish
+      if (isEditMessageEdge && connection.source && connection.target) {
+        const sourceNode = nodes.find((n) => n.id === connection.source);
+        const targetNode = nodes.find((n) => n.id === connection.target);
+
+        // Agar source EditMessageNode bo'lsa va bu birinchi ulanish bo'lsa
+        if (sourceNode && sourceNode.type === "EditMessageNode" && targetNode) {
+          // Bu EditMessageNode'dan chiqqan barcha edit-message-source edgelarni sanash
+          const existingEditEdges = edges.filter(
+            (e) =>
+              e.source === connection.source &&
+              e.sourceHandle === "edit-message-source"
+          );
+
+          // Agar bu birinchi ulanish bo'lsa (hali edgelar qo'shilmagan, faqat yangi edge bor)
+          if (existingEditEdges.length === 0) {
+            // Target nodening ma'lumotlarini nusxalash
+            const targetData = targetNode.data;
+            const sourceData = sourceNode.data;
+
+            // Ma'lumotlarni nusxalash uchun yangilanish obyekti
+            const dataUpdate: any = {};
+
+            // SendTextMessageNode uchun
+            if (targetNode.type === "SendTextMessageNode") {
+              if (targetData.messageText) {
+                dataUpdate.newText = targetData.messageText;
+              }
+              if (targetData.parseMode) {
+                dataUpdate.parseMode = targetData.parseMode;
+              }
+              if (targetData.keyboard) {
+                dataUpdate.keyboard = JSON.parse(JSON.stringify(targetData.keyboard));
+              }
+              if (targetData.dynamicMessages) {
+                dataUpdate.dynamicMessages = JSON.parse(
+                  JSON.stringify(targetData.dynamicMessages)
+                );
+              }
+            }
+            // SendPhotoNode, SendVideoNode, SendFileNode, SendAudioNode uchun
+            else if (
+              targetNode.type === "SendPhotoNode" ||
+              targetNode.type === "SendVideoNode" ||
+              targetNode.type === "SendFileNode" ||
+              targetNode.type === "SendAudioNode"
+            ) {
+              if (targetData.caption) {
+                dataUpdate.newCaption = targetData.caption;
+              }
+              if (targetData.parseMode) {
+                dataUpdate.parseMode = targetData.parseMode;
+              }
+              if (targetData.keyboard) {
+                dataUpdate.keyboard = JSON.parse(JSON.stringify(targetData.keyboard));
+              }
+              if (targetData.dynamicMessages) {
+                dataUpdate.dynamicMessages = JSON.parse(
+                  JSON.stringify(targetData.dynamicMessages)
+                );
+              }
+            }
+
+            // Agar nusxalanishi kerak bo'lgan ma'lumotlar bo'lsa, yangilash
+            if (Object.keys(dataUpdate).length > 0) {
+              updateNodeData(connection.source, dataUpdate);
+            }
+          }
+        }
+      }
     },
   };
 });
