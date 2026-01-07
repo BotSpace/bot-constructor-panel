@@ -25,10 +25,7 @@ const StateConfigComponent = ({
   availableTypes,
   nodeId,
 }: StateConfigComponentProps) => {
-  const [enabled, setEnabled] = useMemo(
-    () => [!!state, (val: boolean) => !val && onStateChange(undefined)],
-    [state, onStateChange]
-  );
+  const enabled = !!state;
 
   const handleKeyChange = (key: string) => {
     if (state) {
