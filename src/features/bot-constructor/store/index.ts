@@ -7,6 +7,8 @@ import { createClipboardSlice } from "./clipboardSlice";
 import { createHistorySlice } from "./historySlice";
 import { createActions } from "./actions";
 import { Connection, addEdge } from "reactflow";
+import { KeyboardConfig } from "@/features/bot-constructor/components";
+import { DynamicMessage, ParseMode } from "@/features/bot-constructor/nodes/actions/shared/types";
 
 // Keling, shu usulga o'tamiz.
 export const useFlowStore = create<FlowStoreState>()((set, get) => {
@@ -95,15 +97,15 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 
         // Agar source EditMessageNode bo'lsa va bu birinchi ulanish bo'lsa
         if (sourceNode && sourceNode.type === "EditMessageNode" && targetNode) {
-          // Bu EditMessageNode'dan chiqqan barcha edit-message-source edgelarni sanash
-          const existingEditEdges = edges.filter(
+          // Yangi qo'shilgan edge bilan birga EditMessageNode'dan chiqqan barcha edit-message-source edgelarni sanash
+          const editEdgesCount = newEdges.filter(
             (e) =>
               e.source === connection.source &&
               e.sourceHandle === "edit-message-source"
-          );
+          ).length;
 
-          // Agar bu birinchi ulanish bo'lsa (hali edgelar qo'shilmagan, faqat yangi edge bor)
-          if (existingEditEdges.length === 0) {
+          // Agar bu birinchi ulanish bo'lsa (faqat yangi edge bor)
+          if (editEdgesCount === 1) {
             // Target nodening ma'lumotlarini nusxalash
             const targetData = targetNode.data;
 
@@ -111,9 +113,9 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
             const dataUpdate: Partial<{
               newText: string;
               newCaption: string;
-              parseMode: string;
-              keyboard: any;
-              dynamicMessages: any[];
+              parseMode: ParseMode;
+              keyboard: KeyboardConfig;
+              dynamicMessages: DynamicMessage[];
             }> = {};
 
             // SendTextMessageNode uchun
