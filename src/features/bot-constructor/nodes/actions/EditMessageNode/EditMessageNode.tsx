@@ -61,14 +61,6 @@ export const EditMessageNode = memo(
             </SelectContent>
           </Select>
 
-          {nearestParentAction ? null : (
-            <div>
-              <p className="p-4 text-center text-red-500">
-                No parent action found
-              </p>
-            </div>
-          )}
-
           {data.messageIdSource === "message_id" ? (
             <>
               <Input
@@ -77,7 +69,8 @@ export const EditMessageNode = memo(
                 placeholder="Enter message id"
               />
             </>
-          ) : parrentActionType === "SendTextMessageNode" ? (
+          ) : parrentActionType === "SendTextMessageNode" ||
+            !parrentActionType ? (
             <ForTextMessageNode
               data={data}
               handleUpdate={handleUpdate}
