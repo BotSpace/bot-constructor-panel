@@ -10,6 +10,15 @@ import { Connection, addEdge } from "reactflow";
 import { KeyboardConfig } from "@/features/bot-constructor/components";
 import { DynamicMessage, ParseMode } from "@/features/bot-constructor/nodes/actions/shared/types";
 
+// EditMessage node uchun ma'lumotlarni nusxalash uchun interface
+interface EditMessageDataUpdate {
+  newText?: string;
+  newCaption?: string;
+  parseMode?: ParseMode;
+  keyboard?: KeyboardConfig;
+  dynamicMessages?: DynamicMessage[];
+}
+
 // Keling, shu usulga o'tamiz.
 export const useFlowStore = create<FlowStoreState>()((set, get) => {
   return {
@@ -92,11 +101,11 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 
       // EditMessage nodedan boshqa nodega ulanish holatini tekshirish
       if (isEditMessageEdge && connection.source && connection.target) {
-        const sourceNode = nodes.find((n) => n.id === connection.source);
-        const targetNode = nodes.find((n) => n.id === connection.target);
+        const editMessageNode = nodes.find((n) => n.id === connection.source);
+        const messageNode = nodes.find((n) => n.id === connection.target);
 
         // Agar source EditMessageNode bo'lsa va bu birinchi ulanish bo'lsa
-        if (sourceNode && sourceNode.type === "EditMessageNode" && targetNode) {
+        if (editMessageNode && editMessageNode.type === "EditMessageNode" && messageNode) {
           // Yangi qo'shilgan edge bilan birga EditMessageNode'dan chiqqan barcha edit-message-source edgelarni sanash
           const editEdgesCount = newEdges.filter(
             (e) =>
@@ -106,45 +115,39 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 
           // Agar bu birinchi ulanish bo'lsa (faqat yangi edge bor)
           if (editEdgesCount === 1) {
-            // Target nodening ma'lumotlarini nusxalash
-            const targetData = targetNode.data;
+            // Message nodening ma'lumotlarini nusxalash
+            const messageData = messageNode.data;
 
             // Ma'lumotlarni nusxalash uchun yangilanish obyekti
-            const dataUpdate: Partial<{
-              newText: string;
-              newCaption: string;
-              parseMode: ParseMode;
-              keyboard: KeyboardConfig;
-              dynamicMessages: DynamicMessage[];
-            }> = {};
+            const dataUpdate: EditMessageDataUpdate = {};
 
             // SendTextMessageNode uchun
-            if (targetNode.type === "SendTextMessageNode") {
-              if (targetData.messageText) {
-                dataUpdate.newText = targetData.messageText;
+            if (messageNode.type === "SendTextMessageNode") {
+              if (messageData.messageText) {
+                dataUpdate.newText = messageData.messageText;
               }
             }
             // SendPhotoNode, SendVideoNode, SendFileNode, SendAudioNode uchun
             else if (
-              targetNode.type === "SendPhotoNode" ||
-              targetNode.type === "SendVideoNode" ||
-              targetNode.type === "SendFileNode" ||
-              targetNode.type === "SendAudioNode"
+              messageNode.type === "SendPhotoNode" ||
+              messageNode.type === "SendVideoNode" ||
+              messageNode.type === "SendFileNode" ||
+              messageNode.type === "SendAudioNode"
             ) {
-              if (targetData.caption) {
-                dataUpdate.newCaption = targetData.caption;
+              if (messageData.caption) {
+                dataUpdate.newCaption = messageData.caption;
               }
             }
 
             // Barcha xabar turlari uchun umumiy ma'lumotlar
-            if (targetData.parseMode) {
-              dataUpdate.parseMode = targetData.parseMode;
+            if (messageData.parseMode) {
+              dataUpdate.parseMode = messageData.parseMode;
             }
-            if (targetData.keyboard) {
-              dataUpdate.keyboard = structuredClone(targetData.keyboard);
+            if (messageData.keyboard) {
+              dataUpdate.keyboard = structuredClone(messageData.keyboard);
             }
-            if (targetData.dynamicMessages) {
-              dataUpdate.dynamicMessages = structuredClone(targetData.dynamicMessages);
+            if (messageData.dynamicMessages) {
+              dataUpdate.dynamicMessages = structuredClone(messageData.dynamicMessages);
             }
 
             // Agar nusxalanishi kerak bo'lgan ma'lumotlar bo'lsa, yangilash
