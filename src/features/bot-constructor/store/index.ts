@@ -106,7 +106,6 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
           if (existingEditEdges.length === 0) {
             // Target nodening ma'lumotlarini nusxalash
             const targetData = targetNode.data;
-            const sourceData = sourceNode.data;
 
             // Ma'lumotlarni nusxalash uchun yangilanish obyekti
             const dataUpdate: any = {};
