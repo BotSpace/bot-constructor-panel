@@ -1,4 +1,5 @@
 import { ButtonConfig } from "@/features/bot-constructor/components";
+import { StateConfig } from "../shared";
 
 export interface ReplyButtonTriggerData {
   // `selectedButtons` (ko'plik) o'rniga `selectedButton` (birlik)
@@ -7,4 +8,5 @@ export interface ReplyButtonTriggerData {
   context: {};
   // Hech qanday tugma bosilmasa ham tutib olish
   catchNoButton?: boolean;
+  state?: StateConfig;
 }
