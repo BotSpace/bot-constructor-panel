@@ -62,10 +62,16 @@ export function ConstructorPageHeader() {
             variant={"default"}
             size={"icon"}
             onClick={() => setIsChatOpen(true)}
-            className="relative"
+            className="relative w-10 h-10"
             title="AI Chat Assistant"
           >
-            <Image src={"/ai.png"} alt="AI" width={20} height={20} />
+            <Image 
+              src={"/ai.png"} 
+              alt="AI" 
+              width={24} 
+              height={24}
+              className="object-contain"
+            />
           </Button>
           <ReleasePanel />
         </div>
