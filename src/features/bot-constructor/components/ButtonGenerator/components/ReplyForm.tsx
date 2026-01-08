@@ -45,7 +45,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useNodes } from "reactflow";
-import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
 import {
   Card,
   CardContent,
@@ -54,6 +53,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CollectionButtonForm } from "./CollectionButtonForm";
+import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 
 interface ReplyFormProps {
   onAdd: (button: ButtonConfig) => void;
@@ -134,19 +134,10 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
     enabled: !!selectedCollection,
   });
 
-  // State keys'larni olish
+  // State keys'larni olish (StateNode va Trigger'lardan)
   const nodes = useNodes();
   const availableStateKeys = useMemo(() => {
-    const stateKeys = new Set<string>();
-    nodes.forEach((node) => {
-      if (node.type === "StateNode") {
-        const nodeData = node.data as StateNodeData;
-        if (nodeData.key && nodeData.key.trim() !== "") {
-          stateKeys.add(nodeData.key);
-        }
-      }
-    });
-    return Array.from(stateKeys).sort();
+    return getAvailableStateKeys(nodes);
   }, [nodes]);
 
   const handleCollectionChange = (collectionName: string) => {
