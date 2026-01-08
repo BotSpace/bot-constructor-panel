@@ -34,8 +34,16 @@ function hasStateConfig(data: unknown): data is TriggerNodeWithState {
     typeof data === "object" &&
     data !== null &&
     "state" in data &&
+    (data as TriggerNodeWithState).state !== null &&
     typeof (data as TriggerNodeWithState).state === "object"
   );
+}
+
+/**
+ * Type guard to check if a node type is a trigger type with state support
+ */
+function isTriggerTypeWithState(nodeType: string): nodeType is typeof TRIGGER_TYPES_WITH_STATE[number] {
+  return TRIGGER_TYPES_WITH_STATE.includes(nodeType as typeof TRIGGER_TYPES_WITH_STATE[number]);
 }
 
 /**
@@ -51,6 +59,8 @@ export function getAvailableStateKeys(nodes: Node[]): string[] {
   const stateKeys = new Set<string>();
 
   nodes.forEach((node) => {
+    if (!node.type) return;
+    
     // Check StateNode
     if (node.type === "StateNode") {
       const nodeData = node.data as StateNodeData;
@@ -59,7 +69,7 @@ export function getAvailableStateKeys(nodes: Node[]): string[] {
       }
     }
     // Check trigger nodes with state configuration
-    else if (TRIGGER_TYPES_WITH_STATE.includes(node.type as typeof TRIGGER_TYPES_WITH_STATE[number])) {
+    else if (isTriggerTypeWithState(node.type)) {
       if (hasStateConfig(node.data)) {
         const stateKey = node.data.state?.key;
         if (stateKey && stateKey.trim() !== "") {
