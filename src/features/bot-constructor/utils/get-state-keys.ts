@@ -17,6 +17,28 @@ type TriggerNodeWithState =
   | ReplyButtonTriggerData;
 
 /**
+ * Node types that support state configuration
+ */
+const TRIGGER_TYPES_WITH_STATE = [
+  "MessageTriggerNode",
+  "CallbackQueryTriggerNode",
+  "CommandTriggerNode",
+  "ReplyButtonTriggerNode",
+] as const;
+
+/**
+ * Type guard to check if node data has state configuration
+ */
+function hasStateConfig(data: unknown): data is TriggerNodeWithState {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    "state" in data &&
+    typeof (data as TriggerNodeWithState).state === "object"
+  );
+}
+
+/**
  * Extract all available state keys from nodes in the flow.
  * This includes:
  * - StateNode keys
@@ -37,15 +59,12 @@ export function getAvailableStateKeys(nodes: Node[]): string[] {
       }
     }
     // Check trigger nodes with state configuration
-    else if (
-      node.type === "MessageTriggerNode" ||
-      node.type === "CallbackQueryTriggerNode" ||
-      node.type === "CommandTriggerNode" ||
-      node.type === "ReplyButtonTriggerNode"
-    ) {
-      const nodeData = node.data as TriggerNodeWithState;
-      if (nodeData.state?.key && nodeData.state.key.trim() !== "") {
-        stateKeys.add(nodeData.state.key);
+    else if (TRIGGER_TYPES_WITH_STATE.includes(node.type as typeof TRIGGER_TYPES_WITH_STATE[number])) {
+      if (hasStateConfig(node.data)) {
+        const stateKey = node.data.state?.key;
+        if (stateKey && stateKey.trim() !== "") {
+          stateKeys.add(stateKey);
+        }
       }
     }
   });
