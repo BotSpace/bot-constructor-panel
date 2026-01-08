@@ -17,6 +17,13 @@ type TriggerNodeWithState =
   | ReplyButtonTriggerData;
 
 /**
+ * Type for trigger node with required state
+ */
+type TriggerNodeWithRequiredState = TriggerNodeWithState & {
+  state: NonNullable<TriggerNodeWithState["state"]>;
+};
+
+/**
  * Node types that support state configuration
  */
 const TRIGGER_TYPES_WITH_STATE = [
@@ -29,21 +36,22 @@ const TRIGGER_TYPES_WITH_STATE = [
 /**
  * Type guard to check if node data has state configuration
  */
-function hasStateConfig(data: unknown): data is TriggerNodeWithState {
-  return (
-    typeof data === "object" &&
-    data !== null &&
-    "state" in data &&
-    (data as TriggerNodeWithState).state !== null &&
-    typeof (data as TriggerNodeWithState).state === "object"
-  );
+function hasStateConfig(data: unknown): data is TriggerNodeWithRequiredState {
+  if (typeof data !== "object" || data === null || !("state" in data)) {
+    return false;
+  }
+  
+  const triggerData = data as TriggerNodeWithState;
+  return triggerData.state !== null && 
+         triggerData.state !== undefined && 
+         typeof triggerData.state === "object";
 }
 
 /**
  * Type guard to check if a node type is a trigger type with state support
  */
 function isTriggerTypeWithState(nodeType: string): nodeType is typeof TRIGGER_TYPES_WITH_STATE[number] {
-  return TRIGGER_TYPES_WITH_STATE.includes(nodeType as typeof TRIGGER_TYPES_WITH_STATE[number]);
+  return (TRIGGER_TYPES_WITH_STATE as readonly string[]).includes(nodeType);
 }
 
 /**
@@ -71,7 +79,7 @@ export function getAvailableStateKeys(nodes: Node[]): string[] {
     // Check trigger nodes with state configuration
     else if (isTriggerTypeWithState(node.type)) {
       if (hasStateConfig(node.data)) {
-        const stateKey = node.data.state?.key;
+        const stateKey = node.data.state.key;
         if (stateKey && stateKey.trim() !== "") {
           stateKeys.add(stateKey);
         }
