@@ -29,7 +29,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useNodes } from "reactflow";
-import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
 import {
   Card,
   CardContent,
@@ -40,6 +39,7 @@ import {
 import SeparatorWithTitle from "@/components/common/separetor";
 import { Badge } from "@/components/ui/badge";
 import { CollectionButtonForm } from "./CollectionButtonForm";
+import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 
 interface InlineFormProps {
   onAdd: (button: ButtonConfig) => void;
@@ -142,19 +142,10 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
     enabled: !!selectedCollection,
   });
 
-  // State keys'larni olish
+  // State keys'larni olish (StateNode va Trigger'lardan)
   const nodes = useNodes();
   const availableStateKeys = useMemo(() => {
-    const stateKeys = new Set<string>();
-    nodes.forEach((node) => {
-      if (node.type === "StateNode") {
-        const nodeData = node.data as StateNodeData;
-        if (nodeData.key && nodeData.key.trim() !== "") {
-          stateKeys.add(nodeData.key);
-        }
-      }
-    });
-    return Array.from(stateKeys).sort();
+    return getAvailableStateKeys(nodes);
   }, [nodes]);
 
   // Collection o'zgarganda filter'larni tozalash
