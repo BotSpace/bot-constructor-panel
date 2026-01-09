@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 12/28/2025, 11:11:40 AM
+Sana: 1/7/2026, 3:44:26 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -34,6 +34,7 @@ bot-constructor-panel
 │   └── pre-push
 ├── Dockerfile
 ├── README.md
+├── Telegram bot API
 ├── components.json
 ├── docs
 │   ├── AI_INTEGRATION_GUIDE.md
@@ -114,7 +115,6 @@ bot-constructor-panel
 │   │       ├── context-menu.tsx
 │   │       ├── dialog.tsx
 │   │       ├── dropdown-menu.tsx
-│   │       ├── hover-border-gradient.tsx
 │   │       ├── input-group.tsx
 │   │       ├── input-otp.tsx
 │   │       ├── input.tsx
@@ -454,8 +454,7 @@ bot-constructor-panel
 │   └── wss
 │       └── web-socket-provider.tsx
 ├── stack.yaml
-├── test.ts
-├── todo
+├── telegra-bot-api.md
 └── tsconfig.json
 ```
 
