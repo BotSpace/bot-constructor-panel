@@ -15,15 +15,10 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials) {
-        console.log("🚀 ~ file: option.ts:22 ~ credentials:", credentials);
         const code = credentials?.code as string;
-        console.log("🚀 ~ file: option.ts:24 ~ code:", code);
 
         // Avval Confirm API orqali tasdiqlash tokenlarini olish
         let { data, request, status, headers, config } = await Login({ code });
-        console.log("🚀 ~ file: option.ts:27 ~ status:", status);
-        console.log("🚀 ~ file: option.ts:27 ~ request:", request);
-        console.log("🚀 ~ file: option.ts:27 ~ data:", data);
 
         if (!data) {
           throw new Error("Code hato");

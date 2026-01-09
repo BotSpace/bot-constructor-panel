@@ -21,6 +21,7 @@ import { SendLocationNodeData } from "../nodes/actions/LocationNode/types";
 import { CallbackAnswerNodeData } from "../nodes/custom/CallbackAnswerNode/types";
 import { getFormatFlow } from "../lib/format-flow";
 import { generateId } from "@/lib/utils";
+import { EncryptFlow } from "./encrypt";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
@@ -195,12 +196,16 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     const { nodes, edges } = get();
     set({ isLoading: true });
 
+    const flow = {
+      nodes: nodes,
+      edges: edges,
+    };
+
+    const encryptedNodes = await EncryptFlow(JSON.stringify(flow));
+
     try {
       const response = await instanceAuth.patch(`/project/${project_id}/`, {
-        flow: {
-          nodes: nodes,
-          edges: edges,
-        },
+        encryptedNodes,
       });
       if (response.status !== 200) {
         throw new Error("Serverda saqlashda xatolik.");
