@@ -58,7 +58,7 @@ export function ConstructorPageHeader() {
             <Search />
           </Button>
 
-          <Button
+          {/* <Button
             variant={"default"}
             size={"icon"}
             onClick={() => setIsChatOpen(true)}
@@ -66,7 +66,7 @@ export function ConstructorPageHeader() {
             title="AI Chat Assistant"
           >
             <Image src={"/ai.png"} alt="AI" width={20} height={20} />
-          </Button>
+          </Button> */}
 
           <DebugActions />
 
