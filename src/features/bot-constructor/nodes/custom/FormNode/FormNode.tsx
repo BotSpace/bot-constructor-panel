@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import React, { useState } from "react";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { cn } from "@/lib/utils";
-import { TargetHandles } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import AddItemModal from "./components/add-item-modal";
 import { NodeProps } from "reactflow";
 import { FormNodeData } from "./types";
@@ -154,6 +154,8 @@ export function FormNode({ data, id, selected }: NodeProps<FormNodeData>) {
           editingItem={editingItem}
           onClose={() => setEditingItem(null)}
         />
+
+        <SourceHandles />
       </CardContent>
     </Card>
   );
