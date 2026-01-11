@@ -61,38 +61,34 @@ export function ChatWidget({ open, onOpenChange }: ChatWidgetProps) {
   const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const {
-    sendMessage,
-    isLoading,
-    conversationHistory,
-    clearHistory,
-  } = useAIChat({
-    agent: selectedAgent.model,
-    onSuccess: (responseText) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: responseText,
-          timestamp: new Date(),
-        },
-      ]);
-      setPrompt("");
-      // Chat'ni saqlash
-      saveCurrentChat();
-    },
-    onError: (error) => {
-      console.error("AI Chat Error:", error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: `❌ Xatolik: ${error}`,
-          timestamp: new Date(),
-        },
-      ]);
-    },
-  });
+  const { sendMessage, isLoading, conversationHistory, clearHistory } =
+    useAIChat({
+      agent: selectedAgent.model,
+      onSuccess: (responseText) => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: responseText,
+            timestamp: new Date(),
+          },
+        ]);
+        setPrompt("");
+        // Chat'ni saqlash
+        saveCurrentChat();
+      },
+      onError: (error) => {
+        console.error("AI Chat Error:", error);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: `❌ Xatolik: ${error}`,
+            timestamp: new Date(),
+          },
+        ]);
+      },
+    });
 
   // Chatlar tarixini yuklash
   useEffect(() => {
@@ -103,9 +99,12 @@ export function ChatWidget({ open, onOpenChange }: ChatWidgetProps) {
 
   const loadChatHistory = () => {
     const history = getChatHistory();
-    setChatHistory(history.sort((a, b) => 
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    ));
+    setChatHistory(
+      history.sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      )
+    );
   };
 
   const saveCurrentChat = () => {
@@ -116,9 +115,10 @@ export function ChatWidget({ open, onOpenChange }: ChatWidgetProps) {
       content: msg.content,
     }));
 
-    const title = messages.length > 0 
-      ? generateChatTitle(messages[0].content)
-      : "Yangi suhbat";
+    const title =
+      messages.length > 0
+        ? generateChatTitle(messages[0].content)
+        : "Yangi suhbat";
 
     const existingChat = currentChatId
       ? chatHistory.find((c) => c.id === currentChatId)
@@ -222,7 +222,11 @@ export function ChatWidget({ open, onOpenChange }: ChatWidgetProps) {
         timestamp: new Date(),
       }));
       setMessages(historyWithTimestamps);
-    } else if (open && conversationHistory.length === 0 && messages.length === 0) {
+    } else if (
+      open &&
+      conversationHistory.length === 0 &&
+      messages.length === 0
+    ) {
       setMessages([]);
     }
   }, [open, conversationHistory]);
@@ -276,9 +280,13 @@ export function ChatWidget({ open, onOpenChange }: ChatWidgetProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setViewMode(viewMode === "chat" ? "history" : "chat")}
+                onClick={() =>
+                  setViewMode(viewMode === "chat" ? "history" : "chat")
+                }
                 className="h-8 px-2 text-muted-foreground hover:text-foreground"
-                title={viewMode === "chat" ? "Chatlar tarixi" : "Chatga qaytish"}
+                title={
+                  viewMode === "chat" ? "Chatlar tarixi" : "Chatga qaytish"
+                }
               >
                 {viewMode === "chat" ? (
                   <History className="h-4 w-4" />
@@ -304,7 +312,8 @@ export function ChatWidget({ open, onOpenChange }: ChatWidgetProps) {
               <Select
                 value={selectedAgent.id}
                 onValueChange={(value) => {
-                  const agent = AI_AGENTS.find((a) => a.id === value) || DEFAULT_AGENT;
+                  const agent =
+                    AI_AGENTS.find((a) => a.id === value) || DEFAULT_AGENT;
                   setSelectedAgent(agent);
                 }}
               >
@@ -352,8 +361,8 @@ export function ChatWidget({ open, onOpenChange }: ChatWidgetProps) {
                     </h3>
                     <p className="text-sm text-muted-foreground max-w-[280px] mb-4">
                       Bot yaratishda yordam olish uchun savol bering. Men sizga
-                      node konfiguratsiyalari, flow yaratish va optimallashtirish
-                      bo'yicha tavsiyalar beraman.
+                      node konfiguratsiyalari, flow yaratish va
+                      optimallashtirish bo'yicha tavsiyalar beraman.
                     </p>
                     <div className="space-y-2 w-full max-w-[280px]">
                       <div className="text-xs text-muted-foreground font-medium">
@@ -514,7 +523,8 @@ export function ChatWidget({ open, onOpenChange }: ChatWidgetProps) {
                             {chat.title}
                           </h4>
                           <span className="text-xs text-muted-foreground px-1.5 py-0.5 bg-background rounded">
-                            {AI_AGENTS.find((a) => a.id === chat.agent)?.name || chat.agent}
+                            {AI_AGENTS.find((a) => a.id === chat.agent)?.name ||
+                              chat.agent}
                           </span>
                         </div>
                         <p className="text-xs text-muted-foreground line-clamp-2 mb-1">
@@ -524,12 +534,15 @@ export function ChatWidget({ open, onOpenChange }: ChatWidgetProps) {
                           <span>{chat.messages.length} xabar</span>
                           <span>•</span>
                           <span>
-                            {new Date(chat.updatedAt).toLocaleDateString("uz-UZ", {
-                              day: "numeric",
-                              month: "short",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            {new Date(chat.updatedAt).toLocaleDateString(
+                              "uz-UZ",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
                           </span>
                         </div>
                       </div>

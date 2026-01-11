@@ -171,6 +171,10 @@
         "name": "Check membership",
         "description": "Checks if user is a member of channel/group."
       },
+      "form": {
+        "name": "Form",
+        "description": "Collects user data through a form."
+      },
       "elseif": {
         "name": "Else If",
         "description": "Additional condition check after If."
