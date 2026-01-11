@@ -23,6 +23,8 @@ import { ParameterInput } from "@/features/bot-constructor/nodes/triggers/Messag
 import { getFiltersForType } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/utils";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
 import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { Input } from "@/components/ui/input";
+import { varibulNameValidator } from "@/lib/input-validators";
 
 type Props = {
   onAddItem: (item: FormNodeData["items"][0]) => void;
@@ -41,6 +43,9 @@ function AddItemModal({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<MessageTriggerValueTypes | "">("");
+  const [stateKey, setStateKey] = useState("");
+  const [stateKeyError, setStateKeyError] = useState<string>("");
+
   const [filter, setFilter] = useState<string>("any");
   const [context, setContext] = useState<FormNodeData["items"][0]["context"]>({
     value: undefined,
@@ -76,6 +81,8 @@ function AddItemModal({
         }
       );
       setMessageText(editingItem.question || "");
+      setStateKey(editingItem.key || "");
+      setStateKeyError("");
       setKeyboard(
         editingItem.keyboard || {
           active: "inline",
@@ -89,6 +96,8 @@ function AddItemModal({
       setFilter("any");
       setContext({ value: undefined, radius: undefined, size: undefined });
       setMessageText("");
+      setStateKey("");
+      setStateKeyError("");
       setKeyboard({
         active: "inline",
         inline: [],
@@ -131,7 +140,13 @@ function AddItemModal({
       return;
     }
 
+    // Validate stateKey
+    if (!stateKey || !varibulNameValidator(stateKey)) {
+      return;
+    }
+
     const item: FormNodeData["items"][0] = {
+      key: stateKey,
       question: messageText,
       type,
       filter: filter || "any",
@@ -151,6 +166,7 @@ function AddItemModal({
     setFilter("any");
     setContext({ value: undefined, radius: undefined, size: undefined });
     setMessageText("");
+    setStateKey("");
     setKeyboard({
       active: "inline",
       inline: [],
@@ -198,6 +214,40 @@ function AddItemModal({
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
               />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-gray-400">state key</Label>
+              <Input
+                value={stateKey}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setStateKey(value);
+                  // Validate on change
+                  if (value && !varibulNameValidator(value)) {
+                    setStateKeyError(
+                      "O'zgaruvchi nomi noto'g'ri formatda. Faqat harflar, raqamlar va pastki chiziq (_) ishlatish mumkin. Birinchi belgi harf yoki pastki chiziq bo'lishi kerak."
+                    );
+                  } else {
+                    setStateKeyError("");
+                  }
+                }}
+                onBlur={() => {
+                  // Validate on blur
+                  if (stateKey && !varibulNameValidator(stateKey)) {
+                    setStateKeyError(
+                      "O'zgaruvchi nomi noto'g'ri formatda. Faqat harflar, raqamlar va pastki chiziq (_) ishlatish mumkin. Birinchi belgi harf yoki pastki chiziq bo'lishi kerak."
+                    );
+                  } else {
+                    setStateKeyError("");
+                  }
+                }}
+                aria-invalid={!!stateKeyError}
+                placeholder="masalan: user_name"
+              />
+              {stateKeyError && (
+                <p className="text-xs text-destructive mt-1">{stateKeyError}</p>
+              )}
             </div>
 
             <div className="space-y-1.5">
@@ -250,7 +300,10 @@ function AddItemModal({
                 Bekor qilish
               </Button>
             </DialogClose>
-            <Button onClick={handleSubmit} disabled={!type}>
+            <Button
+              onClick={handleSubmit}
+              disabled={!type || !stateKey || !varibulNameValidator(stateKey)}
+            >
               Saqlash
             </Button>
           </DialogFooter>
