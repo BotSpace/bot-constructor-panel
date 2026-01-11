@@ -1,5 +1,5 @@
 import { StateCreator } from "zustand";
-import { Node, useReactFlow } from "reactflow";
+import { Node } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
 import { ElementItemType } from "@/types/element-types";
 import { instanceAuth } from "@/services/instance";
@@ -21,6 +21,7 @@ import { SendLocationNodeData } from "../nodes/actions/LocationNode/types";
 import { CallbackAnswerNodeData } from "../nodes/custom/CallbackAnswerNode/types";
 import { getFormatFlow } from "../lib/format-flow";
 import { generateId } from "@/lib/utils";
+import { FormNodeData } from "../nodes/custom/FormNode/types";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
@@ -157,6 +158,10 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
           value: "",
         },
       } as CallbackQueryTriggerData;
+
+    case "FormNode":
+      return { items: [] } as FormNodeData;
+
     // Custom Nodes
     case "StateNode":
       return {

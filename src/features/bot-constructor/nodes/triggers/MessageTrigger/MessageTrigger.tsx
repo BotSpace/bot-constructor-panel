@@ -29,10 +29,9 @@ const MessageTriggerNodeComponent = ({
   };
 
   const onTypeChange = (newType: string) => {
-
     handleUpdate({
       type: newType as MessageTriggerValueTypes,
-      filter: 'any',
+      filter: "any",
     });
   };
 
@@ -43,9 +42,7 @@ const MessageTriggerNodeComponent = ({
   const { filtersForType, isNodeConfigured } = useMemo(() => {
     const filters = getFiltersForType(data.type);
 
-    const configured =
-      data.type === "any" ||
-      (!!data.type && !!data.filter);
+    const configured = data.type === "any" || (!!data.type && !!data.filter);
 
     return {
       filtersForType: filters,
@@ -53,12 +50,12 @@ const MessageTriggerNodeComponent = ({
     };
   }, [data.type, data.filter]);
 
-  const showFilterSection =
-    data.type && data.type !== "any"
+  const showFilterSection = data.type && data.type !== "any";
   return (
     <Card
-      className={`w-80 rounded-lg shadow-xl border-2 ${selected ? "border-sky-500/80" : "border-gray-600/50"
-        }`}
+      className={`w-80 rounded-lg shadow-xl border-2 ${
+        selected ? "border-sky-500/80" : "border-gray-600/50"
+      }`}
     >
       <TargetHandles />
       <ElseMessageSource />
