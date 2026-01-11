@@ -41,6 +41,7 @@ export interface ElementItemType {
     | "random"
     | "variable"
     | "check_membership"
+    | "form"
     // Integration
     | "http_request"
     | "callback_answer"
