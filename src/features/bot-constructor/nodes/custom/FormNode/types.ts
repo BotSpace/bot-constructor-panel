@@ -19,6 +19,7 @@ export interface FormNodeData {
     order: number;
     type: MessageTriggerValueTypes;
     filter: string;
+    key: string;
     context: {
       value?: string;
       radius?: RadiusContext;
