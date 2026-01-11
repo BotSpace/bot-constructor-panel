@@ -44,7 +44,6 @@ export function ConstructorPageHeader() {
         </div>
         <div className="flex items-center gap-2">
           <PromptInterface />
-          <DebugActions />
 
           <Button variant="outline" onClick={backToCollection}>
             <Database />
@@ -58,6 +57,7 @@ export function ConstructorPageHeader() {
           >
             <Search />
           </Button>
+
           <Button
             variant={"default"}
             size={"icon"}
@@ -67,6 +67,9 @@ export function ConstructorPageHeader() {
           >
             <Image src={"/ai.png"} alt="AI" width={20} height={20} />
           </Button>
+
+          <DebugActions />
+
           <ReleasePanel />
         </div>
       </header>
