@@ -81,7 +81,7 @@ export default function Constructor() {
   useFlowKeyboardShortcuts({
     containerRef: reactFlowWrapper,
     mousePosition: mousePosition,
-    onOpenPalette: () => {},
+    onOpenPalette: () => { },
   });
 
   // Countdown ni kamaytirish va save qilish
