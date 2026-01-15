@@ -108,7 +108,11 @@ function LoadCollectionItemNode({
               placeholder="e.g., selected_film"
               value={data.contextKey || ""}
               onChange={(e) => handleUpdate({ contextKey: e.target.value })}
+              required
             />
+            {data.contextKey.length <= 0 && (
+              <p className="text-red-500">Context key must be at least 1 character long</p>
+            )}
             <p className="text-xs text-muted-foreground">
               Use: {"{"}
               {"{"}collection_{data.contextKey || "key"}_fieldname{"}}"}
