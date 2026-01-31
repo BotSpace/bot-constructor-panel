@@ -18,10 +18,12 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const socketRef = useRef<WebSocketType>(null);
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const shouldReconnectRef = useRef(true);
   const session = useSession();
 
   useEffect(() => {
     console.log(project);
+    shouldReconnectRef.current = true; // Enable reconnection when effect runs
     
     const connectWebSocket = () => {
       if (session.status !== "authenticated" || !project) {
@@ -81,6 +83,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         console.log("WS closed");
         socketRef.current = null;
 
+        // Only attempt reconnection if it's not an intentional disconnect
+        if (!shouldReconnectRef.current) {
+          return;
+        }
+
         // Attempt to reconnect with exponential backoff
         if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
           const delay = Math.min(
@@ -107,6 +114,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
     // Cleanup on unmount
     return () => {
+      shouldReconnectRef.current = false; // Disable reconnection on cleanup
+      
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
@@ -118,7 +127,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         socketRef.current = null;
       }
     };
-  }, [session.status, project, changeRelease, changeDebug, changeProject]);
+  }, [session.status, project]);
 
   return (
     <WebSocketContext.Provider value={socketRef.current}>
