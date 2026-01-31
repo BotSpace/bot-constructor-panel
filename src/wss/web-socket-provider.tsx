@@ -18,7 +18,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     console.log(project);
     if (!socketRef.current && session.status === "authenticated" && project) {
       const ws = new WebSocket(
-        `wss://api.botmother.uz/ws/events/?token=${session.data.user.access}`
+        `wss://api.botmother.uz/ws/events?token=${session.data.user.access}`
       );
 
       socketRef.current = ws;
