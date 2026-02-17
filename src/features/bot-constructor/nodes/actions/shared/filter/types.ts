@@ -1,4 +1,4 @@
-export type FilterType = "text" | "number" | "bool" | "datetime" | "file" | "audio" | "video" | "photo";
+export type FilterType = "text" | "number" | "bool" | "datetime" | "file" | "audio" | "video" | "photo" | "relation";
 
 export type TextOperator =
   | "equals"

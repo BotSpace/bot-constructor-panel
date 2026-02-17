@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
 
 type Props = {};
 
-function Elements({}: Props) {
+function Elements({ }: Props) {
   const Elements = useElements();
   const t = useTranslations();
 
@@ -102,7 +102,7 @@ function Elements({}: Props) {
                           draggable
                           onDragStart={(e) => {
                             e.dataTransfer.setData(
-                              "application/json",
+                              "text/plain",
                               JSON.stringify(element)
                             );
                           }}

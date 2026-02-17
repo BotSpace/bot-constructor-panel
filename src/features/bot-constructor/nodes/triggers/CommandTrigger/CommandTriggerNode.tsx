@@ -1,18 +1,19 @@
 // FAYL: constructor/nodes/triggers/CommandTrigger/CommandTriggerNode.tsx
 
-import { memo } from "react";
+import { memo, useState } from "react";
 import { NodeProps } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { CommandTriggerNodeData } from "./types";
 import { cn } from "@/lib/utils";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Command } from "lucide-react";
 
 import { SourceHandles, TargetHandles } from "../../components";
+import { TriggerHeader } from "../shared/TriggerHeader";
 
 const CommandTriggerNodeComponent = ({
   id,
@@ -20,6 +21,7 @@ const CommandTriggerNodeComponent = ({
   selected,
 }: NodeProps<CommandTriggerNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const handleUpdate = (update: Partial<CommandTriggerNodeData>) => {
     updateNodeData(id, update);
@@ -32,22 +34,16 @@ const CommandTriggerNodeComponent = ({
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
 
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between text-base">
-          <div className="flex items-center gap-2">
-            <Command className="h-5 w-5 text-blue-400" />
-            <span>Command Handler</span>
-          </div>
-          <div
-            className={`w-2.5 h-2.5 rounded-full transition-all ${
-              isConfigured ? "bg-green-500" : "bg-destructive/50"
-            }`}
-            title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
-          />
-        </CardTitle>
-      </CardHeader>
+      <TriggerHeader
+        icon={<Command className="h-4 w-4 text-blue-400 flex-shrink-0" />}
+        title="Command Handler"
+        isExpanded={isExpanded}
+        isConfigured={isConfigured}
+        onToggle={() => setIsExpanded(!isExpanded)}
+      />
 
-      <CardContent className="flex flex-col gap-4">
+      {isExpanded && (
+        <CardContent className="flex flex-col gap-4">
         {/* Buyruq kiritish maydoni */}
         <div>
           <Label
@@ -97,6 +93,7 @@ const CommandTriggerNodeComponent = ({
           Global
         </Label>
       </CardContent>
+      )}
 
       <SourceHandles />
     </Card>
