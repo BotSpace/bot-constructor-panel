@@ -1,6 +1,6 @@
 // FAYL: constructor/nodes/triggers/CommandTrigger/CommandTriggerNode.tsx
 
-import { memo, useState } from "react";
+import { memo, useState, useMemo } from "react";
 import { NodeProps } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { CommandTriggerNodeData } from "./types";
@@ -14,6 +14,7 @@ import { Command } from "lucide-react";
 
 import { SourceHandles, TargetHandles } from "../../components";
 import { TriggerHeader } from "../shared/TriggerHeader";
+import { StateConfigUI, getStateTypesForCommandTrigger } from "../shared";
 
 const CommandTriggerNodeComponent = ({
   id,
@@ -29,6 +30,10 @@ const CommandTriggerNodeComponent = ({
 
   // Node sozlangaligini tekshirish (buyruq matni kiritilgan bo'lishi kerak)
   const isConfigured = !!data.command?.trim();
+
+  const availableStateTypes = useMemo(() => {
+    return getStateTypesForCommandTrigger();
+  }, []);
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -92,6 +97,14 @@ const CommandTriggerNodeComponent = ({
           />
           Global
         </Label>
+
+        {/* State Configuration */}
+        <StateConfigUI
+          state={data.state}
+          onStateChange={(state) => handleUpdate({ state })}
+          availableTypes={availableStateTypes}
+          nodeId={id}
+        />
       </CardContent>
       )}
 
