@@ -16,12 +16,14 @@ export type NumberOperator =
   | "less_or_equal";
 export type BoolOperator = "is_true" | "is_false";
 export type DatetimeOperator = "equals" | "before" | "after" | "between";
+export type DefaultOperator = ""
 
 export type FilterOperator =
   | TextOperator
   | NumberOperator
   | BoolOperator
-  | DatetimeOperator;
+  | DatetimeOperator
+  | DefaultOperator;
 
 export interface FilterField {
   id: string;

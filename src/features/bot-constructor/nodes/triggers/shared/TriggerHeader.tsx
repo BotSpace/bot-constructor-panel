@@ -72,7 +72,7 @@ export const TriggerHeader = ({
           <Button className="lg:hidden" onClick={deleteSelectedElement} size={'icon'}>
             <Trash />
           </Button>
-          
+
           <div
             className={`w-2 h-2 rounded-full transition-all ${isConfigured
               ? "bg-green-500 shadow-sm shadow-green-500/50"
