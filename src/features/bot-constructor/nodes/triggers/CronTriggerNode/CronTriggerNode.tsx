@@ -4,10 +4,10 @@ import { NodeProps } from "reactflow";
 import { memo, useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { NodeHeader } from "../../actions/shared/NodeHeader";
-import { SourceHandles } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { CronTriggerNodeData } from "./types";
+import { TriggerHeader } from "../shared/TriggerHeader";
 
 import {
   Select,
@@ -24,7 +24,7 @@ const CronTriggerNodeComponent = ({
   data,
   selected,
 }: NodeProps<CronTriggerNodeData>) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
   // --- PARSING & DEFAULTS ---
@@ -102,18 +102,24 @@ const CronTriggerNodeComponent = ({
     }
   }, [type, minute, hour, dayOfMonth, month, dayOfWeek]);
 
+  // Cron trigger har doim sozlangan deb hisoblanadi (schedule mavjud bo'lsa)
+  const isConfigured = !!data.schedule;
+
   return (
     <Card
       className={cn("w-[350px] shadow-lg", selected && "ring-2 ring-primary")}
     >
-      <NodeHeader
+      <TargetHandles />
+      
+      <TriggerHeader
         icon="⏰"
         title="Cron Trigger"
-        isCollapsed={isCollapsed}
-        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        isExpanded={isExpanded}
+        isConfigured={isConfigured}
+        onToggle={() => setIsExpanded(!isExpanded)}
       />
 
-      {!isCollapsed && (
+      {isExpanded && (
         <CardContent className="flex flex-col gap-4 pt-4">
           <div className="space-y-2">
             <Label className="text-[11px] font-bold uppercase text-muted-foreground">
