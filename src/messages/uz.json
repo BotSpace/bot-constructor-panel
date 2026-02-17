@@ -171,6 +171,10 @@
         "name": "A'zolikni tekshirish",
         "description": "Foydalanuvchi kanal/guruh a'zosi ekanligini tekshiradi."
       },
+      "form": {
+        "name": "Forma",
+        "description": "Foydalanuvchi ma'lumotlarini forma orqali yig'adi."
+      },
       "elseif": {
         "name": "Else If (Aks holda agar)",
         "description": "If dan keyin qo'shimcha shart tekshiradi."

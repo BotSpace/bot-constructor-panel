@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 12/28/2025, 11:11:40 AM
+Sana: 1/11/2026, 2:00:19 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -32,15 +32,16 @@ bot-constructor-panel
 │   │   ├── pre-rebase
 │   │   └── prepare-commit-msg
 │   └── pre-push
+├── .keys
+│   ├── private.pem
+│   └── public.pem
 ├── Dockerfile
 ├── README.md
+├── Telegram bot API
+│   └── telegrm-bot-apis.md
 ├── components.json
 ├── docs
-│   ├── AI_INTEGRATION_GUIDE.md
-│   ├── AI_QUOTA_FIX.md
-│   ├── AI_SETUP_INSTRUCTIONS.md
 │   ├── ARCHITECTURE.md
-│   ├── COLLECTION_BUTTON_LAYOUT.md
 │   └── project_analysis.md
 ├── next-env.d.ts
 ├── next.config.ts
@@ -90,6 +91,7 @@ bot-constructor-panel
 │   │   │   │   ├── add-env-dialog.tsx
 │   │   │   │   ├── add-env.tsx
 │   │   │   │   ├── ai-chat
+│   │   │   │   │   ├── chat-widget.tsx
 │   │   │   │   │   └── prompt-interface.tsx
 │   │   │   │   ├── debug
 │   │   │   │   │   ├── debug.tsx
@@ -114,7 +116,6 @@ bot-constructor-panel
 │   │       ├── context-menu.tsx
 │   │       ├── dialog.tsx
 │   │       ├── dropdown-menu.tsx
-│   │       ├── hover-border-gradient.tsx
 │   │       ├── input-group.tsx
 │   │       ├── input-otp.tsx
 │   │       ├── input.tsx
@@ -330,6 +331,10 @@ bot-constructor-panel
 │   │   │   │   │   │   ├── ElseNode.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── FormNode
+│   │   │   │   │   │   ├── FormNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── HTTPRequestNode
 │   │   │   │   │   │   ├── HTTPRequestNode.tsx
 │   │   │   │   │   │   ├── index.ts
@@ -383,6 +388,10 @@ bot-constructor-panel
 │   │   │   │       │   ├── index.ts
 │   │   │   │       │   └── types.ts
 │   │   │   │       └── index.ts
+│   │   │   ├── panel
+│   │   │   │   ├── elements
+│   │   │   │   │   └── elements.tsx
+│   │   │   │   └── pane.tsx
 │   │   │   ├── search
 │   │   │   │   ├── search-panel.tsx
 │   │   │   │   └── search-store.ts
@@ -409,6 +418,8 @@ bot-constructor-panel
 │   │   ├── request.ts
 │   │   └── routing.ts
 │   ├── lib
+│   │   ├── ai-agents.ts
+│   │   ├── chat-history-storage.ts
 │   │   ├── chech-bot-token.ts
 │   │   ├── constants.ts
 │   │   ├── env.ts
@@ -454,8 +465,6 @@ bot-constructor-panel
 │   └── wss
 │       └── web-socket-provider.tsx
 ├── stack.yaml
-├── test.ts
-├── todo
 └── tsconfig.json
 ```
 

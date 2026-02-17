@@ -166,7 +166,6 @@ export function FilterRow({
             className="flex-1"
           />
         );
-
       case "number":
         return (
           <Input
@@ -176,6 +175,17 @@ export function FilterRow({
               onUpdate({ value: parseFloat(e.target.value) || 0 })
             }
             placeholder="Enter number..."
+            className="flex-1"
+          />
+        );
+      
+      case "relation":
+        return (
+          <Input
+            type="text"
+            value={filter.value as string}
+            onChange={(e) => onUpdate({ value: e.target.value })}
+            placeholder="Enter value..."
             className="flex-1"
           />
         );
@@ -305,6 +315,15 @@ function getOperatorsForType(type: FilterField["type"]) {
         { value: "before", label: "Before" },
         { value: "after", label: "After" },
       ];
+    case "relation":
+      return [
+        { value: "equals", label: "Equals" },
+        { value: "not_equals", label: "Not equals" },
+      ];
+    default: return [
+        { value: "equals", label: "Equals" },
+        { value: "not_equals", label: "Not equals" },
+    ]
   }
 }
 
@@ -322,5 +341,8 @@ function getDefaultValue(type: FilterField["type"]): Filter["value"] {
       return true;
     case "datetime":
       return new Date();
+    case "relation":
+      return "";
+    default: return "";
   }
 }

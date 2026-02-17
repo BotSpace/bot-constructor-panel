@@ -43,14 +43,7 @@ export function TourWelcomeModal() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden border-none shadow-2xl">
-        {/* Gradient Header */}
-        <div className="h-32 bg-gradient-to-br from-indigo-600 to-violet-700 flex items-center justify-center relative">
-          <div className="bg-white/20 p-4 rounded-full backdrop-blur-md border border-white/30">
-            <Sparkles className="w-10 h-10 text-white animate-pulse" />
-          </div>
-        </div>
-
+      <DialogContent className="sm:max-w-[400px] max-h-[90vh] p-0 overflow-hidden border-none shadow-2xl">
         <div className="p-6">
           <DialogHeader className="text-center">
             <DialogTitle className="text-2xl text-center font-bold">

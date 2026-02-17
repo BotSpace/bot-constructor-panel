@@ -311,6 +311,14 @@ export function useElements(): ElementTypes[] {
           color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
           triggerId: "CheckMembershipNode",
         },
+        {
+          type: "form",
+          name: t("constructor.flowControl.form.name"),
+          description: t("constructor.flowControl.form.description"),
+          icon: "📝",
+          color: "bg-green-500/10 text-green-400 border-green-500/20",
+          triggerId: "FormNode",
+        },
       ],
     },
     {

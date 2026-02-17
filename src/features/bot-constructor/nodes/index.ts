@@ -46,6 +46,7 @@ import {
   HTTPRequestNode,
   CallbackQueryAnswerNode,
   CheckMembershipNode,
+  FormNode,
 } from "./custom";
 
 export const Triggers = {
@@ -101,6 +102,7 @@ export const CustomNodesFlowControl = {
   RandomNode,
   VariableNode,
   CheckMembershipNode,
+  FormNode,
 };
 
 export const CustomIntegration = {

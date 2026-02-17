@@ -61,25 +61,41 @@ interface ReplyFormProps {
   data?: SendTextMessageNodeData;
 }
 
-type ReplyType = "reply" | "web_app" | "request_poll";
+type ReplyType = "reply" | "web_app" | "request_poll" | "request_contact" | "request_location" | "request_poll" | "request_live_location"
+
 
 const replyOptions: {
   value: ReplyType;
   label: string;
   icon?: React.ReactNode;
 }[] = [
-  {
-    value: "reply",
-    label: "Matnli tugma",
-    icon: <TextIcon className="h-4 w-4" />,
-  },
-  { value: "web_app", label: "Web App", icon: <Globe className="h-4 w-4" /> },
-  {
-    value: "request_poll",
-    label: "So'rovnoma",
-    icon: <BarChart3 className="h-4 w-4" />,
-  },
-];
+    {
+      value: "reply",
+      label: "Matnli tugma",
+      icon: <TextIcon className="h-4 w-4" />,
+    },
+    { value: "web_app", label: "Web App", icon: <Globe className="h-4 w-4" /> },
+    {
+      value: "request_poll",
+      label: "So'rovnoma",
+      icon: <BarChart3 className="h-4 w-4" />,
+    },
+    {
+      value: "request_contact",
+      label: "Kontakt",
+      icon: <Smartphone className="h-4 w-4" />,
+    },
+    {
+      value: "request_location",
+      label: "Joylashuv",
+      icon: <MapPin className="h-4 w-4" />,
+    },
+    {
+      value: "request_live_location",
+      label: "Jonli Joylashuv",
+      icon: <MapPin className="h-4 w-4" />,
+    },
+  ];
 
 // Common buttons configuration (Reply tugmalar uchun text = value bo'ladi)
 const commonButtonGroups = [
@@ -212,9 +228,8 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
       case "request_poll":
         newButton = {
           id: uniqueId,
-          text: `📊 So'rovnoma yaratish (${
-            pollType === "quiz" ? "Viktorina" : "Oddiy"
-          })`,
+          text: `📊 So'rovnoma yaratish (${pollType === "quiz" ? "Viktorina" : "Oddiy"
+            })`,
           type,
           pollType,
         };

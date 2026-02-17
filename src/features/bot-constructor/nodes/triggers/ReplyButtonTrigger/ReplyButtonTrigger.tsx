@@ -1,9 +1,9 @@
 "use client";
 
-import { FormEvent, memo, useMemo } from "react";
+import { FormEvent, memo, useMemo, useState } from "react";
 import { NodeProps, useNodes, useEdges } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ReplyButtonTriggerData } from "./types";
 import { AlertCircle, CornerDownLeft } from "lucide-react";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
+import { TriggerHeader } from "../shared/TriggerHeader";
 import {
   ButtonConfig,
   KeyboardConfig,
@@ -31,6 +32,7 @@ const ReplyButtonTriggerNodeComponent = ({
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const nodes = useNodes();
   const edges = useEdges();
+  const [isExpanded, setIsExpanded] = useState(true);
 
   // --- O'ZGARTIRISH: Mantiq to'liq yangilandi va soddalashtirildi ---
   const availableReplyButtons = useMemo(() => {
@@ -115,22 +117,16 @@ const ReplyButtonTriggerNodeComponent = ({
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
 
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between text-base">
-          <div className="flex items-center gap-2">
-            <CornerDownLeft className="h-5 w-5 text-primary" />
-            <span>Reply Tugma Handleri</span>
-          </div>
-          <div
-            className={`w-2.5 h-2.5 rounded-full transition-all ${
-              isConfigured ? "bg-green-500" : "bg-destructive/50"
-            }`}
-            title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
-          />
-        </CardTitle>
-      </CardHeader>
+      <TriggerHeader
+        icon={<CornerDownLeft className="h-4 w-4 text-primary flex-shrink-0" />}
+        title="Reply Tugma Handleri"
+        isExpanded={isExpanded}
+        isConfigured={isConfigured}
+        onToggle={() => setIsExpanded(!isExpanded)}
+      />
 
-      <CardContent className="flex flex-col gap-3">
+      {isExpanded && (
+        <CardContent className="flex flex-col gap-3">
         {!data.catchNoButton && (
           <>
             {availableReplyButtons.length > 0 ? (
@@ -219,6 +215,7 @@ const ReplyButtonTriggerNodeComponent = ({
           nodeId={id}
         />
       </CardContent>
+      )}
       <SourceHandles />
     </Card>
   );

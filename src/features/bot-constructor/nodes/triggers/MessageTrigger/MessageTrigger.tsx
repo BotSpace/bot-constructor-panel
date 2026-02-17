@@ -6,8 +6,9 @@ import { getFiltersForType } from "./utils";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Settings } from "lucide-react";
 
-import { TriggerHeader } from "./components/TriggerHeader";
+import { TriggerHeader } from "../shared/TriggerHeader";
 import { TypeSelector } from "./components/TypeSelector";
 import { FilterSelector } from "./components/FilterSelector";
 import { ParameterInput } from "./components/ParameterInput";
@@ -30,10 +31,9 @@ const MessageTriggerNodeComponent = ({
   };
 
   const onTypeChange = (newType: string) => {
-
     handleUpdate({
       type: newType as MessageTriggerValueTypes,
-      filter: 'any',
+      filter: "any",
     });
   };
 
@@ -44,9 +44,7 @@ const MessageTriggerNodeComponent = ({
   const { filtersForType, isNodeConfigured } = useMemo(() => {
     const filters = getFiltersForType(data.type);
 
-    const configured =
-      data.type === "any" ||
-      (!!data.type && !!data.filter);
+    const configured = data.type === "any" || (!!data.type && !!data.filter);
 
     return {
       filtersForType: filters,
@@ -71,6 +69,8 @@ const MessageTriggerNodeComponent = ({
       <ElseMessageSource />
 
       <TriggerHeader
+        icon={<Settings className="h-4 w-4 text-blue-400 flex-shrink-0" />}
+        title="Xabar Handleri"
         isExpanded={isExpanded}
         isConfigured={isNodeConfigured}
         dataType={data.type}

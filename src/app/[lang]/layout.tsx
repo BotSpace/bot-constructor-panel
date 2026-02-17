@@ -68,7 +68,7 @@ export default async function RootLayout({
                 >
                   <NextIntlClientProvider messages={messages}>
                     {children}
-                    <NotificationAlert />
+                    {/* <NotificationAlert /> */}
                   </NextIntlClientProvider>
                   <Toaster position="top-center" reverseOrder={false} />
                 </ThemeProvider>
