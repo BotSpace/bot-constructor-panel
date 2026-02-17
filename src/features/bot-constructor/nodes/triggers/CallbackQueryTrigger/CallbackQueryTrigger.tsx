@@ -29,6 +29,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ElseMessageSource } from "../../components/shared/ReactFlowHandles/ElseMessageSource";
 import { KeyboardConfig } from "@/features/bot-constructor/components";
 import { TriggerHeader } from "../shared/TriggerHeader";
+import { StateConfigUI, getStateTypesForCallbackQueryTrigger } from "../shared";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
 interface NodeWithKeyboardData {
@@ -136,6 +137,13 @@ const CallbackQueryTriggerNodeComponent = ({
     () => ConstructorData.Filters.callbackFilters,
     []
   );
+
+  const availableStateTypes = useMemo(() => {
+    // Check if the selected callback value is from a collection button
+    const selectedValue = data.context?.value || "";
+    const isCollectionButton = selectedValue.startsWith("collection:");
+    return getStateTypesForCallbackQueryTrigger(isCollectionButton);
+  }, [data.context?.value]);
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -252,6 +260,14 @@ const CallbackQueryTriggerNodeComponent = ({
             Global
           </Label>
         </div>
+
+        {/* State Configuration */}
+        <StateConfigUI
+          state={data.state}
+          onStateChange={(state) => handleUpdate({ state })}
+          availableTypes={availableStateTypes}
+          nodeId={id}
+        />
       </CardContent>
       )}
 

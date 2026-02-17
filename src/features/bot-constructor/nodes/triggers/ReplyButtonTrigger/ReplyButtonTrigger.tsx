@@ -16,6 +16,7 @@ import {
   ButtonConfig,
   KeyboardConfig,
 } from "@/features/bot-constructor/components";
+import { StateConfigUI, getStateTypesForReplyButtonTrigger } from "../shared";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
 // --- O'ZGARTIRISH: `keyboard` ixtiyoriy qilindi, xatolikdan saqlanish uchun ---
@@ -107,6 +108,10 @@ const ReplyButtonTriggerNodeComponent = ({
       return;
     }
   }
+
+  const availableStateTypes = useMemo(() => {
+    return getStateTypesForReplyButtonTrigger();
+  }, []);
 
   return (
     <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
@@ -201,6 +206,14 @@ const ReplyButtonTriggerNodeComponent = ({
             Global
           </Label>
         </div>
+
+        {/* State Configuration */}
+        <StateConfigUI
+          state={data.state}
+          onStateChange={(state) => updateNodeData(id, { state })}
+          availableTypes={availableStateTypes}
+          nodeId={id}
+        />
       </CardContent>
       )}
       <SourceHandles />
