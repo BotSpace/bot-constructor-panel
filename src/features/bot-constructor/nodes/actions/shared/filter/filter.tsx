@@ -98,6 +98,8 @@ function getDefaultOperator(type: FilterField["type"]): Filter["operator"] {
       return "is_true";
     case "datetime":
       return "equals";
+    default:
+      return ""
   }
 }
 
@@ -115,5 +117,7 @@ function getDefaultValue(type: FilterField["type"]): Filter["value"] {
       return true;
     case "datetime":
       return new Date();
+    default:
+      return ""
   }
 }
