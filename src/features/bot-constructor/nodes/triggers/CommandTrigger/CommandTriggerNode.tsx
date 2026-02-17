@@ -49,63 +49,63 @@ const CommandTriggerNodeComponent = ({
 
       {isExpanded && (
         <CardContent className="flex flex-col gap-4">
-        {/* Buyruq kiritish maydoni */}
-        <div>
-          <Label
-            htmlFor={`command-input-${id}`}
-            className="text-xs text-muted-foreground"
-          >
-            Buyruq matni (masalan, "start")
-          </Label>
-          <div className="relative mt-1">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <span className="text-gray-500 sm:text-sm">/</span>
+          {/* Buyruq kiritish maydoni */}
+          <div>
+            <Label
+              htmlFor={`command-input-${id}`}
+              className="text-xs text-muted-foreground"
+            >
+              Buyruq matni (masalan, "start")
+            </Label>
+            <div className="relative mt-1">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <span className="text-gray-500 sm:text-sm">/</span>
+              </div>
+              <Input
+                id={`command-input-${id}`}
+                placeholder="start"
+                value={data.command || ""}
+                onChange={(e) => handleUpdate({ command: e.target.value.trim() })}
+                className="pl-7" // "/" belgisi uchun joy
+              />
             </div>
-            <Input
-              id={`command-input-${id}`}
-              placeholder="start"
-              value={data.command || ""}
-              onChange={(e) => handleUpdate({ command: e.target.value.trim() })}
-              className="pl-7" // "/" belgisi uchun joy
-            />
           </div>
-        </div>
 
-        {/* Qo'shimcha argumentlarni ushlash uchun checkbox */}
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id={`with-args-${id}`}
-            checked={!!data.withArgs}
-            onCheckedChange={(checked) => handleUpdate({ withArgs: !!checked })}
-          />
-          <Label
-            htmlFor={`with-args-${id}`}
-            className="text-sm font-normal cursor-pointer"
-          >
-            Argumentlarni ushlash (deep linking)
+          {/* Qo'shimcha argumentlarni ushlash uchun checkbox */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id={`with-args-${id}`}
+              checked={!!data.withArgs}
+              onCheckedChange={(checked) => handleUpdate({ withArgs: !!checked })}
+            />
+            <Label
+              htmlFor={`with-args-${id}`}
+              className="text-sm font-normal cursor-pointer"
+            >
+              Argumentlarni ushlash (deep linking)
+            </Label>
+          </div>
+
+          <Label className="mt-2">
+            <Checkbox
+              checked={data.global}
+              onCheckedChange={(e) =>
+                handleUpdate({
+                  global: e as boolean,
+                })
+              }
+            />
+            Global
           </Label>
-        </div>
 
-        <Label className="mt-2">
-          <Checkbox
-            checked={data.global}
-            onCheckedChange={(e) =>
-              handleUpdate({
-                global: e as boolean,
-              })
-            }
+          {/* State Configuration */}
+          <StateConfigUI
+            state={data.state}
+            onStateChange={(state) => handleUpdate({ state })}
+            availableTypes={availableStateTypes}
+            nodeId={id}
           />
-          Global
-        </Label>
-
-        {/* State Configuration */}
-        <StateConfigUI
-          state={data.state}
-          onStateChange={(state) => handleUpdate({ state })}
-          availableTypes={availableStateTypes}
-          nodeId={id}
-        />
-      </CardContent>
+        </CardContent>
       )}
 
       <SourceHandles />

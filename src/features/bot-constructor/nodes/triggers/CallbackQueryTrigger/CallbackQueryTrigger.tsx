@@ -160,115 +160,115 @@ const CallbackQueryTriggerNodeComponent = ({
 
       {isExpanded && (
         <CardContent className="space-y-4 pt-2">
-        <div className="space-y-1.5">
-          <Label className="text-xs text-muted-foreground">
-            Callback ma'lumoti filtri
-          </Label>
-          <FilterSelector
-            value={data.filter || ""}
-            onValueChange={onFilterChange}
-            options={filterOptions}
-          />
-        </div>
-
-        {/* --- 3. SMART SELECTOR (STATIC YA COLLECTION) --- */}
-        {data.filter && data.filter !== "any" && (
-          <div className="space-y-1.5 animate-in fade-in-50">
-            <Label className="text-xs text-muted-foreground">Parametr</Label>
-            {showStaticSelector ? (
-              // Static callback tugmalar uchun selector
-              <Select
-                value={data.context?.value || ""}
-                onValueChange={onValueChange}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Static callback tanlang..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableCallbacks
-                    .filter((button) => !button.isCollection)
-                    .map((button) => (
-                      <SelectItem key={button.id} value={button.value}>
-                        <div className="flex items-center justify-between w-full gap-2">
-                          <span>{button.text}</span>
-                          <span className="text-xs text-muted-foreground font-mono">
-                            {button.value}
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            ) : showCollectionSelector ? (
-              // Collection callback tugmalar uchun selector
-              <Select
-                value={data.context?.value || ""}
-                onValueChange={onValueChange}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Collection callback tanlang..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableCallbacks
-                    .filter((button) => button.isCollection)
-                    .map((button) => (
-                      <SelectItem key={button.id} value={button.value}>
-                        <div className="flex items-center justify-between w-full gap-2">
-                          <span className="flex items-center gap-1.5">
-                            📦 {button.text}
-                            <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded">
-                              Dynamic
-                            </span>
-                          </span>
-                          <span className="text-xs text-muted-foreground font-mono">
-                            {button.collectionName}.{button.fieldName}
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              // Qo'lda kiritish uchun input
-              <ValueInput
-                value={data.context?.value || ""}
-                onChange={onValueChange}
-                placeholder={
-                  data.filter === "regex"
-                    ? "Masalan: item:.*"
-                    : data.filter === "collection"
-                      ? "Masalan: collection:users:id"
-                      : "Masalan: main_menu"
-                }
-              />
-            )}
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">
+              Callback ma'lumoti filtri
+            </Label>
+            <FilterSelector
+              value={data.filter || ""}
+              onValueChange={onFilterChange}
+              options={filterOptions}
+            />
           </div>
-        )}
 
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="global-checkbox"
-            checked={data.global}
-            onCheckedChange={(e) =>
-              handleUpdate({
-                ...data,
-                global: e as boolean,
-              })
-            }
+          {/* --- 3. SMART SELECTOR (STATIC YA COLLECTION) --- */}
+          {data.filter && data.filter !== "any" && (
+            <div className="space-y-1.5 animate-in fade-in-50">
+              <Label className="text-xs text-muted-foreground">Parametr</Label>
+              {showStaticSelector ? (
+                // Static callback tugmalar uchun selector
+                <Select
+                  value={data.context?.value || ""}
+                  onValueChange={onValueChange}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Static callback tanlang..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableCallbacks
+                      .filter((button) => !button.isCollection)
+                      .map((button) => (
+                        <SelectItem key={button.id} value={button.value}>
+                          <div className="flex items-center justify-between w-full gap-2">
+                            <span>{button.text}</span>
+                            <span className="text-xs text-muted-foreground font-mono">
+                              {button.value}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              ) : showCollectionSelector ? (
+                // Collection callback tugmalar uchun selector
+                <Select
+                  value={data.context?.value || ""}
+                  onValueChange={onValueChange}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Collection callback tanlang..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableCallbacks
+                      .filter((button) => button.isCollection)
+                      .map((button) => (
+                        <SelectItem key={button.id} value={button.value}>
+                          <div className="flex items-center justify-between w-full gap-2">
+                            <span className="flex items-center gap-1.5">
+                              📦 {button.text}
+                              <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded">
+                                Dynamic
+                              </span>
+                            </span>
+                            <span className="text-xs text-muted-foreground font-mono">
+                              {button.collectionName}.{button.fieldName}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                // Qo'lda kiritish uchun input
+                <ValueInput
+                  value={data.context?.value || ""}
+                  onChange={onValueChange}
+                  placeholder={
+                    data.filter === "regex"
+                      ? "Masalan: item:.*"
+                      : data.filter === "collection"
+                        ? "Masalan: collection:users:id"
+                        : "Masalan: main_menu"
+                  }
+                />
+              )}
+            </div>
+          )}
+
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="global-checkbox"
+              checked={data.global}
+              onCheckedChange={(e) =>
+                handleUpdate({
+                  ...data,
+                  global: e as boolean,
+                })
+              }
+            />
+            <Label htmlFor="global-checkbox" className="text-sm cursor-pointer">
+              Global
+            </Label>
+          </div>
+
+          {/* State Configuration */}
+          <StateConfigUI
+            state={data.state}
+            onStateChange={(state) => handleUpdate({ state })}
+            availableTypes={availableStateTypes}
+            nodeId={id}
           />
-          <Label htmlFor="global-checkbox" className="text-sm cursor-pointer">
-            Global
-          </Label>
-        </div>
-
-        {/* State Configuration */}
-        <StateConfigUI
-          state={data.state}
-          onStateChange={(state) => handleUpdate({ state })}
-          availableTypes={availableStateTypes}
-          nodeId={id}
-        />
-      </CardContent>
+        </CardContent>
       )}
 
       <SourceHandles />
