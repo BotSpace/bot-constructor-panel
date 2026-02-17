@@ -81,7 +81,7 @@ export default function Constructor() {
   useFlowKeyboardShortcuts({
     containerRef: reactFlowWrapper,
     mousePosition: mousePosition,
-    onOpenPalette: () => {},
+    onOpenPalette: () => { },
   });
 
   // Countdown ni kamaytirish va save qilish
@@ -151,9 +151,10 @@ export default function Constructor() {
         x: event.clientX,
         y: event.clientY,
       });
-      const data = JSON.parse(
-        event.dataTransfer.getData("application/json")
-      ) as ElementItemType;
+
+      const event_data = event.dataTransfer.getData("text/plain");
+
+      const data = JSON.parse(event_data) as ElementItemType;
       addNode(data, position);
     },
     [screenToFlowPosition, addNode]

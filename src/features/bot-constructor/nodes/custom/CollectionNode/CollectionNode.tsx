@@ -108,11 +108,10 @@ export function CollectionNode({
 
   return (
     <Card
-      className={`w-[600px] rounded-xl border shadow-lg transition-all overflow-hidden ${
-        selected
+      className={`w-[600px] rounded-xl border shadow-lg transition-all overflow-hidden ${selected
           ? "border-sky-500/80 shadow-xl shadow-sky-500/10 ring-2 ring-sky-500/20"
           : "border-gray-700/50 shadow-md"
-      }`}
+        }`}
     >
       <TargetHandles />
 
@@ -143,17 +142,15 @@ export function CollectionNode({
           </div>
           <div className="flex items-center gap-2 ml-2">
             <div
-              className={`w-2 h-2 rounded-full transition-all ${
-                isConfigured
+              className={`w-2 h-2 rounded-full transition-all ${isConfigured
                   ? "bg-green-500 shadow-sm shadow-green-500/50"
                   : "bg-gray-600"
-              }`}
+                }`}
               title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
             />
             <ChevronDown
-              className={`h-4 w-4 text-gray-400 transform transition-transform duration-200 ${
-                isExpanded ? "rotate-0" : "-rotate-90"
-              }`}
+              className={`h-4 w-4 text-gray-400 transform transition-transform duration-200 ${isExpanded ? "rotate-0" : "-rotate-90"
+                }`}
             />
           </div>
         </div>
@@ -245,13 +242,13 @@ export function CollectionNode({
                         <Select
                           value={
                             fieldMappings[field.name] &&
-                            availableStateKeys.includes(
-                              fieldMappings[field.name]
-                            )
+                              availableStateKeys.includes(
+                                fieldMappings[field.name]
+                              )
                               ? fieldMappings[field.name]
                               : fieldMappings[field.name]
-                              ? "custom"
-                              : ""
+                                ? "custom"
+                                : ""
                           }
                           onValueChange={(value) => {
                             if (value === "custom") {
@@ -287,23 +284,23 @@ export function CollectionNode({
                           !availableStateKeys.includes(
                             fieldMappings[field.name]
                           )) && (
-                          <Input
-                            type="text"
-                            placeholder="Custom state key..."
-                            value={
-                              fieldMappings[field.name] &&
-                              !availableStateKeys.includes(
-                                fieldMappings[field.name]
-                              )
-                                ? fieldMappings[field.name]
-                                : ""
-                            }
-                            onChange={(e) =>
-                              handleStateKeyChange(field.name, e.target.value)
-                            }
-                            className="w-full bg-gray-900/50 border-purple-500/30 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm h-8 mt-1.5"
-                          />
-                        )}
+                            <Input
+                              type="text"
+                              placeholder="Custom state key..."
+                              value={
+                                fieldMappings[field.name] &&
+                                  !availableStateKeys.includes(
+                                    fieldMappings[field.name]
+                                  )
+                                  ? fieldMappings[field.name]
+                                  : ""
+                              }
+                              onChange={(e) =>
+                                handleStateKeyChange(field.name, e.target.value)
+                              }
+                              className="w-full bg-gray-900/50 border-purple-500/30 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm h-8 mt-1.5"
+                            />
+                          )}
                         <p className="text-xs text-gray-500 font-medium mt-1">
                           State Value
                         </p>

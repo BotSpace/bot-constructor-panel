@@ -1,6 +1,6 @@
 // FAYL: constructor/nodes/triggers/CallbackQueryTrigger/CallbackQueryTrigger.tsx (YANGILANGAN - Collection support)
 
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import { NodeProps, useNodes, useEdges } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { CallbackQueryTriggerData } from "./types";
@@ -28,6 +28,7 @@ import { SourceHandles, TargetHandles } from "../../components";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ElseMessageSource } from "../../components/shared/ReactFlowHandles/ElseMessageSource";
 import { KeyboardConfig } from "@/features/bot-constructor/components";
+import { TriggerHeader } from "../shared/TriggerHeader";
 import { StateConfigUI, getStateTypesForCallbackQueryTrigger } from "../shared";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
@@ -52,6 +53,7 @@ const CallbackQueryTriggerNodeComponent = ({
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const nodes = useNodes();
   const edges = useEdges();
+  const [isExpanded, setIsExpanded] = useState(true);
 
   // --- 1. OTA-ONA NODE'DAN CALLBACK TUGMALARINI OLISH (STATIC + COLLECTION) ---
   const availableCallbacks = useMemo(() => {
@@ -148,27 +150,16 @@ const CallbackQueryTriggerNodeComponent = ({
       <TargetHandles />
       <ElseMessageSource />
 
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center justify-between text-base">
-          <div className="flex items-center gap-2">
-            <MousePointerClick className="h-5 w-5 text-primary" />
-            <span>Callback Handler</span>
-          </div>
-          <div
-            className={`w-2.5 h-2.5 rounded-full transition-all ${
-              isConfigured ? "bg-green-500" : "bg-destructive/50"
-            }`}
-            title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
-          />
-        </CardTitle>
-        <CardDescription className="text-xs pt-1">
-          {isConnected
-            ? "Oldingi qadamdan callback'larni tinglaydi"
-            : "Global callback handler"}
-        </CardDescription>
-      </CardHeader>
+      <TriggerHeader
+        icon={<MousePointerClick className="h-4 w-4 text-primary flex-shrink-0" />}
+        title="Callback Handler"
+        isExpanded={isExpanded}
+        isConfigured={isConfigured}
+        onToggle={() => setIsExpanded(!isExpanded)}
+      />
 
-      <CardContent className="space-y-4 pt-2">
+      {isExpanded && (
+        <CardContent className="space-y-4 pt-2">
         <div className="space-y-1.5">
           <Label className="text-xs text-muted-foreground">
             Callback ma'lumoti filtri
@@ -246,8 +237,8 @@ const CallbackQueryTriggerNodeComponent = ({
                   data.filter === "regex"
                     ? "Masalan: item:.*"
                     : data.filter === "collection"
-                    ? "Masalan: collection:users:id"
-                    : "Masalan: main_menu"
+                      ? "Masalan: collection:users:id"
+                      : "Masalan: main_menu"
                 }
               />
             )}
@@ -278,6 +269,7 @@ const CallbackQueryTriggerNodeComponent = ({
           nodeId={id}
         />
       </CardContent>
+      )}
 
       <SourceHandles />
     </Card>

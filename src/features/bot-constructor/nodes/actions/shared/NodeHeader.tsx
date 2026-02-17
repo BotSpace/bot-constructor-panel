@@ -2,7 +2,9 @@ import { ReactNode } from "react";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { ChevronDown, LayoutGrid } from "lucide-react";
+import { ChevronDown, Delete, LayoutGrid, Trash } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useFlowStore } from "@/features/bot-constructor/store";
 
 interface NodeHeaderProps {
   /** Node'ning asosiy ikonasi */
@@ -27,6 +29,8 @@ export const NodeHeader = ({
   isCollapsed = false,
   onToggleCollapse,
 }: NodeHeaderProps) => {
+  const deleteSelectedElement = useFlowStore((state) => state.deleteSelectedElements);
+
   return (
     <CardHeader onClick={onToggleCollapse}>
       <div
@@ -45,6 +49,12 @@ export const NodeHeader = ({
               {buttonCount}
             </Badge>
           )}
+
+          <div className={cn('lg:hidden')}>
+            <Button onClick={deleteSelectedElement} size={'icon'}>
+              <Trash />
+            </Button>
+          </div>
 
           {onToggleCollapse && (
             <ChevronDown

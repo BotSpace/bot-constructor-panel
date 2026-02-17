@@ -43,7 +43,8 @@ export type ButtonType =
   | "switch_inline_query_current_chat"
   | "web_app"
   | "login_url"
-  | "request_poll";
+  | "request_poll"
+  | "request_live_location";
 
 // Asosiy tugma konfiguratsiyasi
 export interface ButtonConfig {

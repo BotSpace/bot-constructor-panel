@@ -44,7 +44,6 @@ export function ConstructorPageHeader() {
         </div>
         <div className="flex items-center gap-2">
           <PromptInterface />
-          <DebugActions />
 
           <Button variant="outline" onClick={backToCollection}>
             <Database />
@@ -58,21 +57,19 @@ export function ConstructorPageHeader() {
           >
             <Search />
           </Button>
-          {/* <Button */}
-          {/*   variant={"default"} */}
-          {/*   size={"icon"} */}
-          {/*   onClick={() => setIsChatOpen(true)} */}
-          {/*   className="relative w-10 h-10" */}
-          {/*   title="AI Chat Assistant" */}
-          {/* > */}
-          {/*   <Image  */}
-          {/*     src={"/ai.png"}  */}
-          {/*     alt="AI"  */}
-          {/*     width={24}  */}
-          {/*     height={24} */}
-          {/*     className="object-contain" */}
-          {/*   /> */}
-          {/* </Button> */}
+
+          {/* <Button
+            variant={"default"}
+            size={"icon"}
+            onClick={() => setIsChatOpen(true)}
+            className="relative"
+            title="AI Chat Assistant"
+          >
+            <Image src={"/ai.png"} alt="AI" width={20} height={20} />
+          </Button> */}
+
+          <DebugActions />
+
           <ReleasePanel />
         </div>
       </header>

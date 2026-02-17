@@ -19,11 +19,13 @@ import { calculateActiveButtonCount } from "./utils";
 interface ButtonGeneratorProps {
   initialKeyboard: KeyboardConfig;
   node_id: string;
+  onChange?: (keyboard: KeyboardConfig) => void;
 }
 
 export function ButtonGenerator({
   initialKeyboard: keyboards,
   node_id,
+  onChange,
 }: ButtonGeneratorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [buttonCount, setButtonCount] = useState(0);
@@ -49,12 +51,15 @@ export function ButtonGenerator({
     handleEditButton,
     handleRemoveRow,
     getFinalKeyboardConfig,
+    keyboards: hookKeyboards,
   } = useButtonGeneratorState(isOpen, keyboards);
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
   const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
-    updateNodeData(node_id, update);
+    if (node_id) {
+      updateNodeData(node_id, update);
+    }
   };
 
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -68,7 +73,15 @@ export function ButtonGenerator({
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      handleUpdate({ keyboard: getFinalKeyboardConfig() });
+      const finalConfig = getFinalKeyboardConfig();
+      
+      // If onChange callback is provided, use it (for form modal context)
+      if (onChange) {
+        onChange(finalConfig);
+      } else if (node_id) {
+        // Otherwise, auto-save to node (existing behavior)
+        handleUpdate({ keyboard: finalConfig });
+      }
     }, 500);
 
     return () => {
@@ -76,14 +89,18 @@ export function ButtonGenerator({
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [isOpen, currentButtons, activeTab]);
+  }, [isOpen, currentButtons, activeTab, onChange, node_id]);
 
   // 2. Button count logikasi (TUZATILDI)
   useEffect(() => {
-    const newCount = calculateActiveButtonCount(keyboards);
+    const newCount = calculateActiveButtonCount({
+      active: activeTab,
+      inline: hookKeyboards.inline,
+      reply: hookKeyboards.reply,
+    });
     // Faqat qiymat haqiqatan o'zgarganda state yangilanadi
     setButtonCount((prev) => (prev !== newCount ? newCount : prev));
-  }, [keyboards]);
+  }, [hookKeyboards, activeTab]);
 
   // 3. Layout o'zgarishini boshqarish (TUZATILDI)
   // useCallback ishlatildi va state yangilash callback orqali bajarildi

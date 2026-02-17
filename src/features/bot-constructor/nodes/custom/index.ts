@@ -11,6 +11,7 @@ export * from "./DelayNode";
 export * from "./RandomNode";
 export * from "./VariableNode";
 export * from "./CheckMembershipNode";
+export * from "./FormNode";
 
 // Integration nodes
 export * from "./HTTPRequestNode";

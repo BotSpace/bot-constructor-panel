@@ -14,7 +14,6 @@ interface SizeContext {
   max?: string;
 }
 
-
 // Bizning node saqlaydigan asosiy ma'lumotlar strukturasi
 export interface MessageTriggerNodeData {
   type: MessageTriggerValueTypes;
