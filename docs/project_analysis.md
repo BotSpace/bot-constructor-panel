@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 1/11/2026, 2:00:19 PM
+Sana: 2/18/2026, 7:32:39 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -8,6 +8,7 @@ Sana: 1/11/2026, 2:00:19 PM
 bot-constructor-panel
 ├── .env
 ├── .env.example
+├── .eslintrc.json
 ├── .github
 │   └── workflows
 │       └── deploy.yaml
@@ -32,16 +33,19 @@ bot-constructor-panel
 │   │   ├── pre-rebase
 │   │   └── prepare-commit-msg
 │   └── pre-push
-├── .keys
-│   ├── private.pem
-│   └── public.pem
 ├── Dockerfile
+├── IMPLEMENTATION_COMPLETE.md
+├── IMPLEMENTATION_SUMMARY.md
 ├── README.md
 ├── Telegram bot API
 │   └── telegrm-bot-apis.md
 ├── components.json
 ├── docs
 │   ├── ARCHITECTURE.md
+│   ├── TEST_SCENARIOS_TRIGGER_STATE.md
+│   ├── TRIGGER_STATE_IN_COLLECTIONS.md
+│   ├── TRIGGER_STATE_SAVING.md
+│   ├── VISUAL_SUMMARY_TRIGGER_STATE.md
 │   └── project_analysis.md
 ├── next-env.d.ts
 ├── next.config.ts
@@ -333,6 +337,9 @@ bot-constructor-panel
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── FormNode
 │   │   │   │   │   │   ├── FormNode.tsx
+│   │   │   │   │   │   ├── components
+│   │   │   │   │   │   │   ├── add-item-modal.tsx
+│   │   │   │   │   │   │   └── form-item.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── HTTPRequestNode
@@ -378,7 +385,6 @@ bot-constructor-panel
 │   │   │   │       │   │   │   ├── SizeInput.tsx
 │   │   │   │       │   │   │   ├── ValueInput.tsx
 │   │   │   │       │   │   │   └── index.tsx
-│   │   │   │       │   │   ├── TriggerHeader.tsx
 │   │   │   │       │   │   └── TypeSelector.tsx
 │   │   │   │       │   ├── index.ts
 │   │   │   │       │   ├── types.ts
@@ -387,7 +393,13 @@ bot-constructor-panel
 │   │   │   │       │   ├── ReplyButtonTrigger.tsx
 │   │   │   │       │   ├── index.ts
 │   │   │   │       │   └── types.ts
-│   │   │   │       └── index.ts
+│   │   │   │       ├── index.ts
+│   │   │   │       └── shared
+│   │   │   │           ├── StateConfigUI.tsx
+│   │   │   │           ├── TriggerHeader.tsx
+│   │   │   │           ├── index.ts
+│   │   │   │           ├── state-config-helpers.ts
+│   │   │   │           └── state-config-types.ts
 │   │   │   ├── panel
 │   │   │   │   ├── elements
 │   │   │   │   │   └── elements.tsx
@@ -395,14 +407,17 @@ bot-constructor-panel
 │   │   │   ├── search
 │   │   │   │   ├── search-panel.tsx
 │   │   │   │   └── search-store.ts
-│   │   │   └── store
-│   │   │       ├── actions.ts
-│   │   │       ├── clipboardSlice.ts
-│   │   │       ├── flowSlice.ts
-│   │   │       ├── historySlice.ts
-│   │   │       ├── index.ts
-│   │   │       ├── project.ts
-│   │   │       └── types.ts
+│   │   │   ├── store
+│   │   │   │   ├── actions.ts
+│   │   │   │   ├── clipboardSlice.ts
+│   │   │   │   ├── flowSlice.ts
+│   │   │   │   ├── historySlice.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── project.ts
+│   │   │   │   └── types.ts
+│   │   │   └── utils
+│   │   │       ├── get-state-keys.ts
+│   │   │       └── index.ts
 │   │   ├── collections
 │   │   │   └── store
 │   │   │       ├── collection-list.ts
