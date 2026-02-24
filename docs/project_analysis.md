@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 1/11/2026, 2:00:19 PM
+Sana: 2/21/2026, 8:26:34 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -32,9 +32,6 @@ bot-constructor-panel
 │   │   ├── pre-rebase
 │   │   └── prepare-commit-msg
 │   └── pre-push
-├── .keys
-│   ├── private.pem
-│   └── public.pem
 ├── Dockerfile
 ├── README.md
 ├── Telegram bot API
@@ -333,6 +330,9 @@ bot-constructor-panel
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── FormNode
 │   │   │   │   │   │   ├── FormNode.tsx
+│   │   │   │   │   │   ├── components
+│   │   │   │   │   │   │   ├── add-item-modal.tsx
+│   │   │   │   │   │   │   └── form-item.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── HTTPRequestNode
