@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 2/21/2026, 8:26:34 PM
+Sana: 2/24/2026, 9:16:34 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -39,6 +39,7 @@ bot-constructor-panel
 ├── components.json
 ├── docs
 │   ├── ARCHITECTURE.md
+│   ├── node_types.md
 │   └── project_analysis.md
 ├── next-env.d.ts
 ├── next.config.ts
@@ -98,6 +99,10 @@ bot-constructor-panel
 │   │   │   │   └── relas
 │   │   │   │       └── relas.tsx
 │   │   │   └── header.tsx
+│   │   ├── login-form
+│   │   │   ├── google-auth-widget.tsx
+│   │   │   ├── index.tsx
+│   │   │   └── telegram-auth-widget.tsx
 │   │   └── ui
 │   │       ├── accordion.tsx
 │   │       ├── alert-dialog.tsx
@@ -113,6 +118,7 @@ bot-constructor-panel
 │   │       ├── context-menu.tsx
 │   │       ├── dialog.tsx
 │   │       ├── dropdown-menu.tsx
+│   │       ├── field.tsx
 │   │       ├── input-group.tsx
 │   │       ├── input-otp.tsx
 │   │       ├── input.tsx

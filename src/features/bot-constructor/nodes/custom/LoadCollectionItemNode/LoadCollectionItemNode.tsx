@@ -175,17 +175,17 @@ function LoadCollectionItemNode({
       {/* Not Found Output */}
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         id="not_found"
-        className="translate-x-[-100px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
+        className="translate-y-[70px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
       />
 
       {/* Found Output */}
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         id="found"
-        className="translate-x-[100px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
+        className="translate-y-[-70px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
       />
     </>
   );

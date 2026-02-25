@@ -53,9 +53,8 @@ const MessageTriggerNodeComponent = ({
   const showFilterSection = data.type && data.type !== "any";
   return (
     <Card
-      className={`w-80 rounded-lg shadow-xl border-2 ${
-        selected ? "border-sky-500/80" : "border-gray-600/50"
-      }`}
+      className={`w-80 rounded-lg shadow-xl border-2 ${selected ? "border-sky-500/80" : "border-gray-600/50"
+        }`}
     >
       <TargetHandles />
       <ElseMessageSource />
