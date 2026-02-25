@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
 
 type Props = {};
 
-function Elements({}: Props) {
+function Elements({ }: Props) {
   const Elements = useElements();
   const t = useTranslations();
 
