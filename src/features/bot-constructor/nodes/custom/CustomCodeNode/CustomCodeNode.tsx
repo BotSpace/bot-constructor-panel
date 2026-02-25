@@ -7,6 +7,7 @@ import { CodeEditorDialog } from "./components/CodeEditorDialog";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { Code2 } from "lucide-react";
+import { SourceHandles, TargetHandles } from "../../components";
 
 // Botda ishlatiladigan maxsus global o'zgaruvchilar
 const BOT_GLOBALS = ["message", "user", "state"];
@@ -20,11 +21,7 @@ export const CustomCodeNode = ({ id, data }: NodeProps<CustomCodeNodeData>) => {
 
   return (
     <div className="min-w-[250px] bg-background border-2 border-yellow-500/50 rounded-xl shadow-lg overflow-hidden">
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="w-3 h-3 bg-yellow-500"
-      />
+      <TargetHandles />
 
       <NodeHeader
         title="JS Script"
@@ -50,11 +47,7 @@ export const CustomCodeNode = ({ id, data }: NodeProps<CustomCodeNodeData>) => {
         />
       </div>
 
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="w-3 h-3 bg-yellow-500"
-      />
+      <SourceHandles />
     </div>
   );
 };
