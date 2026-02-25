@@ -37,6 +37,7 @@ import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { ActionPanel } from "../../components/shared/ActionPanel";
 import TextArea from "../shared/text-area";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendVideoNodeComponent = ({
   id,
@@ -264,6 +265,9 @@ const SendVideoNodeComponent = ({
           </CardFooter>
         </>
       )}
+
+      {/* Handler list */}
+      <HandlersList sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

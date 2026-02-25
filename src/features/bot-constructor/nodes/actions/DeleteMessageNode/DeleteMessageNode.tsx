@@ -14,9 +14,12 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { AlertCircle } from "lucide-react";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import { HandlerData } from "../TextMessageNode/types";
 
 export interface DeleteMessageNodeData {
   deleteFromContext?: boolean;
+  handlers?: HandlerData[];
 }
 
 const DeleteMessageNodeComponent = ({
@@ -118,6 +121,9 @@ const DeleteMessageNodeComponent = ({
           )}
         </CardContent>
       )}
+
+      {/* Handler list */}
+      <HandlersList sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

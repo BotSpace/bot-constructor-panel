@@ -15,10 +15,14 @@ import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+
+import { HandlerData } from "../TextMessageNode/types";
 
 interface DiceNodeData {
   emoji?: string;
   disableNotification?: boolean;
+  handlers?: HandlerData[];
 }
 
 const DiceNodeInternal = ({ id, data, selected }: NodeProps<DiceNodeData>) => {
@@ -73,6 +77,9 @@ const DiceNodeInternal = ({ id, data, selected }: NodeProps<DiceNodeData>) => {
           </div>
         </CardContent>
       )}
+
+      {/* Handler list */}
+      <HandlersList sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

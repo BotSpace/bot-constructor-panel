@@ -7,8 +7,9 @@ import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import ComingSoonNodeContent from "../shared/ComingSoonNodeContent";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
-const AnimationNodeComponent = ({ selected }: NodeProps) => {
+const AnimationNodeComponent = ({ id, selected }: NodeProps) => {
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
@@ -16,6 +17,10 @@ const AnimationNodeComponent = ({ selected }: NodeProps) => {
       <CardContent>
         <ComingSoonNodeContent node_description="GIF yoki MP4 animation yuboradi" />
       </CardContent>
+      
+      {/* Handler list */}
+      <HandlersList sourceNodeId={id} />
+
       <SourceHandles />
     </Card>
   );

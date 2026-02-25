@@ -1,3 +1,5 @@
+import { HandlerData } from "../TextMessageNode/types";
+
 export interface SendContactNodeData {
   recipients?: {
     sendToSender: boolean;
@@ -7,4 +9,5 @@ export interface SendContactNodeData {
   firstName?: string;
   lastName?: string;
   vcard?: string;
+  handlers?: HandlerData[];
 }

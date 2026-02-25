@@ -2,6 +2,7 @@ import {
   ButtonConfig,
   KeyboardConfig,
 } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { HandlerData } from "../TextMessageNode/types";
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
  * 'sender' - xabarni yuborgan foydalanuvchining o'ziga.
@@ -39,4 +40,5 @@ export interface SendPhotoNodeData {
   protectContent?: boolean; // Xabarni nusxalash va saqlashni taqiqlash.
 
   keyboard: KeyboardConfig;
+  handlers?: HandlerData[];
 }
