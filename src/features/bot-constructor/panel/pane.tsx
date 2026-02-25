@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Props = {};
 
-function Panel({}: Props) {
+function Panel({ }: Props) {
   return (
     <Tabs defaultValue="Elements" className="w-[350px] p-2 bg-muted/40">
       <TabsList className="grid text-sm w-full grid-cols-3 gap-2 my-1">

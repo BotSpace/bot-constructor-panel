@@ -9,7 +9,7 @@ interface SourceHandlerProps {
 
 export function SourceHandles({
   id = "source-handler",
-  position = Position.Bottom,
+  position = Position.Right,
 }: SourceHandlerProps) {
   return (
     <Handle

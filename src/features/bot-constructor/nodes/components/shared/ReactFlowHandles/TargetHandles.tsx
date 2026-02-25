@@ -6,7 +6,7 @@ export function TargetHandles() {
   return (
     <Handle
       type="target"
-      position={Position.Top}
+      position={Position.Left}
       className="!w-4 !h-4 !bg-sky-500 !border-2 !border-gray-800 flex items-center justify-center"
       id="target-handler"
     >

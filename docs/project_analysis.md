@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 1/11/2026, 2:00:19 PM
+Sana: 2/24/2026, 9:16:34 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -32,9 +32,6 @@ bot-constructor-panel
 │   │   ├── pre-rebase
 │   │   └── prepare-commit-msg
 │   └── pre-push
-├── .keys
-│   ├── private.pem
-│   └── public.pem
 ├── Dockerfile
 ├── README.md
 ├── Telegram bot API
@@ -42,6 +39,7 @@ bot-constructor-panel
 ├── components.json
 ├── docs
 │   ├── ARCHITECTURE.md
+│   ├── node_types.md
 │   └── project_analysis.md
 ├── next-env.d.ts
 ├── next.config.ts
@@ -101,6 +99,10 @@ bot-constructor-panel
 │   │   │   │   └── relas
 │   │   │   │       └── relas.tsx
 │   │   │   └── header.tsx
+│   │   ├── login-form
+│   │   │   ├── google-auth-widget.tsx
+│   │   │   ├── index.tsx
+│   │   │   └── telegram-auth-widget.tsx
 │   │   └── ui
 │   │       ├── accordion.tsx
 │   │       ├── alert-dialog.tsx
@@ -116,6 +118,7 @@ bot-constructor-panel
 │   │       ├── context-menu.tsx
 │   │       ├── dialog.tsx
 │   │       ├── dropdown-menu.tsx
+│   │       ├── field.tsx
 │   │       ├── input-group.tsx
 │   │       ├── input-otp.tsx
 │   │       ├── input.tsx
@@ -333,6 +336,9 @@ bot-constructor-panel
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── FormNode
 │   │   │   │   │   │   ├── FormNode.tsx
+│   │   │   │   │   │   ├── components
+│   │   │   │   │   │   │   ├── add-item-modal.tsx
+│   │   │   │   │   │   │   └── form-item.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── HTTPRequestNode

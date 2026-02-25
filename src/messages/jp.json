@@ -25,7 +25,18 @@
     "debugLogin": "DEBUG ログイン",
     "loginLoading": "ログイン中...",
     "loginSuccess": "ログイン成功",
-    "loginError": "ログインエラー"
+    "loginError": "ログインエラー",
+    "login": {
+      "title": "コードを入力",
+      "error": "ログインエラー。もう一度お試しください。",
+      "note": "ボットから受け取った6桁のコードを入力してください",
+      "loading": "読み込み中...",
+      "instruction": "Telegramボットにアクセスしてコードを取得してください。"
+    },
+    "loginForm": {
+      "orContinueWith": "または次で続行",
+      "loginWithGoogle": "Googleで続行"
+    }
   },
   "header": {
     "back": "戻る",
