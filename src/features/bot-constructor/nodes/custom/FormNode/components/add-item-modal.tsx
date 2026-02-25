@@ -17,10 +17,6 @@ import { ButtonGenerator } from "@/features/bot-constructor/components";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { FormNodeData } from "../types";
-import { TypeSelector } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/TypeSelector";
-import { FilterSelector } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/FilterSelector";
-import { ParameterInput } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/ParameterInput";
-import { getFiltersForType } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/utils";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
 import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 import { Input } from "@/components/ui/input";
@@ -106,15 +102,7 @@ function AddItemModal({
     }
   }, [editingItem, open]);
 
-  const { filtersForType, showFilterSection } = useMemo(() => {
-    const filters = getFiltersForType(type);
-    const showFilter = type && type !== "any";
 
-    return {
-      filtersForType: filters,
-      showFilterSection: showFilter,
-    };
-  }, [type]);
 
   const handleTypeChange = (newType: string) => {
     setType(newType as MessageTriggerValueTypes);
@@ -266,33 +254,10 @@ function AddItemModal({
             {/* Xabarlarni filter qilib olish */}
             <div className="space-y-1.5">
               <Label className="text-xs text-gray-400">Xabar turi</Label>
-              <TypeSelector
-                value={type || ""}
-                onValueChange={handleTypeChange}
-              />
+
             </div>
 
-            {showFilterSection && (
-              <div className="space-y-1.5 animate-in fade-in-50">
-                <Label className="text-xs text-gray-400">Filter</Label>
-                <FilterSelector
-                  value={filter || ""}
-                  onValueChange={handleFilterChange}
-                  options={filtersForType}
-                />
-              </div>
-            )}
 
-            {showFilterSection && filter && filter !== "any" && (
-              <div className="space-y-1.5 animate-in fade-in-50">
-                <Label className="text-xs text-gray-400">Parametr</Label>
-                <ParameterInput
-                  filter={filter}
-                  context={context}
-                  onContextUpdate={handleContextUpdate}
-                />
-              </div>
-            )}
           </div>
           <DialogFooter>
             <DialogClose asChild>

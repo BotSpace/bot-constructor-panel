@@ -11,7 +11,7 @@ import { SendLocationNodeData } from "./types";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
+import { ActionPanel } from "../../components/shared/ActionPanel";
 
 const LocationNodeComponent = ({
   id,
@@ -72,8 +72,8 @@ const LocationNodeComponent = ({
         </CardContent>
       )}
 
-      <CardFooter>
-        <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+      <CardFooter className="flex flex-col gap-2">
+        <ActionPanel keyboard={data.keyboard} id={id} />
       </CardFooter>
 
       <SourceHandles />

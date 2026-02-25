@@ -71,10 +71,10 @@ function ActionNodeSettings({
             </label>
             <Select
               onValueChange={(e) => handleUpdate({ parseMode: e as any })}
-              value={parseMode}
+              value={parseMode || "None"}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a markdown type" />
+                <SelectValue placeholder="Matn formatlash turini tanlang" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>

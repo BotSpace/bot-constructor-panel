@@ -17,9 +17,9 @@ import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/
 import { DynamicMessageConstructor } from "./components/dynamic-message-constructor-modal";
 import { Button } from "@/components/ui/button";
 
-import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
-import ActionNodeSettings from "../shared/ActionNodeSettings";
 import TextArea from "../shared/text-area";
+import { ActionPanel } from "../../components/shared/ActionPanel";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendTextMessageNodeComponent = ({
   id,
@@ -77,7 +77,6 @@ const SendTextMessageNodeComponent = ({
                   </Button>
                 </DynamicMessageConstructor>
               </div>
-
               <TextArea
                 placeholder="Xabar matni..."
                 defaultValue={data.messageText}
@@ -85,20 +84,22 @@ const SendTextMessageNodeComponent = ({
               />
             </div>
 
-            {/* Sozlamalar */}
-            <ActionNodeSettings
-              notificationDisabled={data.disableNotification}
-              contentProtected={data.protectContent}
-              parseMode={data.parseMode}
-              handleUpdate={handleUpdate}
-            />
           </CardContent>
 
-          <CardFooter>
-            <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+          <CardFooter className="flex flex-col gap-2">
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} parseMode={data.parseMode} protectContent={data.protectContent} id={id} />
+
           </CardFooter>
         </>
       )}
+
+      {/* Handler list */}
+      <div className="px-2">
+        {data.handlers && data.handlers.length > 0 && (
+          <HandlersList sourceNodeId={id} />
+        )}
+      </div>
+
       <SourceHandles />
     </Card>
   );

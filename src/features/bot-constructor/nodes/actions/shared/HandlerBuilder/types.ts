@@ -1,5 +1,6 @@
-import { ConstructorData } from "@/features/bot-constructor/data";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
+import { ButtonConfig } from "@/features/bot-constructor/components";
+
 
 // Murakkab context'lar uchun tiplar
 interface RadiusContext {
@@ -23,5 +24,24 @@ export interface MessageTriggerNodeData {
     value?: string;
     radius?: RadiusContext;
     size?: SizeContext;
+  };
+}
+
+
+export interface ReplyButtonTriggerData {
+  // `selectedButtons` (ko'plik) o'rniga `selectedButton` (birlik)
+  selectedButtons?: ButtonConfig[];
+  global: boolean;
+  context: {};
+  // Hech qanday tugma bosilmasa ham tutib olish
+  catchNoButton?: boolean;
+}
+
+
+export interface CallbackQueryTriggerData {
+  filter: string;
+  global: boolean;
+  context: {
+    value: string;
   };
 }
