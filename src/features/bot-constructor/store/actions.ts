@@ -12,10 +12,6 @@ import { DeleteMessageNodeData } from "../nodes/actions/DeleteMessageNode/Delete
 import { ForwardMessageNodeData } from "../nodes/actions/ForwardMessageNode/ForwardMessageNode";
 import { DownloadFileNodeData } from "../nodes/actions/DownloadFileNode/DownloadFileNode";
 import { CustomCodeNodeData } from "../nodes/custom/CustomCodeNode/types";
-import { MessageTriggerNodeData } from "../nodes/triggers/MessageTrigger/types";
-import { ReplyButtonTriggerData } from "../nodes/triggers/ReplyButtonTrigger/types";
-import { CommandTriggerNodeData } from "../nodes/triggers/CommandTrigger/types";
-import { CallbackQueryTriggerData } from "../nodes/triggers/CallbackQueryTrigger/types";
 import { StateNodeData } from "../nodes/custom/StateNode/types";
 import { SendLocationNodeData } from "../nodes/actions/LocationNode/types";
 import { CallbackAnswerNodeData } from "../nodes/custom/CallbackAnswerNode/types";
@@ -130,35 +126,7 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         },
       } as CallbackAnswerNodeData;
 
-    // Triggers
-    case "MessageTriggerNode":
-      return {
-        ...baseTriggerData,
-        global: false,
-        type: "text",
-        filter: "any",
-      } as MessageTriggerNodeData;
-    case "ReplyButtonTriggerNode":
-      return {
-        ...baseTriggerData,
-        global: false,
-      } as ReplyButtonTriggerData;
-    case "CommandTriggerNode":
-      return {
-        ...baseTriggerData,
-        global: true,
-        command: "/start",
-      } as CommandTriggerNodeData;
-    case "CallbackQueryTriggerNode":
-      return {
-        ...baseTriggerData,
-        global: false,
-        filter: "",
-        context: {
-          value: "",
-        },
-      } as CallbackQueryTriggerData;
-
+    
     case "FormNode":
       return { items: [] } as FormNodeData;
 

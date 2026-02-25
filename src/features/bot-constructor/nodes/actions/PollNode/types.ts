@@ -1,3 +1,5 @@
+import { HandlerData } from "../TextMessageNode/types";
+
 export interface PollOption {
   text: string;
 }

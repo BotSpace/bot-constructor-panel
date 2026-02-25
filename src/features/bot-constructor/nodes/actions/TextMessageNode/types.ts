@@ -1,8 +1,6 @@
 import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 import { DynamicMessage, ParseMode } from "../shared/types";
-import { MessageTriggerNodeData } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/types";
-import { ReplyButtonTriggerData } from "@/features/bot-constructor/nodes/triggers/ReplyButtonTrigger/types";
-import { CallbackQueryTriggerData } from "@/features/bot-constructor/nodes/triggers/CallbackQueryTrigger/types";
+import { CallbackQueryTriggerData, MessageTriggerNodeData, ReplyButtonTriggerData } from "../shared/HandlerBuilder/types";
 
 export type HandlerData =
   | MessageTriggerNodeData
