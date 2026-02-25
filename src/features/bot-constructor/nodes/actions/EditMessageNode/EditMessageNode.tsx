@@ -8,7 +8,7 @@ import { NodeHeader } from "../shared/NodeHeader";
 import { findNearestParentAction } from "@/features/bot-constructor/lib/findNearestParentAction";
 import { ElementItemType } from "@/types/element-types";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { ButtonGenerator } from "@/features/bot-constructor/components";
+import { ActionPanel } from "../../components/shared/ActionPanel";
 import { EditMessageSource } from "../../components/shared/ReactFlowHandles/EditMessageSource";
 import ForTextMessageNode from "./components/ForTextMessageNode";
 import ForVideoPhotoDocumentAudio from "./components/ForVideoPhotoDocumentAudio";
@@ -100,8 +100,8 @@ export const EditMessageNode = memo(
         <SourceHandles />
         <EditMessageSource />
 
-        <CardFooter>
-          <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+        <CardFooter className="flex flex-col gap-2">
+          <ActionPanel keyboard={data.keyboard} parseMode={data.parseMode} id={id} />
         </CardFooter>
       </Card>
     );

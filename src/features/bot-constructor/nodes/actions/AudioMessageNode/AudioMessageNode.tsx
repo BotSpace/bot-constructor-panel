@@ -27,7 +27,7 @@ import { NodeHeader } from "../shared/NodeHeader";
 import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
-import { ButtonGenerator } from "@/features/bot-constructor/components";
+import { ActionPanel } from "../../components/shared/ActionPanel";
 import TextArea from "../shared/text-area";
 
 const SendAudioNodeComponent = ({
@@ -270,10 +270,10 @@ const SendAudioNodeComponent = ({
               </div>
             </div>
 
-            <CardFooter>
-              <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
-            </CardFooter>
           </CardContent>
+          <CardFooter className="flex flex-col gap-2">
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} />
+          </CardFooter>
         </>
       )}
 
