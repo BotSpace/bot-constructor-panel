@@ -16,4 +16,5 @@ export interface SendPollNodeData {
   explanation?: string;
   openPeriod?: number;
   closeDate?: string;
+  handlers?: HandlerData[];
 }

@@ -19,4 +19,5 @@ export interface EditMessageNodeData {
   keyboard: KeyboardConfig;
 
   dynamicMessages?: DynamicMessage[];
+  handlers?: HandlerData[];
 }

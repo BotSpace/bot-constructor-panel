@@ -94,11 +94,7 @@ const SendTextMessageNodeComponent = ({
       )}
 
       {/* Handler list */}
-      <div className="px-2">
-        {data.handlers && data.handlers.length > 0 && (
-          <HandlersList sourceNodeId={id} />
-        )}
-      </div>
+      <HandlersList sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

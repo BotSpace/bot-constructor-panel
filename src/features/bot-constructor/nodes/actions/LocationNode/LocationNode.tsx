@@ -12,6 +12,7 @@ import { RecipientsManager } from "../shared/RecipientSelector";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ActionPanel } from "../../components/shared/ActionPanel";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const LocationNodeComponent = ({
   id,
@@ -75,6 +76,9 @@ const LocationNodeComponent = ({
       <CardFooter className="flex flex-col gap-2">
         <ActionPanel keyboard={data.keyboard} id={id} />
       </CardFooter>
+
+      {/* Handler list */}
+      <HandlersList sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

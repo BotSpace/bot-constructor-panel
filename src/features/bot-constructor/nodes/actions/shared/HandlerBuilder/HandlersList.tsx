@@ -208,7 +208,7 @@ export function HandlersList({ sourceNodeId, showHandle = true }: HandlersListPr
     }
 
     return (
-        <div className="space-y-2 py-4 w-full">
+        <div className="space-y-2 py-4 w-full px-2">
             <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-semibold">Yaratilgan handlerlar</h3>
                 <Badge variant="secondary" className="text-xs">

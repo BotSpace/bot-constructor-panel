@@ -16,12 +16,16 @@ import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+
+import { HandlerData } from "../TextMessageNode/types";
 
 interface StickerNodeData {
   stickerSourceType?: "file_id" | "url";
   stickerFileId?: string;
   stickerUrl?: string;
   disableNotification?: boolean;
+  handlers?: HandlerData[];
 }
 
 const StickerNodeInternal = ({
@@ -91,6 +95,9 @@ const StickerNodeInternal = ({
           )}
         </CardContent>
       )}
+
+      {/* Handler list */}
+      <HandlersList sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

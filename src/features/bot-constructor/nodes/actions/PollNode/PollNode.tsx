@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Plus, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const PollNodeComponent = ({
   id,
@@ -206,6 +207,9 @@ const PollNodeComponent = ({
           </div>
         </CardContent>
       )}
+
+      {/* Handler list */}
+      <HandlersList sourceNodeId={id} />
 
       <SourceHandles />
     </Card>
