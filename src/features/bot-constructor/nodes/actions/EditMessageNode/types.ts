@@ -1,5 +1,6 @@
 import { KeyboardConfig } from "@/features/bot-constructor/components";
 import { DynamicMessage, ParseMode } from "../shared/types";
+import { HandlerData } from "../TextMessageNode/types";
 
 export type MessageIdSource = "this_message" | "connected_node" | "message_id";
 
