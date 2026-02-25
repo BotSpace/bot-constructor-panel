@@ -15,7 +15,7 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
 
 type Props = {};
 
-function SearchPanel({}: Props) {
+function SearchPanel({ }: Props) {
   const { setCenter } = useReactFlow();
   const { nodes } = useFlowStore();
   const { searchPanelIsOpen, toggleSearchPanel } = useSearchStore();
@@ -29,11 +29,17 @@ function SearchPanel({}: Props) {
     { preventDefault: true }
   );
 
+  function getItemTextConten(item: any) {
+    const value = item.data.messageText || item.data.caption || item.data.command || item.data?.context?.value || item.data.newText || "";
+    return value
+  }
+
   // 👉 Best practice: useMemo bilan filterni optimallashtiramiz
   const filteredNodes = useMemo(() => {
     if (!search.trim()) return nodes; // bo‘sh bo‘lsa hamma node qaytadi
 
     return nodes.filter((item) => {
+      console.log(item)
       const value = item.data.messageText || item.data.caption || "";
 
       return value.toLowerCase().includes(search.toLowerCase());
@@ -42,7 +48,7 @@ function SearchPanel({}: Props) {
 
   return (
     <div
-      className={cn("h-[calc(100vh-56px)] bg-secondary p-3", {
+      className={cn("h-[calc(100vh-56px)] bg-secondary p-3 overflow-auto", {
         "col-span-3 flex flex-col": searchPanelIsOpen,
         "hidden col-end-0": !searchPanelIsOpen,
       })}
@@ -81,16 +87,9 @@ function SearchPanel({}: Props) {
             className="p-3 rounded-xl bg-card shadow-sm border hover:bg-accent hover:text-accent-foreground transition cursor-pointer"
           >
             <p className="text-sm font-medium line-clamp-2">
-              {item.data.messageText || item.data.caption || "No text"}
+              {getItemTextConten(item)}
             </p>
 
-            <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-              <span>ID: {item.id}</span>
-              <span className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full" />
-                Node
-              </span>
-            </div>
           </div>
         ))}
       </div>
