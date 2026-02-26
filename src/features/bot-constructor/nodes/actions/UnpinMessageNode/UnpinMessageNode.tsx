@@ -70,9 +70,6 @@ const UnpinMessageNodeComponent = ({
         </CardContent>
       )}
 
-      {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
-
       <SourceHandles />
     </Card>
   );

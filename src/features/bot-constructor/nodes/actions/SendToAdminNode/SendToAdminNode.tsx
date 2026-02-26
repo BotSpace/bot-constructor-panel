@@ -16,9 +16,6 @@ const SendToAdminNodeComponent = ({ id, selected }: NodeProps) => {
       <div className="p-4 text-sm text-muted-foreground text-center">
         Xabarni admin panelga yuboradi
       </div>
-      
-      {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

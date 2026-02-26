@@ -16,9 +16,9 @@ const CopyMessageNodeComponent = ({ id, data, selected }: NodeProps) => {
       <div className="p-4 text-sm text-muted-foreground text-center">
         Xabarni nusxalab yuboradi
       </div>
-      
+
       {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

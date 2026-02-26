@@ -78,9 +78,6 @@ const DiceNodeInternal = ({ id, data, selected }: NodeProps<DiceNodeData>) => {
         </CardContent>
       )}
 
-      {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
-
       <SourceHandles />
     </Card>
   );

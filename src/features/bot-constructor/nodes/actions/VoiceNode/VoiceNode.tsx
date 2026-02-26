@@ -15,9 +15,9 @@ const VoiceNodeComponent = ({ id, data, selected }: NodeProps) => {
       <TargetHandles />
       <NodeHeader icon="🎤" title="Ovozli xabar" />
       <ComingSoonNodeContent node_description="Voice message yuboradi" />
-      
+
       {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

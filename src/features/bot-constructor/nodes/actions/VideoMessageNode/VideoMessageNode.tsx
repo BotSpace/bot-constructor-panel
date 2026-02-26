@@ -261,7 +261,7 @@ const SendVideoNodeComponent = ({
       )}
 
       {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

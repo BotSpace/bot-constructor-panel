@@ -16,7 +16,7 @@ export function SourceHandles({
       type="source"
       position={position}
       id={id}
-      className="!w-4 !h-4 !bg-sky-500 !border-2 !border-gray-800 flex items-center justify-center"
+      className="!w-6 !h-14 !bg-sky-500 !rounded-[10px] !border-gray-800 flex items-center justify-center"
     >
       <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
     </Handle>
