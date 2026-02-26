@@ -6,7 +6,6 @@ import ReactFlow, {
   Controls,
   MiniMap,
   useReactFlow,
-  ReactFlowProvider,
   ConnectionMode,
 } from "reactflow";
 import "reactflow/dist/style.css";
@@ -33,6 +32,8 @@ import toast from "react-hot-toast";
 import { useSearchStore } from "./search/search-store";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { NodeSelectionDialog } from "./components/NodeSelectionDialog";
+import { Connection, addEdge } from "reactflow";
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
@@ -65,6 +66,15 @@ export default function Constructor() {
   const { screenToFlowPosition, fitView } = useReactFlow();
   const [snapToGrid, setSnapToGrid] = useState(false);
   const mousePosition = useMousePosition();
+
+  // Node selection dialog state
+  const [showNodeDialog, setShowNodeDialog] = useState(false);
+  const pendingConnectionRef = useRef<{
+    source: string;
+    sourceHandle: string | null | undefined;
+    position: { x: number; y: number };
+  } | null>(null);
+  const connectionSuccessfulRef = useRef(false);
 
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -232,6 +242,103 @@ export default function Constructor() {
 
   const isMobile = useIsMobile();
 
+  // Connection boshlanganda ma'lumotlarni saqlash
+  const handleConnectStart = useCallback(
+    (
+      _event: React.MouseEvent | React.TouchEvent,
+      { nodeId, handleId }: { nodeId: string | null; handleId: string | null | undefined }
+    ) => {
+      connectionSuccessfulRef.current = false;
+      if (nodeId) {
+        // Mouse pozitsiyasini olish
+        const position = screenToFlowPosition({
+          x: mousePosition.x,
+          y: mousePosition.y,
+        });
+
+        pendingConnectionRef.current = {
+          source: nodeId,
+          sourceHandle: handleId ?? null,
+          position,
+        };
+      }
+    },
+    [screenToFlowPosition, mousePosition]
+  );
+
+  // Connection tugaganda tekshirish
+  const handleConnectEnd = useCallback(
+    (event: MouseEvent | TouchEvent) => {
+      // Mouse pozitsiyasini yangilash (connection tugagan joyda)
+      if (pendingConnectionRef.current) {
+        const clientX = 'clientX' in event ? event.clientX : event.touches[0]?.clientX ?? 0;
+        const clientY = 'clientY' in event ? event.clientY : event.touches[0]?.clientY ?? 0;
+
+        if (clientX && clientY) {
+          const position = screenToFlowPosition({
+            x: clientX,
+            y: clientY,
+          });
+          pendingConnectionRef.current.position = position;
+        }
+      }
+
+      // Agar connection muvaffaqiyatli bo'lsa (onConnect chaqiriladi), 
+      // bu yerda hech narsa qilmaymiz
+      // Faqat connection tugagan va target yo'q bo'lsa dialog ko'rsatamiz
+      setTimeout(() => {
+        // Kichik delay - onConnect chaqirilishini kutish uchun
+        if (pendingConnectionRef.current && !connectionSuccessfulRef.current) {
+          setShowNodeDialog(true);
+        }
+        connectionSuccessfulRef.current = false;
+      }, 100);
+    },
+    [screenToFlowPosition]
+  );
+
+  // Node tanlanganda yaratish va ulash
+  const handleNodeSelected = useCallback(
+    (element: ElementItemType) => {
+      if (!pendingConnectionRef.current) return;
+
+      const { source, sourceHandle, position } = pendingConnectionRef.current;
+
+      // Yangi node yaratish
+      addNode(element, position);
+
+      // Yangi yaratilgan node'ni topish va edge yaratish
+      setTimeout(() => {
+        const currentNodes = useFlowStore.getState().nodes;
+        const newNode = currentNodes[currentNodes.length - 1]; // Oxirgi node yangi yaratilgan
+
+        if (newNode) {
+          const connection: Connection = {
+            source,
+            sourceHandle: sourceHandle ?? null,
+            target: newNode.id,
+            targetHandle: null,
+          };
+
+          // Edge yaratish
+          onConnect(connection);
+        }
+
+        // Tozalash
+        pendingConnectionRef.current = null;
+      }, 50);
+    },
+    [addNode, onConnect]
+  );
+
+  // Dialog yopilganda tozalash
+  const handleDialogClose = useCallback((open: boolean) => {
+    setShowNodeDialog(open);
+    if (!open) {
+      pendingConnectionRef.current = null;
+    }
+  }, []);
+
   return (
     <>
       <ContextMenu>
@@ -254,7 +361,14 @@ export default function Constructor() {
               edgeTypes={CustomEdge}
               nodes={nodes}
               edges={edges}
-              onConnect={onConnect}
+              onConnect={(connection) => {
+                // Connection muvaffaqiyatli bo'lsa, pending connection'ni tozalash
+                connectionSuccessfulRef.current = true;
+                pendingConnectionRef.current = null;
+                onConnect(connection);
+              }}
+              onConnectStart={handleConnectStart}
+              onConnectEnd={handleConnectEnd}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onNodeDrag={handleNodeDrag}
@@ -291,6 +405,11 @@ export default function Constructor() {
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
+      <NodeSelectionDialog
+        open={showNodeDialog}
+        onOpenChange={handleDialogClose}
+        onSelect={handleNodeSelected}
+      />
     </>
   );
 }

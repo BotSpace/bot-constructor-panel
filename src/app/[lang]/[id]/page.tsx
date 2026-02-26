@@ -42,9 +42,6 @@ export default function Page() {
     loadCollections(id);
   }, []);
 
-  // 1. Qidiruv matnini saqlash uchun state
-  const [searchTerm, setSearchTerm] = useState("");
-
   const isMobile = useIsMobile();
   const [isOriented, setIsOriented] = useState(false);
 
