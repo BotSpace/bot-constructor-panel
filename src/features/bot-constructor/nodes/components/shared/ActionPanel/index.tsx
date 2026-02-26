@@ -15,17 +15,23 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { ParseMode } from "../../../actions/shared/types";
 import { ButtonGenerator, KeyboardConfig } from "@/features/bot-constructor/components";
 import { HandlerBuilder } from "../../../actions/shared/HandlerBuilder";
+import { RecipientsManager } from "../../../actions/shared/RecipientSelector";
+import { Separator } from "@/components/ui/separator";
 
 interface ActionPanelTypes {
-  keyboard: KeyboardConfig,
+  keyboard?: KeyboardConfig,
   disableNotification?: boolean,
   protectContent?: boolean,
   parseMode?: ParseMode,
   id: string,
+  recipients?: {
+    sendToSender: boolean;
+    additionalIds: string[];
+  };
   // handlers: Handler
 }
 
-export function ActionPanel({ disableNotification, parseMode, protectContent, id, keyboard }: ActionPanelTypes) {
+export function ActionPanel({ disableNotification, parseMode, protectContent, id, keyboard, recipients }: ActionPanelTypes) {
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
@@ -44,13 +50,25 @@ export function ActionPanel({ disableNotification, parseMode, protectContent, id
           <DrawerTitle>Sozlamalar</DrawerTitle>
           <DrawerDescription>Tugmalar va xabar sozlamalarini boshqaring</DrawerDescription>
         </DrawerHeader>
-        <div className="no-scrollbar overflow-y-auto px-4">
+        <div className="no-scrollbar overflow-y-auto px-4 flex flex-col gap-3">
+
+          {/* Qabul qiluvchi */}
+          {recipients !== undefined && (
+            <RecipientsManager
+              recipients={recipients}
+              onUpdate={handleUpdate}
+            />
+          )}
 
           {/* handler builder */}
           <HandlerBuilder sourceNodeId={id} />
 
           {/* Buttonlar generate qilish */}
-          <ButtonGenerator initialKeyboard={keyboard} node_id={id} />
+          {keyboard !== undefined && (
+            <ButtonGenerator initialKeyboard={keyboard} node_id={id} />
+          )}
+
+          <Separator />
 
           {/* Sozlamalar */}
           <ActionNodeSettings

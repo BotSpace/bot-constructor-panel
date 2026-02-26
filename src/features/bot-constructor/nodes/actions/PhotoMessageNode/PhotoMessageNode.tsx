@@ -23,7 +23,6 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 // Yaratgan andozamiz uchun kerakli importlar
 import { Camera } from "lucide-react";
 import { NodeHeader } from "../shared/NodeHeader";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { ActionPanel } from "../../components/shared/ActionPanel";
@@ -117,12 +116,6 @@ const SendPhotoNodeComponent = ({
       {!isCollapsed && (
         <>
           <CardContent className="flex flex-col gap-4">
-            {/* Qabul qiluvchi */}
-            <RecipientsManager
-              recipients={data.recipients}
-              onUpdate={handleUpdate}
-            />
-
             {/* Rasm manbasi */}
             <div className="flex flex-col gap-2">
               <Label>Rasm manbasi</Label>
@@ -254,7 +247,7 @@ const SendPhotoNodeComponent = ({
           </CardContent>
 
           <CardFooter className="flex flex-col gap-2">
-            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} />
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} recipients={data.recipients} />
           </CardFooter>
         </>
       )}

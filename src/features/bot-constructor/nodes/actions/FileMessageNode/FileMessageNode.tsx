@@ -24,7 +24,6 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 
 import { NodeHeader } from "../shared/NodeHeader";
 import { FileText } from "lucide-react";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { ActionPanel } from "../../components/shared/ActionPanel";
@@ -118,12 +117,6 @@ const SendFileNodeComponent = ({
       {!isCollapsed && (
         <>
           <CardContent className="flex flex-col gap-4">
-            {/* Qabul qiluvchi */}
-            <RecipientsManager
-              recipients={data.recipients}
-              onUpdate={handleUpdate}
-            />
-
             {/* Fayl manbasi */}
             <div className="grid gap-2">
               <Label>Fayl manbasi</Label>
@@ -249,7 +242,7 @@ const SendFileNodeComponent = ({
           </CardContent>
 
           <CardFooter className="flex flex-col gap-2">
-            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} />
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} recipients={data.recipients} />
           </CardFooter>
         </>
       )}

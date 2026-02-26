@@ -69,7 +69,7 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
         // React Flow'ning default edge'ini ishlatamiz
         // Rasmga mos stil
         style: {
-          strokeWidth: 1.5,
+          strokeWidth: 4,
           stroke: edgeColor,
         },
         // EditMessageHandler va DeleteMessageHandler'dan chiqqan edge'lar uchun animated true

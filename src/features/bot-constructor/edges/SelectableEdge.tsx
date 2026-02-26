@@ -34,13 +34,13 @@ function SelectableEdge({
   });
 
   // Get original style values
-  const originalStroke = (style as any)?.stroke || "#495057";
-  const originalStrokeWidth = (style as any)?.strokeWidth || 1.5;
+  const originalStroke = "#fff";
+  const originalStrokeWidth = (style as any)?.strokeWidth || 4;
 
   // Selected state styling - more visible
   const selectedStyle = {
     stroke: "#3b82f6", // Blue color when selected
-    strokeWidth: 2.5, // Thicker when selected
+    strokeWidth: 5, // Thicker when selected
   };
 
   // Default style
