@@ -103,7 +103,7 @@ export const EditMessageNode = memo(
         </CardFooter>
 
         {/* Handler list */}
-        <HandlersList sourceNodeId={id} />
+        <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
         <SourceHandles />
         <EditMessageSource />

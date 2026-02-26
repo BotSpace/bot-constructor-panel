@@ -96,9 +96,6 @@ const StickerNodeInternal = ({
         </CardContent>
       )}
 
-      {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
-
       <SourceHandles />
     </Card>
   );

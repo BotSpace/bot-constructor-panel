@@ -84,9 +84,6 @@ const ChatActionNodeInternal = ({
         </CardContent>
       )}
 
-      {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
-
       <SourceHandles />
     </Card>
   );

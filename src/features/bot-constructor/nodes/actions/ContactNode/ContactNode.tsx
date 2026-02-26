@@ -2,7 +2,7 @@
 
 import { NodeProps } from "reactflow";
 import { memo, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
@@ -85,7 +85,7 @@ const ContactNodeComponent = ({
       </CardFooter>
 
       {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

@@ -121,9 +121,6 @@ const ForwardMessageNodeComponent = ({
         </div>
       </CardContent>
 
-      {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
-
       <SourceHandles />
     </Card>
   );

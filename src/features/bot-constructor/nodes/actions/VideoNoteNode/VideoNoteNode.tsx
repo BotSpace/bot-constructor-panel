@@ -15,9 +15,9 @@ const VideoNoteNodeComponent = ({ id, data, selected }: NodeProps) => {
       <TargetHandles />
       <NodeHeader icon="📹" title="Video xabar" />
       <ComingSoonNodeContent node_description="Dumaloq video xabar yuboradi" />
-      
+
       {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

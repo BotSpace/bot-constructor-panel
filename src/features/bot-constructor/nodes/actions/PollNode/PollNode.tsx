@@ -2,7 +2,7 @@
 
 import { NodeProps } from "reactflow";
 import { memo, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
@@ -206,9 +206,6 @@ const PollNodeComponent = ({
       <CardFooter className="flex flex-col gap-2">
         <ActionPanel keyboard={data.keyboard} id={id} recipients={data.recipients} />
       </CardFooter>
-
-      {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

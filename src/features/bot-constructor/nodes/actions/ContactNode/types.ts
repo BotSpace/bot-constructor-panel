@@ -10,6 +10,6 @@ export interface SendContactNodeData {
   firstName?: string;
   lastName?: string;
   vcard?: string;
-  keyboard?: KeyboardConfig;
+  keyboard: KeyboardConfig;
   handlers?: HandlerData[];
 }

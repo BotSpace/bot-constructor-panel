@@ -7,12 +7,13 @@ import ReactFlow, {
   MiniMap,
   useReactFlow,
   ReactFlowProvider,
+  ConnectionMode,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { ElementItemType } from "@/types/element-types";
 import { useFlowStore } from "./store";
 import { CustomNodes } from "./nodes";
-import { CustomEdge } from "./edges";
+import { CustomEdge, FloatingConnectionLine } from "./edges";
 import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
 import { useMousePosition } from "./hooks/useMousePosition";
 import { useParams } from "next/navigation";
@@ -264,13 +265,15 @@ export default function Constructor() {
               deleteKeyCode={null} // O'zimizning handler'imizni ishlatamiz
               minZoom={0.1}
               maxZoom={2.5}
-              connectionRadius={50}
+              connectionRadius={210}
               snapToGrid={snapToGrid}
               snapGrid={snapToGrid ? [20, 20] : undefined}
               connectionLineStyle={{
                 strokeWidth: 4,
                 stroke: "#fff",
               }}
+              connectionLineComponent={FloatingConnectionLine}
+              connectionMode={ConnectionMode.Loose}
             >
               <SaveStatusBadge className="absolute top-2 right-2 z-20" />
               <Background gap={24} color="#666" />

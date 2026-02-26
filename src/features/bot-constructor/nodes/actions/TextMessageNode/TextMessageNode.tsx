@@ -41,9 +41,9 @@ const SendTextMessageNodeComponent = ({
     )?.flat().length || 0;
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary relative")}>
       <TargetHandles />
-      <SelectedMessageTarget />
+      {/* <SelectedMessageTarget /> */}
 
       <NodeHeader
         icon={<LetterText className="text-primary" />}

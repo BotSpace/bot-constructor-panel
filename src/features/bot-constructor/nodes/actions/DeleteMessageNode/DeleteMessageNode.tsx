@@ -91,14 +91,14 @@ const DeleteMessageNodeComponent = ({
                     {connectedMessageNode.type === "SendTextMessageNode"
                       ? "Matn xabari"
                       : connectedMessageNode.type === "SendPhotoNode"
-                      ? "Rasm xabari"
-                      : connectedMessageNode.type === "SendVideoNode"
-                      ? "Video xabari"
-                      : connectedMessageNode.type === "SendAudioNode"
-                      ? "Audio xabari"
-                      : connectedMessageNode.type === "SendFileNode"
-                      ? "Fayl xabari"
-                      : "Xabar"}
+                        ? "Rasm xabari"
+                        : connectedMessageNode.type === "SendVideoNode"
+                          ? "Video xabari"
+                          : connectedMessageNode.type === "SendAudioNode"
+                            ? "Audio xabari"
+                            : connectedMessageNode.type === "SendFileNode"
+                              ? "Fayl xabari"
+                              : "Xabar"}
                   </span>
                 </div>
               ) : (
@@ -121,10 +121,6 @@ const DeleteMessageNodeComponent = ({
           )}
         </CardContent>
       )}
-
-      {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
-
       <SourceHandles />
     </Card>
   );

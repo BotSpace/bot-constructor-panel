@@ -59,7 +59,7 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 
       const newEdge = {
         ...connection,
-        type: "step",
+        type: "floating",
         markerEnd: {
           type: "arrow",
           width: 30,
