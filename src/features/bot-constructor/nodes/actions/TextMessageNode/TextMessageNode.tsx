@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 import { Label } from "@radix-ui/react-dropdown-menu";
 
 import { NodeHeader } from "../shared/NodeHeader";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { DynamicMessageConstructor } from "./components/dynamic-message-constructor-modal";
@@ -55,46 +54,37 @@ const SendTextMessageNodeComponent = ({
       />
       {!isCollapsed && (
         <>
-          <CardContent className="flex flex-col gap-4">
-            {/* Qabul qiluvchi */}
-            <RecipientsManager
-              recipients={data.recipients}
-              onUpdate={handleUpdate}
-            />
-
+          <CardContent className="grid gap-2">
             {/* Xabar matni */}
-            <div className="grid gap-2">
-              <div className="flex justify-between items-center">
-                <Label>Xabar matni</Label>
+            <div className="flex justify-between items-center">
+              <Label>Xabar matni</Label>
 
-                <DynamicMessageConstructor
-                  handleUpdate={handleUpdate}
-                  initialDynamicMessages={data.dynamicMessages}
-                  id={id}
-                >
-                  <Button size={"icon-sm"} variant={"outline"}>
-                    <ListPlus />
-                  </Button>
-                </DynamicMessageConstructor>
-              </div>
-              <TextArea
-                placeholder="Xabar matni..."
-                defaultValue={data.messageText}
-                onChange={(e) => handleUpdate({ messageText: e })}
-              />
+              <DynamicMessageConstructor
+                handleUpdate={handleUpdate}
+                initialDynamicMessages={data.dynamicMessages}
+                id={id}
+              >
+                <Button size={"icon-sm"} variant={"outline"}>
+                  <ListPlus />
+                </Button>
+              </DynamicMessageConstructor>
             </div>
-
+            <TextArea
+              placeholder="Xabar matni..."
+              defaultValue={data.messageText}
+              onChange={(e) => handleUpdate({ messageText: e })}
+            />
           </CardContent>
 
           <CardFooter className="flex flex-col gap-2">
-            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} parseMode={data.parseMode} protectContent={data.protectContent} id={id} />
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} parseMode={data.parseMode} protectContent={data.protectContent} id={id} recipients={data.recipients} />
 
           </CardFooter>
         </>
       )}
 
       {/* Handler list */}
-      <HandlersList sourceNodeId={id} />
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

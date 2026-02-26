@@ -8,11 +8,11 @@ import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendContactNodeData } from "./types";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import { ActionPanel } from "../../components/shared/ActionPanel";
 
 const ContactNodeComponent = ({
   id,
@@ -38,11 +38,6 @@ const ContactNodeComponent = ({
 
       {!isCollapsed && (
         <CardContent className="flex flex-col gap-4 pt-4">
-          <RecipientsManager
-            recipients={data.recipients}
-            onUpdate={handleUpdate}
-          />
-
           <div className="flex flex-col gap-2">
             <Label>Telefon raqam</Label>
             <Input
@@ -84,6 +79,10 @@ const ContactNodeComponent = ({
           </div>
         </CardContent>
       )}
+
+      <CardFooter className="flex flex-col gap-2">
+        <ActionPanel keyboard={data.keyboard} id={id} recipients={data.recipients} />
+      </CardFooter>
 
       {/* Handler list */}
       <HandlersList sourceNodeId={id} />

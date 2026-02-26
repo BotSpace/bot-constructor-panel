@@ -24,7 +24,6 @@ import { FiMusic } from "react-icons/fi";
 
 // Bizning andozamiz uchun yangi importlar
 import { NodeHeader } from "../shared/NodeHeader";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { ActionPanel } from "../../components/shared/ActionPanel";
@@ -119,12 +118,6 @@ const SendAudioNodeComponent = ({
       {!isCollapsed && (
         <>
           <CardContent className="flex flex-col gap-4">
-            {/* Qabul qiluvchi */}
-            <RecipientsManager
-              recipients={data.recipients}
-              onUpdate={handleUpdate}
-            />
-
             {/* Audio manbasi */}
             <div className="grid gap-2">
               <Label>Audio manbasi</Label>
@@ -273,7 +266,7 @@ const SendAudioNodeComponent = ({
 
           </CardContent>
           <CardFooter className="flex flex-col gap-2">
-            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} />
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} recipients={data.recipients} />
           </CardFooter>
         </>
       )}

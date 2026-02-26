@@ -32,7 +32,6 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 
 // Andozamiz uchun yangi importlar
 import { NodeHeader } from "../shared/NodeHeader";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { ActionPanel } from "../../components/shared/ActionPanel";
@@ -128,11 +127,6 @@ const SendVideoNodeComponent = ({
       {!isCollapsed && (
         <>
           <CardContent className="p-4 pt-0 flex flex-col gap-5">
-            <RecipientsManager
-              recipients={data.recipients}
-              onUpdate={handleUpdate}
-            />
-
             {/* Video manbasi */}
             <div className="grid gap-2">
               <Label>Video manbasi</Label>
@@ -261,7 +255,7 @@ const SendVideoNodeComponent = ({
           </CardContent>
 
           <CardFooter className="flex flex-col gap-2">
-            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} parseMode={data.parseMode} protectContent={data.protectContent} id={id} />
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} parseMode={data.parseMode} protectContent={data.protectContent} id={id} recipients={data.recipients} />
           </CardFooter>
         </>
       )}

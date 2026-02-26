@@ -17,6 +17,7 @@ import { MessageCircle, CornerDownLeft, MousePointerClick, Trash2, Globe, Pencil
 import { HandlerAdder } from "./handler-adder";
 import { ConstructorData } from "@/features/bot-constructor/data";
 import { CallbackQueryTriggerData, MessageTriggerNodeData, ReplyButtonTriggerData } from "./types";
+import { KeyboardConfig } from "@/features/bot-constructor/components";
 
 type HandlerData =
     | MessageTriggerNodeData
@@ -31,10 +32,11 @@ interface HandlersListProps {
     /** Node ID to get handlers from */
     sourceNodeId?: string;
 
-    showHandle?: boolean;
+    // Keyboardlarni handler qilish uchun
+    keyboard: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
 }
 
-export function HandlersList({ sourceNodeId, showHandle = true }: HandlersListProps) {
+export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
     const nodes = useNodes();
     const updateNodeData = useFlowStore((state) => state.updateNodeData);
     const [editingHandler, setEditingHandler] = useState<{
@@ -67,22 +69,6 @@ export function HandlersList({ sourceNodeId, showHandle = true }: HandlersListPr
         });
     };
 
-    const getHandlerTypeLabel = (handler: HandlerData): string => {
-        if ("type" in handler) {
-            // Message handler
-            const messageType = ConstructorData.MessageTypes.find(
-                (t) => t.value === handler.type
-            );
-            return messageType?.label || handler.type;
-        }
-        if ("selectedButtons" in handler || "catchNoButton" in handler) {
-            return "Reply Button";
-        }
-        if ("filter" in handler && "context" in handler) {
-            return "Callback Button";
-        }
-        return "Unknown";
-    };
 
     const getHandlerIcon = (handler: HandlerData) => {
         if ("type" in handler) {
@@ -168,15 +154,15 @@ export function HandlersList({ sourceNodeId, showHandle = true }: HandlersListPr
         // Reply button handler summary
         if ("selectedButtons" in handler) {
             if (handler.catchNoButton) {
-                return "Reply Button → Hech qanday tugma bosilmasa";
+                return "Hech qanday tugma bosilmasa";
             }
 
             if (handler.selectedButtons && handler.selectedButtons.length > 0) {
                 const buttonTexts = handler.selectedButtons.map((btn) => btn.text).join(", ");
-                return `Reply Button → ${buttonTexts}`;
+                return `${buttonTexts}`;
             }
 
-            return "Reply Button";
+            return "";
         }
 
         // Callback button handler summary
@@ -197,15 +183,6 @@ export function HandlersList({ sourceNodeId, showHandle = true }: HandlersListPr
         return "Noma'lum handler";
     };
 
-    if (handlers.length === 0) {
-        return (
-            <div className="py-4">
-                <p className="text-sm text-muted-foreground text-center">
-                    Hozircha handlerlar mavjud emas
-                </p>
-            </div>
-        );
-    }
 
     return (
         <div className="space-y-2 py-4 w-full px-2">
@@ -217,6 +194,29 @@ export function HandlersList({ sourceNodeId, showHandle = true }: HandlersListPr
             </div>
 
             <div className="space-y-2 overflow-y-auto">
+                {keyboard && keyboard.active && keyboard[keyboard.active] && keyboard[keyboard.active].flat().length > 0 && (
+                    <div className="flex flex-wrap flex-col gap-2 mb-3 pb-3 border-b">
+                        {keyboard[keyboard.active].flat().map((button) => (
+                            <Button
+                                key={button.id}
+                                variant="outline"
+                                className="text-xs px-2 py-1 relative"
+                            >
+                                {button.text}
+                                <Handle
+                                    type="source"
+                                    id={`source-handler-${sourceNodeId}-${button.text}`}
+                                    position={Position.Right}
+                                    className="!w-3 !h-3 !bg-blue-500 translate-x-[-5px] flex items-center justify-center"
+                                >
+                                    <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
+                                </Handle>
+
+                            </Button>
+                        ))}
+                    </div>
+                )}
+
                 {handlers.map((handler, index) => {
                     const Icon = getHandlerIcon(handler);
                     const summary = getHandlerSummary(handler);
@@ -261,16 +261,14 @@ export function HandlersList({ sourceNodeId, showHandle = true }: HandlersListPr
                                             <Trash2 className="h-3.5 w-3.5" />
                                         </Button>
                                     </div>
-                                    {showHandle && (
-                                        <Handle
-                                            type="source"
-                                            id={handleId}
-                                            position={Position.Right}
-                                            className="!w-3 !h-3 !bg-blue-500 translate-x-[-5px] flex items-center justify-center"
-                                        >
-                                            <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
-                                        </Handle>
-                                    )}
+                                    <Handle
+                                        type="source"
+                                        id={handleId}
+                                        position={Position.Right}
+                                        className="!w-3 !h-3 !bg-blue-500 translate-x-[-5px] flex items-center justify-center"
+                                    >
+                                        <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
+                                    </Handle>
                                 </div>
                             </CardContent>
                         </Card>

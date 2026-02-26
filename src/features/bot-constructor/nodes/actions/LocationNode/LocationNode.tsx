@@ -8,7 +8,6 @@ import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendLocationNodeData } from "./types";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ActionPanel } from "../../components/shared/ActionPanel";
@@ -38,11 +37,6 @@ const LocationNodeComponent = ({
 
       {!isCollapsed && (
         <CardContent className="flex flex-col gap-4 pt-4">
-          <RecipientsManager
-            recipients={data.recipients}
-            onUpdate={handleUpdate}
-          />
-
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
               <Label>Latitude</Label>
@@ -74,7 +68,7 @@ const LocationNodeComponent = ({
       )}
 
       <CardFooter className="flex flex-col gap-2">
-        <ActionPanel keyboard={data.keyboard} id={id} />
+        <ActionPanel keyboard={data.keyboard} id={id} recipients={data.recipients} />
       </CardFooter>
 
       {/* Handler list */}

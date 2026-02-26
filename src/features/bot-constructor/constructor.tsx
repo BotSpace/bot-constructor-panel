@@ -267,6 +267,10 @@ export default function Constructor() {
               connectionRadius={50}
               snapToGrid={snapToGrid}
               snapGrid={snapToGrid ? [20, 20] : undefined}
+              connectionLineStyle={{
+                strokeWidth: 4,
+                stroke: "#fff",
+              }}
             >
               <SaveStatusBadge className="absolute top-2 right-2 z-20" />
               <Background gap={24} color="#666" />
