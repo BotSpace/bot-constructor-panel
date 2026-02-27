@@ -18,6 +18,14 @@ export function useElements(): ElementTypes[] {
           triggerId: "CommandTriggerNode",
         },
         {
+          type: "message",
+          name: "Xabar triggeri",
+          description: "Kiruvchi xabarlar uchun handler.",
+          icon: "💬",
+          color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+          triggerId: "MessageTriggerNode",
+        },
+        {
           type: "cron",
           name: "Cron triggeri",
           description: "Belgilangan vaqtda bajariladigan ishlar.",
