@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { Handle, Position, useNodes } from "reactflow";
+import React, { useCallback, useMemo, useState } from "react";
+import { Handle, Position, useEdges, useNodes } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,6 +38,7 @@ interface HandlersListProps {
 
 export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
     const nodes = useNodes();
+    const edges = useEdges();
     const updateNodeData = useFlowStore((state) => state.updateNodeData);
     const [editingHandler, setEditingHandler] = useState<{
         handler: HandlerData;
@@ -53,6 +54,39 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
         const nodeData = node.data as NodeWithHandlersData;
         return nodeData.handlers || [];
     }, [sourceNodeId, nodes]);
+
+    // Source node ni topish
+    const sourceNode = useMemo(() => {
+        return nodes.find((n) => n.id === sourceNodeId);
+    }, [nodes, sourceNodeId]);
+
+    /**
+     * Handle uchun pozitsiyani aniqlash:
+     * Agar ulangan target node source node dan chap tarafda bo'lsa → Left
+     * Aks holda → Right (default)
+     */
+    const getHandlePosition = useCallback(
+        (handleId: string): Position => {
+            if (!sourceNode) return Position.Right;
+
+            // Shu handle dan chiqqan edge ni topamiz
+            const edge = edges.find(
+                (e) => e.source === sourceNodeId && e.sourceHandle === handleId
+            );
+            if (!edge) return Position.Right;
+
+            // Target node ni topamiz
+            const targetNode = nodes.find((n) => n.id === edge.target);
+            if (!targetNode) return Position.Right;
+
+            const sourceX = sourceNode.position.x;
+            const targetX = targetNode.position.x;
+
+            // Agar target node chap tarafda bo'lsa, handle ham chap tarafga o'tadi
+            return targetX < sourceX ? Position.Left : Position.Right;
+        },
+        [sourceNode, edges, nodes, sourceNodeId]
+    );
 
     const handleRemoveHandler = (index: number) => {
         if (!sourceNodeId) return;
@@ -203,15 +237,21 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                                 className="text-xs px-2 py-1 relative"
                             >
                                 {button.text}
-                                <Handle
-                                    type="source"
-                                    id={`target-handler-${sourceNodeId}-${button.text}`}
-                                    position={Position.Right}
-                                    className="!w-3 !h-3 !bg-blue-500 translate-x-[-5px] flex items-center justify-center"
-                                >
-                                    <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
-                                </Handle>
-
+                                {(() => {
+                                    const handleId = `target-handler-${sourceNodeId}-${button.text}`;
+                                    const pos = getHandlePosition(handleId);
+                                    const isLeft = pos === Position.Left;
+                                    return (
+                                        <Handle
+                                            type="source"
+                                            id={handleId}
+                                            position={pos}
+                                            className={`!w-3 !h-3 !bg-blue-500 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`}
+                                        >
+                                            <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
+                                        </Handle>
+                                    );
+                                })()}
                             </Button>
                         ))}
                     </div>
@@ -261,14 +301,20 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                                             <Trash2 className="h-3.5 w-3.5" />
                                         </Button>
                                     </div>
-                                    <Handle
-                                        type="source"
-                                        id={handleId}
-                                        position={Position.Right}
-                                        className="!w-3 !h-3 !bg-blue-500 translate-x-[-5px] flex items-center justify-center"
-                                    >
-                                        <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
-                                    </Handle>
+                                    {(() => {
+                                        const pos = getHandlePosition(handleId);
+                                        const isLeft = pos === Position.Left;
+                                        return (
+                                            <Handle
+                                                type="source"
+                                                id={handleId}
+                                                position={pos}
+                                                className={`!w-3 !h-3 !bg-blue-500 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`}
+                                            >
+                                                <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
+                                            </Handle>
+                                        );
+                                    })()}
                                 </div>
                             </CardContent>
                         </Card>

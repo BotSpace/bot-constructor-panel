@@ -3,17 +3,18 @@ import { memo } from "react";
 import {
     BaseEdge,
     type EdgeProps,
+    Position,
     getBezierPath,
     useNodes,
 } from "reactflow";
-import { getEdgeParams } from "./utils";
 
 /**
- * FloatingEdge - Edge that dynamically calculates connection points
- * based on node positions rather than fixed handles
+ * FloatingEdge - Edge that dynamically exits from left or right
+ * based on relative positions of source and target nodes
  *
  * Features:
- * - Automatically calculates optimal connection points on nodes
+ * - Dynamically determines exit/entry side (left or right)
+ * - Uses handle Y positions from ReactFlow (edges come out of buttons/handles)
  * - Uses Bezier curves for smooth connections
  * - Shows visual feedback when selected
  */
@@ -21,33 +22,58 @@ function FloatingEdge({
     id,
     source,
     target,
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+    sourcePosition,
+    targetPosition,
     markerEnd,
     style = {},
     selected,
 }: EdgeProps) {
     const nodes = useNodes();
 
-    // Find source and target nodes
+    // Find source and target nodes for dynamic direction
     const sourceNode = nodes.find((node) => node.id === source);
     const targetNode = nodes.find((node) => node.id === target);
 
-    // If nodes are not found, return null (edge won't render)
-    if (!sourceNode || !targetNode) {
-        return null;
+    // Dynamically determine direction based on node positions
+    let dynSourcePos = sourcePosition;
+    let dynTargetPos = targetPosition;
+    let dynSourceX = sourceX;
+    let dynTargetX = targetX;
+
+    if (sourceNode && targetNode) {
+        const sourceWidth = sourceNode.width || 150;
+        const targetWidth = targetNode.width || 150;
+
+        const sourceCenterX = sourceNode.position.x + sourceWidth / 2;
+        const targetCenterX = targetNode.position.x + targetWidth / 2;
+
+        if (targetCenterX >= sourceCenterX) {
+            // Target o'ngda → source o'ngdan chiqadi, target chapdan kiradi
+            dynSourcePos = Position.Right;
+            dynTargetPos = Position.Left;
+            dynSourceX = sourceNode.position.x + sourceWidth;
+            dynTargetX = targetNode.position.x;
+        } else {
+            // Target chapda → source chapdan chiqadi, target o'ngdan kiradi
+            dynSourcePos = Position.Left;
+            dynTargetPos = Position.Right;
+            dynSourceX = sourceNode.position.x;
+            dynTargetX = targetNode.position.x + targetWidth;
+        }
     }
 
-    // Get edge positions from nodes
-    const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } =
-        getEdgeParams(sourceNode, targetNode);
-
-    // Use Bezier path for floating edges
+    // Use Bezier path with dynamic positions
     const [edgePath] = getBezierPath({
-        sourceX,
+        sourceX: dynSourceX,
         sourceY,
-        targetX,
+        targetX: dynTargetX,
         targetY,
-        sourcePosition,
-        targetPosition,
+        sourcePosition: dynSourcePos,
+        targetPosition: dynTargetPos,
     });
 
     // Get original style values
