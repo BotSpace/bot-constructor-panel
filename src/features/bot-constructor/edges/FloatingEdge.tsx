@@ -51,7 +51,7 @@ function FloatingEdge({
     });
 
     // Get original style values
-    const originalStroke = (style as any)?.stroke || "#fff";
+    const originalStroke = "#fff";
     const originalStrokeWidth = (style as any)?.strokeWidth || 4;
 
     // Selected state styling - more visible
