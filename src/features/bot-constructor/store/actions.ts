@@ -18,6 +18,7 @@ import { CallbackAnswerNodeData } from "../nodes/custom/CallbackAnswerNode/types
 import { getFormatFlow } from "../lib/format-flow";
 import { generateId } from "@/lib/utils";
 import { FormNodeData } from "../nodes/custom/FormNode/types";
+import { CommandTriggerNodeData } from "../nodes/triggers/CommandTrigger/types";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
@@ -36,6 +37,14 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
   };
 
   switch (nodeType) {
+    // Triggers
+    case "CommandTriggerNode":
+      return {
+        command: "",
+        withArgs: false,
+        global: true,
+      } as CommandTriggerNodeData;
+    
     // Actions
     case "SendTextMessageNode":
       return {
