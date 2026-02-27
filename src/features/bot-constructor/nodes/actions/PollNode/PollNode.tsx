@@ -2,13 +2,12 @@
 
 import { NodeProps } from "reactflow";
 import { memo, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendPollNodeData, PollOption } from "./types";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,8 @@ import {
 } from "@/components/ui/select";
 import { Plus, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import { ActionPanel } from "../../components/shared/ActionPanel";
 
 const PollNodeComponent = ({
   id,
@@ -66,11 +67,6 @@ const PollNodeComponent = ({
 
       {!isCollapsed && (
         <CardContent className="flex flex-col gap-4 pt-4">
-          <RecipientsManager
-            recipients={data.recipients}
-            onUpdate={handleUpdate}
-          />
-
           {/* Question */}
           <div className="flex flex-col gap-2">
             <Label>Savol</Label>
@@ -206,6 +202,10 @@ const PollNodeComponent = ({
           </div>
         </CardContent>
       )}
+
+      <CardFooter className="flex flex-col gap-2">
+        <ActionPanel keyboard={data.keyboard} id={id} recipients={data.recipients} />
+      </CardFooter>
 
       <SourceHandles />
     </Card>

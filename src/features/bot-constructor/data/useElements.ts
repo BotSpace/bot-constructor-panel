@@ -10,36 +10,12 @@ export function useElements(): ElementTypes[] {
       id: "sidebar-triggers",
       elements: [
         {
-          type: "message",
-          name: t("constructor.triggers.message.name"),
-          description: t("constructor.triggers.message.description"),
-          icon: "💬",
-          color: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-          triggerId: "MessageTriggerNode",
-        },
-        {
           type: "command",
           name: t("constructor.triggers.command.name"),
           description: t("constructor.triggers.command.description"),
           icon: "⌘",
           color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
           triggerId: "CommandTriggerNode",
-        },
-        {
-          type: "reply_button",
-          name: t("constructor.triggers.replyButton.name"),
-          description: t("constructor.triggers.replyButton.description"),
-          icon: "↩️",
-          color: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-          triggerId: "ReplyButtonTriggerNode",
-        },
-        {
-          type: "callback_query",
-          name: t("constructor.triggers.callbackQuery.name"),
-          description: t("constructor.triggers.callbackQuery.description"),
-          icon: "🕸️",
-          color: "bg-teal-500/10 text-teal-400 border-teal-500/20",
-          triggerId: "CallbackQueryTriggerNode",
         },
         {
           type: "cron",

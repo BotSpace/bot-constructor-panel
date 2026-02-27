@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -16,8 +17,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { HandlerData } from "../TextMessageNode/types";
+
 interface ChatActionNodeData {
   action?: string;
+  handlers?: HandlerData[];
 }
 
 const ChatActionNodeInternal = ({

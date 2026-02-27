@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendToAdminNodeComponent = ({ id, selected }: NodeProps) => {
   return (
@@ -15,6 +16,7 @@ const SendToAdminNodeComponent = ({ id, selected }: NodeProps) => {
       <div className="p-4 text-sm text-muted-foreground text-center">
         Xabarni admin panelga yuboradi
       </div>
+
       <SourceHandles />
     </Card>
   );
