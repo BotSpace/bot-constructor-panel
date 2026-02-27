@@ -1,7 +1,8 @@
 "use client";
 
 import { NodeProps } from "reactflow";
-import { memo, useState } from "react";
+import { memo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
@@ -19,7 +20,7 @@ const LocationNodeComponent = ({
   selected,
 }: NodeProps<SendLocationNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const handleUpdate = (update: Partial<SendLocationNodeData>) => {
     updateNodeData(id, update);

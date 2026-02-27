@@ -4,7 +4,8 @@ import { NodeProps } from "reactflow";
 
 import { SendTextMessageNodeData } from "./types";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { memo, useState } from "react";
+import { memo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { LetterText, ListPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,7 +26,7 @@ const SendTextMessageNodeComponent = ({
   data,
   selected,
 }: NodeProps<SendTextMessageNodeData>) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
   // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya

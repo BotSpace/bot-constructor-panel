@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, memo } from "react";
+import { memo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { NodeProps } from "reactflow";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -28,7 +29,7 @@ const MediaGroupNodeInternal = ({
   selected,
 }: NodeProps<MediaGroupNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const mediaItems = data.mediaItems || [];
 

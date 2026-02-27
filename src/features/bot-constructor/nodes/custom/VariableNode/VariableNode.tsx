@@ -1,7 +1,8 @@
 "use client";
 
 import { NodeProps } from "reactflow";
-import { memo, useState } from "react";
+import { memo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
@@ -25,7 +26,7 @@ const VariableNodeComponent = ({
   selected,
 }: NodeProps<VariableNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const handleUpdate = (update: Partial<VariableNodeData>) => {
     updateNodeData(id, update);

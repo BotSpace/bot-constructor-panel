@@ -28,6 +28,12 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
       set({ countdownRemaining: null });
     },
 
+    // Barcha nodelarni collapse qilish
+    collapseAllSignal: 0,
+    collapseAllNodes: () => {
+      set((state) => ({ collapseAllSignal: state.collapseAllSignal + 1 }));
+    },
+
     // Barcha slice'larni birlashtiramiz
     // Har bir slice'ga (set, get) ni uzatamiz
     ...createFlowSlice(set, get, {} as any),

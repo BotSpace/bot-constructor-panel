@@ -1,7 +1,8 @@
 "use client";
 
 import { NodeProps, Position, Handle } from "reactflow";
-import { memo, useState } from "react";
+import { memo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
@@ -9,7 +10,7 @@ import { SourceHandles } from "../../components";
 import { ElseNodeData } from "./types";
 
 const ElseNodeComponent = ({ id, data, selected }: NodeProps<ElseNodeData>) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   return (
     <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>

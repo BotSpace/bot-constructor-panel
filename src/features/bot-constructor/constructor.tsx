@@ -26,7 +26,7 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Text } from "lucide-react";
+import { Text, ChevronDown } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
 import { useSearchStore } from "./search/search-store";
@@ -215,7 +215,7 @@ export default function Constructor() {
   );
 
   // Store'dan kerakli qismlarni olamiz
-  const { formatFlow } = useFlowStore();
+  const { formatFlow, collapseAllNodes } = useFlowStore();
 
   function handleFormating() {
     const toastId = toast.loading("Formating ...");
@@ -411,6 +411,10 @@ export default function Constructor() {
             <Text />
             Formating
             <ContextMenuShortcut>⌘ i</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={collapseAllNodes}>
+            <ChevronDown />
+            Collapse all
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>

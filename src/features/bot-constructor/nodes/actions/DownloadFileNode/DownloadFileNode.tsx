@@ -1,7 +1,8 @@
 "use client";
 
 import { NodeProps, useNodes, useEdges } from "reactflow";
-import { memo, useState, useMemo, useEffect } from "react";
+import { memo, useMemo, useEffect } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
@@ -25,7 +26,7 @@ const DownloadFileNodeInternal = ({
   selected,
 }: NodeProps<DownloadFileNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
   const nodes = useNodes();
   const edges = useEdges();
 
