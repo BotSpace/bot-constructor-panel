@@ -24,11 +24,11 @@ import { FiMusic } from "react-icons/fi";
 
 // Bizning andozamiz uchun yangi importlar
 import { NodeHeader } from "../shared/NodeHeader";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
-import { ButtonGenerator } from "@/features/bot-constructor/components";
+import { ActionPanel } from "../../components/shared/ActionPanel";
 import TextArea from "../shared/text-area";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendAudioNodeComponent = ({
   id,
@@ -118,12 +118,6 @@ const SendAudioNodeComponent = ({
       {!isCollapsed && (
         <>
           <CardContent className="flex flex-col gap-4">
-            {/* Qabul qiluvchi */}
-            <RecipientsManager
-              recipients={data.recipients}
-              onUpdate={handleUpdate}
-            />
-
             {/* Audio manbasi */}
             <div className="grid gap-2">
               <Label>Audio manbasi</Label>
@@ -270,12 +264,15 @@ const SendAudioNodeComponent = ({
               </div>
             </div>
 
-            <CardFooter>
-              <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
-            </CardFooter>
           </CardContent>
+          <CardFooter className="flex flex-col gap-2">
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} recipients={data.recipients} />
+          </CardFooter>
         </>
       )}
+
+      {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

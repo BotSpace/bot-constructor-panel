@@ -23,10 +23,10 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 // Yaratgan andozamiz uchun kerakli importlar
 import { Camera } from "lucide-react";
 import { NodeHeader } from "../shared/NodeHeader";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
-import { ButtonGenerator } from "@/features/bot-constructor/components";
+import { ActionPanel } from "../../components/shared/ActionPanel";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendPhotoNodeComponent = ({
   id,
@@ -116,12 +116,6 @@ const SendPhotoNodeComponent = ({
       {!isCollapsed && (
         <>
           <CardContent className="flex flex-col gap-4">
-            {/* Qabul qiluvchi */}
-            <RecipientsManager
-              recipients={data.recipients}
-              onUpdate={handleUpdate}
-            />
-
             {/* Rasm manbasi */}
             <div className="flex flex-col gap-2">
               <Label>Rasm manbasi</Label>
@@ -252,11 +246,14 @@ const SendPhotoNodeComponent = ({
             </div>
           </CardContent>
 
-          <CardFooter>
-            <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+          <CardFooter className="flex flex-col gap-2">
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} recipients={data.recipients} />
           </CardFooter>
         </>
       )}
+
+      {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

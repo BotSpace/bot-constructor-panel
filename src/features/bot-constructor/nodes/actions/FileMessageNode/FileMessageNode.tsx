@@ -24,10 +24,10 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 
 import { NodeHeader } from "../shared/NodeHeader";
 import { FileText } from "lucide-react";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
-import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
+import { ActionPanel } from "../../components/shared/ActionPanel";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendFileNodeComponent = ({
   id,
@@ -117,12 +117,6 @@ const SendFileNodeComponent = ({
       {!isCollapsed && (
         <>
           <CardContent className="flex flex-col gap-4">
-            {/* Qabul qiluvchi */}
-            <RecipientsManager
-              recipients={data.recipients}
-              onUpdate={handleUpdate}
-            />
-
             {/* Fayl manbasi */}
             <div className="grid gap-2">
               <Label>Fayl manbasi</Label>
@@ -247,11 +241,14 @@ const SendFileNodeComponent = ({
             </div>
           </CardContent>
 
-          <CardFooter>
-            <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+          <CardFooter className="flex flex-col gap-2">
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} recipients={data.recipients} />
           </CardFooter>
         </>
       )}
+
+      {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

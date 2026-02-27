@@ -1,4 +1,5 @@
 import { KeyboardConfig } from "@/features/bot-constructor/components";
+import { HandlerData } from "../TextMessageNode/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -40,4 +41,5 @@ export interface SendAudioNodeData {
   protectContent?: boolean;
 
   keyboard: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
+  handlers?: HandlerData[];
 }

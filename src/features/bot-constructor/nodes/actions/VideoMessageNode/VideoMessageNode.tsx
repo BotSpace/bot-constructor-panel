@@ -32,12 +32,11 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 
 // Andozamiz uchun yangi importlar
 import { NodeHeader } from "../shared/NodeHeader";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
-import { ButtonGenerator } from "@/features/bot-constructor/components";
+import { ActionPanel } from "../../components/shared/ActionPanel";
 import TextArea from "../shared/text-area";
-import ActionNodeSettings from "../shared/ActionNodeSettings";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendVideoNodeComponent = ({
   id,
@@ -128,11 +127,6 @@ const SendVideoNodeComponent = ({
       {!isCollapsed && (
         <>
           <CardContent className="p-4 pt-0 flex flex-col gap-5">
-            <RecipientsManager
-              recipients={data.recipients}
-              onUpdate={handleUpdate}
-            />
-
             {/* Video manbasi */}
             <div className="grid gap-2">
               <Label>Video manbasi</Label>
@@ -258,19 +252,16 @@ const SendVideoNodeComponent = ({
               </div>
             </div>
 
-            <ActionNodeSettings
-              contentProtected={data.protectContent}
-              notificationDisabled={data.disableNotification}
-              parseMode={data.parseMode}
-              handleUpdate={handleUpdate}
-            />
           </CardContent>
 
-          <CardFooter>
-            <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+          <CardFooter className="flex flex-col gap-2">
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} parseMode={data.parseMode} protectContent={data.protectContent} id={id} recipients={data.recipients} />
           </CardFooter>
         </>
       )}
+
+      {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

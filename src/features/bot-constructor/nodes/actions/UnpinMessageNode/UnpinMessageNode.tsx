@@ -10,10 +10,13 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import { HandlerData } from "../TextMessageNode/types";
 
 interface UnpinMessageNodeData {
   messageId?: number;
   unpinAll?: boolean;
+  handlers?: HandlerData[];
 }
 
 const UnpinMessageNodeComponent = ({

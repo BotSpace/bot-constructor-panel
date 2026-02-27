@@ -7,8 +7,9 @@ export function TargetHandles() {
     <Handle
       type="target"
       position={Position.Left}
-      className="!w-4 !h-4 !bg-sky-500 !border-2 !border-gray-800 flex items-center justify-center"
+      className="customHandle"
       id="target-handler"
+      isConnectableStart={false}
     >
       <CircleDot size={12} className="w-2 h-2 text-white" />
     </Handle>

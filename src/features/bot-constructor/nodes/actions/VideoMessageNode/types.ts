@@ -1,5 +1,6 @@
 import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 import { ParseMode } from "../shared/types";
+import { HandlerData } from "../TextMessageNode/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -42,4 +43,5 @@ export interface SendVideoNodeData {
   protectContent?: boolean;
   parseMode: ParseMode;
   keyboard: KeyboardConfig;
+  handlers?: HandlerData[];
 }

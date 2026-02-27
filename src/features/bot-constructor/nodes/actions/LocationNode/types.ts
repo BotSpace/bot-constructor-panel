@@ -1,4 +1,5 @@
 import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { HandlerData } from "../TextMessageNode/types";
 
 export interface SendLocationNodeData {
   recipients?: {
@@ -8,4 +9,5 @@ export interface SendLocationNodeData {
   latitude?: number;
   longitude?: number;
   keyboard: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
+  handlers?: HandlerData[];
 }
