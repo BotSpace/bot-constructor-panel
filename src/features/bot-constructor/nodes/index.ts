@@ -27,6 +27,7 @@ import {
 import {
   CommandTriggerNode,
   CronTriggerNode,
+  MessageTriggerNode,
 } from "./triggers";
 
 import {
@@ -49,6 +50,7 @@ import {
 export const Triggers = {
   CommandTriggerNode,
   CronTriggerNode,
+  MessageTriggerNode,
 };
 
 export const ActionsTextAndMedia = {
