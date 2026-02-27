@@ -205,7 +205,7 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                                 {button.text}
                                 <Handle
                                     type="source"
-                                    id={`source-handler-${sourceNodeId}-${button.text}`}
+                                    id={`target-handler-${sourceNodeId}-${button.text}`}
                                     position={Position.Right}
                                     className="!w-3 !h-3 !bg-blue-500 translate-x-[-5px] flex items-center justify-center"
                                 >
