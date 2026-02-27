@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, memo, useRef } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { NodeProps, useUpdateNodeInternals } from "reactflow";
 import TextareaAutosize from "react-textarea-autosize";
 import { FiHelpCircle } from "react-icons/fi";
@@ -45,7 +46,7 @@ const SendVideoNodeComponent = ({
 }: NodeProps<SendVideoNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const project = useProjectStore((state) => state.project);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);

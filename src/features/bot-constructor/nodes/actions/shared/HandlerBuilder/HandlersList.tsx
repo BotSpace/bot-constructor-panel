@@ -184,7 +184,7 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                                             type="source"
                                             id={handleId}
                                             position={pos}
-                                            className={`!w-3 !h-3 !bg-blue-500 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`}
+                                            className={`!w-4 !h-full !rounded-[6px] !bg-blue-500 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`}
                                         >
                                             <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
                                         </Handle>
@@ -246,7 +246,7 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                                                 type="source"
                                                 id={handleId}
                                                 position={pos}
-                                                className={`!w-3 !h-3 !bg-blue-500 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`}
+                                                className={`!w-4 !h-full !rounded-[6px] !bg-blue-500 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`}
                                             >
                                                 <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
                                             </Handle>

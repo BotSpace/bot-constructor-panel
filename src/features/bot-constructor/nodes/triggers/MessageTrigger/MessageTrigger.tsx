@@ -1,4 +1,5 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo } from "react";
+import { useNodeExpanded } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { NodeProps } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { MessageTriggerNodeData } from "./types";
@@ -24,7 +25,7 @@ const MessageTriggerNodeComponent = ({
     selected,
 }: NodeProps<MessageTriggerNodeData>) => {
     const updateNodeData = useFlowStore((state) => state.updateNodeData);
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = useNodeExpanded();
 
     const handleUpdate = (update: Partial<MessageTriggerNodeData>) => {
         updateNodeData(id, update);

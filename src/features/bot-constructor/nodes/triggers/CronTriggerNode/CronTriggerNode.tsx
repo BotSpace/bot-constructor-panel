@@ -2,6 +2,7 @@
 
 import { NodeProps } from "reactflow";
 import { memo, useState, useEffect, useMemo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
@@ -24,7 +25,7 @@ const CronTriggerNodeComponent = ({
   data,
   selected,
 }: NodeProps<CronTriggerNodeData>) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
   // --- PARSING & DEFAULTS ---
