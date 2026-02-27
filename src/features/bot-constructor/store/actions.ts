@@ -31,11 +31,6 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
     },
   };
 
-  const baseTriggerData = {
-    context: {},
-    node_type: nodeType,
-  };
-
   switch (nodeType) {
     // Triggers
     case "CommandTriggerNode":

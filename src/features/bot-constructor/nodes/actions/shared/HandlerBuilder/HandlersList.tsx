@@ -13,19 +13,14 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { MessageCircle, CornerDownLeft, MousePointerClick, Trash2, Globe, Pencil, PlusIcon } from "lucide-react";
+import { MessageCircle, Trash2, Globe, Pencil, PlusIcon } from "lucide-react";
 import { HandlerAdder } from "./handler-adder";
 import { ConstructorData } from "@/features/bot-constructor/data";
-import { CallbackQueryTriggerData, MessageTriggerNodeData, ReplyButtonTriggerData } from "./types";
+import { MessageTriggerNodeData } from "./types";
 import { KeyboardConfig } from "@/features/bot-constructor/components";
 
-type HandlerData =
-    | MessageTriggerNodeData
-    | ReplyButtonTriggerData
-    | CallbackQueryTriggerData;
-
 interface NodeWithHandlersData {
-    handlers?: HandlerData[];
+    handlers?: MessageTriggerNodeData[];
 }
 
 interface HandlersListProps {
@@ -33,7 +28,7 @@ interface HandlersListProps {
     sourceNodeId?: string;
 
     // Keyboardlarni handler qilish uchun
-    keyboard: KeyboardConfig; // <-- O'ZGARISH SHU YERDA
+    keyboard: KeyboardConfig;
 }
 
 export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
@@ -41,7 +36,7 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
     const edges = useEdges();
     const updateNodeData = useFlowStore((state) => state.updateNodeData);
     const [editingHandler, setEditingHandler] = useState<{
-        handler: HandlerData;
+        handler: MessageTriggerNodeData;
         index: number;
     } | null>(null);
 
@@ -103,118 +98,61 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
         });
     };
 
-
-    const getHandlerIcon = (handler: HandlerData) => {
-        if ("type" in handler) {
-            return MessageCircle;
-        }
-        if ("selectedButtons" in handler || "catchNoButton" in handler) {
-            return CornerDownLeft;
-        }
-        if ("filter" in handler && "context" in handler) {
-            return MousePointerClick;
-        }
-        return MessageCircle;
-    };
-
-    const getFilterLabel = (filterValue: string, handlerType: "message" | "callback"): string => {
+    const getFilterLabel = (filterValue: string): string => {
         if (filterValue === "any") {
             return "Har qanday";
         }
 
-        if (handlerType === "message") {
-            // Message handler filterlarini topish
-            const allFilters = [
-                ...ConstructorData.Filters.textFilters,
-                ...ConstructorData.Filters.locationFilters,
-                ...ConstructorData.Filters.fileFilters,
-                ...ConstructorData.Filters.documentFilters,
-            ];
-            const filter = allFilters.find((f) => f.value === filterValue);
-            return filter?.label || filterValue;
-        } else {
-            // Callback handler filterlarini topish
-            const filter = ConstructorData.Filters.callbackFilters.find(
-                (f) => f.value === filterValue
-            );
-            return filter?.label || filterValue;
-        }
+        const allFilters = [
+            ...ConstructorData.Filters.textFilters,
+            ...ConstructorData.Filters.locationFilters,
+            ...ConstructorData.Filters.fileFilters,
+            ...ConstructorData.Filters.documentFilters,
+        ];
+        const filter = allFilters.find((f) => f.value === filterValue);
+        return filter?.label || filterValue;
     };
 
-    const getHandlerSummary = (handler: HandlerData): string => {
-        // Message handler summary
-        if ("type" in handler) {
-            const messageType = ConstructorData.MessageTypes.find(
-                (t) => t.value === handler.type
-            );
-            const messageTypeLabel = messageType?.label || handler.type;
+    const getHandlerSummary = (handler: MessageTriggerNodeData): string => {
+        const messageType = ConstructorData.MessageTypes.find(
+            (t) => t.value === handler.type
+        );
+        const messageTypeLabel = messageType?.label || handler.type;
 
-            if (handler.type === "any") {
-                return messageTypeLabel;
-            }
-
-            if (!handler.filter || handler.filter === "any") {
-                return `${messageTypeLabel} → Har qanday`;
-            }
-
-            const filterLabel = getFilterLabel(handler.filter, "message");
-
-            // Agar parametr bo'lsa, uni ko'rsatamiz
-            if (handler.context?.value) {
-                return `${messageTypeLabel} → ${filterLabel} → "${handler.context.value}"`;
-            }
-
-            // Radius parametri
-            if (handler.context?.radius) {
-                const { lat, lng, km } = handler.context.radius;
-                if (lat || lng || km) {
-                    const radiusParts = [lat, lng, km].filter(Boolean).join(", ");
-                    return `${messageTypeLabel} → ${filterLabel} → ${radiusParts}`;
-                }
-            }
-
-            // Size parametri
-            if (handler.context?.size) {
-                const { min, max } = handler.context.size;
-                if (min || max) {
-                    const sizeText = min && max ? `${min} - ${max} MB` : min ? `${min} MB` : `${max} MB`;
-                    return `${messageTypeLabel} → ${filterLabel} → ${sizeText}`;
-                }
-            }
-
-            return `${messageTypeLabel} → ${filterLabel}`;
+        if (handler.type === "any") {
+            return messageTypeLabel;
         }
 
-        // Reply button handler summary
-        if ("selectedButtons" in handler) {
-            if (handler.catchNoButton) {
-                return "Hech qanday tugma bosilmasa";
-            }
-
-            if (handler.selectedButtons && handler.selectedButtons.length > 0) {
-                const buttonTexts = handler.selectedButtons.map((btn) => btn.text).join(", ");
-                return `${buttonTexts}`;
-            }
-
-            return "";
+        if (!handler.filter || handler.filter === "any") {
+            return `${messageTypeLabel} → Har qanday`;
         }
 
-        // Callback button handler summary
-        if ("filter" in handler && "context" in handler) {
-            if (!handler.filter || handler.filter === "any") {
-                return "Callback Button → Har qanday";
-            }
+        const filterLabel = getFilterLabel(handler.filter);
 
-            const filterLabel = getFilterLabel(handler.filter, "callback");
-
-            if (handler.context?.value) {
-                return `Callback Button → ${filterLabel} → "${handler.context.value}"`;
-            }
-
-            return `Callback Button → ${filterLabel}`;
+        // Agar parametr bo'lsa, uni ko'rsatamiz
+        if (handler.context?.value) {
+            return `${messageTypeLabel} → ${filterLabel} → "${handler.context.value}"`;
         }
 
-        return "Noma'lum handler";
+        // Radius parametri
+        if (handler.context?.radius) {
+            const { lat, lng, km } = handler.context.radius;
+            if (lat || lng || km) {
+                const radiusParts = [lat, lng, km].filter(Boolean).join(", ");
+                return `${messageTypeLabel} → ${filterLabel} → ${radiusParts}`;
+            }
+        }
+
+        // Size parametri
+        if (handler.context?.size) {
+            const { min, max } = handler.context.size;
+            if (min || max) {
+                const sizeText = min && max ? `${min} - ${max} MB` : min ? `${min} MB` : `${max} MB`;
+                return `${messageTypeLabel} → ${filterLabel} → ${sizeText}`;
+            }
+        }
+
+        return `${messageTypeLabel} → ${filterLabel}`;
     };
 
 
@@ -258,9 +196,8 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                 )}
 
                 {handlers.map((handler, index) => {
-                    const Icon = getHandlerIcon(handler);
                     const summary = getHandlerSummary(handler);
-                    const isGlobal = "global" in handler && handler.global;
+                    const isGlobal = handler.global;
 
                     const handleId = `source-handler-${sourceNodeId}-${index}`;
 
@@ -270,7 +207,7 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                                 <div className="flex items-start justify-between gap-2">
                                     <div className="flex-1 space-y-1">
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <Icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                            <MessageCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                             <span className="text-sm font-medium leading-relaxed">
                                                 {summary}
                                             </span>
