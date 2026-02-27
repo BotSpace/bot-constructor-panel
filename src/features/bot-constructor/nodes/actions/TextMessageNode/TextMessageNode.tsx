@@ -78,7 +78,6 @@ const SendTextMessageNodeComponent = ({
 
           <CardFooter className="flex flex-col gap-2">
             <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} parseMode={data.parseMode} protectContent={data.protectContent} id={id} recipients={data.recipients} />
-
           </CardFooter>
         </>
       )}

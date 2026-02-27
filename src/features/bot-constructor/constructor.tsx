@@ -339,6 +339,14 @@ export default function Constructor() {
     }
   }, []);
 
+
+
+  const isValidConnection = (connection: Connection) => {
+    // source va target bir xil bo‘lsa false qaytaradi
+    return connection.source !== connection.target;
+  };
+
+
   return (
     <>
       <ContextMenu>
@@ -356,6 +364,7 @@ export default function Constructor() {
             onMouseDown={handleContainerClick}
           >
             <ReactFlow
+              isValidConnection={isValidConnection}
               id="canvas-area"
               nodeTypes={CustomNodes}
               edgeTypes={CustomEdge}
