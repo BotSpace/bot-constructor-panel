@@ -39,9 +39,8 @@ const CommandTriggerNodeComponent = ({
             <span>Command Handler</span>
           </div>
           <div
-            className={`w-2.5 h-2.5 rounded-full transition-all ${
-              isConfigured ? "bg-green-500" : "bg-destructive/50"
-            }`}
+            className={`w-2.5 h-2.5 rounded-full transition-all ${isConfigured ? "bg-green-500" : "bg-destructive/50"
+              }`}
             title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
           />
         </CardTitle>
@@ -57,15 +56,11 @@ const CommandTriggerNodeComponent = ({
             Buyruq matni (masalan, "start")
           </Label>
           <div className="relative mt-1">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <span className="text-gray-500 sm:text-sm">/</span>
-            </div>
             <Input
               id={`command-input-${id}`}
-              placeholder="start"
+              placeholder="/start"
               value={data.command || ""}
               onChange={(e) => handleUpdate({ command: e.target.value.trim() })}
-              className="pl-7" // "/" belgisi uchun joy
             />
           </div>
         </div>
