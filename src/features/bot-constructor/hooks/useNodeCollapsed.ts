@@ -2,9 +2,9 @@ import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { useFlowStore } from "../store";
 
 /**
- * Hook that manages node collapsed state with global collapse support.
+ * Hook that manages node collapsed state with global collapse/expand support.
  * Replaces `useState(false)` for isCollapsed in node components.
- * Listens to global collapseAllSignal from the store.
+ * Listens to global collapseAllSignal and expandAllSignal from the store.
  */
 export function useNodeCollapsed(
   defaultValue = false
@@ -13,6 +13,9 @@ export function useNodeCollapsed(
   const collapseAllSignal = useFlowStore(
     (state) => state.collapseAllSignal
   );
+  const expandAllSignal = useFlowStore(
+    (state) => state.expandAllSignal
+  );
 
   useEffect(() => {
     if (collapseAllSignal > 0) {
@@ -20,13 +23,19 @@ export function useNodeCollapsed(
     }
   }, [collapseAllSignal]);
 
+  useEffect(() => {
+    if (expandAllSignal > 0) {
+      setIsCollapsed(false);
+    }
+  }, [expandAllSignal]);
+
   return [isCollapsed, setIsCollapsed];
 }
 
 /**
- * Hook that manages node expanded state with global collapse support.
+ * Hook that manages node expanded state with global collapse/expand support.
  * Replaces `useState(true)` for isExpanded in node components.
- * Listens to global collapseAllSignal from the store.
+ * Listens to global collapseAllSignal and expandAllSignal from the store.
  */
 export function useNodeExpanded(
   defaultValue = true
@@ -35,12 +44,21 @@ export function useNodeExpanded(
   const collapseAllSignal = useFlowStore(
     (state) => state.collapseAllSignal
   );
+  const expandAllSignal = useFlowStore(
+    (state) => state.expandAllSignal
+  );
 
   useEffect(() => {
     if (collapseAllSignal > 0) {
       setIsExpanded(false);
     }
   }, [collapseAllSignal]);
+
+  useEffect(() => {
+    if (expandAllSignal > 0) {
+      setIsExpanded(true);
+    }
+  }, [expandAllSignal]);
 
   return [isExpanded, setIsExpanded];
 }

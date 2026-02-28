@@ -45,6 +45,12 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
       set((state) => ({ collapseAllSignal: state.collapseAllSignal + 1 }));
     },
 
+    // Barcha nodelarni expand qilish
+    expandAllSignal: 0,
+    expandAllNodes: () => {
+      set((state) => ({ expandAllSignal: state.expandAllSignal + 1 }));
+    },
+
     // Barcha slice'larni birlashtiramiz
     // Har bir slice'ga (set, get) ni uzatamiz
     ...createFlowSlice(set, get, {} as any),

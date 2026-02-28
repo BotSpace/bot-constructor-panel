@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { SVGProps, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -216,7 +216,7 @@ export default function Constructor() {
   );
 
   // Store'dan kerakli qismlarni olamiz
-  const { formatFlow, collapseAllNodes } = useFlowStore();
+  const { formatFlow, collapseAllNodes, expandAllNodes } = useFlowStore();
 
   function handleFormating() {
     const toastId = toast.loading("Formating ...");
@@ -410,12 +410,16 @@ export default function Constructor() {
           {/* Format */}
           <ContextMenuItem onClick={handleFormating}>
             <Text />
-            Formating
+            Formatlash
             <ContextMenuShortcut>⌘ i</ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuItem onClick={collapseAllNodes}>
-            <ChevronDown />
-            Collapse all
+            <CollapseIcon />
+            Barchasino ochish
+          </ContextMenuItem>
+          <ContextMenuItem onClick={expandAllNodes}>
+            <ExpandIcon />
+            Barchasino yopish
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
@@ -427,3 +431,51 @@ export default function Constructor() {
     </>
   );
 }
+
+
+// Icons
+export const CollapseIcon = (props: SVGProps<SVGSVGElement>) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      width={24}
+      height={24}
+      {...props}
+    >
+      <path d="M3 5h8" />
+      <path d="M3 12h8" />
+      <path d="M3 19h8" />
+      <path d="m15 5 3 3 3-3" />
+      <path d="m15 19 3-3 3 3" />
+    </svg>
+  );
+};
+
+export const ExpandIcon = (props: SVGProps<SVGSVGElement>) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      width={24}
+      height={24}
+      {...props}
+    >
+      <path d="M3 5h8" />
+      <path d="M3 12h8" />
+      <path d="M3 19h8" />
+      <path d="m15 8 3-3 3 3" />
+      <path d="m15 16 3 3 3-3" />
+    </svg>
+  );
+};
