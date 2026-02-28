@@ -14,53 +14,38 @@ export function getEdgeParams(source: Node, target: Node) {
   const sourcePos = getNodePosition(source, sourceWidth, sourceHeight);
   const targetPos = getNodePosition(target, targetWidth, targetHeight);
 
-  // Calculate the direction and optimal connection points
+  // Calculate the direction
   const dx = targetPos.x - sourcePos.x;
-  const dy = targetPos.y - sourcePos.y;
 
-  // Determine source position based on relative node positions
-  let sourcePosition: Position;
-  let targetPosition: Position;
-
-  if (Math.abs(dx) > Math.abs(dy)) {
-    // Horizontal alignment
-    sourcePosition = dx > 0 ? Position.Right : Position.Left;
-    targetPosition = dx > 0 ? Position.Left : Position.Right;
-  } else {
-    // Vertical alignment
-    sourcePosition = dy > 0 ? Position.Bottom : Position.Top;
-    targetPosition = dy > 0 ? Position.Top : Position.Bottom;
-  }
+  // Source chiqish faqat o'ng yoki chap
+  const sourcePosition: Position = dx >= 0 ? Position.Right : Position.Left;
 
   const sourceX =
-    sourcePos.x +
-    (sourcePosition === Position.Right
-      ? sourceWidth / 2
-      : sourcePosition === Position.Left
-        ? -sourceWidth / 2
-        : 0);
-  const sourceY =
-    sourcePos.y +
-    (sourcePosition === Position.Bottom
-      ? sourceHeight / 2
-      : sourcePosition === Position.Top
-        ? -sourceHeight / 2
-        : 0);
+    sourcePos.x + (sourcePosition === Position.Right ? sourceWidth / 2 : -sourceWidth / 2);
+  const sourceY = sourcePos.y;
 
-  const targetX =
-    targetPos.x +
-    (targetPosition === Position.Right
-      ? targetWidth / 2
-      : targetPosition === Position.Left
-        ? -targetWidth / 2
-        : 0);
-  const targetY =
-    targetPos.y +
-    (targetPosition === Position.Bottom
-      ? targetHeight / 2
-      : targetPosition === Position.Top
-        ? -targetHeight / 2
-        : 0);
+  // Target kirish - 4 tomondan eng yaqinini tanlash
+  const candidates: { pos: Position; x: number; y: number }[] = [
+    { pos: Position.Left, x: targetPos.x - targetWidth / 2, y: targetPos.y },
+    { pos: Position.Right, x: targetPos.x + targetWidth / 2, y: targetPos.y },
+    { pos: Position.Top, x: targetPos.x, y: targetPos.y - targetHeight / 2 },
+    { pos: Position.Bottom, x: targetPos.x, y: targetPos.y + targetHeight / 2 },
+  ];
+
+  let targetPosition: Position = Position.Left;
+  let targetX = candidates[0].x;
+  let targetY = candidates[0].y;
+  let minDist = Infinity;
+
+  for (const c of candidates) {
+    const dist = Math.hypot(c.x - sourceX, c.y - sourceY);
+    if (dist < minDist) {
+      minDist = dist;
+      targetPosition = c.pos;
+      targetX = c.x;
+      targetY = c.y;
+    }
+  }
 
   return {
     sourceX,

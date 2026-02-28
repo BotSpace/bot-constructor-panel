@@ -7,6 +7,7 @@ import {
     getBezierPath,
     useNodes,
 } from "reactflow";
+import { useEdgeColor } from "./useEdgeColor";
 
 /**
  * FloatingEdge - Edge that dynamically exits from left or right
@@ -33,6 +34,7 @@ function FloatingEdge({
     selected,
 }: EdgeProps) {
     const nodes = useNodes();
+    const { stroke: edgeColor, selectedStroke } = useEdgeColor();
 
     // Find source and target nodes for dynamic direction
     const sourceNode = nodes.find((node) => node.id === source);
@@ -43,26 +45,69 @@ function FloatingEdge({
     let dynTargetPos = targetPosition;
     let dynSourceX = sourceX;
     let dynTargetX = targetX;
+    let dynTargetY = targetY;
 
     if (sourceNode && targetNode) {
         const sourceWidth = sourceNode.width || 150;
         const targetWidth = targetNode.width || 150;
+        const targetHeight = targetNode.height || 100;
 
         const sourceCenterX = sourceNode.position.x + sourceWidth / 2;
         const targetCenterX = targetNode.position.x + targetWidth / 2;
 
+        // Source chiqish faqat o'ng yoki chap
         if (targetCenterX >= sourceCenterX) {
-            // Target o'ngda → source o'ngdan chiqadi, target chapdan kiradi
             dynSourcePos = Position.Right;
-            dynTargetPos = Position.Left;
             dynSourceX = sourceNode.position.x + sourceWidth;
-            dynTargetX = targetNode.position.x;
         } else {
-            // Target chapda → source chapdan chiqadi, target o'ngdan kiradi
             dynSourcePos = Position.Left;
-            dynTargetPos = Position.Right;
             dynSourceX = sourceNode.position.x;
-            dynTargetX = targetNode.position.x + targetWidth;
+        }
+
+        // Target kirish - 4 tomondan eng yaqinini tanlash
+        const sourceExitX = dynSourceX;
+        const sourceExitY = sourceY;
+
+        const targetCenterY = targetNode.position.y + targetHeight / 2;
+
+        // 4 ta kirish nuqtasi
+        const candidates: {
+            pos: Position;
+            x: number;
+            y: number;
+        }[] = [
+                {
+                    pos: Position.Left,
+                    x: targetNode.position.x,
+                    y: targetCenterY,
+                },
+                {
+                    pos: Position.Right,
+                    x: targetNode.position.x + targetWidth,
+                    y: targetCenterY,
+                },
+                {
+                    pos: Position.Top,
+                    x: targetCenterX,
+                    y: targetNode.position.y,
+                },
+                {
+                    pos: Position.Bottom,
+                    x: targetCenterX,
+                    y: targetNode.position.y + targetHeight,
+                },
+            ];
+
+        // Eng yaqin kirish nuqtasini topish
+        let minDist = Infinity;
+        for (const c of candidates) {
+            const dist = Math.hypot(c.x - sourceExitX, c.y - sourceExitY);
+            if (dist < minDist) {
+                minDist = dist;
+                dynTargetPos = c.pos;
+                dynTargetX = c.x;
+                dynTargetY = c.y;
+            }
         }
     }
 
@@ -71,24 +116,23 @@ function FloatingEdge({
         sourceX: dynSourceX,
         sourceY,
         targetX: dynTargetX,
-        targetY,
+        targetY: dynTargetY,
         sourcePosition: dynSourcePos,
         targetPosition: dynTargetPos,
     });
 
     // Get original style values
-    const originalStroke = "#fff";
     const originalStrokeWidth = (style as any)?.strokeWidth || 4;
 
     // Selected state styling - more visible
     const selectedStyle = {
-        stroke: "#3b82f6", // Blue color when selected
-        strokeWidth: 5, // Thicker when selected
+        stroke: selectedStroke,
+        strokeWidth: 5,
     };
 
     // Default style
     const defaultStyle = {
-        stroke: originalStroke,
+        stroke: edgeColor,
         strokeWidth: originalStrokeWidth,
     };
 
@@ -96,7 +140,7 @@ function FloatingEdge({
     const dynamicStyle = selected ? selectedStyle : defaultStyle;
 
     // Marker color also changes when selected
-    const markerColor = selected ? "#3b82f6" : originalStroke;
+    const markerColor = selected ? selectedStroke : edgeColor;
 
     return (
         <>
