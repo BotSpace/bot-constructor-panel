@@ -32,6 +32,7 @@ import toast from "react-hot-toast";
 import { useSearchStore } from "./search/search-store";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { useTheme } from "next-themes";
 import { NodeSelectionDialog } from "./components/NodeSelectionDialog";
 import { Connection, addEdge } from "reactflow";
 
@@ -66,6 +67,8 @@ export default function Constructor() {
   const { screenToFlowPosition, fitView } = useReactFlow();
   const [snapToGrid, setSnapToGrid] = useState(false);
   const mousePosition = useMousePosition();
+  const { resolvedTheme } = useTheme();
+  const edgeColor = resolvedTheme === "dark" ? "#fff" : "#374151";
 
   // Node selection dialog state
   const [showNodeDialog, setShowNodeDialog] = useState(false);
@@ -394,7 +397,7 @@ export default function Constructor() {
               snapGrid={snapToGrid ? [20, 20] : undefined}
               connectionLineStyle={{
                 strokeWidth: 4,
-                stroke: "#fff",
+                stroke: edgeColor,
               }}
               connectionLineComponent={FloatingConnectionLine}
               connectionMode={ConnectionMode.Loose}
@@ -415,11 +418,11 @@ export default function Constructor() {
           </ContextMenuItem>
           <ContextMenuItem onClick={collapseAllNodes}>
             <CollapseIcon />
-            Barchasino ochish
+            Barchasino yopish
           </ContextMenuItem>
           <ContextMenuItem onClick={expandAllNodes}>
             <ExpandIcon />
-            Barchasino yopish
+            Barchasino ochish
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
