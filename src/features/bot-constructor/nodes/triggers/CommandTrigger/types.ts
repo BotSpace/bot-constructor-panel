@@ -1,6 +1,6 @@
 // FAYL: constructor/nodes/triggers/CommandTrigger/types.ts
 
-import { StateConfig } from "../shared";
+import { StateConfig } from "../shared/state-config-types";
 
 export interface CommandTriggerNodeData {
   /** Foydalanuvchi kiritgan buyruq (masalan, "start", "help"). "/" belgisisiz saqlanadi. */

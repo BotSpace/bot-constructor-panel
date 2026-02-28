@@ -1,5 +1,5 @@
 import { ButtonConfig } from "@/features/bot-constructor/components";
-import { StateConfig } from "../shared";
+import { StateConfig } from "../shared/state-config-types";
 
 export interface ReplyButtonTriggerData {
   // `selectedButtons` (ko'plik) o'rniga `selectedButton` (birlik)
