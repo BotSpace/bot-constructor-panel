@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo } from "react";
+import { useNodeExpanded } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Select,
@@ -33,7 +34,7 @@ export function CollectionNode({
 }: NodeProps<CollectionNodeData>) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const nodes = useNodes();
-  const [isExpanded, setIsExpanded] = React.useState(true);
+  const [isExpanded, setIsExpanded] = useNodeExpanded();
 
   const { data: Collections } = useReactQueryAction<
     APIListResponse<CollectionListItem[]>

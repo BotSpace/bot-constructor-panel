@@ -1,7 +1,8 @@
 "use client";
 
 import { NodeProps } from "reactflow";
-import { memo, useState } from "react";
+import { memo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
@@ -10,10 +11,13 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import { HandlerData } from "../TextMessageNode/types";
 
 interface UnpinMessageNodeData {
   messageId?: number;
   unpinAll?: boolean;
+  handlers?: HandlerData[];
 }
 
 const UnpinMessageNodeComponent = ({
@@ -22,7 +26,7 @@ const UnpinMessageNodeComponent = ({
   selected,
 }: NodeProps<UnpinMessageNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const handleUpdate = (update: Partial<UnpinMessageNodeData>) => {
     updateNodeData(id, update);

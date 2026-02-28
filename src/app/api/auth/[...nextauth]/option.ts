@@ -1,10 +1,12 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { GetMe, Login, RefreshAccessToken } from "@/services/requests/auth";
 
 import { AuthSession } from "../next-auth";
 import { TIME_CONSTANTS } from "@/lib/constants";
 import env from "@/lib/env";
+import { instance } from "@/services/instance";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -59,9 +61,43 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID!,
+      clientSecret: env.GOOGLE_CLIENT_SECRET!
+    })
   ],
   secret: env.NEXTAUTH_SECRET,
   callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google") {
+
+        console.log("account and profile and user 😃", account, profile, user)
+
+        // Google ID token
+        const idToken = account.id_token;
+
+        console.log(idToken)
+
+        // Backendga yuborish
+        const res = await instance.post('/api/v1/auth/google', {
+          "id_token": idToken
+        })
+
+        const data = res.data
+
+        console.log("response data", data)
+
+        if (!data) return false;
+
+        // keyin jwt callbackda ishlatish uchun userga qo'shish
+        user.access = data.data.token.access;
+        user.refresh = data.data.token.refresh;
+      }
+
+      return true;
+    },
+
+
     async jwt({ token, trigger, user, session: sessionUser }) {
       // Agar trigger update bo'lsa, tokenni yangilash
       if (trigger === "update" && sessionUser.user) {

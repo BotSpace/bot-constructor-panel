@@ -25,7 +25,18 @@
     "debugLogin": "DEBUG Login",
     "loginLoading": "Login...",
     "loginSuccess": "Login success",
-    "loginError": "Login error"
+    "loginError": "Login error",
+    "login": {
+      "title": "Enter Code",
+      "error": "Login error. Please try again.",
+      "note": "Enter the 6-digit code you received from the bot",
+      "loading": "Loading...",
+      "instruction": "telegram botiga kiring va kodeni oling."
+    },
+    "loginForm": {
+      "orContinueWith": "or continue with",
+      "loginWithGoogle": "Continue with Google"
+    }
   },
   "header": {
     "back": "Back",

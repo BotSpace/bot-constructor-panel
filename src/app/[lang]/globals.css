@@ -3,6 +3,26 @@
 
 @custom-variant dark (&:is(.dark *));
 
+
+
+
+.customHandle {
+  width: 100% !important;
+  height: 100% !important;
+  background: blue !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 0;
+  transform: none;
+  border: none;
+  opacity: 0 !important;
+  z-index: 100;
+  border-radius: 0px !important;
+  pointer-events: none !important;
+}
+
+
 body,
 * {
   scroll-behavior: smooth;

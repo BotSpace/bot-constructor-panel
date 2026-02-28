@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, memo } from "react";
+import { memo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { NodeProps } from "reactflow";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -16,12 +17,16 @@ import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+
+import { HandlerData } from "../TextMessageNode/types";
 
 interface StickerNodeData {
   stickerSourceType?: "file_id" | "url";
   stickerFileId?: string;
   stickerUrl?: string;
   disableNotification?: boolean;
+  handlers?: HandlerData[];
 }
 
 const StickerNodeInternal = ({
@@ -30,7 +35,7 @@ const StickerNodeInternal = ({
   selected,
 }: NodeProps<StickerNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const handleUpdate = (update: Partial<StickerNodeData>) => {
     updateNodeData(id, update);

@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 2/18/2026, 7:32:39 PM
+Sana: 2/24/2026, 9:16:34 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -42,10 +42,7 @@ bot-constructor-panel
 ├── components.json
 ├── docs
 │   ├── ARCHITECTURE.md
-│   ├── TEST_SCENARIOS_TRIGGER_STATE.md
-│   ├── TRIGGER_STATE_IN_COLLECTIONS.md
-│   ├── TRIGGER_STATE_SAVING.md
-│   ├── VISUAL_SUMMARY_TRIGGER_STATE.md
+│   ├── node_types.md
 │   └── project_analysis.md
 ├── next-env.d.ts
 ├── next.config.ts
@@ -105,6 +102,10 @@ bot-constructor-panel
 │   │   │   │   └── relas
 │   │   │   │       └── relas.tsx
 │   │   │   └── header.tsx
+│   │   ├── login-form
+│   │   │   ├── google-auth-widget.tsx
+│   │   │   ├── index.tsx
+│   │   │   └── telegram-auth-widget.tsx
 │   │   └── ui
 │   │       ├── accordion.tsx
 │   │       ├── alert-dialog.tsx
@@ -120,6 +121,7 @@ bot-constructor-panel
 │   │       ├── context-menu.tsx
 │   │       ├── dialog.tsx
 │   │       ├── dropdown-menu.tsx
+│   │       ├── field.tsx
 │   │       ├── input-group.tsx
 │   │       ├── input-otp.tsx
 │   │       ├── input.tsx
@@ -337,6 +339,9 @@ bot-constructor-panel
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── FormNode
 │   │   │   │   │   │   ├── FormNode.tsx
+│   │   │   │   │   │   ├── components
+│   │   │   │   │   │   │   ├── add-item-modal.tsx
+│   │   │   │   │   │   │   └── form-item.tsx
 │   │   │   │   │   │   ├── components
 │   │   │   │   │   │   │   ├── add-item-modal.tsx
 │   │   │   │   │   │   │   └── form-item.tsx

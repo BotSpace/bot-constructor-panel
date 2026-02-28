@@ -7,7 +7,7 @@ export function SelectedMessageTarget() {
     <Handle
       type="target"
       position={Position.Left}
-      className="!w-4 !h-4 !bg-orange-500 !border-2 !border-gray-800 flex items-center justify-center"
+      className="translate-y-8 !w-4 !h-4 !bg-orange-500 !border-2 !border-gray-800 flex items-center justify-center"
       id="selected-message-target"
       style={{ top: "50%" }}
       title="Tanlangan Xabar"

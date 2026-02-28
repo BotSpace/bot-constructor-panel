@@ -25,7 +25,18 @@
     "debugLogin": "DEBUG Вход",
     "loginLoading": "Вход...",
     "loginSuccess": "Вход успешен",
-    "loginError": "Ошибка входа"
+    "loginError": "Ошибка входа",
+    "login": {
+      "title": "Введите код",
+      "error": "Ошибка входа. Пожалуйста, попробуйте снова.",
+      "note": "Введите 6-значный код, полученный от бота",
+      "loading": "Загрузка...",
+      "instruction": "telegram бот и получите код."
+    },
+    "loginForm": {
+      "orContinueWith": "или продолжите с",
+      "loginWithGoogle": "Продолжить с Google"
+    }
   },
   "header": {
     "back": "Назад",

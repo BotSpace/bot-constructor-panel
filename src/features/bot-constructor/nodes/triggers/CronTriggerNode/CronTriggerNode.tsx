@@ -2,6 +2,7 @@
 
 import { NodeProps } from "reactflow";
 import { memo, useState, useEffect, useMemo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
@@ -110,7 +111,7 @@ const CronTriggerNodeComponent = ({
       className={cn("w-[350px] shadow-lg", selected && "ring-2 ring-primary")}
     >
       <TargetHandles />
-      
+
       <TriggerHeader
         icon="⏰"
         title="Cron Trigger"
