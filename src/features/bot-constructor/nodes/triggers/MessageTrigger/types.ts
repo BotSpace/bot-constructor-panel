@@ -1,10 +1,6 @@
 import { ConstructorData } from "@/features/bot-constructor/data";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
-<<<<<<< HEAD
 import { StateConfig } from "../shared/state-config-types";
-=======
-import { StateConfig } from "../shared";
->>>>>>> main
 
 // Murakkab context'lar uchun tiplar
 interface RadiusContext {
@@ -31,8 +27,4 @@ export interface MessageTriggerNodeData {
   };
 
   state?: StateConfig;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> main

@@ -1,4 +1,4 @@
-import { StateConfig } from "../shared";
+import { StateConfig } from "../shared/state-config-types";
 
 export interface CallbackQueryTriggerData {
   filter: string;
