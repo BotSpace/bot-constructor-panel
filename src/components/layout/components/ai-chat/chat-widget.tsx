@@ -15,6 +15,7 @@ import {
   History,
   MessageSquare,
   ChevronRight,
+  AlertCircle,
 } from "lucide-react";
 import {
   Sheet,
@@ -318,16 +319,24 @@ export function ChatWidget({ open, onOpenChange }: ChatWidgetProps) {
                 }}
               >
                 <SelectTrigger className="h-8 text-xs">
-                  <SelectValue />
+                  <SelectValue>
+                    <div className="flex items-center gap-2">
+                      {selectedAgent.icon && <span className="text-base">{selectedAgent.icon}</span>}
+                      <span>{selectedAgent.name}</span>
+                    </div>
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {AI_AGENTS.map((agent) => (
                     <SelectItem key={agent.id} value={agent.id}>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{agent.name}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {agent.description}
-                        </span>
+                      <div className="flex items-center gap-2">
+                        {agent.icon && <span className="text-base">{agent.icon}</span>}
+                        <div className="flex flex-col">
+                          <span className="font-medium">{agent.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {agent.description}
+                          </span>
+                        </div>
                       </div>
                     </SelectItem>
                   ))}
@@ -344,6 +353,19 @@ export function ChatWidget({ open, onOpenChange }: ChatWidgetProps) {
             </div>
           )}
         </SheetHeader>
+
+        {/* AI Availability Notice */}
+        <div className="mx-4 mt-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg flex items-start gap-2">
+          <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-500 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-xs text-amber-800 dark:text-amber-300 font-medium">
+              AI agent hozirda mavjud emas
+            </p>
+            <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+              Tez orada ishga tushuramiz
+            </p>
+          </div>
+        </div>
 
         {/* Content Area */}
         {viewMode === "chat" ? (

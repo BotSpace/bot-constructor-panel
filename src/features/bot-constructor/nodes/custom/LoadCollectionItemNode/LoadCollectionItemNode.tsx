@@ -23,9 +23,9 @@ import { APIDetailCreateResponse } from "@/types/http/response";
 import { CollectionDetail } from "@/types/http/collection";
 import { Badge } from "@/components/ui/badge";
 import { useNodes } from "reactflow";
-import { StateNodeData } from "../StateNode/types";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
+import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 
 function LoadCollectionItemNode({
   id,
@@ -52,16 +52,7 @@ function LoadCollectionItemNode({
   // Get available state keys
   const nodes = useNodes();
   const availableStateKeys = useMemo(() => {
-    const stateKeys = new Set<string>();
-    nodes.forEach((node) => {
-      if (node.type === "StateNode") {
-        const nodeData = node.data as StateNodeData;
-        if (nodeData.key && nodeData.key.trim() !== "") {
-          stateKeys.add(nodeData.key);
-        }
-      }
-    });
-    return Array.from(stateKeys).sort();
+    return getAvailableStateKeys(nodes);
   }, [nodes]);
 
   return (

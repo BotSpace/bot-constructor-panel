@@ -8,11 +8,11 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendTextMessageNodeData } from "../types";
 import { Badge } from "@/components/ui/badge";
 import { useNodes } from "reactflow";
-import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { DynamicMessage } from "../../shared/types";
+import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 
 type Props = {
   collection: CollectionListItem;
@@ -33,19 +33,10 @@ function AccordionItemWrapper({ collection, id, dynamicMessages }: Props) {
     url: `collection/${collection.name}/?project=[id]`,
   });
 
-  // State keys'larni olish
+  // State keys'larni olish (StateNode va Trigger'lardan)
   const nodes = useNodes();
   const availableStateKeys = useMemo(() => {
-    const stateKeys = new Set<string>();
-    nodes.forEach((node) => {
-      if (node.type === "StateNode") {
-        const nodeData = node.data as StateNodeData;
-        if (nodeData.key && nodeData.key.trim() !== "") {
-          stateKeys.add(nodeData.key);
-        }
-      }
-    });
-    return Array.from(stateKeys).sort();
+    return getAvailableStateKeys(nodes);
   }, [nodes]);
 
   if (!fields) return <Skeleton className="w-full h-10" />;

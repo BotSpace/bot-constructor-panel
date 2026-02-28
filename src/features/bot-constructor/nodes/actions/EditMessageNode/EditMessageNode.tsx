@@ -27,7 +27,7 @@ export const EditMessageNode = memo(
     const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
     const nearestParentAction = findNearestParentAction(id);
-    const parrentActionType =
+    const parentActionType =
       nearestParentAction?.type as ElementItemType["triggerId"];
 
     // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
@@ -62,14 +62,6 @@ export const EditMessageNode = memo(
             </SelectContent>
           </Select>
 
-          {nearestParentAction ? null : (
-            <div>
-              <p className="p-4 text-center text-red-500">
-                No parent action found
-              </p>
-            </div>
-          )}
-
           {data.messageIdSource === "message_id" ? (
             <>
               <Input
@@ -78,23 +70,24 @@ export const EditMessageNode = memo(
                 placeholder="Enter message id"
               />
             </>
-          ) : parrentActionType === "SendTextMessageNode" ? (
+          ) : parentActionType === "SendTextMessageNode" ||
+            !parentActionType ? (
             <ForTextMessageNode
               data={data}
               handleUpdate={handleUpdate}
               id={id}
             />
           ) : (
-            parrentActionType === "SendPhotoNode" ||
-            parrentActionType === "SendVideoNode" ||
-            parrentActionType === "SendFileNode" ||
-            (parrentActionType === "SendAudioNode" && (
+            (parentActionType === "SendPhotoNode" ||
+              parentActionType === "SendVideoNode" ||
+              parentActionType === "SendFileNode" ||
+              parentActionType === "SendAudioNode") && (
               <ForVideoPhotoDocumentAudio
                 data={data}
                 handleUpdate={handleUpdate}
                 id={id}
               />
-            ))
+            )
           )}
         </CardContent>
 

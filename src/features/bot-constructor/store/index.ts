@@ -7,6 +7,17 @@ import { createClipboardSlice } from "./clipboardSlice";
 import { createHistorySlice } from "./historySlice";
 import { createActions } from "./actions";
 import { Connection, addEdge } from "reactflow";
+import { KeyboardConfig } from "@/features/bot-constructor/components";
+import { DynamicMessage, ParseMode } from "@/features/bot-constructor/nodes/actions/shared/types";
+
+// EditMessage node uchun ma'lumotlarni nusxalash uchun interface
+interface EditMessageDataUpdate {
+  newText?: string;
+  newCaption?: string;
+  parseMode?: ParseMode;
+  keyboard?: KeyboardConfig;
+  dynamicMessages?: DynamicMessage[];
+}
 
 // Keling, shu usulga o'tamiz.
 export const useFlowStore = create<FlowStoreState>()((set, get) => {
@@ -42,7 +53,7 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     ...createActions(set, get, {} as any),
 
     onConnect: (connection: Connection) => {
-      const { initialState, saveToHistory } = get();
+      const { initialState, saveToHistory, nodes, edges, updateNodeData } = get();
 
       // History ga saqlash (undo/redo flag tekshiriladi ichida)
       saveToHistory();
@@ -99,6 +110,65 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
         edges: newEdges,
         isDirty: hasRealChanges,
       });
+
+      // EditMessage nodedan boshqa nodega ulanish holatini tekshirish
+      if (isEditMessageEdge && connection.source && connection.target) {
+        const editMessageNode = nodes.find((n) => n.id === connection.source);
+        const messageNode = nodes.find((n) => n.id === connection.target);
+
+        // Agar source EditMessageNode bo'lsa va bu birinchi ulanish bo'lsa
+        if (editMessageNode && editMessageNode.type === "EditMessageNode" && messageNode) {
+          // Yangi qo'shilgan edge bilan birga EditMessageNode'dan chiqqan barcha edit-message-source edgelarni sanash
+          const editEdgesCount = newEdges.filter(
+            (e) =>
+              e.source === connection.source &&
+              e.sourceHandle === "edit-message-source"
+          ).length;
+
+          // Agar bu birinchi ulanish bo'lsa (faqat yangi edge bor)
+          if (editEdgesCount === 1) {
+            // Message nodening ma'lumotlarini nusxalash
+            const messageData = messageNode.data;
+
+            // Ma'lumotlarni nusxalash uchun yangilanish obyekti
+            const dataUpdate: EditMessageDataUpdate = {};
+
+            // SendTextMessageNode uchun
+            if (messageNode.type === "SendTextMessageNode") {
+              if (messageData.messageText) {
+                dataUpdate.newText = messageData.messageText;
+              }
+            }
+            // SendPhotoNode, SendVideoNode, SendFileNode, SendAudioNode uchun
+            else if (
+              messageNode.type === "SendPhotoNode" ||
+              messageNode.type === "SendVideoNode" ||
+              messageNode.type === "SendFileNode" ||
+              messageNode.type === "SendAudioNode"
+            ) {
+              if (messageData.caption) {
+                dataUpdate.newCaption = messageData.caption;
+              }
+            }
+
+            // Barcha xabar turlari uchun umumiy ma'lumotlar
+            if (messageData.parseMode) {
+              dataUpdate.parseMode = messageData.parseMode;
+            }
+            if (messageData.keyboard) {
+              dataUpdate.keyboard = structuredClone(messageData.keyboard);
+            }
+            if (messageData.dynamicMessages) {
+              dataUpdate.dynamicMessages = structuredClone(messageData.dynamicMessages);
+            }
+
+            // Agar nusxalanishi kerak bo'lgan ma'lumotlar bo'lsa, yangilash
+            if (Object.keys(dataUpdate).length > 0) {
+              updateNodeData(connection.source, dataUpdate);
+            }
+          }
+        }
+      }
     },
   };
 });

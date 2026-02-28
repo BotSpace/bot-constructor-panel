@@ -17,7 +17,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ElseMessageSource } from "../../components/shared/ReactFlowHandles/ElseMessageSource";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
 import { StateConfigUI, getStateTypesForMessageTrigger } from "../shared";
-import { getFiltersForType } from "../../actions/shared/HandlerBuilder/utils";
 
 const MessageTriggerNodeComponent = ({
     id,
