@@ -19,7 +19,7 @@ function FloatingConnectionLine({
   toPosition,
   fromNode,
   toNode,
-}: ConnectionLineComponentProps) {
+}: ConnectionLineComponentProps & { toNode?: any }) {
   // If we have both nodes, use the utility to get proper positions
   let sourceX = fromX;
   let sourceY = fromY;
