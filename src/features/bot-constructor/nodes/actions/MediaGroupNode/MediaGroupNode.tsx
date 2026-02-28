@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, memo } from "react";
+import { memo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { NodeProps } from "reactflow";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -18,8 +19,9 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import { Plus, Trash2 } from "lucide-react";
-import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
+import { ActionPanel } from "../../components/shared/ActionPanel";
 import { MediaGroupNodeData, MediaItem } from "./types";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const MediaGroupNodeInternal = ({
   id,
@@ -27,7 +29,7 @@ const MediaGroupNodeInternal = ({
   selected,
 }: NodeProps<MediaGroupNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const mediaItems = data.mediaItems || [];
 
@@ -190,9 +192,12 @@ const MediaGroupNodeInternal = ({
         </CardContent>
       )}
 
-      <CardFooter>
-        <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+      <CardFooter className="flex flex-col gap-2">
+        <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} id={id} />
       </CardFooter>
+
+      {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

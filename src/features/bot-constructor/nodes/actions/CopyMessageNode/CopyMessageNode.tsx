@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const CopyMessageNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
@@ -15,6 +16,10 @@ const CopyMessageNodeComponent = ({ id, data, selected }: NodeProps) => {
       <div className="p-4 text-sm text-muted-foreground text-center">
         Xabarni nusxalab yuboradi
       </div>
+
+      {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
+
       <SourceHandles />
     </Card>
   );

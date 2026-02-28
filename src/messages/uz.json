@@ -25,7 +25,18 @@
     "debugLogin": "DEBUG Login",
     "loginLoading": "Login...",
     "loginSuccess": "Login muvaffaqiyatli",
-    "loginError": "Login xatosi"
+    "loginError": "Login xatosi",
+    "login": {
+      "title": "Kodni Kiriting",
+      "error": "Kirish xatosi. Iltimos, qaytadan urinib ko'ring.",
+      "note": "Botdan olgan 6 xonali kodingizni kiriting",
+      "loading": "Yuklanmoqda...",
+      "instruction": "telegram botiga kiring va kodeni oling."
+    },
+    "loginForm": {
+      "orContinueWith": "yoki davom eting",
+      "loginWithGoogle": "Google bilan davom etish"
+    }
   },
   "header": {
     "back": "Orqaga",

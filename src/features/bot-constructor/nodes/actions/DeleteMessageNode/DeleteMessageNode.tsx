@@ -1,7 +1,8 @@
 "use client";
 
 import { NodeProps, useNodes, useEdges } from "reactflow";
-import { memo, useState, useMemo } from "react";
+import { memo, useMemo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
@@ -14,9 +15,12 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { AlertCircle } from "lucide-react";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import { HandlerData } from "../TextMessageNode/types";
 
 export interface DeleteMessageNodeData {
   deleteFromContext?: boolean;
+  handlers?: HandlerData[];
 }
 
 const DeleteMessageNodeComponent = ({
@@ -25,7 +29,7 @@ const DeleteMessageNodeComponent = ({
   selected,
 }: NodeProps<DeleteMessageNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
   const nodes = useNodes();
   const edges = useEdges();
 
@@ -88,14 +92,14 @@ const DeleteMessageNodeComponent = ({
                     {connectedMessageNode.type === "SendTextMessageNode"
                       ? "Matn xabari"
                       : connectedMessageNode.type === "SendPhotoNode"
-                      ? "Rasm xabari"
-                      : connectedMessageNode.type === "SendVideoNode"
-                      ? "Video xabari"
-                      : connectedMessageNode.type === "SendAudioNode"
-                      ? "Audio xabari"
-                      : connectedMessageNode.type === "SendFileNode"
-                      ? "Fayl xabari"
-                      : "Xabar"}
+                        ? "Rasm xabari"
+                        : connectedMessageNode.type === "SendVideoNode"
+                          ? "Video xabari"
+                          : connectedMessageNode.type === "SendAudioNode"
+                            ? "Audio xabari"
+                            : connectedMessageNode.type === "SendFileNode"
+                              ? "Fayl xabari"
+                              : "Xabar"}
                   </span>
                 </div>
               ) : (
@@ -118,7 +122,6 @@ const DeleteMessageNodeComponent = ({
           )}
         </CardContent>
       )}
-
       <SourceHandles />
     </Card>
   );

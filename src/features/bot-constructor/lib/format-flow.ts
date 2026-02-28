@@ -9,7 +9,7 @@ type Direction = "TB" | "LR";
 export const getFormatFlow = (
   nodes: Node[],
   edges: Edge[],
-  direction: Direction = "TB"
+  direction: Direction = "LR"
 ) => {
   const isHorizontal = direction === "LR";
 

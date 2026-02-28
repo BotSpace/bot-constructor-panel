@@ -25,11 +25,9 @@ import {
 } from "./actions";
 
 import {
-  MessageTriggerNode,
-  ReplyButtonTriggerNode,
-  CallbackQueryTriggerNode,
   CommandTriggerNode,
   CronTriggerNode,
+  MessageTriggerNode,
 } from "./triggers";
 
 import {
@@ -50,11 +48,9 @@ import {
 } from "./custom";
 
 export const Triggers = {
-  ReplyButtonTriggerNode,
-  MessageTriggerNode,
-  CallbackQueryTriggerNode,
   CommandTriggerNode,
   CronTriggerNode,
+  MessageTriggerNode,
 };
 
 export const ActionsTextAndMedia = {

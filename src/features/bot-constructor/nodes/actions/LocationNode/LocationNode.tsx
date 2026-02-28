@@ -1,17 +1,18 @@
 "use client";
 
 import { NodeProps } from "reactflow";
-import { memo, useState } from "react";
+import { memo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendLocationNodeData } from "./types";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
+import { ActionPanel } from "../../components/shared/ActionPanel";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const LocationNodeComponent = ({
   id,
@@ -19,7 +20,7 @@ const LocationNodeComponent = ({
   selected,
 }: NodeProps<SendLocationNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const handleUpdate = (update: Partial<SendLocationNodeData>) => {
     updateNodeData(id, update);
@@ -37,11 +38,6 @@ const LocationNodeComponent = ({
 
       {!isCollapsed && (
         <CardContent className="flex flex-col gap-4 pt-4">
-          <RecipientsManager
-            recipients={data.recipients}
-            onUpdate={handleUpdate}
-          />
-
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
               <Label>Latitude</Label>
@@ -72,9 +68,12 @@ const LocationNodeComponent = ({
         </CardContent>
       )}
 
-      <CardFooter>
-        <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+      <CardFooter className="flex flex-col gap-2">
+        <ActionPanel keyboard={data.keyboard} id={id} recipients={data.recipients} />
       </CardFooter>
+
+      {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

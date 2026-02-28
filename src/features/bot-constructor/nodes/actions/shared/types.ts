@@ -31,3 +31,7 @@ export interface DynamicMessage {
   // Qaysi matn kerak
   messageText?: string;
 }
+
+export interface BaseAction {
+
+}

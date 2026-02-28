@@ -1,7 +1,8 @@
 "use client";
 
 import { NodeProps, useNodes, useEdges } from "reactflow";
-import { memo, useState, useMemo, useEffect } from "react";
+import { memo, useMemo, useEffect } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
@@ -11,9 +12,12 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import { HandlerData } from "../TextMessageNode/types";
 
 export interface DownloadFileNodeData {
   messageType?: string; // Type of message from MessageTrigger (photo, video, audio, document)
+  handlers?: HandlerData[];
 }
 
 const DownloadFileNodeInternal = ({
@@ -22,7 +26,7 @@ const DownloadFileNodeInternal = ({
   selected,
 }: NodeProps<DownloadFileNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
   const nodes = useNodes();
   const edges = useEdges();
 

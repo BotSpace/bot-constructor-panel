@@ -1,4 +1,5 @@
 import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { HandlerData } from "../TextMessageNode/types";
 
 /**
  * Foydalanuvchi kimga yuborilishini aniqlaydi.
@@ -37,4 +38,5 @@ export interface SendFileNodeData {
   protectContent?: boolean;
 
   keyboard: KeyboardConfig;
+  handlers?: HandlerData[];
 }

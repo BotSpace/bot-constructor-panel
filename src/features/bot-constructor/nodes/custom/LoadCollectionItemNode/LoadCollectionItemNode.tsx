@@ -99,7 +99,11 @@ function LoadCollectionItemNode({
               placeholder="e.g., selected_film"
               value={data.contextKey || ""}
               onChange={(e) => handleUpdate({ contextKey: e.target.value })}
+              required
             />
+            {data.contextKey.length <= 0 && (
+              <p className="text-red-500">Context key must be at least 1 character long</p>
+            )}
             <p className="text-xs text-muted-foreground">
               Use: {"{"}
               {"{"}collection_{data.contextKey || "key"}_fieldname{"}}"}
@@ -166,17 +170,17 @@ function LoadCollectionItemNode({
       {/* Not Found Output */}
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         id="not_found"
-        className="translate-x-[-100px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
+        className="translate-y-[70px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
       />
 
       {/* Found Output */}
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         id="found"
-        className="translate-x-[100px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
+        className="translate-y-[-70px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
       />
     </>
   );

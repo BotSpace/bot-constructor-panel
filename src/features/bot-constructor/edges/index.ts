@@ -1,10 +1,12 @@
 import SelectableEdge from "./SelectableEdge";
-
-import { SmartBezierEdge } from "@tisoap/react-flow-smart-edge";
+import FloatingEdge from "./FloatingEdge";
+import FloatingConnectionLine from "./FloatingConnectionLine";
 
 // Custom edge with selected state visual feedback
 export const CustomEdge = {
   step: SelectableEdge,
-
-  // step: SmartBezierEdge,
+  floating: FloatingEdge,
 };
+
+// Export floating connection line for use in ReactFlow
+export { FloatingConnectionLine };

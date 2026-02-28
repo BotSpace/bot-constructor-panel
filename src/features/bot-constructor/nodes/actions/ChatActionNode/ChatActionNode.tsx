@@ -1,12 +1,14 @@
 "use client";
 
 import { NodeProps } from "reactflow";
-import { memo, useState } from "react";
+import { memo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -16,8 +18,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { HandlerData } from "../TextMessageNode/types";
+
 interface ChatActionNodeData {
   action?: string;
+  handlers?: HandlerData[];
 }
 
 const ChatActionNodeInternal = ({
@@ -26,7 +31,7 @@ const ChatActionNodeInternal = ({
   selected,
 }: NodeProps<ChatActionNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const handleUpdate = (update: Partial<ChatActionNodeData>) => {
     updateNodeData(id, update);

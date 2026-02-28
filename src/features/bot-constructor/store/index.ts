@@ -39,6 +39,12 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
       set({ countdownRemaining: null });
     },
 
+    // Barcha nodelarni collapse qilish
+    collapseAllSignal: 0,
+    collapseAllNodes: () => {
+      set((state) => ({ collapseAllSignal: state.collapseAllSignal + 1 }));
+    },
+
     // Barcha slice'larni birlashtiramiz
     // Har bir slice'ga (set, get) ni uzatamiz
     ...createFlowSlice(set, get, {} as any),
@@ -60,6 +66,11 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
       const isDeleteMessageEdge =
         connection.sourceHandle === "delete-message-source";
 
+      // Handler handle'dan chiqqan edge'ni aniqlash (keyboard tugmalari)
+      const isHandlerEdge =
+        connection.sourceHandle?.startsWith("target-handler-") ||
+        connection.sourceHandle?.startsWith("source-handler-");
+
       // Edge rangini aniqlash
       let edgeColor = "#495057"; // Default kulrang
       if (isEditMessageEdge) {
@@ -70,7 +81,8 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 
       const newEdge = {
         ...connection,
-        type: "step",
+        // type: isHandlerEdge ? "step" : "floating",
+        type: "floating",
         markerEnd: {
           type: "arrow",
           width: 30,
@@ -80,7 +92,7 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
         // React Flow'ning default edge'ini ishlatamiz
         // Rasmga mos stil
         style: {
-          strokeWidth: 1.5,
+          strokeWidth: 4,
           stroke: edgeColor,
         },
         // EditMessageHandler va DeleteMessageHandler'dan chiqqan edge'lar uchun animated true

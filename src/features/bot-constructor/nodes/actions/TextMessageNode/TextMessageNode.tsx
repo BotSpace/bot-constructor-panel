@@ -4,29 +4,29 @@ import { NodeProps } from "reactflow";
 
 import { SendTextMessageNodeData } from "./types";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { memo, useState } from "react";
+import { memo } from "react";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { LetterText, ListPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@radix-ui/react-dropdown-menu";
 
 import { NodeHeader } from "../shared/NodeHeader";
-import { RecipientsManager } from "../shared/RecipientSelector";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { DynamicMessageConstructor } from "./components/dynamic-message-constructor-modal";
 import { Button } from "@/components/ui/button";
 
-import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
-import ActionNodeSettings from "../shared/ActionNodeSettings";
 import TextArea from "../shared/text-area";
+import { ActionPanel } from "../../components/shared/ActionPanel";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendTextMessageNodeComponent = ({
   id,
   data,
   selected,
 }: NodeProps<SendTextMessageNodeData>) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
   // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
@@ -42,9 +42,9 @@ const SendTextMessageNodeComponent = ({
     )?.flat().length || 0;
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary relative")}>
       <TargetHandles />
-      <SelectedMessageTarget />
+      {/* <SelectedMessageTarget /> */}
 
       <NodeHeader
         icon={<LetterText className="text-primary" />}
@@ -55,50 +55,37 @@ const SendTextMessageNodeComponent = ({
       />
       {!isCollapsed && (
         <>
-          <CardContent className="flex flex-col gap-4">
-            {/* Qabul qiluvchi */}
-            <RecipientsManager
-              recipients={data.recipients}
-              onUpdate={handleUpdate}
-            />
-
+          <CardContent className="grid gap-2">
             {/* Xabar matni */}
-            <div className="grid gap-2">
-              <div className="flex justify-between items-center">
-                <Label>Xabar matni</Label>
+            <div className="flex justify-between items-center">
+              <Label>Xabar matni</Label>
 
-                <DynamicMessageConstructor
-                  handleUpdate={handleUpdate}
-                  initialDynamicMessages={data.dynamicMessages}
-                  id={id}
-                >
-                  <Button size={"icon-sm"} variant={"outline"}>
-                    <ListPlus />
-                  </Button>
-                </DynamicMessageConstructor>
-              </div>
-
-              <TextArea
-                placeholder="Xabar matni..."
-                defaultValue={data.messageText}
-                onChange={(e) => handleUpdate({ messageText: e })}
-              />
+              <DynamicMessageConstructor
+                handleUpdate={handleUpdate}
+                initialDynamicMessages={data.dynamicMessages}
+                id={id}
+              >
+                <Button size={"icon-sm"} variant={"outline"}>
+                  <ListPlus />
+                </Button>
+              </DynamicMessageConstructor>
             </div>
-
-            {/* Sozlamalar */}
-            <ActionNodeSettings
-              notificationDisabled={data.disableNotification}
-              contentProtected={data.protectContent}
-              parseMode={data.parseMode}
-              handleUpdate={handleUpdate}
+            <TextArea
+              placeholder="Xabar matni..."
+              defaultValue={data.messageText}
+              onChange={(e) => handleUpdate({ messageText: e })}
             />
           </CardContent>
 
-          <CardFooter>
-            <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
+          <CardFooter className="flex flex-col gap-2">
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} parseMode={data.parseMode} protectContent={data.protectContent} id={id} recipients={data.recipients} />
           </CardFooter>
         </>
       )}
+
+      {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
+
       <SourceHandles />
     </Card>
   );
