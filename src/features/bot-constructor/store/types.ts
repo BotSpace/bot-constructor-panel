@@ -61,4 +61,6 @@ export interface FlowStoreState
   stopCountdown: () => void;
   collapseAllSignal: number; // Barcha nodelarni collapse qilish signali (counter)
   collapseAllNodes: () => void; // Barcha nodelarni collapse qilish
+  expandAllSignal: number; // Barcha nodelarni expand qilish signali (counter)
+  expandAllNodes: () => void; // Barcha nodelarni expand qilish
 }
