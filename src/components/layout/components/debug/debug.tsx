@@ -3,23 +3,20 @@
 import React, { useEffect } from "react";
 import {
   BotMessageSquare,
-  BugPlay,
   RotateCcw,
   StopCircle,
   Copy,
   Mail,
   Share2,
   Play,
+  LoaderCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 
 import { instanceAuth } from "@/services/instance";
 
-import { Button, buttonVariants } from "@/components/ui/button";
-
 import useProjectStore from "@/features/bot-constructor/store/project";
-import { ButtonGroup } from "@/components/ui/button-group";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import {
   DropdownMenu,
@@ -27,15 +24,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import CoundDownButton from "@/components/common/count-down-button";
-import { useNotificationContext } from "@/components/common/notification-provider";
-import { createSimpleNotification } from "@/lib/notification-utils";
+import BottomButtonGroup from "@/features/bot-constructor/components/bottom-panel/components/button-group";
+import { BottomPanelButton } from "@/features/bot-constructor/components/bottom-panel/components/button";
+import { PlayIcon } from "@/components/icons/play";
+import CountdownComponent from "@/components/common/count-down/count-down";
 
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
-export default function DebugActions() {
+export default function DebugingButtons() {
   const { id }: { id: string } = useParams();
   const { project, changeDebug } = useProjectStore();
-  const { sendNotification } = useNotificationContext();
 
   // Store'dan kerakli qismlarni olamiz
   const { saveFlow } = useFlowStore();
@@ -130,58 +127,40 @@ export default function DebugActions() {
     );
   }
 
+
   if (project)
     return (
-      <ButtonGroup id="open-bot-btn">
+      <BottomButtonGroup>
         {project.debug.status === "running" ? (
           <>
-            <Button onClick={handleStopBot} variant="outline">
-              <StopCircle />
-              <CoundDownButton
-                onComplete={() => {
-                  sendNotification(
-                    createSimpleNotification(
-                      "Debug bot o'chirildi",
-                      "Debug bot uchun ajiratilgan 30 daqiqa tugadi! Testni davom ettirish uchun debug botni qaytatdan ishga tushirign"
-                    )
-                  );
-                }}
-                date={
-                  new Date(
-                    new Date(project.debug.updated_at).getTime() +
-                    30 * 60 * 1000
-                  )
-                }
-                completed_component={null}
-              />
-            </Button>
-            <Button
+            <BottomPanelButton size={'default'} onClick={handleStopBot}>
+              <StopCircle size={16} />
+              <CountdownComponent updated_at={project.debug.updated_at} />
+            </BottomPanelButton>
+            <BottomPanelButton
               onClick={handleRunAndRelaodDebugBot}
-              variant="outline"
-              className="cursor-pointer"
-              size={"icon"}
             >
-              <RotateCcw />
-            </Button>
+              <RotateCcw size={16} />
+            </BottomPanelButton>
 
             {/* open debug bot */}
-            <a
-              href={botLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={buttonVariants({ variant: "outline" })}
-            >
-              <BotMessageSquare className="mr-2 h-4 w-4" />
-              Open bot
-            </a>
+            <BottomPanelButton size={'default'} asChild>
+              <a
+                href={botLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <BotMessageSquare className="h-4 w-4" />
+                Open bot
+              </a>
+            </BottomPanelButton>
 
             {/* share  */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share
-                </Button>
+                <BottomPanelButton size={'icon'}>
+                  <Share2 className="h-4 w-4" />
+                </BottomPanelButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={handleCopyLink}>
@@ -201,15 +180,14 @@ export default function DebugActions() {
 
           </>
         ) : project.debug.status === "initializing" ? (
-          <Button variant="outline" disabled>
-            <span className="animate-pulse">Starting...</span>
-          </Button>
+          <BottomPanelButton size={'icon'} disabled>
+            <LoaderCircle className="h-4 w-4 animate-spin" />
+          </BottomPanelButton>
         ) : (
-          <Button onClick={handleRunAndRelaodDebugBot} variant="outline">
-            Run
-            <Play />
-          </Button>
+          <BottomPanelButton onClick={handleRunAndRelaodDebugBot} variant="outline">
+            <PlayIcon />
+          </BottomPanelButton>
         )}
-      </ButtonGroup>
+      </BottomButtonGroup>
     );
 }
