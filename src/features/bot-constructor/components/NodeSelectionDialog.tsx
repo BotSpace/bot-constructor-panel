@@ -64,24 +64,24 @@ export function NodeSelectionDialog({
             id: "must-have",
             elements: query
                 ? mustHaveElements.filter(
-                      (el) =>
-                          el.name.toLowerCase().includes(query) ||
-                          el.description.toLowerCase().includes(query)
-                  )
+                    (el) =>
+                        el.name.toLowerCase().includes(query) ||
+                        el.description.toLowerCase().includes(query)
+                )
                 : mustHaveElements,
         };
 
         const baseGroups = query
             ? elements
-                  .map((group) => ({
-                      ...group,
-                      elements: group.elements?.filter(
-                          (el) =>
-                              el.name.toLowerCase().includes(query) ||
-                              el.description.toLowerCase().includes(query)
-                      ),
-                  }))
-                  .filter((group) => group.elements && group.elements.length > 0)
+                .map((group) => ({
+                    ...group,
+                    elements: group.elements?.filter(
+                        (el) =>
+                            el.name.toLowerCase().includes(query) ||
+                            el.description.toLowerCase().includes(query)
+                    ),
+                }))
+                .filter((group) => group.elements && group.elements.length > 0)
             : elements;
 
         // Must have bo'sh bo'lmasa, boshiga qo'shish
