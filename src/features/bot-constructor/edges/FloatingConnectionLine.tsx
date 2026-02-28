@@ -5,6 +5,7 @@ import {
   getBezierPath,
 } from "reactflow";
 import { getEdgeParams } from "./utils";
+import { useEdgeColor } from "./useEdgeColor";
 
 /**
  * FloatingConnectionLine - Custom connection line component
@@ -20,6 +21,8 @@ function FloatingConnectionLine({
   fromNode,
   toNode,
 }: ConnectionLineComponentProps & { toNode?: any }) {
+  const { stroke: edgeColor } = useEdgeColor();
+
   // If we have both nodes, use the utility to get proper positions
   let sourceX = fromX;
   let sourceY = fromY;
@@ -56,7 +59,7 @@ function FloatingConnectionLine({
     <g>
       <path
         fill="none"
-        stroke="#fff"
+        stroke={edgeColor}
         strokeWidth={4}
         className="animated"
         d={edgePath}
@@ -64,9 +67,9 @@ function FloatingConnectionLine({
       <circle
         cx={targetX}
         cy={targetY}
-        fill="#fff"
+        fill={edgeColor}
         r={3}
-        stroke="#fff"
+        stroke={edgeColor}
         strokeWidth={1.5}
       />
     </g>
