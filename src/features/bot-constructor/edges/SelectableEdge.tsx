@@ -1,6 +1,7 @@
 "use client";
 import { memo } from "react";
 import { BaseEdge, type EdgeProps, getSmoothStepPath } from "reactflow";
+import { useEdgeColor } from "./useEdgeColor";
 
 /**
  * SelectableEdge - Minimal custom edge that shows selected state
@@ -22,6 +23,8 @@ function SelectableEdge({
   markerEnd,
   selected,
 }: EdgeProps) {
+  const { stroke: edgeColor, selectedStroke } = useEdgeColor();
+
   // Calculate path using React Flow's smooth step path
   const [edgePath] = getSmoothStepPath({
     sourceX,
@@ -34,18 +37,17 @@ function SelectableEdge({
   });
 
   // Get original style values
-  const originalStroke = "#fff";
   const originalStrokeWidth = (style as any)?.strokeWidth || 4;
 
   // Selected state styling - more visible
   const selectedStyle = {
-    stroke: "#3b82f6", // Blue color when selected
-    strokeWidth: 5, // Thicker when selected
+    stroke: selectedStroke,
+    strokeWidth: 5,
   };
 
   // Default style
   const defaultStyle = {
-    stroke: originalStroke,
+    stroke: edgeColor,
     strokeWidth: originalStrokeWidth,
   };
 
@@ -53,7 +55,7 @@ function SelectableEdge({
   const dynamicStyle = selected ? selectedStyle : defaultStyle;
 
   // Marker color also changes when selected
-  const markerColor = selected ? "#3b82f6" : originalStroke;
+  const markerColor = selected ? selectedStroke : edgeColor;
 
   return (
     <>
