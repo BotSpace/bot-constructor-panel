@@ -102,7 +102,7 @@ function Elements({ }: Props) {
                           draggable
                           onDragStart={(e) => {
                             e.dataTransfer.setData(
-                              "application/json",
+                              "text/plain",
                               JSON.stringify(element)
                             );
                           }}

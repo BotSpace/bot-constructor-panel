@@ -77,7 +77,7 @@ export default function Page() {
 
 function ConstructorLoadingSkeletions() {
   return (
-    <div className="w-full h-screen grid grid-cols-12 grid-rows-12 gap-4">
+    <div className="w-full h-[calc(100vh-56px)]  grid grid-cols-12 grid-rows-12 gap-4">
       <Skeleton className="col-span-3 row-span-4 col-start-3 row-start-3"></Skeleton>
       <Skeleton className="col-span-3 col-start-4 row-start-8"></Skeleton>
       <Skeleton className="col-span-3 row-span-3 col-start-8 row-start-4"></Skeleton>

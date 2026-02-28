@@ -35,8 +35,8 @@ import { CollectionDetail } from "@/types/http/collection";
 import { generateId } from "@/lib/utils";
 import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
 import { useNodes } from "reactflow";
-import { StateNodeData } from "@/features/bot-constructor/nodes/custom/StateNode/types";
 import { Filter } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
+import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 
 interface Props {
   onAdd: (button: ButtonConfig) => void;
@@ -70,16 +70,9 @@ export const CollectionButtonForm = ({
     enabled: !!selectedCollection,
   });
 
-  // Flow'dagi mavjud o'zgaruvchilarni (StateNode) filtrlar uchun olish
+  // Flow'dagi mavjud o'zgaruvchilarni (StateNode va Trigger'lar) filtrlar uchun olish
   const availableStateKeys = useMemo(() => {
-    const keys = new Set<string>();
-    nodes.forEach((node) => {
-      if (node.type === "StateNode") {
-        const d = node.data as StateNodeData;
-        if (d.key) keys.add(d.key);
-      }
-    });
-    return Array.from(keys).sort();
+    return getAvailableStateKeys(nodes);
   }, [nodes]);
 
   // --- HANDLERS ---

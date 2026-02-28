@@ -16,18 +16,21 @@ export const AI_AGENTS: AIAgent[] = [
     name: "Gemini Flash",
     description: "Tez va samarali javoblar",
     model: "gemini-1.5-flash",
+    icon: "⚡",
   },
   {
     id: "gemini-pro",
     name: "Gemini Pro",
     description: "Kuchli va batafsil javoblar",
     model: "gemini-1.5-pro",
+    icon: "💎",
   },
   {
     id: "gemini-2-flash",
     name: "Gemini 2.0 Flash",
     description: "Yangi model - eng yaxshi sifat",
     model: "gemini-2.0-flash-exp",
+    icon: "🚀",
   },
 ];
 

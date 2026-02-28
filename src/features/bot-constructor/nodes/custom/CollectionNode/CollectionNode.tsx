@@ -25,7 +25,7 @@ import { NodeProps, useNodes } from "reactflow";
 import { CollectionNodeData } from "./types";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SourceHandles, TargetHandles } from "../../components";
-import { StateNodeData } from "../StateNode/types";
+import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 
 export function CollectionNode({
   id,
@@ -82,21 +82,9 @@ export function CollectionNode({
   // Field mappings'ni olish
   const fieldMappings = data.fieldMappings || {};
 
-  // Mavjud StateNode'lardan state key'larni olish
+  // Mavjud StateNode'lardan va Trigger'lardan state key'larni olish
   const availableStateKeys = useMemo(() => {
-    const stateKeys = new Set<string>();
-
-    // Barcha StateNode'larni topib, ularning key'larini olish
-    nodes.forEach((node) => {
-      if (node.type === "StateNode") {
-        const nodeData = node.data as StateNodeData;
-        if (nodeData.key && nodeData.key.trim() !== "") {
-          stateKeys.add(nodeData.key);
-        }
-      }
-    });
-
-    return Array.from(stateKeys).sort();
+    return getAvailableStateKeys(nodes);
   }, [nodes]);
 
   // State key o'zgartirish

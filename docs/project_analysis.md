@@ -8,6 +8,7 @@ Sana: 2/24/2026, 9:16:34 PM
 bot-constructor-panel
 ├── .env
 ├── .env.example
+├── .eslintrc.json
 ├── .github
 │   └── workflows
 │       └── deploy.yaml
@@ -33,6 +34,8 @@ bot-constructor-panel
 │   │   └── prepare-commit-msg
 │   └── pre-push
 ├── Dockerfile
+├── IMPLEMENTATION_COMPLETE.md
+├── IMPLEMENTATION_SUMMARY.md
 ├── README.md
 ├── Telegram bot API
 │   └── telegrm-bot-apis.md
@@ -339,6 +342,9 @@ bot-constructor-panel
 │   │   │   │   │   │   ├── components
 │   │   │   │   │   │   │   ├── add-item-modal.tsx
 │   │   │   │   │   │   │   └── form-item.tsx
+│   │   │   │   │   │   ├── components
+│   │   │   │   │   │   │   ├── add-item-modal.tsx
+│   │   │   │   │   │   │   └── form-item.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── HTTPRequestNode
@@ -384,7 +390,6 @@ bot-constructor-panel
 │   │   │   │       │   │   │   ├── SizeInput.tsx
 │   │   │   │       │   │   │   ├── ValueInput.tsx
 │   │   │   │       │   │   │   └── index.tsx
-│   │   │   │       │   │   ├── TriggerHeader.tsx
 │   │   │   │       │   │   └── TypeSelector.tsx
 │   │   │   │       │   ├── index.ts
 │   │   │   │       │   ├── types.ts
@@ -393,7 +398,13 @@ bot-constructor-panel
 │   │   │   │       │   ├── ReplyButtonTrigger.tsx
 │   │   │   │       │   ├── index.ts
 │   │   │   │       │   └── types.ts
-│   │   │   │       └── index.ts
+│   │   │   │       ├── index.ts
+│   │   │   │       └── shared
+│   │   │   │           ├── StateConfigUI.tsx
+│   │   │   │           ├── TriggerHeader.tsx
+│   │   │   │           ├── index.ts
+│   │   │   │           ├── state-config-helpers.ts
+│   │   │   │           └── state-config-types.ts
 │   │   │   ├── panel
 │   │   │   │   ├── elements
 │   │   │   │   │   └── elements.tsx
@@ -401,14 +412,17 @@ bot-constructor-panel
 │   │   │   ├── search
 │   │   │   │   ├── search-panel.tsx
 │   │   │   │   └── search-store.ts
-│   │   │   └── store
-│   │   │       ├── actions.ts
-│   │   │       ├── clipboardSlice.ts
-│   │   │       ├── flowSlice.ts
-│   │   │       ├── historySlice.ts
-│   │   │       ├── index.ts
-│   │   │       ├── project.ts
-│   │   │       └── types.ts
+│   │   │   ├── store
+│   │   │   │   ├── actions.ts
+│   │   │   │   ├── clipboardSlice.ts
+│   │   │   │   ├── flowSlice.ts
+│   │   │   │   ├── historySlice.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── project.ts
+│   │   │   │   └── types.ts
+│   │   │   └── utils
+│   │   │       ├── get-state-keys.ts
+│   │   │       └── index.ts
 │   │   ├── collections
 │   │   │   └── store
 │   │   │       ├── collection-list.ts
