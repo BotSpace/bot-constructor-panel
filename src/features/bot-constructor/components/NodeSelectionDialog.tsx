@@ -11,9 +11,35 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useElements } from "@/features/bot-constructor/data/useElements";
-import { ElementItemType } from "@/types/element-types";
+import { ElementItemType, ElementTypes } from "@/types/element-types";
 import { cn } from "@/lib/utils";
-import { Search } from "lucide-react";
+import {
+    Search,
+    Zap,
+    MessageSquare,
+    Mail,
+    GitBranch,
+    Plug,
+    Code,
+    Star,
+} from "lucide-react";
+
+const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+    "sidebar-triggers": <Zap className="h-4 w-4" />,
+    "sidebar-actions": <MessageSquare className="h-4 w-4" />,
+};
+
+const CATEGORY_ICON_FALLBACKS = [
+    <Mail className="h-4 w-4" key="mail" />,
+    <GitBranch className="h-4 w-4" key="git" />,
+    <Plug className="h-4 w-4" key="plug" />,
+    <Code className="h-4 w-4" key="code" />,
+];
+
+function getCategoryIcon(group: ElementTypes, index: number): React.ReactNode {
+    if (group.id && CATEGORY_ICONS[group.id]) return CATEGORY_ICONS[group.id];
+    return CATEGORY_ICON_FALLBACKS[index % CATEGORY_ICON_FALLBACKS.length];
+}
 
 interface NodeSelectionDialogProps {
     open: boolean;
@@ -27,9 +53,8 @@ export function NodeSelectionDialog({
     onSelect,
 }: NodeSelectionDialogProps) {
     const [searchQuery, setSearchQuery] = useState("");
-    const [activeIndex, setActiveIndex] = useState(0);
+    const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
     const searchInputRef = useRef<HTMLInputElement>(null);
-    const itemRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
 
     const elements = useElements();
 
@@ -39,7 +64,6 @@ export function NodeSelectionDialog({
         []
     );
 
-    // Must have elementlarni barcha guruhlardan yig'ish
     const mustHaveElements = useMemo(() => {
         const found: ElementItemType[] = [];
         for (const id of MUST_HAVE_IDS) {
@@ -54,13 +78,11 @@ export function NodeSelectionDialog({
         return found;
     }, [elements, MUST_HAVE_IDS]);
 
-    // Barcha filtrlangan elementlarning tekis ro'yxati
     const filteredGroups = useMemo(() => {
         const query = searchQuery.trim().toLowerCase();
 
-        // Must have guruhi
-        const mustHaveGroup = {
-            title: "⭐ Must have",
+        const mustHaveGroup: ElementTypes = {
+            title: "⭐ Tez-tez",
             id: "must-have",
             elements: query
                 ? mustHaveElements.filter(
@@ -84,40 +106,23 @@ export function NodeSelectionDialog({
                 .filter((group) => group.elements && group.elements.length > 0)
             : elements;
 
-        // Must have bo'sh bo'lmasa, boshiga qo'shish
         return mustHaveGroup.elements.length > 0
             ? [mustHaveGroup, ...baseGroups]
             : baseGroups;
     }, [elements, searchQuery, mustHaveElements]);
 
-    // Tekis (flat) elementlar ro'yxati — arrow navigation uchun
-    const flatElements = useMemo(() => {
-        const items: ElementItemType[] = [];
-        filteredGroups.forEach((group) => {
-            group.elements?.forEach((el) => items.push(el));
-        });
-        return items;
-    }, [filteredGroups]);
-
-    // Search o'zgarganda active indexni resetlash
+    // Search yoki dialog o'zgarganda resetlash
     useEffect(() => {
-        setActiveIndex(0);
+        setActiveCategoryIndex(0);
     }, [searchQuery]);
 
-    // Dialog ochilganda resetlash
     useEffect(() => {
         if (open) {
             setSearchQuery("");
-            setActiveIndex(0);
+            setActiveCategoryIndex(0);
             setTimeout(() => searchInputRef.current?.focus(), 100);
         }
     }, [open]);
-
-    // Active element ko'rinishga scroll qilish
-    useEffect(() => {
-        const el = itemRefs.current.get(activeIndex);
-        el?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }, [activeIndex]);
 
     const handleSelect = useCallback(
         (element: ElementItemType) => {
@@ -128,45 +133,17 @@ export function NodeSelectionDialog({
         [onSelect, onOpenChange]
     );
 
-    // Keyboard navigation
-    const handleKeyDown = useCallback(
-        (e: React.KeyboardEvent) => {
-            const total = flatElements.length;
-            if (total === 0) return;
-
-            switch (e.key) {
-                case "ArrowDown":
-                    e.preventDefault();
-                    setActiveIndex((prev) => (prev + 1) % total);
-                    break;
-                case "ArrowUp":
-                    e.preventDefault();
-                    setActiveIndex((prev) => (prev - 1 + total) % total);
-                    break;
-                case "Enter":
-                    e.preventDefault();
-                    if (flatElements[activeIndex]) {
-                        handleSelect(flatElements[activeIndex]);
-                    }
-                    break;
-            }
-        },
-        [flatElements, activeIndex, handleSelect]
-    );
-
-    // Har bir elementning tekis indexini hisoblash
-    let flatIndex = -1;
+    const activeGroup = filteredGroups[activeCategoryIndex];
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
-                className="sm:max-w-[520px] gap-0 p-0 overflow-hidden"
-                onKeyDown={handleKeyDown}
+                className="sm:max-w-[640px] gap-0 p-0 overflow-hidden"
             >
                 <DialogHeader className="px-5 pt-5 pb-3">
-                    <DialogTitle>Yangi node turini tanlang</DialogTitle>
+                    <DialogTitle>Node qo&#39;shish</DialogTitle>
                     <DialogDescription>
-                        Edge ulanadigan yangi node turini tanlang
+                        Kategoriyani tanlang va kerakli node ni bosing
                     </DialogDescription>
                 </DialogHeader>
 
@@ -184,77 +161,93 @@ export function NodeSelectionDialog({
                     </div>
                 </div>
 
-                {/* Element ro'yxati */}
-                <ScrollArea className="h-[400px] border-t">
-                    <div className="p-3">
-                        {filteredGroups.length === 0 ? (
-                            <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-                                Hech narsa topilmadi.
-                            </div>
-                        ) : (
-                            filteredGroups.map((group, groupIndex) => (
-                                <div key={group.id || groupIndex} className="mb-4 last:mb-0">
-                                    {/* Guruh sarlavhasi */}
-                                    <div className="px-2 pb-2 pt-1">
-                                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                            {group.title}
+                {/* Two-column layout */}
+                <div className="flex border-t h-[420px]">
+                    {/* Left: Categories */}
+                    <div className="w-[200px] border-r bg-muted/30 flex flex-col">
+                        <ScrollArea className="flex-1">
+                            <div className="py-2">
+                                {filteredGroups.map((group, index) => (
+                                    <button
+                                        key={group.id || index}
+                                        onMouseEnter={() => setActiveCategoryIndex(index)}
+                                        onClick={() => setActiveCategoryIndex(index)}
+                                        className={cn(
+                                            "flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors",
+                                            "hover:bg-accent/60",
+                                            index === activeCategoryIndex &&
+                                            "bg-accent text-accent-foreground font-medium border-r-2 border-primary"
+                                        )}
+                                    >
+                                        <span className="shrink-0 text-muted-foreground">
+                                            {group.id === "must-have" ? (
+                                                <Star className="h-4 w-4 text-amber-500" />
+                                            ) : (
+                                                getCategoryIcon(group, index)
+                                            )}
                                         </span>
-                                    </div>
+                                        <span className="truncate">{group.title}</span>
+                                        <span className="ml-auto text-xs text-muted-foreground tabular-nums">
+                                            {group.elements?.length || 0}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                    </div>
 
-                                    {/* Elementlar */}
-                                    <div className="grid gap-1">
-                                        {group.elements?.map((element) => {
-                                            flatIndex++;
-                                            const currentIndex = flatIndex;
-                                            const isActive = currentIndex === activeIndex;
-
-                                            return (
-                                                <button
-                                                    key={element.triggerId}
-                                                    ref={(el) => {
-                                                        if (el) {
-                                                            itemRefs.current.set(currentIndex, el);
-                                                        } else {
-                                                            itemRefs.current.delete(currentIndex);
-                                                        }
-                                                    }}
-                                                    onClick={() => handleSelect(element)}
-                                                    onMouseEnter={() => setActiveIndex(currentIndex)}
+                    {/* Right: Nodes */}
+                    <div className="flex-1 flex flex-col min-w-0">
+                        {activeGroup ? (
+                            <>
+                                <div className="px-4 py-3 border-b bg-muted/20">
+                                    <h3 className="text-sm font-semibold text-foreground">
+                                        {activeGroup.title}
+                                    </h3>
+                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                        {activeGroup.elements?.length || 0} ta node mavjud
+                                    </p>
+                                </div>
+                                <ScrollArea className="flex-1">
+                                    <div className="p-2 grid gap-1">
+                                        {activeGroup.elements?.map((element) => (
+                                            <button
+                                                key={element.triggerId}
+                                                onClick={() => handleSelect(element)}
+                                                className={cn(
+                                                    "group flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-all",
+                                                    "hover:bg-accent/50 focus-visible:outline-none",
+                                                    "active:scale-[0.98] transition-transform duration-100"
+                                                )}
+                                            >
+                                                <div
                                                     className={cn(
-                                                        "group flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors",
-                                                        "hover:bg-accent/50 focus-visible:outline-none",
-                                                        "active:scale-[0.99] transition-transform duration-100",
-                                                        isActive && "bg-accent/50 ring-1 ring-ring/30"
+                                                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-md border text-lg",
+                                                        element.color
                                                     )}
                                                 >
-                                                    {/* Icon */}
-                                                    <div
-                                                        className={cn(
-                                                            "flex h-9 w-9 shrink-0 items-center justify-center rounded-md border text-lg",
-                                                            element.color
-                                                        )}
-                                                    >
-                                                        {element.icon}
-                                                    </div>
-
-                                                    {/* Kontent */}
-                                                    <div className="flex flex-col gap-0.5 min-w-0">
-                                                        <span className="text-sm font-medium leading-tight text-foreground group-hover:text-foreground">
-                                                            {element.name}
-                                                        </span>
-                                                        <span className="text-xs leading-snug text-muted-foreground line-clamp-1">
-                                                            {element.description}
-                                                        </span>
-                                                    </div>
-                                                </button>
-                                            );
-                                        })}
+                                                    {element.icon}
+                                                </div>
+                                                <div className="flex flex-col gap-0.5 min-w-0">
+                                                    <span className="text-sm font-medium leading-tight text-foreground">
+                                                        {element.name}
+                                                    </span>
+                                                    <span className="text-xs leading-snug text-muted-foreground line-clamp-2">
+                                                        {element.description}
+                                                    </span>
+                                                </div>
+                                            </button>
+                                        ))}
                                     </div>
-                                </div>
-                            ))
+                                </ScrollArea>
+                            </>
+                        ) : (
+                            <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
+                                Hech narsa topilmadi
+                            </div>
                         )}
                     </div>
-                </ScrollArea>
+                </div>
             </DialogContent>
         </Dialog>
     );
