@@ -27,6 +27,7 @@ import {
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
     "sidebar-triggers": <Zap className="h-4 w-4" />,
     "sidebar-actions": <MessageSquare className="h-4 w-4" />,
+    "sidebar-plugins": <Plug className="h-4 w-4" />,
 };
 
 const CATEGORY_ICON_FALLBACKS = [

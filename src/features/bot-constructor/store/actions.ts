@@ -142,6 +142,7 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         pluginName: "",
         pluginDescription: "",
         params: {},
+        paramsSchema: {},
         outputs: [],
       } as SubFlowNodeData;
 
@@ -179,7 +180,10 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
       id: generateNodeId(),
       type: element.triggerId,
       position,
-      data: getDefaultNodeData(element.triggerId || ""),
+      data: {
+        ...getDefaultNodeData(element.triggerId || ""),
+        ...(element.defaultData || {}),
+      },
     };
     set({ nodes: [...get().nodes, newNode], isDirty: true });
   },
