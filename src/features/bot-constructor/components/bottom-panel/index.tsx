@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useState } from 'react'
 import { BottomPanelButton } from './components/button'
-import { Database, Plus, Search } from 'lucide-react'
+import { Database, Keyboard, Plus, Search } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -16,6 +16,7 @@ import { ReleasePanel } from '@/components/layout/components/relas/relas'
 import DebugingButtons from '@/components/layout/components/debug/debug'
 import BottomButtonGroup from './components/button-group'
 import { NodeSelectionDialog } from '../NodeSelectionDialog'
+import { ShortcutsDialog } from '../ShortcutsDialog'
 import { useFlowStore } from '../../store'
 import { useReactFlow } from 'reactflow'
 import { ElementItemType } from '@/types/element-types'
@@ -27,6 +28,7 @@ function BottomPanel({ }: Props) {
     const { isOpen, height, toggle } = debugConsoleStore();
     const { toggleSearchPanel } = useSearchStore();
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false);
+    const [shortcutsOpen, setShortcutsOpen] = useState(false);
     const { addNode } = useFlowStore();
     const { getViewport } = useReactFlow();
 
@@ -78,10 +80,11 @@ function BottomPanel({ }: Props) {
                         <Database size={20} />
                     </BottomPanelButton>
 
+                    <BottomPanelButton onClick={() => setShortcutsOpen(true)} title="Shortcutlar (?)">
+                        <Keyboard size={20} />
+                    </BottomPanelButton>
+
                     <DebugingButtons />
-                    {/* <BottomPanelButton>
-                        <PlayIcon />
-                    </BottomPanelButton> */}
 
                     <Separator className='!h-[2px] !h-[40px]' orientation="vertical" />
 
@@ -94,6 +97,11 @@ function BottomPanel({ }: Props) {
             open={nodeDialogOpen}
             onOpenChange={setNodeDialogOpen}
             onSelect={handleAddNode}
+        />
+
+        <ShortcutsDialog
+            open={shortcutsOpen}
+            onOpenChange={setShortcutsOpen}
         />
     </>
     )
