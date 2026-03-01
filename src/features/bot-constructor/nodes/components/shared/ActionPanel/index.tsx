@@ -68,7 +68,7 @@ function SectionWrapper({
   );
 }
 
-export function ActionPanel({ disableNotification, parseMode, protectContent, id, keyboard, recipients, hideHandlers }: ActionPanelTypes) {
+export function ActionPanel({ disableNotification, parseMode, protectContent, id, keyboard, recipients, hideHandlers = true }: ActionPanelTypes) {
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
