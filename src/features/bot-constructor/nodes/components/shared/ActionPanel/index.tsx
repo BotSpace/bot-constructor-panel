@@ -68,6 +68,8 @@ function SectionWrapper({
   );
 }
 
+const DEFAULT_RECIPIENTS = { sendToSender: true, additionalIds: [] };
+
 export function ActionPanel({ disableNotification, parseMode, protectContent, id, keyboard, recipients, hideHandlers = true }: ActionPanelTypes) {
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
