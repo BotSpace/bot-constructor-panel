@@ -44,6 +44,7 @@ interface Message extends AgentMessage {
 interface AgentChatDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  projectId?: string;
 }
 
 const phaseLabel: Record<string, string> = {
@@ -52,7 +53,7 @@ const phaseLabel: Record<string, string> = {
   done: "Tayyor ✓",
 };
 
-export function AgentChatDialog({ open, onOpenChange }: AgentChatDialogProps) {
+export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDialogProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessions, setSessions] = useState<AgentSession[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -63,7 +64,7 @@ export function AgentChatDialog({ open, onOpenChange }: AgentChatDialogProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { setNodes, setEdges, formatFlow, nodes, edges } = useFlowStore();
+  const { setNodes, setEdges, formatFlow } = useFlowStore();
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -84,9 +85,7 @@ export function AgentChatDialog({ open, onOpenChange }: AgentChatDialogProps) {
 
   const createNewSession = useCallback(async () => {
     try {
-      // Pass current project flow so agent can extend it
-      const existingFlow = nodes.length > 0 ? { nodes, edges } : undefined;
-      const { session_id } = await createAgentSession(existingFlow);
+      const { session_id } = await createAgentSession(projectId);
       setSessionId(session_id);
       setMessages([
         {
