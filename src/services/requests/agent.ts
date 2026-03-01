@@ -30,9 +30,9 @@ export interface AgentMessage {
 
 // ── API ──────────────────────────────────────────────────────────────────
 
-/** Create a new agent session */
-export async function createAgentSession(): Promise<{ session_id: string }> {
-  const res = await instanceAuth.post(`${AGENT_BASE}/sessions`);
+/** Create a new agent session, optionally with the current project flow */
+export async function createAgentSession(existingFlow?: { nodes: any[]; edges: any[] }): Promise<{ session_id: string }> {
+  const res = await instanceAuth.post(`${AGENT_BASE}/sessions`, existingFlow ? { existing_flow: existingFlow } : {});
   return res.data;
 }
 

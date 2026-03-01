@@ -63,7 +63,7 @@ export function AgentChatDialog({ open, onOpenChange }: AgentChatDialogProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { setNodes, setEdges, formatFlow } = useFlowStore();
+  const { setNodes, setEdges, formatFlow, nodes, edges } = useFlowStore();
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -84,7 +84,9 @@ export function AgentChatDialog({ open, onOpenChange }: AgentChatDialogProps) {
 
   const createNewSession = useCallback(async () => {
     try {
-      const { session_id } = await createAgentSession();
+      // Pass current project flow so agent can extend it
+      const existingFlow = nodes.length > 0 ? { nodes, edges } : undefined;
+      const { session_id } = await createAgentSession(existingFlow);
       setSessionId(session_id);
       setMessages([
         {
