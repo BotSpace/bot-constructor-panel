@@ -143,7 +143,7 @@ export function NodeSelectionDialog({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
-                className="sm:max-w-[640px] gap-0 p-0 overflow-hidden"
+                className="sm:max-w-[720px] gap-0 p-0 overflow-hidden"
             >
                 <DialogHeader className="px-5 pt-5 pb-3">
                     <DialogTitle>Node qo&#39;shish</DialogTitle>
@@ -167,10 +167,10 @@ export function NodeSelectionDialog({
                 </div>
 
                 {/* Two-column layout */}
-                <div className="flex border-t h-[420px]">
+                <div className="flex border-t h-[450px]">
                     {/* Left: Categories */}
-                    <div className="w-[200px] border-r bg-muted/30 flex flex-col">
-                        <ScrollArea className="flex-1">
+                    <div className="w-[240px] border-r bg-muted/30 flex flex-col min-h-0 overflow-hidden">
+                        <ScrollArea className="h-full">
                             <div className="py-2">
                                 {filteredGroups.map((group, index) => (
                                     <button
