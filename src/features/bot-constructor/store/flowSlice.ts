@@ -214,4 +214,12 @@ export const createFlowSlice: StateCreator<
       edges: get().edges.map((e) => ({ ...e, selected: true })),
     });
   },
+
+  setNodes: (nodes) => {
+    set({ nodes, isDirty: true });
+  },
+
+  setEdges: (edges) => {
+    set({ edges, isDirty: true });
+  },
 });

@@ -9,6 +9,8 @@ export interface FlowSlice {
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
+  setNodes: (nodes: Node[]) => void;
+  setEdges: (edges: Edge[]) => void;
   updateNodeData: (nodeId: string, newData: any) => void;
   updateEdgeData: (edgeId: string, newData: any) => void;
   deleteSelectedElements: () => void;
