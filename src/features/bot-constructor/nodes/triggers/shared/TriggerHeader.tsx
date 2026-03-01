@@ -69,10 +69,6 @@ export const TriggerHeader = ({
         </div>
         <div className="flex items-center gap-2 ml-2">
 
-          <Button className="lg:hidden" onClick={deleteSelectedElement} size={'icon'}>
-            <Trash />
-          </Button>
-
           <div
             className={`w-2 h-2 rounded-full transition-all ${isConfigured
               ? "bg-green-500 shadow-sm shadow-green-500/50"

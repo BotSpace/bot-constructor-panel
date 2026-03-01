@@ -50,12 +50,6 @@ export const NodeHeader = ({
             </Badge>
           )}
 
-          <div className={cn('lg:hidden')}>
-            <Button onClick={deleteSelectedElement} size={'icon'}>
-              <Trash />
-            </Button>
-          </div>
-
           {onToggleCollapse && (
             <ChevronDown
               className={cn(
