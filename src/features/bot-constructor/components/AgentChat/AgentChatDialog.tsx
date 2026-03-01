@@ -6,6 +6,7 @@ import {
   createAgentSession,
   chatWithAgent,
   listAgentSessions,
+  getAgentHistory,
   deleteAgentSession,
   type AgentMessage,
   type AgentChatResponse,
@@ -78,8 +79,23 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
     try {
       const list = await listAgentSessions();
       setSessions(list);
+      return list;
     } catch {
-      // silent
+      return [];
+    }
+  }, []);
+
+  // Load history for an existing session
+  const loadSessionHistory = useCallback(async (sid: string) => {
+    try {
+      const history = await getAgentHistory(sid);
+      if (history.length > 0) {
+        setMessages(history.map((m, i) => ({ ...m, id: String(i) })));
+      } else {
+        setMessages([{ id: "welcome", role: "assistant", content: "Suhbat davom etmoqda..." }]);
+      }
+    } catch {
+      setMessages([{ id: "welcome", role: "assistant", content: "Suhbat davom etmoqda..." }]);
     }
   }, []);
 
@@ -87,6 +103,8 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
     try {
       const { session_id } = await createAgentSession(projectId);
       setSessionId(session_id);
+      const storageKey = `agent_session_${projectId ?? "default"}`;
+      localStorage.setItem(storageKey, session_id);
       setMessages([
         {
           id: "welcome",
@@ -101,21 +119,17 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
     } catch {
       toast.error("Sessiya yaratilmadi");
     }
-  }, [loadSessions]);
+  }, [loadSessions, projectId]);
 
-  const openSession = useCallback((sid: string) => {
+  const openSession = useCallback(async (sid: string) => {
     setSessionId(sid);
     setPhase("chat");
     setPendingFlow(null);
-    setMessages([
-      {
-        id: "welcome",
-        role: "assistant",
-        content: "Suhbat davom etmoqda...",
-      },
-    ]);
+    const storageKey = `agent_session_${projectId ?? "default"}`;
+    localStorage.setItem(storageKey, sid);
+    await loadSessionHistory(sid);
     setTimeout(() => inputRef.current?.focus(), 100);
-  }, []);
+  }, [loadSessionHistory, projectId]);
 
   const handleDeleteSession = useCallback(
     async (e: React.MouseEvent, sid: string) => {
@@ -125,6 +139,8 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
         if (sessionId === sid) {
           setSessionId(null);
           setMessages([]);
+          const storageKey = `agent_session_${projectId ?? "default"}`;
+          localStorage.removeItem(storageKey);
         }
         setSessions((prev) => prev.filter((s) => s.session_id !== sid));
         toast.success("Suhbat o'chirildi");
@@ -132,17 +148,32 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
         toast.error("O'chirishda xatolik");
       }
     },
-    [sessionId]
+    [sessionId, projectId]
   );
 
   useEffect(() => {
-    if (open) {
-      loadSessions();
-      if (!sessionId) {
-        createNewSession();
+    if (!open) return;
+
+    const init = async () => {
+      const list = await loadSessions();
+
+      // Try to restore last used session for this project
+      const storageKey = `agent_session_${projectId ?? "default"}`;
+      const savedId = localStorage.getItem(storageKey);
+      const existing = savedId ? list.find((s) => s.session_id === savedId) : null;
+
+      if (existing) {
+        setSessionId(existing.session_id);
+        setPhase(existing.phase);
+        await loadSessionHistory(existing.session_id);
+      } else if (!sessionId) {
+        await createNewSession();
       }
+
       setTimeout(() => inputRef.current?.focus(), 200);
-    }
+    };
+
+    init();
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const sendMessage = async () => {
