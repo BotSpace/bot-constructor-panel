@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 import { Plus, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import { ActionPanel } from "../../components/shared/ActionPanel";
 
 const PollNodeComponent = ({
