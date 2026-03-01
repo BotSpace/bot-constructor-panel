@@ -336,35 +336,37 @@ export default function Constructor() {
   // Node tanlanganda yaratish va ulash
   const handleNodeSelected = useCallback(
     (element: ElementItemType) => {
-      if (!pendingConnectionRef.current) return;
+      if (pendingConnectionRef.current) {
+        const { source, sourceHandle, position } = pendingConnectionRef.current;
 
-      const { source, sourceHandle, position } = pendingConnectionRef.current;
+        // Yangi node yaratish
+        addNode(element, position);
 
-      // Yangi node yaratish
-      addNode(element, position);
+        // Yangi yaratilgan node'ni topish va edge yaratish
+        setTimeout(() => {
+          const currentNodes = useFlowStore.getState().nodes;
+          const newNode = currentNodes[currentNodes.length - 1];
 
-      // Yangi yaratilgan node'ni topish va edge yaratish
-      setTimeout(() => {
-        const currentNodes = useFlowStore.getState().nodes;
-        const newNode = currentNodes[currentNodes.length - 1]; // Oxirgi node yangi yaratilgan
-
-        if (newNode) {
-          const connection: Connection = {
-            source,
-            sourceHandle: sourceHandle ?? null,
-            target: newNode.id,
-            targetHandle: null,
-          };
-
-          // Edge yaratish
-          onConnect(connection);
-        }
-
-        // Tozalash
-        pendingConnectionRef.current = null;
-      }, 50);
+          if (newNode) {
+            const connection: Connection = {
+              source,
+              sourceHandle: sourceHandle ?? null,
+              target: newNode.id,
+              targetHandle: null,
+            };
+            onConnect(connection);
+          }
+          pendingConnectionRef.current = null;
+        }, 50);
+      } else {
+        // Ctrl+N yoki boshqa usulda ochilganda — markazga qo'shish
+        const { x, y, zoom } = getViewport();
+        const centerX = (-x + window.innerWidth / 2) / zoom;
+        const centerY = (-y + window.innerHeight / 2) / zoom;
+        addNode(element, { x: centerX, y: centerY });
+      }
     },
-    [addNode, onConnect]
+    [addNode, onConnect, getViewport]
   );
 
   // Dialog yopilganda tozalash
