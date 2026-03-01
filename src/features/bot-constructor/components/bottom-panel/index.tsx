@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useState } from 'react'
 import { BottomPanelButton } from './components/button'
-import { Database, Keyboard, Plus, Search } from 'lucide-react'
+import { Bot, Database, Keyboard, Plus, Search } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -17,6 +17,7 @@ import DebugingButtons from '@/components/layout/components/debug/debug'
 import BottomButtonGroup from './components/button-group'
 import { NodeSelectionDialog } from '../NodeSelectionDialog'
 import { ShortcutsDialog } from '../ShortcutsDialog'
+import { AgentChatDialog } from '../AgentChat/AgentChatDialog'
 import { useFlowStore } from '../../store'
 import { useReactFlow } from 'reactflow'
 import { ElementItemType } from '@/types/element-types'
@@ -29,6 +30,7 @@ function BottomPanel({ }: Props) {
     const { toggleSearchPanel } = useSearchStore();
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false);
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
+    const [agentOpen, setAgentOpen] = useState(false);
     const { addNode } = useFlowStore();
     const { getViewport } = useReactFlow();
 
@@ -84,6 +86,10 @@ function BottomPanel({ }: Props) {
                         <Keyboard size={20} />
                     </BottomPanelButton>
 
+                    <BottomPanelButton onClick={() => setAgentOpen(true)} title="AI Agent">
+                        <Bot size={20} />
+                    </BottomPanelButton>
+
                     <DebugingButtons />
 
                     <Separator className='!h-[2px] !h-[40px]' orientation="vertical" />
@@ -102,6 +108,11 @@ function BottomPanel({ }: Props) {
         <ShortcutsDialog
             open={shortcutsOpen}
             onOpenChange={setShortcutsOpen}
+        />
+
+        <AgentChatDialog
+            open={agentOpen}
+            onOpenChange={setAgentOpen}
         />
     </>
     )
