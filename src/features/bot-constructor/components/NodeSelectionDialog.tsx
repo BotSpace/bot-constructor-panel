@@ -65,7 +65,7 @@ export function NodeSelectionDialog({
 
     // Must have element ID lari
     const MUST_HAVE_IDS = useMemo(
-        () => ["SendTextMessageNode", "MessageTriggerNode", "EditMessageNode"] as const,
+        () => ["CommandTriggerNode", "SendTextMessageNode", "MessageTriggerNode", "EditMessageNode"] as const,
         []
     );
 
