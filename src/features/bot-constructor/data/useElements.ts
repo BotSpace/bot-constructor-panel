@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { ElementTypes } from "@/types/element-types";
 import { useQuery } from "@tanstack/react-query";
-import { getActiveSubFlows } from "@/services/requests/plugin";
+import { getActiveSubFlows, getPluginCategories } from "@/services/requests/plugin";
 
 export function useElements(): ElementTypes[] {
   const t = useTranslations();
@@ -12,29 +12,50 @@ export function useElements(): ElementTypes[] {
     staleTime: 1000 * 60 * 5,
   });
 
-  const pluginElements: ElementTypes | null =
-    pluginsData?.data && pluginsData.data.length > 0
-      ? {
-          title: "Pluginlar",
-          id: "sidebar-plugins",
-          elements: pluginsData.data.map((plugin) => ({
-            type: "plugin" as const,
-            name: plugin.name,
-            description: plugin.description || "Plugin",
-            icon: "🔌",
-            color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-            triggerId: "SubFlowNode" as const,
-            defaultData: {
-              slug: plugin.slug,
-              pluginName: plugin.name,
-              pluginDescription: plugin.description,
-              outputs: plugin.outputs || [],
-              paramsSchema: plugin.params_schema || {},
-              params: {},
-            },
-          })),
-        }
-      : null;
+  const { data: categoriesData } = useQuery({
+    queryKey: ["plugin-categories"],
+    queryFn: () => getPluginCategories(),
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Group plugins by their API category into separate ElementTypes groups
+  const pluginGroups: ElementTypes[] = [];
+  if (pluginsData?.data && pluginsData.data.length > 0) {
+    const categories = categoriesData?.data || [];
+    const catMap = new Map(categories.map((c) => [c.slug, c]));
+
+    // Group plugins by category slug
+    const grouped = new Map<string, typeof pluginsData.data>();
+    for (const plugin of pluginsData.data) {
+      const key = plugin.category || "uncategorized";
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key)!.push(plugin);
+    }
+
+    for (const [catSlug, plugins] of grouped) {
+      const cat = catMap.get(catSlug);
+      pluginGroups.push({
+        title: cat?.name || catSlug,
+        id: `plugin-${catSlug}`,
+        elements: plugins.map((plugin) => ({
+          type: "plugin" as const,
+          name: plugin.name,
+          description: plugin.description || "Plugin",
+          icon: plugin.icon || cat?.icon || "🔌",
+          color: cat?.color || "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+          triggerId: "SubFlowNode" as const,
+          defaultData: {
+            slug: plugin.slug,
+            pluginName: plugin.name,
+            pluginDescription: plugin.description,
+            outputs: plugin.outputs || [],
+            paramsSchema: plugin.params_schema || {},
+            params: {},
+          },
+        })),
+      });
+    }
+  }
 
   const baseElements: ElementTypes[] = [
     {
@@ -399,9 +420,5 @@ export function useElements(): ElementTypes[] {
     },
   ];
 
-  if (pluginElements) {
-    baseElements.push(pluginElements);
-  }
-
-  return baseElements;
+  return [...baseElements, ...pluginGroups];
 }

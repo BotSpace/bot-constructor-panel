@@ -39,6 +39,10 @@ const CATEGORY_ICON_FALLBACKS = [
 
 function getCategoryIcon(group: ElementTypes, index: number): React.ReactNode {
     if (group.id && CATEGORY_ICONS[group.id]) return CATEGORY_ICONS[group.id];
+    // Plugin categories: use the first element's icon (emoji from API)
+    if (group.id?.startsWith("plugin-") && group.elements?.[0]?.icon) {
+        return <span className="text-sm">{group.elements[0].icon}</span>;
+    }
     return CATEGORY_ICON_FALLBACKS[index % CATEGORY_ICON_FALLBACKS.length];
 }
 

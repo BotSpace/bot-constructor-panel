@@ -3,6 +3,7 @@ export interface SubFlowPlugin {
   name: string;
   slug: string;
   description: string;
+  icon: string;
   version: string;
   category: string;
   params_schema: Record<string, unknown>;
@@ -24,4 +25,19 @@ export interface SubFlowListResponse {
   page: number;
   per_page: number;
   total_pages: number;
+}
+
+export interface PluginCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  color: string;
+  order: number;
+  active: boolean;
+}
+
+export interface PluginCategoryListResponse {
+  data: PluginCategory[];
 }
