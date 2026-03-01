@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "husky install",
     "dev:mono": "MONO=1 next dev --turbopack --port 3001",
-    "dev": "next dev --port 3001",
+    "dev": "next dev --port 3001 --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -73,6 +73,7 @@
     "react-resizable-panels": "^3.0.6",
     "react-syntax-highlighter": "^15.6.1",
     "react-textarea-autosize": "^8.5.9",
+    "react-use-measure": "^2.1.7",
     "reactflow": "^11.11.4",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",

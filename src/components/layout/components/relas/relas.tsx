@@ -12,7 +12,6 @@ import { useParams } from "next/navigation";
 import React from "react";
 import { AddEditEnvDialog } from "../add-env";
 import {
-  Activity,
   Bot,
   ChevronRight,
   ExternalLink,

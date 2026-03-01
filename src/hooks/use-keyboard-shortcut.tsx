@@ -10,18 +10,20 @@ export function useKeyboardShortcut(
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const pressedKeys = [
-        event.ctrlKey && "Control",
-        event.shiftKey && "Shift",
-        event.altKey && "Alt",
-        event.metaKey && "Meta",
+        event.ctrlKey ? "Control" : null,
+        event.shiftKey ? "Shift" : null,
+        event.altKey ? "Alt" : null,
+        event.metaKey ? "Meta" : null,
         event.key,
       ].filter(Boolean) as string[];
 
-      const isMatch = keys.every((key) =>
-        pressedKeys.some(
-          (pressed) => pressed.toLowerCase() === key.toLowerCase()
-        )
-      );
+      // EXACT MATCH
+      const normalizedPressed = pressedKeys.map(k => k.toLowerCase()).sort();
+      const normalizedKeys = keys.map(k => k.toLowerCase()).sort();
+
+      const isMatch =
+        normalizedPressed.length === normalizedKeys.length &&
+        normalizedPressed.every((k, i) => k === normalizedKeys[i]);
 
       if (isMatch) {
         if (options.preventDefault) {

@@ -35,6 +35,8 @@ import { useIsMobile } from "@/hooks/use-is-mobile";
 import { useTheme } from "next-themes";
 import { NodeSelectionDialog } from "./components/NodeSelectionDialog";
 import { Connection, addEdge } from "reactflow";
+import BottomPanel from "./components/bottom-panel";
+import { ReleasePanel } from "@/components/layout/components/relas/relas";
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
@@ -344,7 +346,6 @@ export default function Constructor() {
   }, []);
 
 
-
   const isValidConnection = (connection: Connection) => {
     // source va target bir xil bo‘lsa false qaytaradi
     return connection.source !== connection.target;
@@ -354,15 +355,10 @@ export default function Constructor() {
   return (
     <>
       <ContextMenu>
-        <ContextMenuTrigger
-          className={cn({
-            "col-span-9": searchPanelIsOpen,
-            "col-span-12": !searchPanelIsOpen,
-          })}
-        >
+        <ContextMenuTrigger>
           <div
             ref={reactFlowWrapper}
-            className="col-span-10 h-[calc(100vh-56px)] outline-none relative" // `tabIndex` hook ichida o'rnatiladi
+            className="h-screen"
             onDrop={onDrop}
             onDragOver={onDragOver}
             onMouseDown={handleContainerClick}
