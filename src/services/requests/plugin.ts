@@ -1,5 +1,5 @@
 import axios from "axios";
-import { SubFlowListResponse, SubFlowPlugin } from "@/types/http/plugin";
+import { SubFlowListResponse, SubFlowPlugin, PluginCategoryListResponse } from "@/types/http/plugin";
 
 const PLUGIN_API_URL =
   process.env.NEXT_PUBLIC_PLUGIN_API || "https://api.botmother.uz/api/engine-plugin";
@@ -38,4 +38,9 @@ export async function getSubFlowSchema(
 
 export async function getActiveSubFlows(): Promise<SubFlowListResponse> {
   return getSubFlows({ active: "true", per_page: 100 });
+}
+
+export async function getPluginCategories(): Promise<PluginCategoryListResponse> {
+  const { data } = await pluginInstance.get("/categories", { params: { active: "true" } });
+  return data;
 }
