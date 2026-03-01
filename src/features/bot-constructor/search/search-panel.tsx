@@ -5,13 +5,13 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { SearchIcon } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useFlowStore } from "../store";
 import { useReactFlow } from "reactflow";
 import { useSearchStore } from "./search-store";
-import { cn } from "@/lib/utils";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 
 type Props = {};
 
@@ -39,61 +39,63 @@ function SearchPanel({ }: Props) {
     if (!search.trim()) return nodes; // bo‘sh bo‘lsa hamma node qaytadi
 
     return nodes.filter((item) => {
-      console.log(item)
-      const value = item.data.messageText || item.data.caption || "";
-
+      const value = getItemTextConten(item);
+      if (!!value) return false;
       return value.toLowerCase().includes(search.toLowerCase());
     });
   }, [search, nodes, searchPanelIsOpen]);
 
   return (
-    <div
-      className={cn("h-[calc(100vh-56px)] bg-secondary p-3 overflow-auto", {
-        "col-span-3 flex flex-col": searchPanelIsOpen,
-        "hidden col-end-0": !searchPanelIsOpen,
-      })}
-    >
-      {/* Header */}
-      <InputGroup>
-        <InputGroupInput
-          onChange={(e) => setSearch(e.currentTarget.value)}
-          placeholder="Search..."
-        />
-        <InputGroupAddon>
-          <SearchIcon />
-        </InputGroupAddon>
-        <InputGroupButton>
-          <KbdGroup>
-            <Kbd>⌘</Kbd>
-            <Kbd>f</Kbd>
-          </KbdGroup>
-        </InputGroupButton>
-      </InputGroup>
+    <Drawer direction="right" open={searchPanelIsOpen} onOpenChange={toggleSearchPanel}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Search</DrawerTitle>
+        </DrawerHeader>
+        <div
+          className="px-4"
+        >
+          {/* Header */}
+          <InputGroup>
+            <InputGroupInput
+              autoFocus={true}
+              onChange={(e) => setSearch(e.currentTarget.value)}
+              placeholder="Search..."
+            />
+            <InputGroupAddon>
+              <SearchIcon />
+            </InputGroupAddon>
+            <InputGroupButton>
+              <KbdGroup>
+                <Kbd>⌘</Kbd>
+                <Kbd>f</Kbd>
+              </KbdGroup>
+            </InputGroupButton>
+          </InputGroup>
+          <div className="mt-3 space-y-2">
+            {search && filteredNodes.map((item) => (
+              <div
+                onClick={() => {
+                  console.log(item);
+                  // @ts-ignore
+                  const x = item.position.x + item.width / 2;
+                  // @ts-ignore
+                  const y = item.position.y + item.height / 2;
+                  const zoom = 0.8;
 
-      <div className="mt-3 space-y-2">
-        {filteredNodes.map((item) => (
-          <div
-            onClick={() => {
-              console.log(item);
-              // @ts-ignore
-              const x = item.position.x + item.width / 2;
-              // @ts-ignore
-              const y = item.position.y + item.height / 2;
-              const zoom = 0.8;
-
-              setCenter(x, y, { zoom, duration: 1000 }); // 1 soniya davomida silliq boradi
-            }}
-            key={item.id}
-            className="p-3 rounded-xl bg-card shadow-sm border hover:bg-accent hover:text-accent-foreground transition cursor-pointer"
-          >
-            <p className="text-sm font-medium line-clamp-2">
-              {getItemTextConten(item)}
-            </p>
-
+                  setCenter(x, y, { zoom, duration: 1000 }); // 1 soniya davomida silliq boradi
+                }}
+                key={item.id}
+                className="p-3 rounded-xl bg-card shadow-sm border hover:bg-accent hover:text-accent-foreground transition cursor-pointer"
+              >
+                <p className="text-sm font-medium line-clamp-2">
+                  {getItemTextConten(item)}
+                </p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

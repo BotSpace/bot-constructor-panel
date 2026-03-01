@@ -1,28 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react"; // Kerakli hook'larni import qilamiz
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect, useState } from "react"; // Kerakli hook'larni import qilamiz
 import Constructor from "@/features/bot-constructor/constructor";
-import { useElements } from "@/features/bot-constructor/data/useElements";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ConstructorPageHeader } from "@/components/layout/header";
-import { DebugConsole } from "@/components/layout/components/debug-console";
+import { DebugConsole } from "@/components/layout/components/debug-console/debug-console";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
 import { useTranslations } from "next-intl";
 import { ReactFlowProvider } from "reactflow";
 import SearchPanel from "@/features/bot-constructor/search/search-panel";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { OrientationGuard } from "@/components/common/OrientationGuard";
-import { TourWelcomeModal } from "@/features/bot-constructor/guide-tour/tour-welcome";
-import Panel from "@/features/bot-constructor/panel/pane";
+import BottomPanel from "@/features/bot-constructor/components/bottom-panel";
+import { ReleasePanel } from "@/components/layout/components/relas/relas";
 
 export default function Page() {
   const { id }: { id: string } = useParams();
-  const t = useTranslations();
 
   const { loadProject, project } = useProjectStore();
   const { loadCollections } = useCollectionStore();
@@ -47,31 +41,21 @@ export default function Page() {
 
   if (isMobile && !isOriented)
     return <OrientationGuard handleOrientDevice={() => setIsOriented(true)} />;
+
+  if (!project) return <ConstructorLoadingSkeletions />;
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Header */}
-      <ConstructorPageHeader />
+    <main>
+      <ReactFlowProvider>
+        {/* constructor */}
+        <Constructor />
 
-      <TourWelcomeModal />
+        {/* Widgets */}
+        <SearchPanel />
+        <DebugConsole />
 
-      <div className="flex">
-        {/* Components Panel */}
-        <Panel />
-
-        {project ? (
-          <main className="grid grid-cols-12 relative w-full">
-            <ReactFlowProvider>
-              {/* constructor */}
-              <Constructor />
-              <SearchPanel />
-              <DebugConsole />
-            </ReactFlowProvider>
-          </main>
-        ) : (
-          <ConstructorLoadingSkeletions />
-        )}
-      </div>
-    </div>
+        <BottomPanel />
+      </ReactFlowProvider>
+    </main>
   );
 }
 
