@@ -80,7 +80,7 @@ const EditOrSendMessageNodeComponent = ({
               disableNotification={data.disableNotification}
               parseMode={data.parseMode}
               id={id}
-              recipients={data.recipients}
+              recipients={data.recipients ?? { sendToSender: true, additionalIds: [] }}
               hideHandlers
             />
           </CardFooter>

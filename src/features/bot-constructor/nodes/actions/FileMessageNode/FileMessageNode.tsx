@@ -243,7 +243,7 @@ const SendFileNodeComponent = ({
           </CardContent>
 
           <CardFooter className="flex flex-col gap-2">
-            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} recipients={data.recipients} />
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} recipients={data.recipients ?? { sendToSender: true, additionalIds: [] }} />
           </CardFooter>
         </>
       )}

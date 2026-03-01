@@ -205,7 +205,7 @@ const PollNodeComponent = ({
       )}
 
       <CardFooter className="flex flex-col gap-2">
-        <ActionPanel keyboard={data.keyboard} id={id} recipients={data.recipients} />
+        <ActionPanel keyboard={data.keyboard} id={id} recipients={data.recipients ?? { sendToSender: true, additionalIds: [] }} />
       </CardFooter>
 
       <SourceHandles />
