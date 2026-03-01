@@ -69,7 +69,7 @@ export default function Constructor() {
   // First loading start on hear
   const { project, loading } = useProjectStore();
 
-  const { screenToFlowPosition, fitView } = useReactFlow();
+  const { screenToFlowPosition, fitView, getViewport } = useReactFlow();
   const [snapToGrid, setSnapToGrid] = useState(false);
   const mousePosition = useMousePosition();
   const { resolvedTheme } = useTheme();
