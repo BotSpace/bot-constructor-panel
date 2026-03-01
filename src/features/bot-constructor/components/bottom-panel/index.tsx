@@ -1,14 +1,12 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import { BottomPanelButton } from './components/button'
 import { Database, Plus, Search } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
-import { PlayIcon } from '@/components/icons/play'
-import { Button } from '@/components/ui/button'
 import { ArrowLeftIcon } from '@/components/icons/arrow-back'
 import { Separator } from '@/components/ui/separator'
 import { useSearchStore } from '../../search/search-store'
@@ -17,6 +15,10 @@ import { useParams } from 'next/navigation'
 import { ReleasePanel } from '@/components/layout/components/relas/relas'
 import DebugingButtons from '@/components/layout/components/debug/debug'
 import BottomButtonGroup from './components/button-group'
+import { NodeSelectionDialog } from '../NodeSelectionDialog'
+import { useFlowStore } from '../../store'
+import { useReactFlow } from 'reactflow'
+import { ElementItemType } from '@/types/element-types'
 
 type Props = {}
 
@@ -24,6 +26,9 @@ function BottomPanel({ }: Props) {
 
     const { isOpen, height, toggle } = debugConsoleStore();
     const { toggleSearchPanel } = useSearchStore();
+    const [nodeDialogOpen, setNodeDialogOpen] = useState(false);
+    const { addNode } = useFlowStore();
+    const { getViewport } = useReactFlow();
 
     const { id } = useParams();
 
@@ -35,7 +40,15 @@ function BottomPanel({ }: Props) {
         href: `/bot/${id}`,
     });
 
+    const handleAddNode = useCallback((element: ElementItemType) => {
+        const { x, y, zoom } = getViewport();
+        const centerX = (-x + window.innerWidth / 2) / zoom;
+        const centerY = (-y + window.innerHeight / 2) / zoom;
+        addNode(element, { x: centerX, y: centerY });
+    }, [getViewport, addNode]);
+
     return (
+        <>
         <div
             style={isOpen ? { bottom: `${height + 20}px` } : {}}
             className={cn(`sticky bottom-[15px] gap-2 flex items-center justify-center pointer-events-none`)}>
@@ -57,7 +70,7 @@ function BottomPanel({ }: Props) {
                         <Search size={20} />
                     </BottomPanelButton>
 
-                    <BottomPanelButton>
+                    <BottomPanelButton onClick={() => setNodeDialogOpen(true)}>
                         <Plus size={20} />
                     </BottomPanelButton>
 
@@ -77,6 +90,12 @@ function BottomPanel({ }: Props) {
             </Card>
         </div>
 
+        <NodeSelectionDialog
+            open={nodeDialogOpen}
+            onOpenChange={setNodeDialogOpen}
+            onSelect={handleAddNode}
+        />
+    </>
     )
 }
 
