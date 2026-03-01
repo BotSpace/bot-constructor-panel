@@ -66,9 +66,6 @@ function BottomPanel({ }: Props) {
                     </BottomPanelButton>
 
                     <DebugingButtons />
-                    {/* <BottomPanelButton>
-                        <PlayIcon />
-                    </BottomPanelButton> */}
 
                     <Separator className='!h-[2px] !h-[40px]' orientation="vertical" />
 
