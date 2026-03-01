@@ -19,6 +19,8 @@ import { getFormatFlow } from "../lib/format-flow";
 import { generateId } from "@/lib/utils";
 import { FormNodeData } from "../nodes/custom/FormNode/types";
 import { CommandTriggerNodeData } from "../nodes/triggers/CommandTrigger/types";
+import { SubFlowNodeData } from "../nodes/custom/SubFlowNode/types";
+import { SubFlowExitNodeData } from "../nodes/custom/SubFlowExitNode/types";
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
@@ -133,6 +135,20 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
     
     case "FormNode":
       return { items: [] } as FormNodeData;
+
+    case "SubFlowNode":
+      return {
+        slug: "",
+        pluginName: "",
+        pluginDescription: "",
+        params: {},
+        outputs: [],
+      } as SubFlowNodeData;
+
+    case "SubFlowExitNode":
+      return {
+        exitName: "success",
+      } as SubFlowExitNodeData;
 
     // Custom Nodes
     case "StateNode":

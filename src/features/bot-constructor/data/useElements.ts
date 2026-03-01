@@ -324,6 +324,22 @@ export function useElements(): ElementTypes[] {
           color: "bg-sky-500/10 text-sky-400 border-sky-500/20",
           triggerId: "CallbackQueryAnswerNode",
         },
+        {
+          type: "subflow",
+          name: "SubFlow Plugin",
+          description: "Tashqi plugin orqali sub-flow ishga tushirish",
+          icon: "🔌",
+          color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+          triggerId: "SubFlowNode",
+        },
+        {
+          type: "subflow_exit",
+          name: "SubFlow Chiqish",
+          description: "SubFlow tugashi va chiqish nomini belgilash",
+          icon: "🚪",
+          color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+          triggerId: "SubFlowExitNode",
+        },
       ],
     },
     {

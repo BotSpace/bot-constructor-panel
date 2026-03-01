@@ -2,6 +2,8 @@ export * from "./CustomCodeNode";
 export * from "./StateNode";
 export * from "./CollectionNode";
 export * from "./LoadCollectionItemNode";
+export * from "./SubFlowNode";
+export * from "./SubFlowExitNode";
 
 // Flow control nodes
 export * from "./ConditionNode";
