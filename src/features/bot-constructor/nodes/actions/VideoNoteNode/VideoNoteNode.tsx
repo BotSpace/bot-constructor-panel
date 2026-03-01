@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import ComingSoonNodeContent from "../shared/ComingSoonNodeContent";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const VideoNoteNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
@@ -16,6 +17,7 @@ const VideoNoteNodeComponent = ({ id, data, selected }: NodeProps) => {
       <ComingSoonNodeContent node_description="Dumaloq video xabar yuboradi" />
 
       {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

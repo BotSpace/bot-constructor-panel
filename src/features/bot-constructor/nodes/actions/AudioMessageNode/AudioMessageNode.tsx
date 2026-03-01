@@ -29,6 +29,7 @@ import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { ActionPanel } from "../../components/shared/ActionPanel";
 import TextArea from "../shared/text-area";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendAudioNodeComponent = ({
   id,
@@ -272,6 +273,7 @@ const SendAudioNodeComponent = ({
       )}
 
       {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

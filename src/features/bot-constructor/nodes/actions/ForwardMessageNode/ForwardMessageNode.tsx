@@ -11,6 +11,7 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import { Plus, X } from "lucide-react";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import { HandlerData } from "../TextMessageNode/types";
 
 export interface ForwardMessageNodeData {

@@ -21,6 +21,7 @@ import { SourceHandles, TargetHandles } from "../../components";
 import { Plus, Trash2 } from "lucide-react";
 import { ActionPanel } from "../../components/shared/ActionPanel";
 import { MediaGroupNodeData, MediaItem } from "./types";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const MediaGroupNodeInternal = ({
   id,
@@ -196,6 +197,7 @@ const MediaGroupNodeInternal = ({
       </CardFooter>
 
       {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

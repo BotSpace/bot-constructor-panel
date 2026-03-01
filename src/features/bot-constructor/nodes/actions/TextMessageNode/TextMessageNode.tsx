@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 
 import TextArea from "../shared/text-area";
 import { ActionPanel } from "../../components/shared/ActionPanel";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendTextMessageNodeComponent = ({
   id,
@@ -83,6 +84,7 @@ const SendTextMessageNodeComponent = ({
       )}
 
       {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

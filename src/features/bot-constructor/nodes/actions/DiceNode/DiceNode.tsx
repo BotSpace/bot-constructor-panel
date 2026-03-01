@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 import { HandlerData } from "../TextMessageNode/types";
 

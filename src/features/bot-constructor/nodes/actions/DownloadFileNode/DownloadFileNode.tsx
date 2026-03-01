@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import { HandlerData } from "../TextMessageNode/types";
 
 export interface DownloadFileNodeData {
