@@ -52,12 +52,14 @@ export interface ElementItemType {
     | "cron"
     | "load_collection_item"
     | "subflow"
-    | "subflow_exit";
+    | "subflow_exit"
+    | "plugin";
   name: string;
   description: string;
   icon: string;
   color: string;
-  triggerId: keyof typeof CustomNodes; // Optional, used for triggers
+  triggerId: keyof typeof CustomNodes;
+  defaultData?: Record<string, unknown>;
 }
 
 export interface ElementTypes {

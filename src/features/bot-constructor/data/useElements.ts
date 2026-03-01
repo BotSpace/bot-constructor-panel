@@ -1,10 +1,42 @@
 import { useTranslations } from "next-intl";
 import { ElementTypes } from "@/types/element-types";
+import { useQuery } from "@tanstack/react-query";
+import { getActiveSubFlows } from "@/services/requests/plugin";
 
 export function useElements(): ElementTypes[] {
   const t = useTranslations();
 
-  return [
+  const { data: pluginsData } = useQuery({
+    queryKey: ["active-subflows"],
+    queryFn: () => getActiveSubFlows(),
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const pluginElements: ElementTypes | null =
+    pluginsData?.data && pluginsData.data.length > 0
+      ? {
+          title: "Pluginlar",
+          id: "sidebar-plugins",
+          elements: pluginsData.data.map((plugin) => ({
+            type: "plugin" as const,
+            name: plugin.name,
+            description: plugin.description || "Plugin",
+            icon: "🔌",
+            color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+            triggerId: "SubFlowNode" as const,
+            defaultData: {
+              slug: plugin.slug,
+              pluginName: plugin.name,
+              pluginDescription: plugin.description,
+              outputs: plugin.outputs || [],
+              paramsSchema: plugin.params_schema || {},
+              params: {},
+            },
+          })),
+        }
+      : null;
+
+  const baseElements: ElementTypes[] = [
     {
       title: t("constructor.triggers.title"),
       id: "sidebar-triggers",
@@ -324,22 +356,6 @@ export function useElements(): ElementTypes[] {
           color: "bg-sky-500/10 text-sky-400 border-sky-500/20",
           triggerId: "CallbackQueryAnswerNode",
         },
-        {
-          type: "subflow",
-          name: "SubFlow Plugin",
-          description: "Tashqi plugin orqali sub-flow ishga tushirish",
-          icon: "🔌",
-          color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-          triggerId: "SubFlowNode",
-        },
-        {
-          type: "subflow_exit",
-          name: "SubFlow Chiqish",
-          description: "SubFlow tugashi va chiqish nomini belgilash",
-          icon: "🚪",
-          color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-          triggerId: "SubFlowExitNode",
-        },
       ],
     },
     {
@@ -382,4 +398,10 @@ export function useElements(): ElementTypes[] {
       ],
     },
   ];
+
+  if (pluginElements) {
+    baseElements.push(pluginElements);
+  }
+
+  return baseElements;
 }
