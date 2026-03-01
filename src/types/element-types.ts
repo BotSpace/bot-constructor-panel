@@ -50,7 +50,9 @@ export interface ElementItemType {
     | "state"
     | "collection"
     | "cron"
-    | "load_collection_item";
+    | "load_collection_item"
+    | "subflow"
+    | "subflow_exit";
   name: string;
   description: string;
   icon: string;

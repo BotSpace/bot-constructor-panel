@@ -35,6 +35,8 @@ import {
   StateNode,
   CollectionNode,
   LoadCollectionItemNode,
+  SubFlowNode,
+  SubFlowExitNode,
   IfConditionNode,
   ElseIfNode,
   ElseNode,
@@ -104,6 +106,8 @@ export const CustomNodesFlowControl = {
 export const CustomIntegration = {
   HTTPRequestNode,
   CallbackQueryAnswerNode,
+  SubFlowNode,
+  SubFlowExitNode,
 };
 
 export const CustomNodes = {
