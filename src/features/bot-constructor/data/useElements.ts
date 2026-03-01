@@ -59,20 +59,6 @@ export function useElements(): ElementTypes[] {
 
   const baseElements: ElementTypes[] = [
     {
-      title: "🧪 Test",
-      id: "sidebar-test",
-      elements: [
-        {
-          type: "command",
-          name: "Command Trigger (test)",
-          description: "Test uchun command trigger",
-          icon: "⌘",
-          color: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-          triggerId: "CommandTriggerNode",
-        },
-      ],
-    },
-    {
       title: t("constructor.triggers.title"),
       id: "sidebar-triggers",
       elements: [
