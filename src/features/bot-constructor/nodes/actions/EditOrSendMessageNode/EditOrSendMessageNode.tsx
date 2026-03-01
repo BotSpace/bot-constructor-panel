@@ -28,10 +28,12 @@ const EditOrSendMessageNodeComponent = ({
     updateNodeData(id, update);
   };
 
+  const keyboard = data.keyboard ?? { active: "inline" as const, inline: [], reply: [] };
+
   const buttonCount =
-    (data.keyboard?.active === "inline"
-      ? data.keyboard?.inline
-      : data.keyboard?.reply
+    (keyboard.active === "inline"
+      ? keyboard.inline
+      : keyboard.reply
     )?.flat().length || 0;
 
   return (
@@ -73,11 +75,12 @@ const EditOrSendMessageNodeComponent = ({
 
           <CardFooter className="flex flex-col gap-2">
             <ActionPanel
-              keyboard={data.keyboard}
+              keyboard={keyboard}
               disableNotification={data.disableNotification}
               parseMode={data.parseMode}
               id={id}
               recipients={data.recipients}
+              hideHandlers
             />
           </CardFooter>
         </>

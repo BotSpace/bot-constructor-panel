@@ -36,6 +36,7 @@ interface ActionPanelTypes {
     sendToSender: boolean;
     additionalIds: string[];
   };
+  hideHandlers?: boolean;
 }
 
 function SectionWrapper({
@@ -67,7 +68,7 @@ function SectionWrapper({
   );
 }
 
-export function ActionPanel({ disableNotification, parseMode, protectContent, id, keyboard, recipients }: ActionPanelTypes) {
+export function ActionPanel({ disableNotification, parseMode, protectContent, id, keyboard, recipients, hideHandlers }: ActionPanelTypes) {
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
@@ -132,14 +133,15 @@ export function ActionPanel({ disableNotification, parseMode, protectContent, id
             )}
 
             {/* Handler builder */}
-            <SectionWrapper
-              icon={Workflow}
-              title="Handlerlar"
-              description="Xabarga javob berish qoidalari"
-            >
-              <HandlerAdder sourceNodeId={id} />
-
-            </SectionWrapper>
+            {!hideHandlers && (
+              <SectionWrapper
+                icon={Workflow}
+                title="Handlerlar"
+                description="Xabarga javob berish qoidalari"
+              >
+                <HandlerAdder sourceNodeId={id} />
+              </SectionWrapper>
+            )}
 
             {/* Sozlamalar */}
             <SectionWrapper
