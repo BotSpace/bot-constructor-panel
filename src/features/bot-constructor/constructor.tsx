@@ -30,6 +30,7 @@ import { Text, ChevronDown } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
 import { useSearchStore } from "./search/search-store";
+import { debugConsoleStore } from "@/components/layout/components/debug-console/store";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { useTheme } from "next-themes";
@@ -59,6 +60,8 @@ export default function Constructor() {
   } = useFlowStore();
 
   const { searchPanelIsOpen } = useSearchStore();
+  const { toggleSearchPanel } = useSearchStore();
+  const debugToggle = debugConsoleStore.getState().toggle;
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
@@ -243,6 +246,33 @@ export default function Constructor() {
     () => {
       handleFormating();
     },
+    { preventDefault: true }
+  );
+
+  // Ctrl+N - Node qo'shish modali
+  useKeyboardShortcut(
+    ["Control", "n"],
+    () => { setShowNodeDialog(true); },
+    { preventDefault: true }
+  );
+
+  // Ctrl+K / Ctrl+F - Qidirish paneli
+  useKeyboardShortcut(
+    ["Control", "k"],
+    () => { toggleSearchPanel(); },
+    { preventDefault: true }
+  );
+
+  useKeyboardShortcut(
+    ["Control", "f"],
+    () => { toggleSearchPanel(); },
+    { preventDefault: true }
+  );
+
+  // Ctrl+` - Debug konsol
+  useKeyboardShortcut(
+    ["Control", "`"],
+    () => { debugToggle(); },
     { preventDefault: true }
   );
 
