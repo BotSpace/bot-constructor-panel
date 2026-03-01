@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import ComingSoonNodeContent from "../shared/ComingSoonNodeContent";
-import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const AnimationNodeComponent = ({ id, selected }: NodeProps) => {
   return (

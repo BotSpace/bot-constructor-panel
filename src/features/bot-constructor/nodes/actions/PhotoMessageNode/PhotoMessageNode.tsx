@@ -27,7 +27,6 @@ import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { ActionPanel } from "../../components/shared/ActionPanel";
-import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendPhotoNodeComponent = ({
   id,
@@ -254,7 +253,6 @@ const SendPhotoNodeComponent = ({
       )}
 
       {/* Handler list */}
-      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { NodeHeader } from "../shared/NodeHeader";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import { Label } from "@/components/ui/label";
 import {
   Select,
