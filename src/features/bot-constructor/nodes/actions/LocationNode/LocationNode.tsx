@@ -12,6 +12,7 @@ import { SendLocationNodeData } from "./types";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ActionPanel } from "../../components/shared/ActionPanel";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const LocationNodeComponent = ({
   id,
@@ -72,6 +73,7 @@ const LocationNodeComponent = ({
       </CardFooter>
 
       {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>

@@ -10,6 +10,7 @@ import { ElementItemType } from "@/types/element-types";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { ActionPanel } from "../../components/shared/ActionPanel";
 import { EditMessageSource } from "../../components/shared/ReactFlowHandles/EditMessageSource";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import ForTextMessageNode from "./components/ForTextMessageNode";
 import ForVideoPhotoDocumentAudio from "./components/ForVideoPhotoDocumentAudio";
 import {
@@ -95,6 +96,7 @@ export const EditMessageNode = memo(
         </CardFooter>
 
         {/* Handler list */}
+        <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
         <SourceHandles />
         <EditMessageSource />

@@ -28,6 +28,7 @@ import { FileText } from "lucide-react";
 import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { ActionPanel } from "../../components/shared/ActionPanel";
+import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 
 const SendFileNodeComponent = ({
   id,
@@ -248,6 +249,7 @@ const SendFileNodeComponent = ({
       )}
 
       {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles />
     </Card>
