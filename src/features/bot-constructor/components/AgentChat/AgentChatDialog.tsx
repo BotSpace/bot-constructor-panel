@@ -63,7 +63,7 @@ export function AgentChatDialog({ open, onOpenChange }: AgentChatDialogProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { setNodes, setEdges } = useFlowStore();
+  const { setNodes, setEdges, formatFlow } = useFlowStore();
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -171,6 +171,8 @@ export function AgentChatDialog({ open, onOpenChange }: AgentChatDialogProps) {
     if (!pendingFlow) return;
     setNodes(pendingFlow.nodes || []);
     setEdges(pendingFlow.edges || []);
+    // Auto-format after applying
+    setTimeout(() => formatFlow(), 50);
     toast.success("Flow qo'llandi!");
     onOpenChange(false);
   };
