@@ -24,6 +24,7 @@ export interface ElementItemType {
     | "callback_button"
     | "callback_query"
     | "edit_message"
+    | "edit_or_send_message"
     // New media types
     | "animation"
     | "voice"

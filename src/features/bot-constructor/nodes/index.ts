@@ -5,6 +5,7 @@ import {
   SendAudioNode,
   SendFileNode,
   EditMessageNode,
+  EditOrSendMessageNode,
   SendAnimationNode,
   SendVoiceNode,
   SendVideoNoteNode,
@@ -75,6 +76,7 @@ export const ActionsTextAndMedia = {
 
 export const ActionsMessageOperations = {
   EditMessageNode,
+  EditOrSendMessageNode,
   ForwardMessageNode,
   SendToAdminNode,
   CopyMessageNode,

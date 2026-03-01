@@ -4,6 +4,7 @@ export { SendVideoNode } from "./VideoMessageNode";
 export { SendAudioNode } from "./AudioMessageNode";
 export { SendFileNode } from "./FileMessageNode";
 export { EditMessageNode } from "./EditMessageNode";
+export { EditOrSendMessageNode } from "./EditOrSendMessageNode";
 
 // New media nodes
 export { SendAnimationNode } from "./AnimationNode";
