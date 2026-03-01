@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import {
   createAgentSession,
+  getAgentSession,
   chatWithAgent,
   listAgentSessions,
   getAgentHistory,
@@ -155,21 +156,26 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
     if (!open) return;
 
     const init = async () => {
-      const list = await loadSessions();
-
-      // Try to restore last used session for this project
       const storageKey = `agent_session_${projectId ?? "default"}`;
       const savedId = localStorage.getItem(storageKey);
-      const existing = savedId ? list.find((s) => s.session_id === savedId) : null;
 
-      if (existing) {
-        setSessionId(existing.session_id);
-        setPhase(existing.phase);
-        await loadSessionHistory(existing.session_id);
-      } else if (!sessionId) {
-        await createNewSession();
+      if (savedId) {
+        try {
+          // Try to restore directly by session id — faster and more reliable than list search
+          const session = await getAgentSession(savedId);
+          setSessionId(savedId);
+          setPhase(session.phase);
+          await loadSessionHistory(savedId);
+          loadSessions(); // refresh sidebar list in background (don't await)
+          setTimeout(() => inputRef.current?.focus(), 200);
+          return;
+        } catch {
+          // Session not found or expired — clear stale id and fall through to create new
+          localStorage.removeItem(storageKey);
+        }
       }
 
+      await createNewSession();
       setTimeout(() => inputRef.current?.focus(), 200);
     };
 
