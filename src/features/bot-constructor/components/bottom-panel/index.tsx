@@ -113,6 +113,7 @@ function BottomPanel({ }: Props) {
         <AgentChatDialog
             open={agentOpen}
             onOpenChange={setAgentOpen}
+            projectId={id as string}
         />
     </>
     )
