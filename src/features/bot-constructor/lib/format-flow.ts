@@ -3,15 +3,60 @@ import { Node, Edge, Position } from "reactflow";
 
 type Direction = "TB" | "LR";
 
-const DEFAULT_NODE_WIDTH = 172;
-const DEFAULT_NODE_HEIGHT = 36;
+const DEFAULT_NODE_WIDTH = 320;
+const DEFAULT_NODE_HEIGHT = 200;
 
+/**
+ * Cycle-safe dagre layout.
+ * Back-edges (cycles) are excluded from dagre so it doesn't produce overlapping
+ * positions, then the original edges are restored unchanged.
+ */
 export const getFormatFlow = (
   nodes: Node[],
   edges: Edge[],
   direction: Direction = "LR"
 ) => {
-  // Har safar yangi graf yaratamiz — eski node/edge qoldiqlaridan tozalanadi
+  if (nodes.length === 0) return { nodes, edges };
+
+  // Detect and remove back-edges that create cycles (DFS-based)
+  const nodeIds = new Set(nodes.map((n) => n.id));
+
+  // Build adjacency list (only edges whose endpoints exist in nodes)
+  const adj = new Map<string, string[]>();
+  nodes.forEach((n) => adj.set(n.id, []));
+  edges.forEach((e) => {
+    if (nodeIds.has(e.source) && nodeIds.has(e.target)) {
+      adj.get(e.source)!.push(e.target);
+    }
+  });
+
+  // DFS to find back-edges
+  const visited = new Set<string>();
+  const inStack = new Set<string>();
+  const backEdgePairs = new Set<string>(); // "source->target"
+
+  const dfs = (id: string) => {
+    visited.add(id);
+    inStack.add(id);
+    for (const neighbor of adj.get(id) ?? []) {
+      if (!visited.has(neighbor)) {
+        dfs(neighbor);
+      } else if (inStack.has(neighbor)) {
+        backEdgePairs.add(`${id}->${neighbor}`);
+      }
+    }
+    inStack.delete(id);
+  };
+
+  nodes.forEach((n) => {
+    if (!visited.has(n.id)) dfs(n.id);
+  });
+
+  // Only feed forward edges to dagre
+  const forwardEdges = edges.filter(
+    (e) => !backEdgePairs.has(`${e.source}->${e.target}`)
+  );
+
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
 
@@ -19,71 +64,30 @@ export const getFormatFlow = (
 
   dagreGraph.setGraph({
     rankdir: direction,
-    nodesep: 50,
-    ranksep: 200,
+    nodesep: 80,
+    ranksep: 250,
   });
 
   nodes.forEach((node) => {
     const width = node.width ?? DEFAULT_NODE_WIDTH;
     const height = node.height ?? DEFAULT_NODE_HEIGHT;
-
     dagreGraph.setNode(node.id, { width, height });
   });
 
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
+  // Deduplicate source→target pairs for dagre
+  const seenEdges = new Set<string>();
+  forwardEdges.forEach((edge) => {
+    const key = `${edge.source}->${edge.target}`;
+    if (!seenEdges.has(key)) {
+      seenEdges.add(key);
+      dagreGraph.setEdge(edge.source, edge.target);
+    }
   });
 
   dagre.layout(dagreGraph);
 
-  // 1-QADAM: Dagre pozitsiyalarini olish
-  const positionMap = new Map<string, { x: number; y: number }>();
-  nodes.forEach((node) => {
-    const { x, y } = dagreGraph.node(node.id);
-    positionMap.set(node.id, { x, y });
-  });
-
-  // 2-QADAM: Predecessors va successors ro'yxatini tuzish
-  const predecessors = new Map<string, string[]>();
-  const successors = new Map<string, string[]>();
-  nodes.forEach((node) => {
-    predecessors.set(node.id, []);
-    successors.set(node.id, []);
-  });
-  edges.forEach((edge) => {
-    successors.get(edge.source)?.push(edge.target);
-    predecessors.get(edge.target)?.push(edge.source);
-  });
-
-  // 3-QADAM: Har bir nodeni predecessor va successor'lari orasida markazlashtirish
-  // Masalan: a→b→e bo'lsa va a→c→d→e ham bo'lsa,
-  // b ning x pozitsiyasi = (a.x + e.x) / 2 — ya'ni c va d orasida turadi
-  nodes.forEach((node) => {
-    const preds = predecessors.get(node.id) || [];
-    const succs = successors.get(node.id) || [];
-
-    if (preds.length > 0 && succs.length > 0) {
-      const predPositions = preds.map((id) => positionMap.get(id)!);
-      const succPositions = succs.map((id) => positionMap.get(id)!);
-
-      if (isHorizontal) {
-        const avgPredX =
-          predPositions.reduce((s, p) => s + p.x, 0) / preds.length;
-        const avgSuccX =
-          succPositions.reduce((s, p) => s + p.x, 0) / succs.length;
-        positionMap.get(node.id)!.x = (avgPredX + avgSuccX) / 2;
-      } else {
-        const avgPredY =
-          predPositions.reduce((s, p) => s + p.y, 0) / preds.length;
-        const avgSuccY =
-          succPositions.reduce((s, p) => s + p.y, 0) / succs.length;
-        positionMap.get(node.id)!.y = (avgPredY + avgSuccY) / 2;
-      }
-    }
-  });
-
   const layoutedNodes = nodes.map((node) => {
-    const pos = positionMap.get(node.id)!;
+    const nodeWithPosition = dagreGraph.node(node.id);
     const width = node.width ?? DEFAULT_NODE_WIDTH;
     const height = node.height ?? DEFAULT_NODE_HEIGHT;
 
@@ -92,8 +96,8 @@ export const getFormatFlow = (
       targetPosition: isHorizontal ? Position.Left : Position.Top,
       sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
       position: {
-        x: pos.x - width / 2,
-        y: pos.y - height / 2,
+        x: nodeWithPosition.x - width / 2,
+        y: nodeWithPosition.y - height / 2,
       },
     };
   });
