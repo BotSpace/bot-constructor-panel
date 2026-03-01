@@ -212,6 +212,14 @@ export function useElements(): ElementTypes[] {
           color: "bg-green-500/10 text-green-400 border-green-500/20",
           triggerId: "EditMessageNode",
         },
+        {
+          type: "edit_or_send_message",
+          name: "Edit yoki Yuborish",
+          description: "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi",
+          icon: "✏️",
+          color: "bg-teal-500/10 text-teal-400 border-teal-500/20",
+          triggerId: "EditOrSendMessageNode",
+        },
       ],
     },
     {
