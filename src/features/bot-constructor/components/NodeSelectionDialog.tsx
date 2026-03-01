@@ -198,10 +198,10 @@ export function NodeSelectionDialog({
                     </div>
 
                     {/* Right: Nodes */}
-                    <div className="flex-1 flex flex-col min-w-0">
+                    <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                         {activeGroup ? (
-                            <>
-                                <div className="px-4 py-3 border-b bg-muted/20">
+                            <React.Fragment key={activeGroup.id || activeCategoryIndex}>
+                                <div className="px-4 py-3 border-b bg-muted/20 shrink-0">
                                     <h3 className="text-sm font-semibold text-foreground">
                                         {activeGroup.title}
                                     </h3>
@@ -209,11 +209,11 @@ export function NodeSelectionDialog({
                                         {activeGroup.elements?.length || 0} ta node mavjud
                                     </p>
                                 </div>
-                                <ScrollArea className="flex-1">
+                                <ScrollArea className="flex-1 overflow-auto">
                                     <div className="p-2 grid gap-1">
-                                        {activeGroup.elements?.map((element) => (
+                                        {activeGroup.elements?.map((element, idx) => (
                                             <button
-                                                key={element.triggerId}
+                                                key={`${element.triggerId}-${idx}`}
                                                 onClick={() => handleSelect(element)}
                                                 className={cn(
                                                     "group flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-all",
@@ -241,7 +241,7 @@ export function NodeSelectionDialog({
                                         ))}
                                     </div>
                                 </ScrollArea>
-                            </>
+                            </React.Fragment>
                         ) : (
                             <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
                                 Hech narsa topilmadi
