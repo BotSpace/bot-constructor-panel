@@ -246,23 +246,7 @@ export function DebugConsole() {
   const hasReleaseBot = !!releaseServiceId;
 
   if (!isOpen)
-    return (
-      <button
-        className="
-      h-[50px] w-[50px] rounded-2xl 
-      bg-gradient-to-br from-slate-800 to-slate-900
-      flex items-center justify-center 
-      absolute z-50 bottom-4 left-12
-      shadow-lg hover:shadow-2xl 
-      transform hover:scale-105 active:scale-95
-      transition-all duration-200
-      text-white
-    "
-        onClick={open} // terminal toggle funksiyasini qo'shing
-      >
-        <TerminalIcon className="w-6 h-6" />
-      </button>
-    );
+    return null;
 
   return (
     <div
