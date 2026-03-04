@@ -1,6 +1,6 @@
 # Loyiha Tahlili Hisoboti
 
-Sana: 2/24/2026, 9:16:34 PM
+Sana: 3/2/2026, 3:45:02 PM
 
 ## 📁 Fayl Strukturasi
 
@@ -34,14 +34,17 @@ bot-constructor-panel
 │   │   └── prepare-commit-msg
 │   └── pre-push
 ├── Dockerfile
-├── IMPLEMENTATION_COMPLETE.md
-├── IMPLEMENTATION_SUMMARY.md
 ├── README.md
 ├── Telegram bot API
 │   └── telegrm-bot-apis.md
 ├── components.json
 ├── docs
 │   ├── ARCHITECTURE.md
+│   ├── TEST_SCENARIOS_TRIGGER_STATE.md
+│   ├── TRIGGER_STATE_IN_COLLECTIONS.md
+│   ├── TRIGGER_STATE_SAVING.md
+│   ├── VISUAL_SUMMARY_TRIGGER_STATE.md
+│   ├── flow_formatter_guideline.md
 │   ├── node_types.md
 │   └── project_analysis.md
 ├── next-env.d.ts
@@ -61,7 +64,11 @@ bot-constructor-panel
 │   │   │   ├── auth
 │   │   │   │   └── page.tsx
 │   │   │   ├── globals.css
-│   │   │   └── layout.tsx
+│   │   │   ├── layout.tsx
+│   │   │   └── plugins
+│   │   │       ├── [pluginId]
+│   │   │       │   └── page.tsx
+│   │   │       └── page.tsx
 │   │   ├── api
 │   │   │   ├── ai
 │   │   │   │   └── chat
@@ -78,7 +85,10 @@ bot-constructor-panel
 │   │   ├── common
 │   │   │   ├── OrientationGuard.tsx
 │   │   │   ├── analitics.tsx
-│   │   │   ├── count-down-button.tsx
+│   │   │   ├── count-down
+│   │   │   │   ├── count-down-item.tsx
+│   │   │   │   ├── count-down.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── i18nLink.tsx
 │   │   │   ├── link-to-parrent.tsx
 │   │   │   ├── notification-alert.tsx
@@ -87,17 +97,23 @@ bot-constructor-panel
 │   │   │   ├── status-badge.tsx
 │   │   │   ├── theme-provider.tsx
 │   │   │   └── toggle-button.tsx
+│   │   ├── icons
+│   │   │   ├── arrow-back.tsx
+│   │   │   ├── home.tsx
+│   │   │   ├── index.ts
+│   │   │   ├── play.tsx
+│   │   │   ├── search.tsx
+│   │   │   └── terminal.tsx
 │   │   ├── layout
 │   │   │   ├── components
 │   │   │   │   ├── add-env-dialog.tsx
 │   │   │   │   ├── add-env.tsx
-│   │   │   │   ├── ai-chat
-│   │   │   │   │   ├── chat-widget.tsx
-│   │   │   │   │   └── prompt-interface.tsx
 │   │   │   │   ├── debug
 │   │   │   │   │   ├── debug.tsx
 │   │   │   │   │   └── index.ts
-│   │   │   │   ├── debug-console.tsx
+│   │   │   │   ├── debug-console
+│   │   │   │   │   ├── debug-console.tsx
+│   │   │   │   │   └── store.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── relas
 │   │   │   │       └── relas.tsx
@@ -106,6 +122,7 @@ bot-constructor-panel
 │   │   │   ├── google-auth-widget.tsx
 │   │   │   ├── index.tsx
 │   │   │   └── telegram-auth-widget.tsx
+│   │   ├── tailwindcss-buttons-demo.tsx
 │   │   └── ui
 │   │       ├── accordion.tsx
 │   │       ├── alert-dialog.tsx
@@ -120,6 +137,7 @@ bot-constructor-panel
 │   │       ├── command.tsx
 │   │       ├── context-menu.tsx
 │   │       ├── dialog.tsx
+│   │       ├── drawer.tsx
 │   │       ├── dropdown-menu.tsx
 │   │       ├── field.tsx
 │   │       ├── input-group.tsx
@@ -147,6 +165,8 @@ bot-constructor-panel
 │   ├── features
 │   │   ├── bot-constructor
 │   │   │   ├── components
+│   │   │   │   ├── AgentChat
+│   │   │   │   │   └── AgentChatDialog.tsx
 │   │   │   │   ├── ButtonGenerator
 │   │   │   │   │   ├── ButtonGenerator.tsx
 │   │   │   │   │   ├── components
@@ -166,6 +186,14 @@ bot-constructor-panel
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── types.ts
 │   │   │   │   │   └── utils.tsx
+│   │   │   │   ├── NodeSelectionDialog.tsx
+│   │   │   │   ├── ShortcutsDialog.tsx
+│   │   │   │   ├── bottom-panel
+│   │   │   │   │   ├── components
+│   │   │   │   │   │   ├── button-group.tsx
+│   │   │   │   │   │   ├── button.tsx
+│   │   │   │   │   │   └── index.ts
+│   │   │   │   │   └── index.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   └── save-status-badge.tsx
 │   │   │   ├── constructor.tsx
@@ -177,16 +205,18 @@ bot-constructor-panel
 │   │   │   │   ├── useElements.ts
 │   │   │   │   └── useMessageTypes.ts
 │   │   │   ├── edges
+│   │   │   │   ├── FloatingConnectionLine.tsx
+│   │   │   │   ├── FloatingEdge.tsx
 │   │   │   │   ├── SelectableEdge.tsx
 │   │   │   │   ├── components
 │   │   │   │   │   └── EdgeContextMenu.tsx
-│   │   │   │   └── index.ts
-│   │   │   ├── guide-tour
 │   │   │   │   ├── index.ts
-│   │   │   │   └── tour-welcome.tsx
+│   │   │   │   ├── useEdgeColor.ts
+│   │   │   │   └── utils.ts
 │   │   │   ├── hooks
 │   │   │   │   ├── useFlowKeyboardShortcuts.ts
-│   │   │   │   └── useMousePosition.ts
+│   │   │   │   ├── useMousePosition.ts
+│   │   │   │   └── useNodeCollapsed.ts
 │   │   │   ├── lib
 │   │   │   │   ├── edge-utils.ts
 │   │   │   │   ├── findNearestParentAction.ts
@@ -225,6 +255,10 @@ bot-constructor-panel
 │   │   │   │   │   │   ├── components
 │   │   │   │   │   │   │   ├── ForTextMessageNode.tsx
 │   │   │   │   │   │   │   └── ForVideoPhotoDocumentAudio.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── EditOrSendMessageNode
+│   │   │   │   │   │   ├── EditOrSendMessageNode.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── FileMessageNode
@@ -283,6 +317,20 @@ bot-constructor-panel
 │   │   │   │   │   └── shared
 │   │   │   │   │       ├── ActionNodeSettings.tsx
 │   │   │   │   │       ├── ComingSoonNodeContent.tsx
+│   │   │   │   │       ├── HandlerBuilder
+│   │   │   │   │       │   ├── HandlersList.tsx
+│   │   │   │   │       │   ├── components
+│   │   │   │   │       │   │   ├── FilterSelector.tsx
+│   │   │   │   │       │   │   ├── ParameterInput
+│   │   │   │   │       │   │   │   ├── RadiusInput.tsx
+│   │   │   │   │       │   │   │   ├── SizeInput.tsx
+│   │   │   │   │       │   │   │   ├── ValueInput.tsx
+│   │   │   │   │       │   │   │   └── index.tsx
+│   │   │   │   │       │   │   └── TypeSelector.tsx
+│   │   │   │   │       │   ├── handler-adder.tsx
+│   │   │   │   │       │   ├── index.tsx
+│   │   │   │   │       │   ├── types.ts
+│   │   │   │   │       │   └── utils.ts
 │   │   │   │   │       ├── NodeHeader.tsx
 │   │   │   │   │       ├── RecipientSelector.tsx
 │   │   │   │   │       ├── filter
@@ -294,6 +342,8 @@ bot-constructor-panel
 │   │   │   │   ├── components
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── shared
+│   │   │   │   │       ├── ActionPanel
+│   │   │   │   │       │   └── index.tsx
 │   │   │   │   │       ├── ReactFlowHandles
 │   │   │   │   │       │   ├── DeleteMessageSource.tsx
 │   │   │   │   │       │   ├── EditMessageSource.tsx
@@ -342,9 +392,6 @@ bot-constructor-panel
 │   │   │   │   │   │   ├── components
 │   │   │   │   │   │   │   ├── add-item-modal.tsx
 │   │   │   │   │   │   │   └── form-item.tsx
-│   │   │   │   │   │   ├── components
-│   │   │   │   │   │   │   ├── add-item-modal.tsx
-│   │   │   │   │   │   │   └── form-item.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── HTTPRequestNode
@@ -362,6 +409,14 @@ bot-constructor-panel
 │   │   │   │   │   │   ├── StateNode.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── SubFlowExitNode
+│   │   │   │   │   │   ├── SubFlowExitNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── SubFlowNode
+│   │   │   │   │   │   ├── SubFlowNode.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── VariableNode
 │   │   │   │   │   │   ├── VariableNode.tsx
 │   │   │   │   │   │   ├── index.ts
@@ -371,7 +426,6 @@ bot-constructor-panel
 │   │   │   │   └── triggers
 │   │   │   │       ├── CallbackQueryTrigger
 │   │   │   │       │   ├── CallbackQueryTrigger.tsx
-│   │   │   │       │   ├── index.ts
 │   │   │   │       │   └── types.ts
 │   │   │   │       ├── CommandTrigger
 │   │   │   │       │   ├── CommandTriggerNode.tsx
@@ -396,7 +450,6 @@ bot-constructor-panel
 │   │   │   │       │   └── utils.ts
 │   │   │   │       ├── ReplyButtonTrigger
 │   │   │   │       │   ├── ReplyButtonTrigger.tsx
-│   │   │   │       │   ├── index.ts
 │   │   │   │       │   └── types.ts
 │   │   │   │       ├── index.ts
 │   │   │   │       └── shared
@@ -405,10 +458,6 @@ bot-constructor-panel
 │   │   │   │           ├── index.ts
 │   │   │   │           ├── state-config-helpers.ts
 │   │   │   │           └── state-config-types.ts
-│   │   │   ├── panel
-│   │   │   │   ├── elements
-│   │   │   │   │   └── elements.tsx
-│   │   │   │   └── pane.tsx
 │   │   │   ├── search
 │   │   │   │   ├── search-panel.tsx
 │   │   │   │   └── search-store.ts
@@ -449,7 +498,6 @@ bot-constructor-panel
 │   │   ├── landscape-screen.ts
 │   │   ├── notification-utils.ts
 │   │   ├── query-generator.ts
-│   │   ├── tour-steps.ts
 │   │   └── utils.ts
 │   ├── messages
 │   │   ├── en.json
@@ -464,10 +512,12 @@ bot-constructor-panel
 │   │   │   ├── use-react-query-action.ts
 │   │   │   └── use-scroll-query-action.ts
 │   │   └── requests
+│   │       ├── agent.ts
 │   │       ├── ai.ts
 │   │       ├── auth.ts
 │   │       ├── bot.ts
-│   │       └── file.ts
+│   │       ├── file.ts
+│   │       └── plugin.ts
 │   ├── types
 │   │   ├── auth
 │   │   │   ├── get-me.ts
@@ -480,6 +530,7 @@ bot-constructor-panel
 │   │       ├── error.ts
 │   │       ├── file.ts
 │   │       ├── flow.ts
+│   │       ├── plugin.ts
 │   │       ├── project.ts
 │   │       └── response.ts
 │   └── wss
