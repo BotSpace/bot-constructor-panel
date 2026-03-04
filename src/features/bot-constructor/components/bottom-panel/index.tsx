@@ -21,6 +21,7 @@ import { AgentChatDialog } from '../AgentChat/AgentChatDialog'
 import { useFlowStore } from '../../store'
 import { useReactFlow } from 'reactflow'
 import { ElementItemType } from '@/types/element-types'
+import { CollectionIframeDialog } from '../CollectionIframe/CollectionIframe'
 
 type Props = {}
 
@@ -53,69 +54,74 @@ function BottomPanel({ }: Props) {
 
     return (
         <>
-        <div
-            style={isOpen ? { bottom: `${height + 20}px` } : {}}
-            className={cn(`sticky bottom-[15px] gap-2 flex items-center justify-center pointer-events-none`)}>
-            <Card className='p-2 pointer-events-auto rounded-2xl'>
-                <CardContent className='p-2 flex items-center justify-center gap-2'>
+            <div
+                style={isOpen ? { bottom: `${height + 20}px` } : {}}
+                className={cn(`sticky bottom-[15px] gap-2 flex items-center justify-center pointer-events-none`)}>
+                <Card className='p-2 pointer-events-auto rounded-2xl'>
+                    <CardContent className='p-2 flex items-center justify-center gap-2'>
 
-                    {/* Home button */}
-                    <BottomPanelButton onClick={backToHome}>
-                        <ArrowLeftIcon />
-                    </BottomPanelButton>
+                        {/* Home button */}
+                        <BottomPanelButton onClick={backToHome}>
+                            <ArrowLeftIcon />
+                        </BottomPanelButton>
 
-                    {/* terminal button */}
-                    <BottomPanelButton onClick={toggle}>
-                        <SquareCommandIcon />
-                    </BottomPanelButton>
+                        {/* terminal button */}
+                        <BottomPanelButton onClick={toggle}>
+                            <SquareCommandIcon />
+                        </BottomPanelButton>
 
 
-                    <BottomPanelButton onClick={toggleSearchPanel}>
-                        <Search size={20} />
-                    </BottomPanelButton>
+                        <BottomPanelButton onClick={toggleSearchPanel}>
+                            <Search size={20} />
+                        </BottomPanelButton>
 
-                    <BottomPanelButton onClick={() => setNodeDialogOpen(true)}>
-                        <Plus size={20} />
-                    </BottomPanelButton>
+                        <BottomPanelButton onClick={() => setNodeDialogOpen(true)}>
+                            <Plus size={20} />
+                        </BottomPanelButton>
 
-                    <BottomPanelButton onClick={(e) => backToCollection(e)}>
-                        <Database size={20} />
-                    </BottomPanelButton>
+                        <BottomPanelButton>
+                            <CollectionIframeDialog>
+                                <Database size={20} />
+                            </CollectionIframeDialog>
+                        </BottomPanelButton>
 
-                    <BottomPanelButton onClick={() => setShortcutsOpen(true)} title="Shortcutlar (?)">
-                        <Keyboard size={20} />
-                    </BottomPanelButton>
+                        <BottomPanelButton onClick={() => setShortcutsOpen(true)} title="Shortcutlar (?)">
+                            <Keyboard size={20} />
+                        </BottomPanelButton>
 
-                    <BottomPanelButton onClick={() => setAgentOpen(true)} title="AI Agent">
-                        <Bot size={20} />
-                    </BottomPanelButton>
+                        <BottomPanelButton className='relative inline-flex overflow-hidden p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50' onClick={() => setAgentOpen(true)} title="AI Agent">
+                            <span className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
+                            <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl bg-transparent px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
+                                <Bot size={20} />
+                            </span>
+                        </BottomPanelButton>
 
-                    <DebugingButtons />
+                        <DebugingButtons />
 
-                    <Separator className='!h-[2px] !h-[40px]' orientation="vertical" />
+                        <Separator className='!h-[2px] !h-[40px]' orientation="vertical" />
 
-                    <ReleasePanel />
-                </CardContent>
-            </Card>
-        </div>
+                        <ReleasePanel />
+                    </CardContent>
+                </Card>
+            </div>
 
-        <NodeSelectionDialog
-            open={nodeDialogOpen}
-            onOpenChange={setNodeDialogOpen}
-            onSelect={handleAddNode}
-        />
+            <NodeSelectionDialog
+                open={nodeDialogOpen}
+                onOpenChange={setNodeDialogOpen}
+                onSelect={handleAddNode}
+            />
 
-        <ShortcutsDialog
-            open={shortcutsOpen}
-            onOpenChange={setShortcutsOpen}
-        />
+            <ShortcutsDialog
+                open={shortcutsOpen}
+                onOpenChange={setShortcutsOpen}
+            />
 
-        <AgentChatDialog
-            open={agentOpen}
-            onOpenChange={setAgentOpen}
-            projectId={id as string}
-        />
-    </>
+            <AgentChatDialog
+                open={agentOpen}
+                onOpenChange={setAgentOpen}
+                projectId={id as string}
+            />
+        </>
     )
 }
 
