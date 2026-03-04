@@ -143,7 +143,7 @@ export function NodeSelectionDialog({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
-                className="sm:max-w-[820px] gap-0 p-0 overflow-hidden"
+                className="sm:max-w-[820px] max-h-[90vh] gap-0 p-0 overflow-auto"
             >
                 <DialogHeader className="px-5 pt-5 pb-3">
                     <DialogTitle>Node qo&#39;shish</DialogTitle>

@@ -14,7 +14,7 @@ import {
   type AgentSession,
 } from "@/services/requests/agent";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import {
@@ -29,7 +29,10 @@ import {
   ChevronRight,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+} from "@/components/ui/drawer";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -64,7 +67,7 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
   const [phase, setPhase] = useState<string>("chat");
   const [pendingFlow, setPendingFlow] = useState<{ nodes: any[]; edges: any[] } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const { setNodes, setEdges, formatFlow } = useFlowStore();
 
@@ -186,6 +189,7 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
     const text = input.trim();
     if (!text || !sessionId || isLoading) return;
     setInput("");
+    if (inputRef.current) inputRef.current.style.height = "auto";
     const userMsg: Message = { id: Date.now().toString(), role: "user", content: text };
     setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
@@ -218,10 +222,9 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
   const currentSession = sessions.find((s) => s.session_id === sessionId);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="sm:max-w-[600px] h-[80vh] flex flex-col gap-0 p-0 overflow-hidden"
-        showCloseButton={false}
+    <Drawer direction="right" open={open} onOpenChange={onOpenChange}>
+      <DrawerContent
+        className="h-full w-full sm:max-w-[480px] flex flex-col gap-0 p-0 overflow-hidden border-l"
       >
         {/* Header */}
         <div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
@@ -372,18 +375,25 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
 
         {/* Input */}
         <div className="px-4 pb-4 pt-2 border-t shrink-0">
-          <div className="flex gap-2">
-            <Input
+          <div className="relative flex items-end gap-2">
+            <Textarea
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
               placeholder="Botingiz haqida yozing..."
               disabled={isLoading || !sessionId}
-              className="flex-1"
+              rows={1}
+              className="flex-1 min-h-[40px] max-h-[160px] resize-none py-2.5 overflow-y-auto"
             />
             <Button
               size="icon"
+              className="shrink-0 mb-0.5"
               onClick={sendMessage}
               disabled={!input.trim() || isLoading || !sessionId}
             >
@@ -394,11 +404,8 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
               )}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground mt-1.5 text-center">
-            Enter — yuborish
-          </p>
         </div>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 }

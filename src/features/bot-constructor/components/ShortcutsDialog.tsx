@@ -111,7 +111,7 @@ export function ShortcutsDialog({ open, onOpenChange }: ShortcutsDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[560px] gap-0 p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-auto gap-0 p-0">
         <DialogHeader className="px-5 pt-5 pb-3">
           <DialogTitle>Klaviatura yorliqlari</DialogTitle>
           <DialogDescription>
