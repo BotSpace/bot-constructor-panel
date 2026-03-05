@@ -30,6 +30,12 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
       active: "inline",
       inline: [],
       reply: [],
+      replyOptions: {
+        remove_after_use: true,
+        resize_keyboard: true,
+        one_time_keyboard: false,
+        is_persistent: false,
+      },
     },
   };
 
@@ -41,7 +47,7 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         withArgs: false,
         global: true,
       } as CommandTriggerNodeData;
-    
+
     // Actions
     case "SendTextMessageNode":
       return {
@@ -50,11 +56,6 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         parseMode: "HTML",
         disableNotification: false,
         protectContent: false,
-        keyboard: {
-          active: "inline",
-          inline: [],
-          reply: [],
-        },
       } as SendTextMessageNodeData;
     case "SendPhotoNode":
       return {
@@ -82,16 +83,12 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
       } as SendFileNodeData;
     case "EditMessageNode":
       return {
+        ...baseMessageData,
         messageIdSource: "this_message",
         messageId: null,
         newText: "",
         parseMode: "HTML",
         newCaption: "",
-        keyboard: {
-          active: "inline",
-          inline: [],
-          reply: [],
-        },
       } as EditMessageNodeData;
     case "DeleteMessageNode":
       return {
@@ -117,22 +114,13 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
       } as CustomCodeNodeData; // Custom code uchun alohida sozlamalar
     case "SendLocationNode":
       return {
-        keyboard: {
-          active: "inline",
-          inline: [],
-          reply: [],
-        },
+        ...baseMessageData,
       } as SendLocationNodeData;
     case "CallbackQueryAnswerNode":
       return {
-        keyboard: {
-          active: "inline",
-          inline: [],
-          reply: [],
-        },
+        ...baseMessageData,
       } as CallbackAnswerNodeData;
 
-    
     case "FormNode":
       return { items: [] } as FormNodeData;
 
@@ -168,7 +156,7 @@ const generateNodeId = () => `node_${generateId()}`;
 
 export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   set,
-  get
+  get,
 ) => ({
   addNode: (element, position) => {
     const { saveToHistory } = get();

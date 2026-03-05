@@ -64,9 +64,25 @@ export interface ButtonConfig {
 
 export type KeyboardType = "inline" | "reply";
 
+// Telegram ReplyKeyboardMarkup opsiyalari
+export interface ReplyKeyboardOptions {
+  resize_keyboard: boolean;
+  one_time_keyboard: boolean;
+  is_persistent: boolean;
+  remove_after_use: boolean;
+}
+
+export const DEFAULT_REPLY_KEYBOARD_OPTIONS: ReplyKeyboardOptions = {
+  remove_after_use: true,
+  resize_keyboard: true,
+  one_time_keyboard: false,
+  is_persistent: false,
+};
+
 // --- Yengi qo'shiladigan struktura ---
 export interface KeyboardConfig {
   active: KeyboardType;
   inline: ButtonConfig[][];
   reply: ButtonConfig[][];
+  replyOptions?: ReplyKeyboardOptions;
 }
