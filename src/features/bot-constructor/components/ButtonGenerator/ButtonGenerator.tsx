@@ -15,6 +15,8 @@ import { LayoutGrid } from "lucide-react";
 import { useFlowStore } from "../../store";
 import { Badge } from "@/components/ui/badge";
 import { calculateActiveButtonCount } from "./utils";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ButtonGeneratorProps {
   initialKeyboard: KeyboardConfig;
@@ -52,6 +54,8 @@ export function ButtonGenerator({
     handleRemoveRow,
     getFinalKeyboardConfig,
     keyboards: hookKeyboards,
+    replyOptions,
+    handleReplyOptionChange,
   } = useButtonGeneratorState(isOpen, keyboards);
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
@@ -59,6 +63,15 @@ export function ButtonGenerator({
   const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
     if (node_id) {
       updateNodeData(node_id, update);
+    }
+  };
+
+  const saveCurrentState = () => {
+    const finalConfig = getFinalKeyboardConfig();
+    if (onChange) {
+      onChange(finalConfig);
+    } else if (node_id) {
+      handleUpdate({ keyboard: finalConfig });
     }
   };
 
@@ -73,15 +86,7 @@ export function ButtonGenerator({
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      const finalConfig = getFinalKeyboardConfig();
-      
-      // If onChange callback is provided, use it (for form modal context)
-      if (onChange) {
-        onChange(finalConfig);
-      } else if (node_id) {
-        // Otherwise, auto-save to node (existing behavior)
-        handleUpdate({ keyboard: finalConfig });
-      }
+      saveCurrentState();
     }, 500);
 
     return () => {
@@ -89,7 +94,18 @@ export function ButtonGenerator({
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [isOpen, currentButtons, activeTab, onChange, node_id]);
+  }, [isOpen, currentButtons, activeTab, replyOptions, onChange, node_id]);
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open && isOpen) {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = null;
+      }
+      saveCurrentState();
+    }
+    setIsOpen(open);
+  };
 
   // 2. Button count logikasi (TUZATILDI)
   useEffect(() => {
@@ -112,70 +128,137 @@ export function ButtonGenerator({
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <div className="relative w-full">
-          <Button variant="outline" className="w-full">
-            <LayoutGrid className="mr-2 h-4 w-4" />
-            Tugmalarni Sozlash
-          </Button>
-          {buttonCount > 0 && (
-            <Badge
-              variant="destructive"
-              className="absolute -top-2 -right-2 px-1.5"
-            >
-              {buttonCount}
-            </Badge>
-          )}
-        </div>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[90%] md:max-w-[80%] lg:max-w-[90%] h-[90vh] overflow-y-auto">
-        <VisuallyHidden>
-          <DialogTitle>Tugmalarni Sozlash</DialogTitle>
-        </VisuallyHidden>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-4 h-full w-full">
-          <ControlPanel
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            onAddButton={handleAddButton}
-            isCurrentRowFull={isCurrentRowFull}
+    <>
+      <FieldGroup className="pb-2">
+        <Field orientation="horizontal">
+          <Checkbox
+            id="remove-after-use"
+            name="remove-after-use"
+            checked={replyOptions.remove_after_use}
+            onCheckedChange={(checked) => {
+              console.log(replyOptions);
+              handleReplyOptionChange("remove_after_use", checked === true)
+            }}
           />
-          <KeyboardPreview
-            buttons={currentButtons}
-            selectedRowIndex={selectedRowIndex}
-            maxButtonsPerRow={MAX_BUTTONS_PER_ROW}
-            onSelectRow={setSelectedRowIndex}
-            onAddRow={handleAddRow}
-            onRemoveButton={handleRemoveButton}
-            onChangeLayout={handleLayoutChange}
-            onEditButton={(rowIndex, buttonId) => {
-              const button = currentButtons[rowIndex]?.find(
-                (b) => b.id === buttonId
-              );
-              if (button) {
-                setEditingButton({ rowIndex, buttonId, button });
+          <FieldLabel htmlFor="remove-after-use">
+            Ishlatib bo'lgach o'chib ketishi kerak.
+          </FieldLabel>
+        </Field>
+      </FieldGroup>
+
+      <FieldGroup className="pb-2">
+        <Field orientation="horizontal">
+          <Checkbox
+            id="resize-keyboard"
+            name="resize-keyboard"
+            checked={replyOptions.resize_keyboard}
+            onCheckedChange={(checked) =>
+              handleReplyOptionChange("resize_keyboard", checked === true)
+            }
+          />
+          <FieldLabel htmlFor="resize-keyboard">
+            Tugmalarni ekran o‘lchamiga moslab kichraytirish.
+          </FieldLabel>
+        </Field>
+      </FieldGroup>
+
+      <FieldGroup className="pb-2">
+        <Field orientation="horizontal">
+          <Checkbox
+            id="one-time-keyboard"
+            name="one-time-keyboard"
+            checked={replyOptions.one_time_keyboard}
+            onCheckedChange={(checked) =>
+              handleReplyOptionChange("one_time_keyboard", checked === true)
+            }
+          />
+          <FieldLabel htmlFor="one-time-keyboard">
+            Tugma bosilgach, klaviatura avtomatik yashirinishi.
+          </FieldLabel>
+        </Field>
+      </FieldGroup>
+
+      <FieldGroup className="pb-2">
+        <Field orientation="horizontal">
+          <Checkbox
+            id="is-persistent"
+            name="is-persistent"
+            checked={replyOptions.is_persistent}
+            onCheckedChange={(checked) =>
+              handleReplyOptionChange("is_persistent", checked === true)
+            }
+          />
+          <FieldLabel htmlFor="is-persistent">
+            Klaviatura doimiy ochiq turishi (yashirish tugmasini olib tashlaydi).
+          </FieldLabel>
+        </Field>
+      </FieldGroup>
+
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild>
+          <div className="relative w-full">
+            <Button variant="outline" className="w-full">
+              <LayoutGrid className="mr-2 h-4 w-4" />
+              Tugmalarni Sozlash
+            </Button>
+            {buttonCount > 0 && (
+              <Badge
+                variant="destructive"
+                className="absolute -top-2 -right-2 px-1.5"
+              >
+                {buttonCount}
+              </Badge>
+            )}
+          </div>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[90%] md:max-w-[80%] lg:max-w-[90%] h-[90vh] overflow-y-auto">
+          <VisuallyHidden>
+            <DialogTitle>Tugmalarni Sozlash</DialogTitle>
+          </VisuallyHidden>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-4 h-full w-full">
+            <ControlPanel
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              onAddButton={handleAddButton}
+              isCurrentRowFull={isCurrentRowFull}
+            />
+            <KeyboardPreview
+              buttons={currentButtons}
+              selectedRowIndex={selectedRowIndex}
+              maxButtonsPerRow={MAX_BUTTONS_PER_ROW}
+              onSelectRow={setSelectedRowIndex}
+              onAddRow={handleAddRow}
+              onRemoveButton={handleRemoveButton}
+              onChangeLayout={handleLayoutChange}
+              onEditButton={(rowIndex, buttonId) => {
+                const button = currentButtons[rowIndex]?.find(
+                  (b) => b.id === buttonId
+                );
+                if (button) {
+                  setEditingButton({ rowIndex, buttonId, button });
+                }
+              }}
+              onRemoveRow={handleRemoveRow}
+            />
+          </div>
+
+          <EditButtonDialog
+            button={editingButton?.button || null}
+            isOpen={!!editingButton}
+            onClose={() => setEditingButton(null)}
+            onSave={(updatedButton) => {
+              if (editingButton) {
+                handleEditButton(
+                  editingButton.rowIndex,
+                  editingButton.buttonId,
+                  updatedButton
+                );
+                setEditingButton(null);
               }
             }}
-            onRemoveRow={handleRemoveRow}
           />
-        </div>
-
-        <EditButtonDialog
-          button={editingButton?.button || null}
-          isOpen={!!editingButton}
-          onClose={() => setEditingButton(null)}
-          onSave={(updatedButton) => {
-            if (editingButton) {
-              handleEditButton(
-                editingButton.rowIndex,
-                editingButton.buttonId,
-                updatedButton
-              );
-              setEditingButton(null);
-            }
-          }}
-        />
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
