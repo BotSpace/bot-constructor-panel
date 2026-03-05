@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useNodeExpanded } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { NodeProps, useEdges, useNodes } from "reactflow";
 import { Database, ChevronDown, Key, Type } from "lucide-react";
@@ -29,7 +29,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
     if (!incomingEdge) {
       return {
         dynamic: [],
-        default: [],
+        default: ['text'],
         custom: ["Custom"],
         all: ["Custom"],
       };
@@ -532,7 +532,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
 
     return {
       dynamic: dynamicFilters,
-      custom: ["Custom"],
+      custom: ["Custom", 'text'],
       all: allTypes,
     };
   }, [nodes, edges, id]);
@@ -550,7 +550,8 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
       return data.type; // Eski custom type'ni ko'rsatish
     }
     return data.customType || "";
-  }, [data.type, data.customType, availableTypes.all]);
+  }, [data.type, data.customType, availableTypes.all, isCustomType]);
+
 
   const handleKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateNodeData(id, { key: e.target.value });
@@ -719,11 +720,12 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
                   id="customType"
                   type="text"
                   placeholder="Masalan: custom_field, my_data..."
-                  value={displayCustomType}
+                  value={data.customType}
                   onChange={handleCustomTypeChange}
                   className="w-full bg-gray-800/50 border-purple-500/30 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
                   required
                 />
+
                 <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
                   O'zingizning custom ma'lumot turingizni kiriting
                 </p>
