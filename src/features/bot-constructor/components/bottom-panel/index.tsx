@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useState } from 'react'
 import { BottomPanelButton } from './components/button'
-import { Bot, Database, Keyboard, Plus, Search } from 'lucide-react'
+import { Bot, Database, Key, Keyboard, Plus, Search } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -22,6 +22,7 @@ import { useFlowStore } from '../../store'
 import { useReactFlow } from 'reactflow'
 import { ElementItemType } from '@/types/element-types'
 import { CollectionIframeDialog } from '../CollectionIframe/CollectionIframe'
+import { EnvManageDialog } from '../EnvManageDialog/EnvManageDialog'
 
 type Props = {}
 
@@ -32,6 +33,7 @@ function BottomPanel({ }: Props) {
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false);
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
     const [agentOpen, setAgentOpen] = useState(false);
+    const [envManageOpen, setEnvManageOpen] = useState(false);
     const { addNode } = useFlowStore();
     const { getViewport } = useReactFlow();
 
@@ -89,6 +91,10 @@ function BottomPanel({ }: Props) {
                             <Keyboard size={20} />
                         </BottomPanelButton>
 
+                        <BottomPanelButton onClick={() => setEnvManageOpen(true)} title="Kalitlarni boshqarish">
+                            <Key size={20} />
+                        </BottomPanelButton>
+
                         <BottomPanelButton className='relative inline-flex overflow-hidden p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50' onClick={() => setAgentOpen(true)} title="AI Agent">
                             <span className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
                             <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl bg-transparent px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
@@ -119,6 +125,12 @@ function BottomPanel({ }: Props) {
             <AgentChatDialog
                 open={agentOpen}
                 onOpenChange={setAgentOpen}
+                projectId={id as string}
+            />
+
+            <EnvManageDialog
+                open={envManageOpen}
+                onOpenChange={setEnvManageOpen}
                 projectId={id as string}
             />
         </>

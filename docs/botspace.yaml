@@ -1,0 +1,7059 @@
+openapi: 3.0.3
+info:
+  title: Your Project API
+  version: 1.0.0
+  description: Your project description
+paths:
+  /api/bot-webhook/{method}/{uuid}/:
+    post:
+      operationId: apiBotWebhookCreate
+      parameters:
+      - in: path
+        name: method
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: uuid
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/chat/mark-read/{projectId}/:
+    post:
+      operationId: apiChatMarkReadCreate
+      description: "\n        Userning xabarlarini o'qilgan deb belgilash.\n     \
+        \   \n        - Agar message_ids berilsa, faqat shu xabarlar o'qilgan bo'ladi\n\
+        \        - Agar message_ids berilmasa, userning barcha xabarlari o'qilgan\
+        \ bo'ladi\n        "
+      summary: Xabarlarni o'qilgan deb belgilash
+      parameters:
+      - in: path
+        name: projectId
+        schema:
+          type: integer
+        description: Project ID
+        required: true
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkAsReadRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MarkAsReadRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MarkAsReadRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/MarkAsReadResponse'
+                required:
+                - status
+                - data
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/chat/messages/{projectId}/{chatId}/:
+    get:
+      operationId: apiChatMessagesRetrieve
+      description: "\n        Bitta user (chat_id) uchun barcha xabarlarni olish.\n\
+        \        Pagination bilan qo'llab-quvvatlanadi.\n        "
+      summary: Bitta user uchun barcha xabarlarni olish
+      parameters:
+      - in: path
+        name: chatId
+        schema:
+          type: string
+        description: Telegram chat ID
+        required: true
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 50
+        description: Qaytariladigan xabarlar soni
+      - in: path
+        name: projectId
+        schema:
+          type: integer
+        description: Project ID
+        required: true
+      - in: query
+        name: skip
+        schema:
+          type: integer
+          default: 0
+        description: O'tkazib yuborilgan xabarlar soni
+      tags:
+      - chat
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/MessagesListResponse'
+                required:
+                - status
+                - data
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/chat/send-message/{projectId}/:
+    post:
+      operationId: apiChatSendMessageCreate
+      description: "\n        Bitta foydalanuvchiga xabar yuborish (matn va media).\n\
+        \        Yuborilgan xabar avtomatik ravishda chatga qo'shiladi va real-time\
+        \ stream orqali boshqa clientlarga yuboriladi.\n        \n        **Media\
+        \ yuborish:**\n        - photo: max 10MB\n        - video: max 50MB\n    \
+        \    - audio: max 50MB\n        - document: max 50MB\n        \n        **Telegram\
+        \ API limitlari:**\n        - 1 ta botga 30 xabar/soniya\n        - 1 ta chatga\
+        \ 1 xabar/soniya\n        - Bu limitlar avtomatik kuzatiladi\n        "
+      summary: Foydalanuvchiga xabar yuborish
+      parameters:
+      - in: path
+        name: projectId
+        schema:
+          type: integer
+        description: Project ID
+        required: true
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SendMessageResponse'
+                required:
+                - status
+                - data
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '413':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/chat/stats/{projectId}/:
+    get:
+      operationId: apiChatStatsRetrieve
+      description: "\n        Project uchun chat statistikasi:\n        - Jami userlar\
+        \ soni\n        - Jami xabarlar soni  \n        - O'qilmagan xabarlar soni\n\
+        \        - O'qilgan xabarlar soni\n        "
+      summary: Chat statistikasini olish
+      parameters:
+      - in: path
+        name: projectId
+        schema:
+          type: integer
+        description: Project ID
+        required: true
+      tags:
+      - chat
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ChatStatsResponse'
+                required:
+                - status
+                - data
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/chat/users/{projectId}/:
+    get:
+      operationId: apiChatUsersRetrieve
+      description: "\n        Project uchun barcha userlarni olish, har bir user uchun:\n\
+        \        - Oxirgi 1 ta xabar\n        - O'qilmagan xabarlar soni\n       \
+        \ - Jami xabarlar soni\n        \n        Userlar oxirgi xabar vaqti bo'yicha\
+        \ tartiblangan (eng yangi xabar tepada).\n        Pagination qo'llab-quvvatlanadi\
+        \ (limit va skip parametrlari).\n        "
+      summary: Userlar va ularning xabarlarini olish
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 50
+        description: Qaytariladigan userlar soni
+      - in: path
+        name: projectId
+        schema:
+          type: integer
+        description: Project ID
+        required: true
+      - in: query
+        name: skip
+        schema:
+          type: integer
+          default: 0
+        description: O'tkazib yuborilgan userlar soni (pagination)
+      tags:
+      - chat
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/UsersListResponse'
+                required:
+                - status
+                - data
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/collection/:
+    get:
+      operationId: apiCollectionList
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - collection
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListCollectionList'
+                required:
+                - status
+                - data
+          description: ''
+    post:
+      operationId: apiCollectionCreate
+      tags:
+      - collection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCollection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateCollection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateCollection'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CreateCollection'
+                required:
+                - status
+                - data
+          description: ''
+  /api/collection/{id}/:
+    get:
+      operationId: apiCollectionRetrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - collection
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveCollection'
+                required:
+                - status
+                - data
+          description: ''
+    put:
+      operationId: apiCollectionUpdate
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - collection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCollection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UpdateCollection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateCollection'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/UpdateCollection'
+                required:
+                - status
+                - data
+          description: ''
+    patch:
+      operationId: apiCollectionPartialUpdate
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - collection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateCollection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateCollection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateCollection'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/UpdateCollection'
+                required:
+                - status
+                - data
+          description: ''
+    delete:
+      operationId: apiCollectionDestroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - collection
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/collection/{id}/export-excel/:
+    post:
+      operationId: apiCollectionExportExcelCreate
+      description: |-
+        Initiate Excel export for collection data.
+        Returns task_id to track export progress.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - collection
+      security:
+      - jwtAuth: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ExportTaskStatus'
+                required:
+                - status
+                - data
+          description: ''
+  /api/collection/{id}/query/:
+    post:
+      operationId: apiCollectionQueryCreate
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - collection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListCollection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ListCollection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ListCollection'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListCollection'
+                required:
+                - status
+                - data
+          description: ''
+  /api/collection/export-status/{taskId}/:
+    get:
+      operationId: apiCollectionExportStatusRetrieve
+      description: Check status of export task by task_id.
+      parameters:
+      - in: path
+        name: taskId
+        schema:
+          type: string
+        required: true
+      tags:
+      - collection
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ExportTaskStatus'
+                required:
+                - status
+                - data
+          description: ''
+  /api/enviroment/:
+    get:
+      operationId: apiEnviromentList
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - enviroment
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListEnviromentList'
+                required:
+                - status
+                - data
+          description: ''
+    post:
+      operationId: apiEnviromentCreate
+      tags:
+      - enviroment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEnviroment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateEnviroment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateEnviroment'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CreateEnviroment'
+                required:
+                - status
+                - data
+          description: ''
+  /api/enviroment/{id}/:
+    get:
+      operationId: apiEnviromentRetrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - enviroment
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveEnviroment'
+                required:
+                - status
+                - data
+          description: ''
+    put:
+      operationId: apiEnviromentUpdate
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - enviroment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListEnviroment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ListEnviroment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ListEnviroment'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListEnviroment'
+                required:
+                - status
+                - data
+          description: ''
+    patch:
+      operationId: apiEnviromentPartialUpdate
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - enviroment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedListEnviroment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedListEnviroment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedListEnviroment'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListEnviroment'
+                required:
+                - status
+                - data
+          description: ''
+    delete:
+      operationId: apiEnviromentDestroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - enviroment
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/file/:
+    get:
+      operationId: apiFileList
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - file
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListFileList'
+                required:
+                - status
+                - data
+          description: ''
+    post:
+      operationId: apiFileCreate
+      tags:
+      - file
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CreateFile'
+                required:
+                - status
+                - data
+          description: ''
+  /api/file/{uuid}/:
+    get:
+      operationId: apiFileRetrieve
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - file
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveFile'
+                required:
+                - status
+                - data
+          description: ''
+    put:
+      operationId: apiFileUpdate
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+        required: true
+      tags:
+      - file
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ListFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ListFile'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListFile'
+                required:
+                - status
+                - data
+          description: ''
+    patch:
+      operationId: apiFilePartialUpdate
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+        required: true
+      tags:
+      - file
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedListFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedListFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedListFile'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListFile'
+                required:
+                - status
+                - data
+          description: ''
+    delete:
+      operationId: apiFileDestroy
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+        required: true
+      tags:
+      - file
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/history/:
+    get:
+      operationId: apiHistoryList
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - history
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListHistoryList'
+                required:
+                - status
+                - data
+          description: ''
+  /api/history/{id}/:
+    get:
+      operationId: apiHistoryRetrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - history
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveHistory'
+                required:
+                - status
+                - data
+          description: ''
+  /api/internal/project-by-debug-uuid/{uuid}/:
+    get:
+      operationId: apiInternalProjectByDebugUuidRetrieve
+      description: |-
+        Get project information by debug webhook UUID
+
+        This endpoint is used by the Golang webhook service to get project info.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/internal/project-by-release-uuid/{uuid}/:
+    get:
+      operationId: apiInternalProjectByReleaseUuidRetrieve
+      description: |-
+        Get project information by release webhook UUID
+
+        This endpoint is used by the Golang webhook service to get project info.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/message/:
+    get:
+      operationId: apiMessageList
+      description: ViewSet for managing broadcast messages
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedMessageList'
+                required:
+                - status
+                - data
+          description: ''
+    post:
+      operationId: apiMessageCreate
+      description: ViewSet for managing broadcast messages
+      tags:
+      - api
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendMessage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendMessage'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessage'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SendMessage'
+                required:
+                - status
+                - data
+          description: ''
+  /api/message/{id}/:
+    get:
+      operationId: apiMessageRetrieve
+      description: ViewSet for managing broadcast messages
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this message.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Message'
+                required:
+                - status
+                - data
+          description: ''
+    put:
+      operationId: apiMessageUpdate
+      description: ViewSet for managing broadcast messages
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this message.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendMessage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendMessage'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessage'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SendMessage'
+                required:
+                - status
+                - data
+          description: ''
+    patch:
+      operationId: apiMessagePartialUpdate
+      description: ViewSet for managing broadcast messages
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this message.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSendMessage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSendMessage'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSendMessage'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SendMessage'
+                required:
+                - status
+                - data
+          description: ''
+    delete:
+      operationId: apiMessageDestroy
+      description: ViewSet for managing broadcast messages
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this message.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/payment/click/update/:
+    post:
+      operationId: apiPaymentClickUpdateCreate
+      description: Check if request is valid
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/payment/create-transaction/:
+    post:
+      operationId: apiPaymentCreateTransactionCreate
+      tags:
+      - order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentLink'
+            examples:
+              Create:
+                value:
+                  method: click
+                  amount: 100000
+                summary: create
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentLink'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentLink'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      link:
+                        type: string
+                        example: https://google.com
+                required:
+                - status
+                - data
+          description: ''
+  /api/payment/payme/update/:
+    post:
+      operationId: apiPaymentPaymeUpdateCreate
+      description: Handle the incoming webhook request.
+      tags:
+      - api
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/plans/:
+    get:
+      operationId: apiPlansList
+      description: |-
+        Tariflarni ko'rish API
+
+        list: Barcha aktiv tariflarni olish
+        retrieve: Bitta tarifni ko'rish
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedPlanList'
+                required:
+                - status
+                - data
+          description: ''
+  /api/plans/{id}/:
+    get:
+      operationId: apiPlansRetrieve
+      description: |-
+        Tariflarni ko'rish API
+
+        list: Barcha aktiv tariflarni olish
+        retrieve: Bitta tarifni ko'rish
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Tarif.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Plan'
+                required:
+                - status
+                - data
+          description: ''
+  /api/project/:
+    get:
+      operationId: apiProjectList
+      description: Foydalanuvchiga tegishli barcha loyihalarni qaytaradi.
+      summary: Loyihalar ro'yxati
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - project
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListProjectList'
+                required:
+                - status
+                - data
+          description: ''
+    post:
+      operationId: apiProjectCreate
+      description: |-
+        Yangi loyiha yaratadi. Loyiha yaratish **bepul va limitsiz** — plan talab qilinmaydi.
+
+        Loyiha avtomatik ravishda **FREE** tarifga biriktiriladi.
+
+        Tarif birinchi **release** qo'shilganda tanlanadi.
+      summary: Loyiha yaratish
+      tags:
+      - project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProject'
+            examples:
+              LoyihaYaratish:
+                value:
+                  name: Mening botim
+                summary: Loyiha yaratish
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateProject'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateProject'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListProject'
+                required:
+                - status
+                - data
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - Bu maydon to'ldirilishi shart.
+          description: Validatsiya xatosi
+  /api/project/{id}/:
+    get:
+      operationId: apiProjectRetrieve
+      description: Berilgan ID bo'yicha loyihaning to'liq ma'lumotlarini qaytaradi.
+      summary: Loyiha ma'lumotlari
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - project
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveProject'
+                required:
+                - status
+                - data
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+          description: Loyiha topilmadi
+    put:
+      operationId: apiProjectUpdate
+      description: Loyiha ma'lumotlarini to'liq yangilaydi.
+      summary: Loyihani yangilash
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProject'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateProject'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateProject'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListProject'
+                required:
+                - status
+                - data
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+          description: Loyiha topilmadi
+    patch:
+      operationId: apiProjectPartialUpdate
+      description: Loyiha ma'lumotlarini qisman yangilaydi (faqat yuborilgan maydonlar
+        o'zgaradi).
+      summary: Loyihani qisman yangilash
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateProject'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateProject'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateProject'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListProject'
+                required:
+                - status
+                - data
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+          description: Loyiha topilmadi
+    delete:
+      operationId: apiProjectDestroy
+      description: Loyihani va unga bog'liq barcha ma'lumotlarni o'chiradi.
+      summary: Loyihani o'chirish
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - project
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+          description: Loyiha topilmadi
+  /api/project/{id}/dashboard/:
+    get:
+      operationId: apiProjectDashboardRetrieve
+      description: Loyiha bo'yicha foydalanuvchilar soni va kunlik o'sish grafigini
+        qaytaradi.
+      summary: Dashboard statistikasi
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - project
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      total_users:
+                        type: integer
+                        example: 1500
+                      daily_users:
+                        type: integer
+                        example: 43
+                      chart:
+                        type: object
+                        properties:
+                          new_users:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                date:
+                                  type: string
+                                  example: '2026-02-28'
+                                value:
+                                  type: integer
+                                  example: 43
+                required:
+                - status
+                - data
+          description: Statistika ma'lumotlari
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+          description: Loyiha topilmadi
+  /api/project/{id}/debug/:
+    get:
+      operationId: apiProjectDebugRetrieve
+      description: |-
+        Loyihaning debug konteynerini ishga tushiradi.
+
+        Debug rejimi test maqsadida ishlatiladi va real foydalanuvchilarga ta'sir qilmaydi.
+      summary: Debug rejimini ishga tushirish
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - project
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      detail:
+                        type: string
+                        example: Updated
+                required:
+                - status
+                - data
+          description: Debug muvaffaqiyatli ishga tushirildi
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+          description: Loyiha topilmadi
+  /api/project/{id}/info/:
+    get:
+      operationId: apiProjectInfoRetrieve
+      description: Loyihaning debug konteynerining joriy holati va ma'lumotlarini
+        qaytaradi.
+      summary: Debug holati
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - project
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListDebug'
+                required:
+                - status
+                - data
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+          description: Loyiha topilmadi
+  /api/project/{id}/stop/:
+    get:
+      operationId: apiProjectStopRetrieve
+      description: Loyihaning ishlab turgan debug konteynerini to'xtatadi.
+      summary: Debug konteynerini to'xtatish
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - project
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      detail:
+                        type: string
+                        example: Stopped
+                required:
+                - status
+                - data
+          description: Muvaffaqiyatli to'xtatildi
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+          description: Loyiha topilmadi
+  /api/project/{projectPk}/plan/:
+    get:
+      operationId: apiProjectPlanRetrieve
+      description: |-
+        Proyektning joriy tarifini olish
+
+        GET /api/projects/{project_id}/plan/
+      parameters:
+      - in: path
+        name: projectPk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/project/{projectPk}/plan/upgrade/:
+    post:
+      operationId: apiProjectPlanUpgradeCreate
+      description: |-
+        Proyekt tarifini yangilash
+
+        POST /api/projects/{project_id}/plan/upgrade/
+        Body: {"plan_id": 2}
+      parameters:
+      - in: path
+        name: projectPk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/project/{projectPk}/plan/usage/:
+    get:
+      operationId: apiProjectPlanUsageRetrieve
+      description: |-
+        Proyekt foydalanish statistikasi
+
+        GET /api/projects/{project_id}/plan/usage/
+      parameters:
+      - in: path
+        name: projectPk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/project/create-from-template/:
+    post:
+      operationId: apiProjectCreateFromTemplateCreate
+      description: |-
+        Sotib olingan shablondan yangi loyiha yaratadi.
+
+        Shablon avval sotib olingan bo'lishi shart.
+
+        Loyiha FREE tarifga biriktiriladi va darhol birinchi release (v1) ham yaratiladi.
+      summary: Shablondan loyiha yaratish
+      tags:
+      - project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectFromTemplate'
+            examples:
+              ShablondanLoyihaYaratish:
+                value:
+                  template: 1
+                  name: Mening shablon botim
+                  token: 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
+                summary: Shablondan loyiha yaratish
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateProjectFromTemplate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateProjectFromTemplate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListProject'
+                required:
+                - status
+                - data
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: template not purchased
+                  template:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - Kechirasiz templateda muammo bor iltimos admin bilan bo'g'laning
+          description: Xatolik
+  /api/relase/:
+    get:
+      operationId: apiRelaseList
+      description: Berilgan loyiha bo'yicha barcha releaselarni qaytaradi.
+      summary: Releaselar ro'yxati
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: project
+        schema:
+          type: integer
+        description: Loyiha ID si (majburiy)
+        required: true
+      tags:
+      - relase
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListRelaseList'
+                required:
+                - status
+                - data
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  project:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - project is required
+          description: project parametri yo'q
+    post:
+      operationId: apiRelaseCreate
+      description: |-
+        Loyiha uchun yangi release yaratadi va uni deploy qiladi.
+
+        **Tarif qoidalari:**
+        - **Birinchi release** — `plan_id` majburiy:
+          - Agar siz hech qaysi loyihangizda FREE plan bilan release qilmagan bo'lsangiz → FREE yoki pulli plan tanlash mumkin.
+          - Agar siz biror loyihangizda FREE plan bilan allaqachon release qilgan bo'lsangiz → pulli tarif tanlash **majburiy**.
+          - Pulli tarif tanlanganda balansdan bir martalik to'lov yechiladi va plan loyihaga biriktiriladi.
+
+        - **Keyingi releaselar** — `plan_id` talab qilinmaydi. Plan allaqachon loyihaga biriktirilgan, oylik to'lov avtomatik yechib turiladi.
+
+        **Versiya** avtomatik oshiriladi.
+      summary: Yangi release yaratish
+      tags:
+      - relase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRelase'
+            examples:
+              BirinchiRelease(FREETarif):
+                value:
+                  project: 1
+                  plan_id: 1
+                summary: Birinchi release (FREE tarif)
+                description: Birinchi marta release qilish — FREE tarif tanlangan
+                  holda
+              BirinchiRelease(pulliTarif):
+                value:
+                  project: 1
+                  plan_id: 2
+                summary: Birinchi release (pulli tarif)
+                description: Birinchi marta release qilish — pulli tarif tanlangan
+                  holda (balansdan yechiladi)
+              KeyingiRelease:
+                value:
+                  project: 1
+                summary: Keyingi release
+                description: Loyihada allaqachon release bor — plan_id talab qilinmaydi
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateRelase'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateRelase'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListRelase'
+                required:
+                - status
+                - data
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plan_id:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - Birinchi release uchun tarif tanlash majburiy
+                    - Siz allaqachon bepul tarifdan foydalangansiz. Pulli tarif tanlash
+                      majburiy
+                    - 'Balansingiz yetarli emas. Kerakli: 50000, Mavjud: 10000'
+                  project:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - Bu maydon to'ldirilishi shart.
+          description: Validatsiya xatosi
+  /api/relase/{id}/:
+    get:
+      operationId: apiRelaseRetrieve
+      description: Berilgan ID bo'yicha releasening to'liq ma'lumotlarini (flow ham
+        kiritilgan holda) qaytaradi.
+      summary: Release ma'lumotlari
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - relase
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveRelase'
+                required:
+                - status
+                - data
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+          description: Release topilmadi
+  /api/relase/{id}/stop/:
+    get:
+      operationId: apiRelaseStopRetrieve
+      description: Ishlab turgan release konteynerini to'xtatadi.
+      summary: Releaseni to'xtatish
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - relase
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      detail:
+                        type: string
+                        example: Stopped
+                required:
+                - status
+                - data
+          description: Muvaffaqiyatli to'xtatildi
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+          description: Release topilmadi
+  /api/resource/:
+    get:
+      operationId: apiResourceList
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - resource
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListResourceList'
+                required:
+                - status
+                - data
+          description: ''
+    post:
+      operationId: apiResourceCreate
+      tags:
+      - resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResource'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateResource'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateResource'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CreateResource'
+                required:
+                - status
+                - data
+          description: ''
+  /api/resource/{id}/:
+    get:
+      operationId: apiResourceRetrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - resource
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveResource'
+                required:
+                - status
+                - data
+          description: ''
+    put:
+      operationId: apiResourceUpdate
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListResource'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ListResource'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ListResource'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListResource'
+                required:
+                - status
+                - data
+          description: ''
+    patch:
+      operationId: apiResourcePartialUpdate
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedListResource'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedListResource'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedListResource'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListResource'
+                required:
+                - status
+                - data
+          description: ''
+    delete:
+      operationId: apiResourceDestroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - resource
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/settings/config/:
+    get:
+      operationId: apiSettingsConfigRetrieve
+      summary: Get public settings
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      example_key:
+                        type: object
+                        properties:
+                          example_key:
+                            type: array
+                            items:
+                              type: string
+                            example:
+                            - 12300.5
+                required:
+                - status
+                - data
+          description: ''
+  /api/settings/languages/:
+    get:
+      operationId: apiSettingsLanguagesRetrieve
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListLanguageList'
+                required:
+                - status
+                - data
+          description: ''
+  /api/template/category/:
+    get:
+      operationId: apiTemplateCategoryList
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - template
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListTemplateCategoryList'
+                required:
+                - status
+                - data
+          description: ''
+  /api/template/category/{id}/:
+    get:
+      operationId: apiTemplateCategoryRetrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this TemplateCategoryModel.
+        required: true
+      tags:
+      - template
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveTemplateCategory'
+                required:
+                - status
+                - data
+          description: ''
+  /api/template/feature/:
+    get:
+      operationId: apiTemplateFeatureList
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - template
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListTemplateFeatureList'
+                required:
+                - status
+                - data
+          description: ''
+  /api/template/feature/{id}/:
+    get:
+      operationId: apiTemplateFeatureRetrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this TemplateFeatureModel.
+        required: true
+      tags:
+      - template
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveTemplateFeature'
+                required:
+                - status
+                - data
+          description: ''
+  /api/template/list/:
+    get:
+      operationId: apiTemplateListList
+      parameters:
+      - in: query
+        name: categories
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: features
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: price_max
+        schema:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          title: Price
+      - in: query
+        name: price_min
+        schema:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          title: Price
+      - in: query
+        name: search
+        schema:
+          type: string
+      tags:
+      - template
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListTemplateList'
+                required:
+                - status
+                - data
+          description: ''
+  /api/template/list/{slug}/:
+    get:
+      operationId: apiTemplateListRetrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - template
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveTemplate'
+                required:
+                - status
+                - data
+          description: ''
+  /api/template/order/:
+    get:
+      operationId: apiTemplateOrderList
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - order
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListTemplateOrderList'
+                required:
+                - status
+                - data
+          description: ''
+    post:
+      operationId: apiTemplateOrderCreate
+      tags:
+      - order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateOrder'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CreateTemplateOrder'
+                required:
+                - status
+                - data
+          description: ''
+  /api/template/order/{id}/:
+    get:
+      operationId: apiTemplateOrderRetrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - order
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveTemplateOrder'
+                required:
+                - status
+                - data
+          description: ''
+  /api/template/submission/:
+    get:
+      operationId: apiTemplateSubmissionList
+      description: |-
+        ViewSet for template submission requests.
+
+        Users can submit their projects as templates for approval.
+        Admins can approve or reject submissions via Django admin panel.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - template-submission
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListTemplateSubmissionList'
+                required:
+                - status
+                - data
+          description: ''
+    post:
+      operationId: apiTemplateSubmissionCreate
+      description: |-
+        ViewSet for template submission requests.
+
+        Users can submit their projects as templates for approval.
+        Admins can approve or reject submissions via Django admin panel.
+      tags:
+      - template-submission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateSubmission'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateSubmission'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateSubmission'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CreateTemplateSubmission'
+                required:
+                - status
+                - data
+          description: ''
+  /api/template/submission/{id}/:
+    get:
+      operationId: apiTemplateSubmissionRetrieve
+      description: |-
+        ViewSet for template submission requests.
+
+        Users can submit their projects as templates for approval.
+        Admins can approve or reject submissions via Django admin panel.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - template-submission
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveTemplateSubmission'
+                required:
+                - status
+                - data
+          description: ''
+    put:
+      operationId: apiTemplateSubmissionUpdate
+      description: |-
+        ViewSet for template submission requests.
+
+        Users can submit their projects as templates for approval.
+        Admins can approve or reject submissions via Django admin panel.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - template-submission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListTemplateSubmission'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ListTemplateSubmission'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ListTemplateSubmission'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListTemplateSubmission'
+                required:
+                - status
+                - data
+          description: ''
+    patch:
+      operationId: apiTemplateSubmissionPartialUpdate
+      description: |-
+        ViewSet for template submission requests.
+
+        Users can submit their projects as templates for approval.
+        Admins can approve or reject submissions via Django admin panel.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - template-submission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateTemplateSubmission'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateTemplateSubmission'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateTemplateSubmission'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CreateTemplateSubmission'
+                required:
+                - status
+                - data
+          description: ''
+    delete:
+      operationId: apiTemplateSubmissionDestroy
+      description: |-
+        ViewSet for template submission requests.
+
+        Users can submit their projects as templates for approval.
+        Admins can approve or reject submissions via Django admin panel.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - template-submission
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/template/withdrawal/:
+    get:
+      operationId: apiTemplateWithdrawalList
+      description: |-
+        ViewSet for template withdrawal requests.
+
+        Template authors can request withdrawal of their template earnings.
+        Admins can approve or reject requests via Django admin panel.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - template-withdrawal
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListTemplateWithdrawalList'
+                required:
+                - status
+                - data
+          description: ''
+    post:
+      operationId: apiTemplateWithdrawalCreate
+      description: |-
+        ViewSet for template withdrawal requests.
+
+        Template authors can request withdrawal of their template earnings.
+        Admins can approve or reject requests via Django admin panel.
+      tags:
+      - template-withdrawal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateWithdrawal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateWithdrawal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateWithdrawal'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CreateTemplateWithdrawal'
+                required:
+                - status
+                - data
+          description: ''
+  /api/template/withdrawal/{id}/:
+    get:
+      operationId: apiTemplateWithdrawalRetrieve
+      description: |-
+        ViewSet for template withdrawal requests.
+
+        Template authors can request withdrawal of their template earnings.
+        Admins can approve or reject requests via Django admin panel.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - template-withdrawal
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveTemplateWithdrawal'
+                required:
+                - status
+                - data
+          description: ''
+    put:
+      operationId: apiTemplateWithdrawalUpdate
+      description: |-
+        ViewSet for template withdrawal requests.
+
+        Template authors can request withdrawal of their template earnings.
+        Admins can approve or reject requests via Django admin panel.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - template-withdrawal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListTemplateWithdrawal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ListTemplateWithdrawal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ListTemplateWithdrawal'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListTemplateWithdrawal'
+                required:
+                - status
+                - data
+          description: ''
+    patch:
+      operationId: apiTemplateWithdrawalPartialUpdate
+      description: |-
+        ViewSet for template withdrawal requests.
+
+        Template authors can request withdrawal of their template earnings.
+        Admins can approve or reject requests via Django admin panel.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - template-withdrawal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedListTemplateWithdrawal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedListTemplateWithdrawal'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedListTemplateWithdrawal'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ListTemplateWithdrawal'
+                required:
+                - status
+                - data
+          description: ''
+    delete:
+      operationId: apiTemplateWithdrawalDestroy
+      description: |-
+        ViewSet for template withdrawal requests.
+
+        Template authors can request withdrawal of their template earnings.
+        Admins can approve or reject requests via Django admin panel.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - template-withdrawal
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/transaction/:
+    get:
+      operationId: apiTransactionList
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - transaction
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PaginatedListTransactionList'
+                required:
+                - status
+                - data
+          description: ''
+  /api/transaction/{id}/:
+    get:
+      operationId: apiTransactionRetrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - transaction
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RetrieveTransaction'
+                required:
+                - status
+                - data
+          description: ''
+  /api/used/:
+    get:
+      operationId: apiUsedRetrieve
+      tags:
+      - used
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/user/balance/:
+    get:
+      operationId: apiUserBalanceRetrieve
+      description: |-
+        User hisobidagi balansni olish
+
+        Args:
+            request ([TODO:type]): [TODO:description]
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /auth/change-password/:
+    post:
+      operationId: authChangePasswordCreate
+      description: Change password of the authenticated user.
+      summary: Change user password.
+      tags:
+      - change-password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ChangePassword'
+                required:
+                - status
+                - data
+          description: ''
+  /auth/confirm/:
+    post:
+      operationId: authConfirmCreate
+      description: Auth confirm user.
+      summary: Auth confirm.
+      tags:
+      - register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Confirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Confirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Confirm'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Confirm'
+                required:
+                - status
+                - data
+          description: ''
+  /auth/me/:
+    get:
+      operationId: authMeRetrieve
+      tags:
+      - me
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/User'
+                required:
+                - status
+                - data
+          description: ''
+  /auth/register/:
+    post:
+      operationId: authRegisterCreate
+      tags:
+      - register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Register'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Register'
+                required:
+                - status
+                - data
+          description: ''
+  /auth/resend/:
+    post:
+      operationId: authResendCreate
+      tags:
+      - register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Resend'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Resend'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Resend'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Resend'
+                required:
+                - status
+                - data
+          description: ''
+  /auth/reset-password/:
+    post:
+      operationId: authResetPasswordCreate
+      tags:
+      - reset-password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ResetPassword'
+                required:
+                - status
+                - data
+          description: ''
+  /auth/reset-password-confirm/:
+    post:
+      operationId: authResetPasswordConfirmCreate
+      tags:
+      - reset-password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetConfirmation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResetConfirmation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResetConfirmation'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ResetConfirmation'
+                required:
+                - status
+                - data
+          description: ''
+  /auth/reset-password-set/:
+    post:
+      operationId: authResetPasswordSetCreate
+      tags:
+      - reset-password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SetPassword'
+                required:
+                - status
+                - data
+          description: ''
+  /auth/token/:
+    post:
+      operationId: authTokenCreate
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/TokenObtainPair'
+                required:
+                - status
+                - data
+          description: ''
+  /auth/token/refresh/:
+    post:
+      operationId: authTokenRefreshCreate
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/TokenRefresh'
+                required:
+                - status
+                - data
+          description: ''
+  /auth/token/verify/:
+    post:
+      operationId: authTokenVerifyCreate
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/TokenVerify'
+                required:
+                - status
+                - data
+          description: ''
+  /auth/user-update/:
+    put:
+      operationId: authUserUpdateUpdate
+      tags:
+      - me
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/UserUpdate'
+                required:
+                - status
+                - data
+          description: ''
+    patch:
+      operationId: authUserUpdatePartialUpdate
+      tags:
+      - me
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/UserUpdate'
+                required:
+                - status
+                - data
+          description: ''
+  /authbot/login/:
+    post:
+      operationId: authbotLoginCreate
+      tags:
+      - authbot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Login'
+                required:
+                - status
+                - data
+          description: ''
+  /authbot/webhook/:
+    post:
+      operationId: authbotWebhookCreate
+      description: Telegram webhook view to handle incoming updates
+      tags:
+      - authbot
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    ChangePassword:
+      type: object
+      properties:
+        old_password:
+          type: string
+        new_password:
+          type: string
+          minLength: 8
+      required:
+      - new_password
+      - old_password
+    ChatStatsResponse:
+      type: object
+      description: Chat statistikasi response
+      properties:
+        total_users:
+          type: integer
+          description: Jami userlar soni
+        total_messages:
+          type: integer
+          description: Jami xabarlar soni
+        unread_messages:
+          type: integer
+          description: O'qilmagan xabarlar soni
+        read_messages:
+          type: integer
+          description: O'qilgan xabarlar soni
+      required:
+      - read_messages
+      - total_messages
+      - total_users
+      - unread_messages
+    Confirm:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 4
+          minLength: 4
+        phone:
+          type: string
+          maxLength: 255
+      required:
+      - code
+      - phone
+    CreateCollection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        project:
+          type: integer
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateField'
+      required:
+      - id
+      - name
+      - project
+    CreateDebug:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          enum:
+          - pending
+          - initializing
+          - running
+          - stopped
+          - stopping
+          - failed
+          - suspended
+          type: string
+          description: |-
+            * `pending` - pending
+            * `initializing` - initializing
+            * `running` - running
+            * `stopped` - stopped
+            * `stopping` - stopping
+            * `failed` - failed
+            * `suspended` - suspended
+          x-spec-enum-id: 55424add8a8b4799
+        service_id:
+          type: string
+          nullable: true
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - updated_at
+    CreateEnviroment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        key:
+          type: string
+          title: Name
+          maxLength: 255
+        value:
+          type: string
+          maxLength: 255
+        project:
+          type: integer
+      required:
+      - id
+      - key
+      - project
+      - value
+    CreateField:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        type:
+          enum:
+          - text
+          - number
+          - bool
+          - datetime
+          - file
+          - audio
+          - video
+          - photo
+          - relation
+          type: string
+          description: |-
+            * `text` - Text
+            * `number` - Number
+            * `bool` - bool
+            * `datetime` - datetime
+            * `file` - file
+            * `audio` - audio
+            * `video` - video
+            * `photo` - photo
+            * `relation` - Relation
+          x-spec-enum-id: 85ed391b3254a087
+          title: Name
+        required:
+          type: boolean
+        default:
+          type: string
+          nullable: true
+          maxLength: 255
+        relation_collection:
+          type: integer
+          nullable: true
+          description: Referenced collection for RELATION type fields
+      required:
+      - id
+      - name
+    CreateFile:
+      type: object
+      properties:
+        file:
+          type: string
+          format: uri
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        filesize:
+          type: integer
+          readOnly: true
+          nullable: true
+        filetype:
+          enum:
+          - file
+          - photo
+          - video
+          - audio
+          type: string
+          description: |-
+            * `file` - File
+            * `photo` - Photo
+            * `video` - Video
+            * `audio` - Audio
+          x-spec-enum-id: ee69fa0c75a08251
+        project:
+          type: integer
+      required:
+      - file
+      - filesize
+      - project
+      - uuid
+    CreatePaymentLink:
+      type: object
+      properties:
+        method:
+          enum:
+          - click
+          - payme
+          - paynet
+          - uzum
+          type: string
+          description: |-
+            * `click` - Click
+            * `payme` - Payme
+            * `paynet` - Paynet
+            * `uzum` - Uzum
+          x-spec-enum-id: 3240330cf906b6e3
+        amount:
+          type: integer
+      required:
+      - amount
+      - method
+    CreateProject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        debug:
+          $ref: '#/components/schemas/CreateDebug'
+        flow: {}
+      required:
+      - id
+      - name
+    CreateProjectFromTemplate:
+      type: object
+      properties:
+        template:
+          type: integer
+          description: Shablon ID
+        name:
+          type: string
+          description: Loyiha nomi
+          maxLength: 255
+        token:
+          type: string
+          description: Release bot tokeni
+          maxLength: 255
+      required:
+      - name
+      - template
+      - token
+    CreateRelase:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+        version:
+          type: integer
+          readOnly: true
+        plan_id:
+          type: integer
+          writeOnly: true
+          description: Tarif ID. Faqat birinchi release uchun majburiy. Loyihada allaqachon
+            release bo'lsa, bu maydon e'tiborga olinmaydi.
+      required:
+      - id
+      - project
+      - version
+    CreateResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+        hostname:
+          type: string
+        ram:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        cpu:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        net_rx:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        net_tx:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+      required:
+      - cpu
+      - hostname
+      - id
+      - net_rx
+      - net_tx
+      - project
+      - ram
+      - user
+    CreateTemplateOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        template:
+          type: integer
+          nullable: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        status:
+          enum:
+          - pending
+          - confirm
+          - cancel
+          type: string
+          description: |-
+            * `pending` - Pending
+            * `confirm` - Confirm
+            * `cancel` - Cancel
+          x-spec-enum-id: 488bbac6099d3352
+          readOnly: true
+        payment_status:
+          type: boolean
+      required:
+      - amount
+      - id
+      - status
+      - template
+    CreateTemplateSubmission:
+      type: object
+      description: Serializer for creating template submission requests
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+          description: Project to be converted into a template
+        name:
+          type: string
+          title: Template name
+          maxLength: 255
+        short_description:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+          format: uri
+          nullable: true
+        video:
+          type: string
+          format: uri
+          nullable: true
+        demo_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        original_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        categories:
+          type: array
+          items:
+            type: integer
+        features:
+          type: array
+          items:
+            type: integer
+      required:
+      - description
+      - id
+      - name
+      - original_price
+      - project
+      - short_description
+    CreateTemplateWithdrawal:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        card_number:
+          type: string
+          maxLength: 20
+        card_owner:
+          type: string
+          maxLength: 255
+      required:
+      - amount
+      - card_number
+      - card_owner
+    ErrorResponse:
+      type: object
+      description: Xato response
+      properties:
+        error:
+          type: string
+          description: Xato xabari
+      required:
+      - error
+    ExportTaskStatus:
+      type: object
+      description: Serializer for export task status
+      properties:
+        task_id:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          enum:
+          - pending
+          - processing
+          - completed
+          - failed
+          type: string
+          description: |-
+            * `pending` - Pending
+            * `processing` - Processing
+            * `completed` - Completed
+            * `failed` - Failed
+          x-spec-enum-id: 31660f45da4cddcc
+          readOnly: true
+        file_url:
+          type: string
+          readOnly: true
+        file_path:
+          type: string
+          readOnly: true
+          nullable: true
+        error_message:
+          type: string
+          readOnly: true
+          nullable: true
+        total_records:
+          type: integer
+          readOnly: true
+          nullable: true
+        processed_records:
+          type: integer
+          readOnly: true
+        progress_percentage:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - error_message
+      - file_path
+      - file_url
+      - processed_records
+      - progress_percentage
+      - status
+      - task_id
+      - total_records
+      - updated_at
+    ListCollection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - name
+    ListDebug:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          enum:
+          - pending
+          - initializing
+          - running
+          - stopped
+          - stopping
+          - failed
+          - suspended
+          type: string
+          description: |-
+            * `pending` - pending
+            * `initializing` - initializing
+            * `running` - running
+            * `stopped` - stopped
+            * `stopping` - stopping
+            * `failed` - failed
+            * `suspended` - suspended
+          x-spec-enum-id: 55424add8a8b4799
+        service_id:
+          type: string
+          nullable: true
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - updated_at
+    ListEnviroment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        key:
+          type: string
+          title: Name
+          maxLength: 255
+        value:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - key
+      - value
+    ListFile:
+      type: object
+      properties:
+        file:
+          type: string
+          format: uri
+        uuid:
+          type: string
+          format: uuid
+        filesize:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        filetype:
+          enum:
+          - file
+          - photo
+          - video
+          - audio
+          type: string
+          description: |-
+            * `file` - File
+            * `photo` - Photo
+            * `video` - Video
+            * `audio` - Audio
+          x-spec-enum-id: ee69fa0c75a08251
+        project:
+          type: integer
+      required:
+      - file
+      - project
+    ListHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,28}(?:\.\d{0,2})?$
+        type:
+          enum:
+          - income
+          - expense
+          type: string
+          description: |-
+            * `income` - income
+            * `expense` - expense
+          x-spec-enum-id: bad304bd2847434b
+        comment:
+          type: string
+          nullable: true
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - id
+    ListLanguage:
+      type: object
+      properties:
+        code:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        is_default:
+          type: boolean
+          readOnly: true
+          default: false
+      required:
+      - code
+      - is_default
+      - name
+    ListProject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        users:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          nullable: true
+          maxLength: 255
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+        release:
+          $ref: '#/components/schemas/ListRelase'
+        plan:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - name
+      - plan
+      - release
+      - users
+    ListRelase:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          enum:
+          - pending
+          - initializing
+          - running
+          - stopped
+          - stopping
+          - failed
+          - suspended
+          type: string
+          description: |-
+            * `pending` - pending
+            * `initializing` - initializing
+            * `running` - running
+            * `stopped` - stopped
+            * `stopping` - stopping
+            * `failed` - failed
+            * `suspended` - suspended
+          x-spec-enum-id: 55424add8a8b4799
+        service_id:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - id
+      - version
+    ListResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: integer
+        project:
+          type: integer
+        hostname:
+          type: string
+        ram:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        cpu:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        net_rx:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        net_tx:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+      required:
+      - cpu
+      - hostname
+      - id
+      - net_rx
+      - net_tx
+      - project
+      - ram
+      - user
+    ListTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          nullable: true
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        image:
+          type: string
+          format: uri
+        price:
+          type: string
+          readOnly: true
+        views:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        likes:
+          type: integer
+          readOnly: true
+        original_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          title: Price
+        discount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        discount_type:
+          enum:
+          - percent
+          - amount
+          type: string
+          description: |-
+            * `percent` - Percent
+            * `amount` - Amount
+          x-spec-enum-id: ca237514cb6f605e
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplateCategory'
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/MiniTemplateFeature'
+        is_order:
+          type: boolean
+          readOnly: true
+        demo_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+      required:
+      - categories
+      - features
+      - id
+      - image
+      - is_order
+      - likes
+      - name
+      - original_price
+      - price
+    ListTemplateCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - name
+    ListTemplateFeature:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        value:
+          type: string
+          nullable: true
+      required:
+      - id
+      - name
+    ListTemplateOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        template:
+          $ref: '#/components/schemas/RetrieveTemplate'
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        status:
+          enum:
+          - pending
+          - confirm
+          - cancel
+          type: string
+          description: |-
+            * `pending` - Pending
+            * `confirm` - Confirm
+            * `cancel` - Cancel
+          x-spec-enum-id: 488bbac6099d3352
+        payment_status:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - id
+      - template
+      - updated_at
+    ListTemplateSubmission:
+      type: object
+      description: Serializer for listing template submission requests
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_phone:
+          type: string
+          readOnly: true
+        project:
+          type: integer
+          description: Project to be converted into a template
+        project_name:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          title: Template name
+          maxLength: 255
+        short_description:
+          type: string
+        image:
+          type: string
+          format: uri
+          nullable: true
+        original_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplateCategory'
+          readOnly: true
+        status:
+          enum:
+          - pending
+          - approved
+          - rejected
+          type: string
+          description: |-
+            * `pending` - Pending
+            * `approved` - Approved
+            * `rejected` - Rejected
+          x-spec-enum-id: de3702061fc1d433
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - categories
+      - created_at
+      - id
+      - name
+      - original_price
+      - project
+      - project_name
+      - short_description
+      - user_phone
+    ListTemplateWithdrawal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        card_number:
+          type: string
+          maxLength: 20
+        card_owner:
+          type: string
+          maxLength: 255
+        status:
+          enum:
+          - pending
+          - approved
+          - rejected
+          type: string
+          description: |-
+            * `pending` - Pending
+            * `approved` - Approved
+            * `rejected` - Rejected
+          x-spec-enum-id: de3702061fc1d433
+        rejection_reason:
+          type: string
+          nullable: true
+          description: Reason for rejection if status is rejected
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - card_number
+      - card_owner
+      - created_at
+      - id
+      - updated_at
+    ListTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        status:
+          type: boolean
+      required:
+      - amount
+      - id
+    Login:
+      type: object
+      properties:
+        code:
+          type: integer
+          maximum: 999999
+          minimum: 100000
+      required:
+      - code
+    MarkAsReadRequest:
+      type: object
+      description: Xabarlarni o'qilgan qilish request
+      properties:
+        chat_id:
+          type: string
+          description: User chat ID
+        message_ids:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: O'qilgan qilish uchun xabar IDlar. Agar berilmasa, barcha xabarlar
+            o'qilgan bo'ladi
+      required:
+      - chat_id
+    MarkAsReadResponse:
+      type: object
+      description: Xabarlarni o'qilgan qilish response
+      properties:
+        success:
+          type: boolean
+          description: Muvaffaqiyatli bajarildi
+        modified_count:
+          type: integer
+          description: O'zgartirilgan xabarlar soni
+      required:
+      - modified_count
+      - success
+    Message:
+      type: object
+      description: Chat xabari
+      properties:
+        _id:
+          type: string
+          readOnly: true
+          title: ' id'
+          description: MongoDB ObjectId
+        chat_id:
+          type: string
+          description: Telegram chat ID
+        message:
+          type: string
+          description: Xabar matni yoki caption
+        message_type:
+          type: string
+          nullable: true
+          description: Xabar turi (text, photo, video, audio, document)
+        is_read:
+          type: boolean
+          default: false
+          description: O'qilgan/o'qilmagan
+        from_admin:
+          type: boolean
+          default: false
+          description: Admin tomonidan yuborilganmi
+        file_url:
+          type: string
+          nullable: true
+          description: File URL
+        file_name:
+          type: string
+          nullable: true
+          description: File nomi
+        file_size:
+          type: integer
+          nullable: true
+          description: File hajmi (bytes)
+        created_at:
+          type: string
+          format: date-time
+          description: Yaratilgan vaqt
+        updated_at:
+          type: string
+          format: date-time
+          description: Yangilangan vaqt
+      required:
+      - _id
+      - chat_id
+    MessagesListResponse:
+      type: object
+      description: Xabarlar ro'yxati response
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+          description: Xabarlar ro'yxati
+        total:
+          type: integer
+          description: Jami xabarlar soni
+        limit:
+          type: integer
+          description: Sahifadagi xabarlar soni
+        skip:
+          type: integer
+          description: O'tkazib yuborilgan xabarlar soni
+      required:
+      - limit
+      - messages
+      - skip
+      - total
+    MiniTemplateFeature:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - name
+    PaginatedListCollectionList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListCollection'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListEnviromentList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListEnviroment'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListFileList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListFile'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListHistoryList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListHistory'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListLanguageList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListLanguage'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListProjectList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListProject'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListRelaseList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListRelase'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListResourceList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListResource'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListTemplateCategoryList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplateCategory'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListTemplateFeatureList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplateFeature'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListTemplateList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplate'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListTemplateOrderList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplateOrder'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListTemplateSubmissionList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplateSubmission'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListTemplateWithdrawalList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplateWithdrawal'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedListTransactionList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTransaction'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedMessageList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PaginatedPlanList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            previous:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=2
+            next:
+              type:
+              - string
+              - 'null'
+              format: uri
+              example: http://api.example.org/accounts/?page=4
+          required:
+          - previous
+          - next
+        total_items:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        page_size:
+          type: integer
+          example: 10
+        current_page:
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan'
+      required:
+      - links
+      - total_items
+      - total_pages
+      - page_size
+      - current_page
+      - results
+    PatchedCreateProject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        debug:
+          $ref: '#/components/schemas/CreateDebug'
+        flow: {}
+    PatchedCreateTemplateSubmission:
+      type: object
+      description: Serializer for creating template submission requests
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+          description: Project to be converted into a template
+        name:
+          type: string
+          title: Template name
+          maxLength: 255
+        short_description:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+          format: uri
+          nullable: true
+        video:
+          type: string
+          format: uri
+          nullable: true
+        demo_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        original_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        categories:
+          type: array
+          items:
+            type: integer
+        features:
+          type: array
+          items:
+            type: integer
+    PatchedListEnviroment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        key:
+          type: string
+          title: Name
+          maxLength: 255
+        value:
+          type: string
+          maxLength: 255
+    PatchedListFile:
+      type: object
+      properties:
+        file:
+          type: string
+          format: uri
+        uuid:
+          type: string
+          format: uuid
+        filesize:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        filetype:
+          enum:
+          - file
+          - photo
+          - video
+          - audio
+          type: string
+          description: |-
+            * `file` - File
+            * `photo` - Photo
+            * `video` - Video
+            * `audio` - Audio
+          x-spec-enum-id: ee69fa0c75a08251
+        project:
+          type: integer
+    PatchedListResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: integer
+        project:
+          type: integer
+        hostname:
+          type: string
+        ram:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        cpu:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        net_rx:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        net_tx:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+    PatchedListTemplateWithdrawal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        card_number:
+          type: string
+          maxLength: 20
+        card_owner:
+          type: string
+          maxLength: 255
+        status:
+          enum:
+          - pending
+          - approved
+          - rejected
+          type: string
+          description: |-
+            * `pending` - Pending
+            * `approved` - Approved
+            * `rejected` - Rejected
+          x-spec-enum-id: de3702061fc1d433
+        rejection_reason:
+          type: string
+          nullable: true
+          description: Reason for rejection if status is rejected
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedSendMessage:
+      type: object
+      description: Serializer for sending messages to bot users
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+        caption:
+          type: string
+          description: Message text/caption
+        message_type:
+          enum:
+          - text
+          - photo
+          - video
+          type: string
+          x-spec-enum-id: 45e13fe684c49ba6
+          description: |-
+            Type of message (text, photo, video)
+
+            * `text` - Text
+            * `photo` - Photo
+            * `video` - Video
+        status:
+          enum:
+          - progress
+          - done
+          - failed
+          type: string
+          x-spec-enum-id: d35033f1e55c0080
+          readOnly: true
+          description: |-
+            Current status of message sending
+
+            * `progress` - Progress
+            * `done` - Done
+            * `failed` - Failed
+        button_type:
+          enum:
+          - inline
+          - reply
+          type: string
+          x-spec-enum-id: e0b9f32f49511554
+          description: |-
+            Type of keyboard (inline or reply)
+
+            * `inline` - Inline
+            * `reply` - Reply
+        buttons:
+          nullable: true
+          description: 2D array of buttons (rows and columns) - can be JSON string
+            or array
+        photo:
+          type: string
+          format: uri
+          writeOnly: true
+          nullable: true
+          description: Photo file for photo messages (max 10 MB)
+        video:
+          type: string
+          format: uri
+          writeOnly: true
+          nullable: true
+          description: Video file for video messages (max 50 MB)
+        total:
+          type: integer
+          readOnly: true
+          description: Total number of recipients
+        done:
+          type: integer
+          readOnly: true
+          description: Number of successfully sent messages
+        fail:
+          type: integer
+          readOnly: true
+          description: Number of failed messages
+    PatchedUpdateCollection:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateField'
+    PatchedUserUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+    Plan:
+      type: object
+      description: Tarif serializer
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          enum:
+          - free
+          - start
+          - pro
+          - enterprise
+          type: string
+          description: |-
+            * `free` - Bepul
+            * `start` - Start
+            * `pro` - Pro
+            * `enterprise` - Enterprise
+          x-spec-enum-id: 03457294832e448e
+          title: Nom
+        name_display:
+          type: string
+          readOnly: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          title: Narx
+        max_users:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Maksimal foydalanuvchilar soni
+        powered_by_botmother:
+          type: boolean
+          description: Botda 'Powered by BotMother' ko'rsatiladi
+        custom_domain:
+          type: boolean
+        is_top:
+          type: boolean
+        priority_support:
+          type: boolean
+        description:
+          type: string
+          nullable: true
+          title: Tavsif
+        is_active:
+          type: boolean
+          title: Faol
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - name_display
+    Register:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 255
+        password:
+          type: string
+          maxLength: 128
+      required:
+      - first_name
+      - last_name
+      - password
+      - phone
+    Resend:
+      type: object
+      properties:
+        phone:
+          type: string
+          maxLength: 255
+      required:
+      - phone
+    ResetConfirmation:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 4
+          minLength: 4
+        phone:
+          type: string
+          maxLength: 255
+      required:
+      - code
+      - phone
+    ResetPassword:
+      type: object
+      properties:
+        phone:
+          type: string
+          maxLength: 255
+      required:
+      - phone
+    RetrieveCollection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/RetrieveField'
+      required:
+      - fields
+      - id
+      - name
+    RetrieveDebug:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          enum:
+          - pending
+          - initializing
+          - running
+          - stopped
+          - stopping
+          - failed
+          - suspended
+          type: string
+          description: |-
+            * `pending` - pending
+            * `initializing` - initializing
+            * `running` - running
+            * `stopped` - stopped
+            * `stopping` - stopping
+            * `failed` - failed
+            * `suspended` - suspended
+          x-spec-enum-id: 55424add8a8b4799
+        service_id:
+          type: string
+          nullable: true
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - updated_at
+    RetrieveEnviroment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        key:
+          type: string
+          title: Name
+          maxLength: 255
+        value:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - key
+      - value
+    RetrieveField:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        type:
+          enum:
+          - text
+          - number
+          - bool
+          - datetime
+          - file
+          - audio
+          - video
+          - photo
+          - relation
+          type: string
+          description: |-
+            * `text` - Text
+            * `number` - Number
+            * `bool` - bool
+            * `datetime` - datetime
+            * `file` - file
+            * `audio` - audio
+            * `video` - video
+            * `photo` - photo
+            * `relation` - Relation
+          x-spec-enum-id: 85ed391b3254a087
+          title: Name
+        required:
+          type: boolean
+        default:
+          type: string
+          nullable: true
+          maxLength: 255
+        relation_collection:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - id
+      - name
+      - relation_collection
+    RetrieveFile:
+      type: object
+      properties:
+        file:
+          type: string
+          format: uri
+        uuid:
+          type: string
+          format: uuid
+        filesize:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        filetype:
+          enum:
+          - file
+          - photo
+          - video
+          - audio
+          type: string
+          description: |-
+            * `file` - File
+            * `photo` - Photo
+            * `video` - Video
+            * `audio` - Audio
+          x-spec-enum-id: ee69fa0c75a08251
+        project:
+          type: integer
+      required:
+      - file
+      - project
+    RetrieveHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,28}(?:\.\d{0,2})?$
+        type:
+          enum:
+          - income
+          - expense
+          type: string
+          description: |-
+            * `income` - income
+            * `expense` - expense
+          x-spec-enum-id: bad304bd2847434b
+        comment:
+          type: string
+          nullable: true
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - id
+    RetrieveProject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        users:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          nullable: true
+          maxLength: 255
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+        debug:
+          $ref: '#/components/schemas/RetrieveDebug'
+        release:
+          $ref: '#/components/schemas/ListRelase'
+        debug_bot:
+          type: boolean
+          readOnly: true
+        release_bot:
+          type: boolean
+          readOnly: true
+        debug_uuid:
+          type: string
+          readOnly: true
+        flow: {}
+        plan:
+          type: string
+          readOnly: true
+      required:
+      - debug
+      - debug_bot
+      - debug_uuid
+      - id
+      - name
+      - plan
+      - release
+      - release_bot
+      - users
+    RetrieveRelase:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          enum:
+          - pending
+          - initializing
+          - running
+          - stopped
+          - stopping
+          - failed
+          - suspended
+          type: string
+          description: |-
+            * `pending` - pending
+            * `initializing` - initializing
+            * `running` - running
+            * `stopped` - stopped
+            * `stopping` - stopping
+            * `failed` - failed
+            * `suspended` - suspended
+          x-spec-enum-id: 55424add8a8b4799
+        service_id:
+          type: string
+          nullable: true
+          maxLength: 255
+        flow: {}
+      required:
+      - id
+      - project
+      - version
+    RetrieveResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: integer
+        project:
+          type: integer
+        hostname:
+          type: string
+        ram:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        cpu:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        net_rx:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        net_tx:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+      required:
+      - cpu
+      - hostname
+      - id
+      - net_rx
+      - net_tx
+      - project
+      - ram
+      - user
+    RetrieveTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          nullable: true
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        image:
+          type: string
+          format: uri
+        video:
+          type: string
+          format: uri
+          nullable: true
+        short_description:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+          readOnly: true
+        views:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        likes:
+          type: integer
+          readOnly: true
+        original_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          title: Price
+        discount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        discount_type:
+          enum:
+          - percent
+          - amount
+          type: string
+          description: |-
+            * `percent` - Percent
+            * `amount` - Amount
+          x-spec-enum-id: ca237514cb6f605e
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplateCategory'
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplateFeature'
+        is_order:
+          type: boolean
+          readOnly: true
+        demo_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+      required:
+      - categories
+      - description
+      - features
+      - id
+      - image
+      - is_order
+      - likes
+      - name
+      - original_price
+      - price
+      - short_description
+    RetrieveTemplateCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - name
+    RetrieveTemplateFeature:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        value:
+          type: string
+          nullable: true
+      required:
+      - id
+      - name
+    RetrieveTemplateOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        template:
+          $ref: '#/components/schemas/RetrieveTemplate'
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        status:
+          enum:
+          - pending
+          - confirm
+          - cancel
+          type: string
+          description: |-
+            * `pending` - Pending
+            * `confirm` - Confirm
+            * `cancel` - Cancel
+          x-spec-enum-id: 488bbac6099d3352
+        payment_status:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - id
+      - template
+      - updated_at
+    RetrieveTemplateSubmission:
+      type: object
+      description: Serializer for retrieving template submission details
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_phone:
+          type: string
+          readOnly: true
+        project:
+          type: integer
+          description: Project to be converted into a template
+        project_name:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          title: Template name
+          maxLength: 255
+        short_description:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+          format: uri
+          nullable: true
+        video:
+          type: string
+          format: uri
+          nullable: true
+        demo_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        original_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplateCategory'
+          readOnly: true
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListTemplateFeature'
+          readOnly: true
+        status:
+          enum:
+          - pending
+          - approved
+          - rejected
+          type: string
+          description: |-
+            * `pending` - Pending
+            * `approved` - Approved
+            * `rejected` - Rejected
+          x-spec-enum-id: de3702061fc1d433
+        rejection_reason:
+          type: string
+          nullable: true
+          description: Reason for rejection if status is rejected
+        template:
+          type: integer
+          nullable: true
+          description: Created template if approved
+        reviewed_by_phone:
+          type: string
+          readOnly: true
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - categories
+      - created_at
+      - description
+      - features
+      - id
+      - name
+      - original_price
+      - project
+      - project_name
+      - reviewed_by_phone
+      - short_description
+      - updated_at
+      - user_phone
+    RetrieveTemplateWithdrawal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        card_number:
+          type: string
+          maxLength: 20
+        card_owner:
+          type: string
+          maxLength: 255
+        status:
+          enum:
+          - pending
+          - approved
+          - rejected
+          type: string
+          description: |-
+            * `pending` - Pending
+            * `approved` - Approved
+            * `rejected` - Rejected
+          x-spec-enum-id: de3702061fc1d433
+        rejection_reason:
+          type: string
+          nullable: true
+          description: Reason for rejection if status is rejected
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - card_number
+      - card_owner
+      - created_at
+      - id
+      - updated_at
+    RetrieveTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+        status:
+          type: boolean
+      required:
+      - amount
+      - id
+    SendMessage:
+      type: object
+      description: Serializer for sending messages to bot users
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+        caption:
+          type: string
+          description: Message text/caption
+        message_type:
+          enum:
+          - text
+          - photo
+          - video
+          type: string
+          x-spec-enum-id: 45e13fe684c49ba6
+          description: |-
+            Type of message (text, photo, video)
+
+            * `text` - Text
+            * `photo` - Photo
+            * `video` - Video
+        status:
+          enum:
+          - progress
+          - done
+          - failed
+          type: string
+          x-spec-enum-id: d35033f1e55c0080
+          readOnly: true
+          description: |-
+            Current status of message sending
+
+            * `progress` - Progress
+            * `done` - Done
+            * `failed` - Failed
+        button_type:
+          enum:
+          - inline
+          - reply
+          type: string
+          x-spec-enum-id: e0b9f32f49511554
+          description: |-
+            Type of keyboard (inline or reply)
+
+            * `inline` - Inline
+            * `reply` - Reply
+        buttons:
+          nullable: true
+          description: 2D array of buttons (rows and columns) - can be JSON string
+            or array
+        photo:
+          type: string
+          format: uri
+          writeOnly: true
+          nullable: true
+          description: Photo file for photo messages (max 10 MB)
+        video:
+          type: string
+          format: uri
+          writeOnly: true
+          nullable: true
+          description: Video file for video messages (max 50 MB)
+        total:
+          type: integer
+          readOnly: true
+          description: Total number of recipients
+        done:
+          type: integer
+          readOnly: true
+          description: Number of successfully sent messages
+        fail:
+          type: integer
+          readOnly: true
+          description: Number of failed messages
+      required:
+      - caption
+      - done
+      - fail
+      - id
+      - project
+      - status
+      - total
+    SendMessageRequest:
+      type: object
+      description: Xabar yuborish request
+      properties:
+        chat_id:
+          type: string
+          description: User chat ID (Telegram chat ID)
+        message:
+          type: string
+          description: Yuborilayotgan xabar matni (caption)
+        file:
+          type: string
+          format: uri
+          nullable: true
+          description: Yuborilayotgan file (photo, video, audio, document)
+        message_type:
+          enum:
+          - text
+          - photo
+          - video
+          - audio
+          - document
+          - null
+          type: string
+          x-spec-enum-id: 48fd76a695f4da3d
+          nullable: true
+          default: text
+          description: |-
+            Xabar turi (text, photo, video, audio, document)
+
+            * `text` - text
+            * `photo` - photo
+            * `video` - video
+            * `audio` - audio
+            * `document` - document
+      required:
+      - chat_id
+    SendMessageResponse:
+      type: object
+      description: Xabar yuborish response
+      properties:
+        success:
+          type: boolean
+          description: Muvaffaqiyatli yuborildi
+        message_id:
+          type: string
+          nullable: true
+          description: Yuborilgan xabar ID
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message'
+          nullable: true
+          description: Yuborilgan xabar ma'lumotlari
+        telegram_sent:
+          type: boolean
+          default: false
+          description: Telegram orqali yuborilganmi
+      required:
+      - message
+      - message_id
+      - success
+    SetPassword:
+      type: object
+      properties:
+        password:
+          type: string
+        token:
+          type: string
+          maxLength: 255
+      required:
+      - password
+      - token
+    TokenObtainPair:
+      type: object
+      properties:
+        phone:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - phone
+      - refresh
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    TokenVerify:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+      required:
+      - token
+    UpdateCollection:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateField'
+    User:
+      type: object
+      description: User ma'lumotlari
+      properties:
+        _id:
+          type: string
+          readOnly: true
+          title: ' id'
+          description: MongoDB ObjectId
+        chat_id:
+          type: string
+          description: Telegram chat ID
+        first_name:
+          type: string
+          description: User ismi
+        last_name:
+          type: string
+          description: User familiyasi
+        created_at:
+          type: string
+          format: date-time
+          description: Yaratilgan vaqt
+      required:
+      - _id
+      - chat_id
+      - first_name
+    UserUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+    UserWithMessages:
+      type: object
+      description: User va uning xabarlari
+      properties:
+        user:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          description: User ma'lumotlari
+        last_message:
+          allOf:
+          - $ref: '#/components/schemas/Message'
+          nullable: true
+          description: Oxirgi xabar
+        unread_count:
+          type: integer
+          description: O'qilmagan xabarlar soni
+        total_messages:
+          type: integer
+          description: Jami xabarlar soni
+      required:
+      - total_messages
+      - unread_count
+      - user
+    UsersListResponse:
+      type: object
+      description: Userlar ro'yxati response
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserWithMessages'
+          description: Userlar va ularning xabarlari
+        total:
+          type: integer
+          description: Jami userlar soni
+        limit:
+          type: integer
+          description: Sahifadagi elementlar soni
+        skip:
+          type: integer
+          description: O'tkazib yuborilgan elementlar soni
+      required:
+      - limit
+      - skip
+      - total
+      - users
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
