@@ -1,7 +1,7 @@
 // FAYL: constructor/components/ButtonGenerator/hooks/useButtonGeneratorState.ts (YANGI HOOK)
 
-import { useState, useEffect, useMemo } from "react";
-import { ButtonConfig, KeyboardConfig } from "../types";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { ButtonConfig, KeyboardConfig, ReplyKeyboardOptions, DEFAULT_REPLY_KEYBOARD_OPTIONS } from "../types";
 
 const MAX_BUTTONS_PER_ROW = 10;
 
@@ -14,6 +14,9 @@ export const useButtonGeneratorState = (
   >({ inline: [[]], reply: [[]] });
   const [activeTab, setActiveTab] = useState<"inline" | "reply">("inline");
   const [selectedRowIndex, setSelectedRowIndex] = useState<number>(0);
+  const [replyOptions, setReplyOptions] = useState<ReplyKeyboardOptions>(
+    DEFAULT_REPLY_KEYBOARD_OPTIONS
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -23,6 +26,11 @@ export const useButtonGeneratorState = (
       });
       setActiveTab(initialKeyboard?.active || "inline");
       setSelectedRowIndex(0);
+      setReplyOptions(
+        initialKeyboard?.replyOptions
+          ? { ...initialKeyboard.replyOptions }
+          : DEFAULT_REPLY_KEYBOARD_OPTIONS
+      );
     }
     // Faqat dialog ochilganda state ni o'rnatamiz, initialKeyboard o'zgarganda emas
     // chunki foydalanuvchi o'zgartirishlar kiritmoqda va ularni yo'qotmasligimiz kerak
@@ -192,13 +200,19 @@ export const useButtonGeneratorState = (
     setCurrentButtons(() => reorderedRows);
   };
 
+  const handleReplyOptionChange = useCallback(
+    (key: keyof ReplyKeyboardOptions, value: boolean) => {
+      setReplyOptions((prev) => ({ ...prev, [key]: value }));
+    },
+    []
+  );
+
   const getFinalKeyboardConfig = (): KeyboardConfig => {
     return {
       active: activeTab,
-      // Bo'sh qatorlarni ham saqlaymiz, chunki foydalanuvchi ularni yaratgan
-      // va ular keyinchalik tugmalar bilan to'ldirilishi mumkin
       inline: keyboards.inline,
       reply: keyboards.reply,
+      replyOptions,
     };
   };
 
@@ -219,6 +233,8 @@ export const useButtonGeneratorState = (
     handleRemoveRow,
     handleReorderRows,
     getFinalKeyboardConfig,
-    setCurrentButtons
+    setCurrentButtons,
+    replyOptions,
+    handleReplyOptionChange,
   };
 };
