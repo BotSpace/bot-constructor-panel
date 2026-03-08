@@ -74,6 +74,8 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
     shortcuts: [
       { keys: [mod, "K"], description: "Qidirish paneli" },
       { keys: [mod, "`"], description: "Debug konsol" },
+      { keys: [mod, "R"], description: "Debug botni reload qilish" },
+      { keys: [mod, "D"], description: "Debug botni run/stop" },
       { keys: [mod, "N"], description: "Node qo'shish modali" },
     ],
   },

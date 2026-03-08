@@ -1,0 +1,86 @@
+import { useReactQueryAction } from "@/services/react-query";
+import React, { useState } from "react";
+import {
+    type BillingPeriodKey,
+    BILLING_PERIODS,
+    type Plan,
+} from "./components/types";
+import { APIListResponse } from "@/types/http/response";
+import { Loader2 } from "lucide-react";
+import { PlanCard } from "./components/plan-card";
+import SaleForLongTime from "./components/sale-for-long-time";
+
+type Props = {
+    updateForm: (key: string, value: string) => void;
+    header: React.ReactNode;
+};
+
+function SelectPlan({ updateForm, header }: Props) {
+
+    const isUserUseFreePlan = true
+
+    const [billingPeriod, setBillingPeriod] =
+        useState<BillingPeriodKey>("3 months");
+
+    const handleBillingChange = (key: BillingPeriodKey) => {
+        setBillingPeriod(key);
+        updateForm("sale_for_long_time", key);
+    };
+
+    const currentPeriod = BILLING_PERIODS.find(
+        (p) => p.key === billingPeriod,
+    )!;
+
+    const { data: plansResponse, isLoading } = useReactQueryAction<
+        APIListResponse<Plan[]>
+    >({
+        url: "plans/",
+    });
+
+    const plans = plansResponse?.data?.results ?? [];
+    return (
+        <>
+            {header}
+
+            <SaleForLongTime
+                value={billingPeriod}
+                onChange={handleBillingChange}
+            />
+
+            {isLoading && (
+                <div className="flex items-center justify-center py-16">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+            )}
+
+            {!isLoading && !plans.length && (
+                <div className="rounded-2xl border border-border bg-card/60 p-8 text-center text-sm text-muted-foreground">
+                    Tariflar ro'yxatini yuklashda muammo yuz berdi. Iltimos,
+                    birozdan so'ng qayta urinib ko'ring.
+                </div>
+            )}
+
+            {!isLoading && !!plans.length && (
+                <div className="grid gap-4 grid-cols-3">
+                    {plans.map((plan) => (
+                        <PlanCard
+                            unable_free={plan.name === "free" && isUserUseFreePlan}
+                            key={plan.id}
+                            plan={plan}
+                            billingPeriod={currentPeriod}
+                            isCurrent={false}
+                            isPopular={plan.is_top}
+                            isProcessing={false}
+                            onSelectPlan={(plan_id) =>
+                                updateForm("plan_id", plan_id.toString())
+                            }
+                            buttonText="Sotib olish"
+                        />
+                    ))}
+                </div>
+            )}
+        </>
+    );
+}
+
+export default SelectPlan;
