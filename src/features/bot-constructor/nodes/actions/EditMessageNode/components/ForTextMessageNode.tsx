@@ -15,6 +15,7 @@ import {
 import { DynamicMessageConstructor } from "../../TextMessageNode/components/dynamic-message-constructor-modal";
 import TextArea from "../../shared/text-area";
 import { EditMessageNodeData } from "../types";
+import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
 
 type Props = {
   handleUpdate: (update: Partial<EditMessageNodeData>) => void;
@@ -39,11 +40,12 @@ function ForTextMessageNode({ handleUpdate, data, id }: Props) {
         </DynamicMessageConstructor>
       </div>
 
-      <TextArea
-        placeholder="Audio uchun izoh..."
-        defaultValue={data.newText || ""}
+
+      <TelegramRichTextEditor
+        defaultValue={data.newText}
         onChange={(e) => handleUpdate({ newText: e })}
       />
+
 
       <div className="flex flex-col">
         <label htmlFor="parse-mode" className="mb-1 select-none">
