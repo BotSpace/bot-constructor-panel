@@ -15,6 +15,7 @@ import {
 import { DynamicMessageConstructor } from "../../TextMessageNode/components/dynamic-message-constructor-modal";
 import TextArea from "../../shared/text-area";
 import { EditMessageNodeData } from "../types";
+import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
 
 type Props = {
   handleUpdate: (update: Partial<EditMessageNodeData>) => void;
@@ -39,9 +40,9 @@ function ForVideoPhotoDocumentAudio({ handleUpdate, data, id }: Props) {
         </DynamicMessageConstructor>
       </div>
 
-      <TextArea
-        placeholder="New caption..."
-        defaultValue={data.newCaption || ""}
+
+      <TelegramRichTextEditor
+        defaultValue={data.newCaption}
         onChange={(e) => handleUpdate({ newCaption: e })}
       />
 

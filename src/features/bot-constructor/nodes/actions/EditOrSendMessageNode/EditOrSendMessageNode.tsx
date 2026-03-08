@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import TextArea from "../shared/text-area";
 import { ActionPanel } from "../../components/shared/ActionPanel";
 import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
 
 const EditOrSendMessageNodeComponent = ({
   id,
@@ -67,11 +68,12 @@ const EditOrSendMessageNodeComponent = ({
                 </Button>
               </DynamicMessageConstructor>
             </div>
-            <TextArea
-              placeholder="Xabar matni..."
+
+            <TelegramRichTextEditor
               defaultValue={data.messageText}
               onChange={(e) => handleUpdate({ messageText: e })}
             />
+
           </CardContent>
 
           <CardFooter className="flex flex-col gap-2">

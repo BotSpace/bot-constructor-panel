@@ -30,6 +30,7 @@ import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/
 import { ActionPanel } from "../../components/shared/ActionPanel";
 import TextArea from "../shared/text-area";
 import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
 
 const SendAudioNodeComponent = ({
   id,
@@ -247,9 +248,8 @@ const SendAudioNodeComponent = ({
             <div className="grid gap-2">
               <Label>Izoh (Caption)</Label>
 
-              <TextArea
-                placeholder="Audio uchun izoh..."
-                defaultValue={data.caption || ""}
+              <TelegramRichTextEditor
+                defaultValue={data.caption}
                 onChange={(e) => handleUpdate({ caption: e })}
               />
 

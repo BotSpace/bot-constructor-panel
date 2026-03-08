@@ -38,6 +38,7 @@ import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/
 import { ActionPanel } from "../../components/shared/ActionPanel";
 import TextArea from "../shared/text-area";
 import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
 
 const SendVideoNodeComponent = ({
   id,
@@ -236,11 +237,11 @@ const SendVideoNodeComponent = ({
             <div className="grid gap-2">
               <Label>Video matni (Caption)</Label>
 
-              <TextArea
-                placeholder="Video uchun matn kiriting..."
+              <TelegramRichTextEditor
                 defaultValue={data.caption}
-                onChange={(value) => handleUpdate({ caption: value })}
+                onChange={(value: string) => handleUpdate({ caption: value })}
               />
+
               <div
                 className={cn(
                   "text-right text-xs",
