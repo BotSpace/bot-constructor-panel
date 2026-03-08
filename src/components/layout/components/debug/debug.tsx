@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import {
   BotMessageSquare,
   RotateCcw,
@@ -37,16 +37,7 @@ export default function DebugingButtons() {
   // Store'dan kerakli qismlarni olamiz
   const { saveFlow } = useFlowStore();
 
-  /* ----------------------- Prevent Ctrl+R (refresh) ----------------------- */
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r")
-        e.preventDefault();
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  /* Ctrl+R is handled in constructor.tsx as a keyboard shortcut */
 
   /* --------------------------- Debug bot actions --------------------------- */
   function handleRunAndRelaodDebugBot() {

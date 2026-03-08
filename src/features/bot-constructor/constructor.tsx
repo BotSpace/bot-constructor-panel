@@ -26,18 +26,16 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Text, ChevronDown } from "lucide-react";
+import { Text } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
 import { useSearchStore } from "./search/search-store";
 import { debugConsoleStore } from "@/components/layout/components/debug-console/store";
-import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { instanceAuth } from "@/services/instance";
 import { useTheme } from "next-themes";
 import { NodeSelectionDialog } from "./components/NodeSelectionDialog";
-import { Connection, addEdge } from "reactflow";
-import BottomPanel from "./components/bottom-panel";
-import { ReleasePanel } from "@/components/layout/components/relas/relas";
+import { Connection } from "reactflow";
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
@@ -273,6 +271,75 @@ export default function Constructor() {
   useKeyboardShortcut(
     ["Control", "`"],
     () => { debugToggle(); },
+    { preventDefault: true }
+  );
+
+  // Ctrl+R - Debug botni reload qilish
+  useKeyboardShortcut(
+    ["Control", "r"],
+    () => {
+      if (!project) return;
+
+      saveFlow(id);
+
+      const { changeDebug } = useProjectStore.getState();
+      changeDebug({
+        ...project.debug,
+        status: "initializing",
+      });
+
+      instanceAuth
+        .get(`/project/${id}/debug/`)
+        .then(() => {
+          toast.success("Bot ishga tushirilmoqda...");
+        })
+        .catch(() => {
+          toast.error("Botni ishga tushirishda xatolik yuz berdi.");
+        });
+    },
+    { preventDefault: true }
+  );
+
+  // Ctrl+D - Debug botni run/stop qilish (toggle)
+  useKeyboardShortcut(
+    ["Control", "d"],
+    () => {
+      if (!project) return;
+
+      const { changeDebug } = useProjectStore.getState();
+
+      if (project.debug.status === "running") {
+        changeDebug({
+          ...project.debug,
+          status: "stopped",
+        });
+
+        instanceAuth
+          .get(`/project/${id}/stop/`)
+          .then(() => {
+            toast.success("Bot muvaffaqiyatli to'xtatildi!");
+          })
+          .catch(() => {
+            toast.error("Botni to'xtatishda xatolik yuz berdi.");
+          });
+      } else {
+        saveFlow(id);
+
+        changeDebug({
+          ...project.debug,
+          status: "initializing",
+        });
+
+        instanceAuth
+          .get(`/project/${id}/debug/`)
+          .then(() => {
+            toast.success("Bot ishga tushirilmoqda...");
+          })
+          .catch(() => {
+            toast.error("Botni ishga tushirishda xatolik yuz berdi.");
+          });
+      }
+    },
     { preventDefault: true }
   );
 
