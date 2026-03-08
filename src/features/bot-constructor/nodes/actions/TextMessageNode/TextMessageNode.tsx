@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button";
 import TextArea from "../shared/text-area";
 import { ActionPanel } from "../../components/shared/ActionPanel";
 import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
+import { Textarea } from "@/components/ui/textarea";
 
 const SendTextMessageNodeComponent = ({
   id,
@@ -70,8 +72,8 @@ const SendTextMessageNodeComponent = ({
                 </Button>
               </DynamicMessageConstructor>
             </div>
-            <TextArea
-              placeholder="Xabar matni..."
+
+            <TelegramRichTextEditor
               defaultValue={data.messageText}
               onChange={(e) => handleUpdate({ messageText: e })}
             />
