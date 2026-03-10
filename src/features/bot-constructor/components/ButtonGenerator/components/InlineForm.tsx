@@ -28,7 +28,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useNodes } from "reactflow";
+import { useNodes, useEdges } from "reactflow";
 import {
   Card,
   CardContent,
@@ -45,6 +45,7 @@ interface InlineFormProps {
   onAdd: (button: ButtonConfig) => void;
   disabled: boolean;
   data?: SendTextMessageNodeData;
+  nodeId: string;
 }
 
 type InlineType =
@@ -114,7 +115,7 @@ const commonButtonGroups = [
   },
 ];
 
-export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
+export const InlineForm = ({ onAdd, disabled, nodeId }: InlineFormProps) => {
   const [text, setText] = useState("");
   const [actionType, setActionType] = useState<InlineType>("callback");
   const [value, setValue] = useState("");
@@ -142,11 +143,12 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
     enabled: !!selectedCollection,
   });
 
-  // State keys'larni olish (StateNode va Trigger'lardan)
+  // State keys'larni olish (faqat zanjiriga ulangan StateNode va Trigger'lardan)
   const nodes = useNodes();
+  const edges = useEdges();
   const availableStateKeys = useMemo(() => {
-    return getAvailableStateKeys(nodes);
-  }, [nodes]);
+    return getAvailableStateKeys(nodes, edges, nodeId);
+  }, [nodes, edges, nodeId]);
 
   // Collection o'zgarganda filter'larni tozalash
   const handleCollectionChange = (collectionName: string) => {
@@ -312,6 +314,7 @@ export const InlineForm = ({ onAdd, disabled }: InlineFormProps) => {
         onAdd={onAdd}
         buttonType="inline"
         disabled={disabled}
+        nodeId={nodeId}
       />
     </>
   );

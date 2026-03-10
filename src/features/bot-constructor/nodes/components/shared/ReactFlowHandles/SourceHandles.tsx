@@ -1,15 +1,18 @@
 import React, { useCallback, useMemo } from "react";
 import { PlusIcon } from "lucide-react";
 import { Handle, Position, useEdges, useNodeId, useNodes } from "reactflow";
+import { cn } from "@/lib/utils";
 
 interface SourceHandlerProps {
   id?: string;
   position?: Position;
+  className?: string;
 }
 
 export function SourceHandles({
   id = "source-handler",
   position,
+  className,
 }: SourceHandlerProps) {
   const nodes = useNodes();
   const edges = useEdges();
@@ -57,7 +60,7 @@ export function SourceHandles({
       type="source"
       position={pos}
       id={handleId}
-      className={`!w-6 !h-14 !bg-sky-500 !rounded-[10px] !border-gray-800 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`}
+      className={cn(`!w-6 !h-14 !bg-sky-500 !rounded-[10px] !border-gray-800 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`, className)}
     >
       <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
     </Handle>
