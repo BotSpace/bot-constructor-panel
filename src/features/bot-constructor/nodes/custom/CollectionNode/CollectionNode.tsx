@@ -20,7 +20,7 @@ import {
 } from "@/types/http/response";
 import { useReactQueryAction } from "@/services/react-query/use-react-query-action";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
-import { NodeProps, useNodes } from "reactflow";
+import { NodeProps, useNodes, useEdges } from "reactflow";
 
 import { CollectionNodeData } from "./types";
 import { useFlowStore } from "@/features/bot-constructor/store";
@@ -34,6 +34,7 @@ export function CollectionNode({
 }: NodeProps<CollectionNodeData>) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const nodes = useNodes();
+  const edges = useEdges();
   const [isExpanded, setIsExpanded] = useNodeExpanded();
 
   const { data: Collections } = useReactQueryAction<
@@ -82,10 +83,10 @@ export function CollectionNode({
   // Field mappings'ni olish
   const fieldMappings = data.fieldMappings || {};
 
-  // Mavjud StateNode'lardan va Trigger'lardan state key'larni olish
+  // Mavjud StateNode'lardan va Trigger'lardan state key'larni olish (faqat zanjiriga ulangan)
   const availableStateKeys = useMemo(() => {
-    return getAvailableStateKeys(nodes);
-  }, [nodes]);
+    return getAvailableStateKeys(nodes, edges, id);
+  }, [nodes, edges, id]);
 
   // State key o'zgartirish
   const handleStateKeyChange = (fieldName: string, stateKey: string) => {
@@ -110,8 +111,8 @@ export function CollectionNode({
   return (
     <Card
       className={`w-[600px] rounded-xl border shadow-lg transition-all overflow-hidden ${selected
-          ? "border-sky-500/80 shadow-xl shadow-sky-500/10 ring-2 ring-sky-500/20"
-          : "border-gray-700/50 shadow-md"
+        ? "border-sky-500/80 shadow-xl shadow-sky-500/10 ring-2 ring-sky-500/20"
+        : "border-gray-700/50 shadow-md"
         }`}
     >
       <TargetHandles />
@@ -144,8 +145,8 @@ export function CollectionNode({
           <div className="flex items-center gap-2 ml-2">
             <div
               className={`w-2 h-2 rounded-full transition-all ${isConfigured
-                  ? "bg-green-500 shadow-sm shadow-green-500/50"
-                  : "bg-gray-600"
+                ? "bg-green-500 shadow-sm shadow-green-500/50"
+                : "bg-gray-600"
                 }`}
               title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
             />
