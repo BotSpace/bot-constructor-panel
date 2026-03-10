@@ -59,7 +59,11 @@ export function NodeSelectionDialog({
 }: NodeSelectionDialogProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+    const [activeElementIndex, setActiveElementIndex] = useState(0);
+    const [focusPanel, setFocusPanel] = useState<"categories" | "elements">("categories");
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const elementRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+    const categoryRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
 
     const elements = useElements();
 
@@ -116,18 +120,37 @@ export function NodeSelectionDialog({
             : baseGroups;
     }, [elements, searchQuery, mustHaveElements]);
 
-    // Search yoki dialog o'zgarganda resetlash
     useEffect(() => {
         setActiveCategoryIndex(0);
+        setActiveElementIndex(0);
+        setFocusPanel("categories");
     }, [searchQuery]);
 
     useEffect(() => {
         if (open) {
             setSearchQuery("");
             setActiveCategoryIndex(0);
+            setActiveElementIndex(0);
+            setFocusPanel("categories");
             setTimeout(() => searchInputRef.current?.focus(), 100);
         }
     }, [open]);
+
+    useEffect(() => {
+        setActiveElementIndex(0);
+    }, [activeCategoryIndex]);
+
+    useEffect(() => {
+        if (focusPanel === "elements") {
+            elementRefs.current.get(activeElementIndex)?.scrollIntoView({ block: "nearest" });
+        }
+    }, [activeElementIndex, focusPanel]);
+
+    useEffect(() => {
+        if (focusPanel === "categories") {
+            categoryRefs.current.get(activeCategoryIndex)?.scrollIntoView({ block: "nearest" });
+        }
+    }, [activeCategoryIndex, focusPanel]);
 
     const handleSelect = useCallback(
         (element: ElementItemType) => {
@@ -138,15 +161,79 @@ export function NodeSelectionDialog({
         [onSelect, onOpenChange]
     );
 
+    const handleKeyDown = useCallback(
+        (e: React.KeyboardEvent) => {
+            const groupCount = filteredGroups.length;
+            const elementCount = filteredGroups[activeCategoryIndex]?.elements?.length || 0;
+
+            switch (e.key) {
+                case "ArrowDown": {
+                    e.preventDefault();
+                    if (focusPanel === "categories") {
+                        setActiveCategoryIndex((i) => Math.min(i + 1, groupCount - 1));
+                    } else {
+                        setActiveElementIndex((i) => Math.min(i + 1, elementCount - 1));
+                    }
+                    break;
+                }
+                case "ArrowUp": {
+                    e.preventDefault();
+                    if (focusPanel === "categories") {
+                        setActiveCategoryIndex((i) => Math.max(i - 1, 0));
+                    } else {
+                        setActiveElementIndex((i) => Math.max(i - 1, 0));
+                    }
+                    break;
+                }
+                case "ArrowRight": {
+                    if (focusPanel === "categories" && elementCount > 0) {
+                        e.preventDefault();
+                        setFocusPanel("elements");
+                        setActiveElementIndex(0);
+                    }
+                    break;
+                }
+                case "ArrowLeft": {
+                    if (focusPanel === "elements") {
+                        e.preventDefault();
+                        setFocusPanel("categories");
+                    }
+                    break;
+                }
+                case "Enter": {
+                    e.preventDefault();
+                    if (focusPanel === "categories" && elementCount > 0) {
+                        setFocusPanel("elements");
+                        setActiveElementIndex(0);
+                    } else if (focusPanel === "elements") {
+                        const el = filteredGroups[activeCategoryIndex]?.elements?.[activeElementIndex];
+                        if (el) handleSelect(el);
+                    }
+                    break;
+                }
+                case "Escape": {
+                    if (focusPanel === "elements") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setFocusPanel("categories");
+                    }
+                    break;
+                }
+            }
+        },
+        [focusPanel, filteredGroups, activeCategoryIndex, activeElementIndex, handleSelect]
+    );
+
     const activeGroup = filteredGroups[activeCategoryIndex];
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
                 className="sm:max-w-[820px] max-h-[90vh] gap-0 p-0 overflow-auto"
+                onKeyDown={handleKeyDown}
             >
                 <DialogHeader className="px-5 pt-5 pb-3">
-                    <DialogTitle>Node qo&#39;shish</DialogTitle>
+                    <DialogTitle>Node qo'shish</DialogTitle>
                     <DialogDescription>
                         Kategoriyani tanlang va kerakli node ni bosing
                     </DialogDescription>
@@ -175,8 +262,19 @@ export function NodeSelectionDialog({
                                 {filteredGroups.map((group, index) => (
                                     <button
                                         key={group.id || index}
-                                        onMouseEnter={() => setActiveCategoryIndex(index)}
-                                        onClick={() => setActiveCategoryIndex(index)}
+                                        ref={(el) => {
+                                            if (el) categoryRefs.current.set(index, el);
+                                            else categoryRefs.current.delete(index);
+                                        }}
+                                        onMouseEnter={() => {
+                                            setActiveCategoryIndex(index);
+                                            setFocusPanel("categories");
+                                        }}
+                                        onClick={() => {
+                                            setActiveCategoryIndex(index);
+                                            setFocusPanel("elements");
+                                            setActiveElementIndex(0);
+                                        }}
                                         className={cn(
                                             "flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors",
                                             "hover:bg-accent/60",
@@ -218,11 +316,21 @@ export function NodeSelectionDialog({
                                         {activeGroup.elements?.map((element, idx) => (
                                             <button
                                                 key={`${element.triggerId}-${idx}`}
+                                                ref={(el) => {
+                                                    if (el) elementRefs.current.set(idx, el);
+                                                    else elementRefs.current.delete(idx);
+                                                }}
                                                 onClick={() => handleSelect(element)}
+                                                onMouseEnter={() => {
+                                                    setFocusPanel("elements");
+                                                    setActiveElementIndex(idx);
+                                                }}
                                                 className={cn(
                                                     "group flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-all",
                                                     "hover:bg-accent/50 focus-visible:outline-none",
-                                                    "active:scale-[0.98] transition-transform duration-100"
+                                                    "active:scale-[0.98] transition-transform duration-100",
+                                                    focusPanel === "elements" && idx === activeElementIndex &&
+                                                    "bg-accent/50 ring-1 ring-primary/30"
                                                 )}
                                             >
                                                 <div
