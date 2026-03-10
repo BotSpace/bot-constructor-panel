@@ -1,7 +1,7 @@
 "use client";
 
 import { NodeProps, Position } from "reactflow";
-import { memo } from "react";
+import React, { memo } from "react";
 import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -114,7 +114,7 @@ const IfConditionNodeComponent = ({
   };
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn(" w-[600px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="🔀"
@@ -160,10 +160,7 @@ const IfConditionNodeComponent = ({
             </div>
 
             {(data.conditions || []).map((condition, index) => (
-              <div
-                key={index}
-                className="flex flex-col gap-2 p-3 border rounded-md bg-muted/50"
-              >
+              <React.Fragment key={index}>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Shart {index + 1}</span>
                   <Button
@@ -175,77 +172,76 @@ const IfConditionNodeComponent = ({
                     <Trash2 className="w-4 h-4 text-destructive" />
                   </Button>
                 </div>
-
-                {/* Variable */}
-                <div className="flex flex-col gap-1">
-                  <Input
-                    placeholder="O'zgaruvchi nomi (masalan: first, user_age)"
-                    value={condition.variable || ""}
-                    onChange={(e) =>
-                      updateCondition(index, { variable: e.target.value })
-                    }
-                    className="text-sm"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Oddiy nom yozing. Template sintaksisi shart emas.
-                  </p>
-                </div>
-
-                {/* Operator */}
-                <Select
-                  value={condition.operator}
-                  onValueChange={(value) =>
-                    updateCondition(index, { operator: value as any })
-                  }
+                <div
+                  key={index}
+                  className="flex flex-row gap-2 p-3 border rounded-md bg-muted/50"
                 >
-                  <SelectTrigger className="text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="equals">Teng (=)</SelectItem>
-                    <SelectItem value="not_equals">Teng emas (≠)</SelectItem>
-                    <SelectItem value="greater_than">Katta (&gt;)</SelectItem>
-                    <SelectItem value="less_than">Kichik (&lt;)</SelectItem>
-                    <SelectItem value="greater_equal">
-                      Katta yoki teng (≥)
-                    </SelectItem>
-                    <SelectItem value="less_equal">
-                      Kichik yoki teng (≤)
-                    </SelectItem>
-                    <SelectItem value="contains">O'z ichiga oladi</SelectItem>
-                    <SelectItem value="not_contains">
-                      O'z ichiga olmaydi
-                    </SelectItem>
-                    <SelectItem value="starts_with">Boshlanadi</SelectItem>
-                    <SelectItem value="ends_with">Tugaydi</SelectItem>
-                    <SelectItem value="is_empty">Bo'sh</SelectItem>
-                    <SelectItem value="not_empty">Bo'sh emas</SelectItem>
-                    <SelectItem value="exists">Mavjud</SelectItem>
-                    <SelectItem value="not_exists">Mavjud emas</SelectItem>
-                    <SelectItem value="in">Ro'yxatda bor</SelectItem>
-                    <SelectItem value="not_in">Ro'yxatda yo'q</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {/* Value (hide for some operators) */}
-                {!["is_empty", "not_empty", "exists", "not_exists"].includes(
-                  condition.operator
-                ) && (
+                  {/* Variable */}
                   <div className="flex flex-col gap-1">
                     <Input
-                      placeholder="Qiymat (masalan: 1, John, {{other_var}})"
-                      value={condition.value?.toString() || ""}
+                      placeholder="O'zgaruvchi nomi (masalan: first, user_age)"
+                      value={condition.variable || ""}
                       onChange={(e) =>
-                        updateCondition(index, { value: e.target.value })
+                        updateCondition(index, { variable: e.target.value })
                       }
                       className="text-sm"
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Kontekstdan qiymat olish uchun {"{{var_name}}"}
-                    </p>
                   </div>
-                )}
-              </div>
+
+                  {/* Operator */}
+                  <Select
+                    value={condition.operator}
+                    onValueChange={(value) =>
+                      updateCondition(index, { operator: value as any })
+                    }
+                  >
+                    <SelectTrigger className="text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="equals">Teng (=)</SelectItem>
+                      <SelectItem value="not_equals">Teng emas (≠)</SelectItem>
+                      <SelectItem value="greater_than">Katta (&gt;)</SelectItem>
+                      <SelectItem value="less_than">Kichik (&lt;)</SelectItem>
+                      <SelectItem value="greater_equal">
+                        Katta yoki teng (≥)
+                      </SelectItem>
+                      <SelectItem value="less_equal">
+                        Kichik yoki teng (≤)
+                      </SelectItem>
+                      <SelectItem value="contains">O'z ichiga oladi</SelectItem>
+                      <SelectItem value="not_contains">
+                        O'z ichiga olmaydi
+                      </SelectItem>
+                      <SelectItem value="starts_with">Boshlanadi</SelectItem>
+                      <SelectItem value="ends_with">Tugaydi</SelectItem>
+                      <SelectItem value="is_empty">Bo'sh</SelectItem>
+                      <SelectItem value="not_empty">Bo'sh emas</SelectItem>
+                      <SelectItem value="exists">Mavjud</SelectItem>
+                      <SelectItem value="not_exists">Mavjud emas</SelectItem>
+                      <SelectItem value="in">Ro'yxatda bor</SelectItem>
+                      <SelectItem value="not_in">Ro'yxatda yo'q</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Value (hide for some operators) */}
+                  {!["is_empty", "not_empty", "exists", "not_exists"].includes(
+                    condition.operator
+                  ) && (
+                      <div className="flex flex-col gap-1">
+                        <Input
+                          placeholder="Qiymat (masalan: 1, John, {{other_var}})"
+                          value={condition.value?.toString() || ""}
+                          onChange={(e) =>
+                            updateCondition(index, { value: e.target.value })
+                          }
+                          className="text-sm"
+                        />
+                      </div>
+                    )}
+                </div>
+              </React.Fragment>
+
             ))}
 
             {(!data.conditions || data.conditions.length === 0) && (
@@ -260,11 +256,11 @@ const IfConditionNodeComponent = ({
       {/* Input - chap tomonda */}
       <TargetHandles />
 
-      {/* TRUE - pastda (shart bajarilsa) */}
-      <SourceHandles id="true" position={Position.Bottom} />
-
       {/* NEXT - o'ng tomonda (ElseIf/Else ga) */}
-      <SourceHandles id="next" position={Position.Right} />
+      <SourceHandles className="!bg-red-500 translate-y-[-75%]" id="next" position={Position.Right} />
+
+      {/* TRUE - pastda (shart bajarilsa) */}
+      <SourceHandles className="translate-y-[75%]" id="true" position={Position.Right} />
     </Card>
   );
 };

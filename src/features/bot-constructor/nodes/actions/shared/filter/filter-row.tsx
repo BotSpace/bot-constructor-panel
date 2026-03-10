@@ -178,7 +178,7 @@ export function FilterRow({
             className="flex-1"
           />
         );
-      
+
       case "relation":
         return (
           <Input
@@ -321,8 +321,8 @@ function getOperatorsForType(type: FilterField["type"]) {
         { value: "not_equals", label: "Not equals" },
       ];
     default: return [
-        { value: "equals", label: "Equals" },
-        { value: "not_equals", label: "Not equals" },
+      { value: "equals", label: "Equals" },
+      { value: "not_equals", label: "Not equals" },
     ]
   }
 }
