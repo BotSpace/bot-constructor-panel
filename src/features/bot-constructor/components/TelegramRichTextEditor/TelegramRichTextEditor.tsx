@@ -247,7 +247,6 @@ function LazyEditorContent({ defaultValue, onChange, onClose }: {
     onChange?: (value: string) => void;
     onClose: () => void;
 }) {
-    const [htmlOutput, setHtmlOutput] = useState("");
     const onChangeRef = useRef(onChange);
     onChangeRef.current = onChange;
 
@@ -263,13 +262,18 @@ function LazyEditorContent({ defaultValue, onChange, onClose }: {
             }),
             Underline,
         ],
-        content: defaultValue || "",
+        content: defaultValue?.replace(/\n/g, "<br>") || "",
         onCreate: ({ editor }) => {
-            setHtmlOutput(tiptapToTelegramHTML(editor.getHTML()));
         },
         onUpdate: ({ editor }) => {
-            setHtmlOutput(tiptapToTelegramHTML(editor.getHTML()));
-            onChangeRef.current?.(editor.getHTML());
+            let html_content = editor.getHTML();
+
+            html_content = html_content.replace(/<\/p><p>/g, "\n");
+            html_content = html_content.replace(/<\/?p>/g, "");
+
+            console.log("🔍 ~ LazyEditorContent ~ src/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor.tsx:272 ~ html_content:", html_content);
+
+            onChangeRef.current?.(html_content);
         },
         editorProps: {
             attributes: {
@@ -342,7 +346,7 @@ export default function TelegramRichTextEditor({ defaultValue, onChange }: { def
             <div
                 onClick={() => setOpen(true)}
                 className="text-editor-content bg-background p-3 rounded-sm border-2 cursor-text min-h-[60px]"
-                dangerouslySetInnerHTML={{ __html: defaultValue || "" }}
+                dangerouslySetInnerHTML={{ __html: defaultValue?.replace(/\n/g, "<br>") || "" }}
             />
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent
