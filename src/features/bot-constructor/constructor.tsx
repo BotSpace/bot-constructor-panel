@@ -457,7 +457,7 @@ export default function Constructor() {
         <ContextMenuTrigger>
           <div
             ref={reactFlowWrapper}
-            className="h-screen"
+            className="h-[100vh]"
             onDrop={onDrop}
             onDragOver={onDragOver}
             onMouseDown={handleContainerClick}
