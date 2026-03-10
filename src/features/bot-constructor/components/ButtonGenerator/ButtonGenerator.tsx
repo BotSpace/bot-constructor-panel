@@ -221,6 +221,7 @@ export function ButtonGenerator({
               onTabChange={setActiveTab}
               onAddButton={handleAddButton}
               isCurrentRowFull={isCurrentRowFull}
+              nodeId={node_id}
             />
             <KeyboardPreview
               buttons={currentButtons}

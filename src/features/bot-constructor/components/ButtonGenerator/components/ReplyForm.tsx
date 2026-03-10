@@ -44,7 +44,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useNodes } from "reactflow";
+import { useNodes, useEdges } from "reactflow";
 import {
   Card,
   CardContent,
@@ -59,6 +59,7 @@ interface ReplyFormProps {
   onAdd: (button: ButtonConfig) => void;
   disabled: boolean;
   data?: SendTextMessageNodeData;
+  nodeId: string;
 }
 
 type ReplyType = "reply" | "web_app" | "request_poll" | "request_contact" | "request_location" | "request_poll" | "request_live_location"
@@ -123,7 +124,7 @@ const commonButtonGroups = [
   },
 ];
 
-export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
+export const ReplyForm = ({ onAdd, disabled, nodeId }: ReplyFormProps) => {
   const [text, setText] = useState("");
   const [actionType, setActionType] = useState<ReplyType>("reply");
   const [webAppUrl, setWebAppUrl] = useState("");
@@ -150,11 +151,12 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
     enabled: !!selectedCollection,
   });
 
-  // State keys'larni olish (StateNode va Trigger'lardan)
+  // State keys'larni olish (faqat zanjiriga ulangan StateNode va Trigger'lardan)
   const nodes = useNodes();
+  const edges = useEdges();
   const availableStateKeys = useMemo(() => {
-    return getAvailableStateKeys(nodes);
-  }, [nodes]);
+    return getAvailableStateKeys(nodes, edges, nodeId);
+  }, [nodes, edges, nodeId]);
 
   const handleCollectionChange = (collectionName: string) => {
     setSelectedCollection(collectionName);
@@ -397,6 +399,7 @@ export const ReplyForm = ({ onAdd, disabled }: ReplyFormProps) => {
         onAdd={onAdd}
         buttonType="inline"
         disabled={disabled}
+        nodeId={nodeId}
       />
     </div>
   );

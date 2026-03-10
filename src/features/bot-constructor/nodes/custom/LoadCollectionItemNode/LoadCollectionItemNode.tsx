@@ -3,10 +3,10 @@
 import { memo, useMemo } from "react";
 import { NodeProps, Handle, Position } from "reactflow";
 import { LoadCollectionItemNodeData } from "./types";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Database, Trash2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Database } from "lucide-react";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { TargetHandles } from "../../components";
+import { SourceHandles, TargetHandles } from "../../components";
 import {
   Select,
   SelectContent,
@@ -22,7 +22,7 @@ import { useReactQueryAction } from "@/services/react-query";
 import { APIDetailCreateResponse } from "@/types/http/response";
 import { CollectionDetail } from "@/types/http/collection";
 import { Badge } from "@/components/ui/badge";
-import { useNodes } from "reactflow";
+import { useNodes, useEdges } from "reactflow";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
@@ -49,11 +49,12 @@ function LoadCollectionItemNode({
     enabled: !!data.collection,
   });
 
-  // Get available state keys
+  // Get available state keys (faqat zanjiriga ulangan)
   const nodes = useNodes();
+  const edges = useEdges();
   const availableStateKeys = useMemo(() => {
-    return getAvailableStateKeys(nodes);
-  }, [nodes]);
+    return getAvailableStateKeys(nodes, edges, id);
+  }, [nodes, edges, id]);
 
   return (
     <>
@@ -66,48 +67,51 @@ function LoadCollectionItemNode({
           title="Collectiondan item yuklash"
         />
         <CardContent className="space-y-4">
-          {/* Collection Selection */}
-          <div className="space-y-2">
-            <Label>Collection</Label>
-            <Select
-              value={data.collection?.name ?? ""}
-              onValueChange={(value) => {
-                const selected = collections?.find((c) => c.name === value);
-                handleUpdate({
-                  collection: selected || null,
-                  filters: [], // Reset filters when collection changes
-                });
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select collection" />
-              </SelectTrigger>
-              <SelectContent>
-                {collections?.map((collection) => (
-                  <SelectItem key={collection.id} value={collection.name}>
-                    {collection.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <div className="flex gap-2">
+            {/* Collection Selection */}
+            <div className="space-y-2">
+              <Label>Collection</Label>
+              <Select
 
-          {/* Context Key */}
-          <div className="space-y-2">
-            <Label>Context Key</Label>
-            <Input
-              placeholder="e.g., selected_film"
-              value={data.contextKey || ""}
-              onChange={(e) => handleUpdate({ contextKey: e.target.value })}
-              required
-            />
-            {data.contextKey.length <= 0 && (
-              <p className="text-red-500">Context key must be at least 1 character long</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Use: {"{"}
-              {"{"}collection_{data.contextKey || "key"}_fieldname{"}}"}
-            </p>
+                value={data.collection?.name ?? ""}
+                onValueChange={(value) => {
+                  const selected = collections?.find((c) => c.name === value);
+                  handleUpdate({
+                    collection: selected || null,
+                    filters: [], // Reset filters when collection changes
+                  });
+                }}
+              >
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select collection" />
+                </SelectTrigger>
+                <SelectContent>
+                  {collections?.map((collection) => (
+                    <SelectItem key={collection.id} value={collection.name}>
+                      {collection.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Context Key */}
+            <div className="space-y-2 w-full">
+              <Label>Context Key</Label>
+              <Input
+                placeholder="e.g., selected_film"
+                value={data.contextKey || ""}
+                onChange={(e) => handleUpdate({ contextKey: e.target.value })}
+                required
+              />
+              {data.contextKey && data.contextKey.length <= 0 && (
+                <p className="text-red-500">Context key must be at least 1 character long</p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Use: {"{"}
+                {"{"}collection.{data.contextKey || "key"}.fieldname{"}}"}
+              </p>
+            </div>
           </div>
 
           {/* Filters */}
@@ -167,21 +171,11 @@ function LoadCollectionItemNode({
         </CardContent>
       </Card>
 
-      {/* Not Found Output */}
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="not_found"
-        className="translate-y-[70px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
-      />
+      {/* Not found - o'ng tomonda (ElseIf/Else ga) */}
+      <SourceHandles className="!bg-red-500 translate-y-[-75%]" id="not_found" position={Position.Right} />
 
-      {/* Found Output */}
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="found"
-        className="translate-y-[-70px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
-      />
+      {/* Found - pastda (shart bajarilsa) */}
+      <SourceHandles className="translate-y-[75%]" id="found" position={Position.Right} />
     </>
   );
 }
