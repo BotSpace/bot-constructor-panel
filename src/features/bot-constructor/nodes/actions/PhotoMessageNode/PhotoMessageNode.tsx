@@ -28,6 +28,7 @@ import { SourceHandles, TargetHandles } from "../../components";
 import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/SelectedMessageTarget";
 import { ActionPanel } from "../../components/shared/ActionPanel";
 import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
+import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
 
 const SendPhotoNodeComponent = ({
   id,
@@ -227,23 +228,10 @@ const SendPhotoNodeComponent = ({
             {/* Rasm matni (Caption) */}
             <div className="grid gap-2">
               <Label>Rasm matni (Caption)</Label>
-              <TextareaAutosize
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                placeholder="Rasm uchun matn kiriting..."
-                value={data.caption || ""}
-                onChange={(e) => handleUpdate({ caption: e.target.value })}
-                maxLength={1024}
+              <TelegramRichTextEditor
+                defaultValue={data.caption}
+                onChange={(e) => handleUpdate({ caption: e })}
               />
-              <div
-                className={cn(
-                  "text-right text-xs",
-                  captionLength > 1024
-                    ? "text-destructive"
-                    : "text-muted-foreground"
-                )}
-              >
-                {captionLength}/1024
-              </div>
             </div>
           </CardContent>
 
