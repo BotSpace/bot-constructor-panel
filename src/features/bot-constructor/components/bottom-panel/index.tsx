@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from './components/button'
 import { Bot, Database, Key, Keyboard, Plus, Search } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
@@ -19,6 +19,7 @@ import { NodeSelectionDialog } from '../NodeSelectionDialog'
 import { ShortcutsDialog } from '../ShortcutsDialog'
 import { AgentChatDialog } from '../AgentChat/AgentChatDialog'
 import { useFlowStore } from '../../store'
+import useProjectStore from '../../store/project'
 import { useReactFlow } from 'reactflow'
 import { ElementItemType } from '@/types/element-types'
 import { CollectionIframeDialog } from '../CollectionIframe/CollectionIframe'
@@ -34,7 +35,19 @@ function BottomPanel({ }: Props) {
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
     const [agentOpen, setAgentOpen] = useState(false);
     const [envManageOpen, setEnvManageOpen] = useState(false);
-    const { addNode } = useFlowStore();
+    const { addNode, nodes } = useFlowStore();
+    const { project } = useProjectStore();
+    const hasAutoOpened = useRef(false);
+
+    // Auto-open AI panel when project has no nodes (empty canvas = new project)
+    useEffect(() => {
+        if (project && !hasAutoOpened.current) {
+            hasAutoOpened.current = true;
+            if (nodes.length === 0) {
+                setAgentOpen(true);
+            }
+        }
+    }, [project, nodes.length]);
     const { getViewport } = useReactFlow();
 
     const { id } = useParams();
