@@ -20,24 +20,76 @@ import {
   RotateCcw,
   CheckCircle2,
   Sparkles,
+  Search,
+  Database,
+  Terminal,
   Wrench,
+  Globe,
+  Users,
+  Settings,
+  Package,
+  FileText,
+  Zap,
 } from "lucide-react";
 import toast from "react-hot-toast";
+
+// ── Tool metadata ─────────────────────────────────────────────────────────
+
+const TOOL_META: Record<string, { label: string; Icon: React.ElementType }> = {
+  search_plugins:            { label: "Plugin qidirish",          Icon: Search },
+  get_plugin:                { label: "Plugin schema",             Icon: Package },
+  list_collections:          { label: "Kolleksiyalar ro'yxati",    Icon: Database },
+  get_collection:            { label: "Kolleksiya ma'lumoti",      Icon: Database },
+  create_collection:         { label: "Kolleksiya yaratish",       Icon: Database },
+  update_collection_fields:  { label: "Kolleksiya yangilash",      Icon: Database },
+  delete_collection:         { label: "Kolleksiya o'chirish",      Icon: Database },
+  query_collection:          { label: "Ma'lumot so'rovi",          Icon: Database },
+  get_project_info:          { label: "Loyiha ma'lumoti",          Icon: Settings },
+  update_project:            { label: "Loyiha yangilash",          Icon: Settings },
+  get_resource_usage:        { label: "Resurs holati",             Icon: Zap },
+  start_debug_bot:           { label: "Debug bot ishga tushirish", Icon: Terminal },
+  stop_debug_bot:            { label: "Debug bot to'xtatish",      Icon: Terminal },
+  get_debug_container_info:  { label: "Container ma'lumoti",       Icon: Terminal },
+  get_logs:                  { label: "Loglar o'qilyapti",         Icon: FileText },
+  list_releases:             { label: "Relizlar ro'yxati",         Icon: Globe },
+  create_release:            { label: "Reliz yaratish",            Icon: Globe },
+  stop_release:              { label: "Reliz to'xtatish",          Icon: Globe },
+  list_env_vars:             { label: "Env o'zgaruvchilar",        Icon: Settings },
+  set_env_var:               { label: "Env saqlash",               Icon: Settings },
+  delete_env_var:            { label: "Env o'chirish",             Icon: Settings },
+  get_chat_stats:            { label: "Chat statistikasi",         Icon: Users },
+  get_bot_users:             { label: "Bot foydalanuvchilari",     Icon: Users },
+  get_user_messages:         { label: "Foydalanuvchi xabarlari",   Icon: Users },
+  send_message_to_user:      { label: "Xabar yuborish",            Icon: Users },
+};
+
+function toolLabel(name: string) {
+  return TOOL_META[name]?.label ?? name;
+}
+function ToolIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = TOOL_META[name]?.Icon ?? Wrench;
+  return <Icon className={className} />;
+}
+
+// ── Types ─────────────────────────────────────────────────────────────────
 
 interface Message extends AgentMessage {
   id: string;
 }
 
-interface LiveEvent {
-  type: "tool_call" | "tool_result";
+interface ActivityStep {
+  key: string;      // tool name + index
   name: string;
-  detail?: string;
+  status: "running" | "done";
+  preview?: string;
 }
 
 interface AgentPanelProps {
   projectId: string;
   onCollapse: () => void;
 }
+
+// ── Main component ────────────────────────────────────────────────────────
 
 export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -48,12 +100,14 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
   const [pendingFlow, setPendingFlow] = useState<{ nodes: any[]; edges: any[] } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
-  // Streaming state
-  const [streamingContent, setStreamingContent] = useState("");
-  const [liveEvents, setLiveEvents] = useState<LiveEvent[]>([]);
+  // Streaming
+  const [streamTokens, setStreamTokens] = useState("");
+  const [activity, setActivity] = useState<ActivityStep[]>([]);
+  const [isThinking, setIsThinking] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const activityRef = useRef<ActivityStep[]>([]);
 
   const { setNodes, setEdges, formatFlow } = useFlowStore();
 
@@ -61,11 +115,8 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, streamingContent, liveEvents, scrollToBottom]);
+  useEffect(() => { scrollToBottom(); }, [messages, streamTokens, activity, scrollToBottom]);
 
-  // Load project session on mount
   useEffect(() => {
     let cancelled = false;
     const init = async () => {
@@ -105,6 +156,13 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
     setTimeout(() => formatFlow(), 50);
   }, [setNodes, setEdges, formatFlow]);
 
+  const resetStreamState = () => {
+    setStreamTokens("");
+    setActivity([]);
+    setIsThinking(false);
+    activityRef.current = [];
+  };
+
   const sendMessage = async () => {
     const text = input.trim();
     if (!text || isLoading || isInitializing) return;
@@ -115,20 +173,30 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
     const userMsg: Message = { id: Date.now().toString(), role: "user", content: text };
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
-    setStreamingContent("");
-    setLiveEvents([]);
+    resetStreamState();
 
     try {
       await streamChatWithAgent(projectId, text, (event: StreamEvent) => {
-        if (event.type === "token") {
-          setStreamingContent(prev => prev + event.content);
+        if (event.type === "thinking") {
+          setIsThinking(true);
+        } else if (event.type === "token") {
+          setIsThinking(false);
+          setStreamTokens(prev => prev + event.content);
         } else if (event.type === "tool_call") {
-          setLiveEvents(prev => [...prev, { type: "tool_call", name: event.name, detail: event.input }]);
+          setIsThinking(false);
+          const step: ActivityStep = { key: `${event.name}-${Date.now()}`, name: event.name, status: "running", preview: event.input };
+          activityRef.current = [...activityRef.current, step];
+          setActivity([...activityRef.current]);
         } else if (event.type === "tool_result") {
-          setLiveEvents(prev => [...prev, { type: "tool_result", name: event.name, detail: event.preview }]);
+          const steps = activityRef.current.map(s =>
+            s.name === event.name && s.status === "running"
+              ? { ...s, status: "done" as const, preview: event.preview }
+              : s
+          );
+          activityRef.current = steps;
+          setActivity([...steps]);
         } else if (event.type === "done") {
-          setStreamingContent("");
-          setLiveEvents([]);
+          resetStreamState();
           setMessages(prev => [...prev, {
             id: (Date.now() + 1).toString(),
             role: "assistant",
@@ -142,16 +210,14 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
           }
           setIsLoading(false);
         } else if (event.type === "error") {
-          setStreamingContent("");
-          setLiveEvents([]);
+          resetStreamState();
           toast.error(event.message || "Xatolik yuz berdi");
           setMessages(prev => prev.filter(m => m.id !== userMsg.id));
           setIsLoading(false);
         }
       });
     } catch {
-      setStreamingContent("");
-      setLiveEvents([]);
+      resetStreamState();
       toast.error("Xabar yuborishda xatolik");
       setMessages(prev => prev.filter(m => m.id !== userMsg.id));
       setIsLoading(false);
@@ -175,11 +241,9 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
             </div>
           )}
           <Button
-            variant="ghost"
-            size="icon"
+            variant="ghost" size="icon"
             className="h-7 w-7 text-muted-foreground hover:text-foreground"
             onClick={onCollapse}
-            title="Yopish"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -200,45 +264,50 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
                 <MessageBubble key={msg.id} message={msg} />
               ))}
 
-              {/* Live streaming bubble */}
+              {/* ── Live streaming area ── */}
               {isLoading && (
                 <div className="flex gap-2 items-start mt-1">
                   <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary mt-0.5">
                     <Bot className="h-3 w-3" />
                   </div>
-                  <div className="max-w-[88%] space-y-1.5">
-                    {/* Tool event pills */}
-                    {liveEvents.length > 0 && (
-                      <div className="flex flex-col gap-1">
-                        {liveEvents.slice(-4).map((ev, i) => (
-                          <div
-                            key={i}
-                            className={cn(
-                              "flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg",
-                              ev.type === "tool_call"
-                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                                : "bg-muted text-muted-foreground"
+                  <div className="flex-1 min-w-0 space-y-1.5">
+
+                    {/* Activity steps */}
+                    {activity.length > 0 && (
+                      <div className="rounded-xl border border-border bg-muted/40 divide-y divide-border overflow-hidden">
+                        {activity.map(step => (
+                          <div key={step.key} className="flex items-center gap-2.5 px-3 py-1.5">
+                            {step.status === "running" ? (
+                              <Loader2 className="h-3.5 w-3.5 shrink-0 text-primary animate-spin" />
+                            ) : (
+                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-green-500" />
                             )}
-                          >
-                            <Wrench className="h-3 w-3 shrink-0" />
-                            <span className="font-mono truncate">{ev.name}</span>
-                            {ev.type === "tool_result" && (
-                              <CheckCircle2 className="h-3 w-3 shrink-0 text-green-500" />
+                            <ToolIcon name={step.name} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                            <span className={cn(
+                              "text-xs font-medium",
+                              step.status === "running" ? "text-foreground" : "text-muted-foreground"
+                            )}>
+                              {toolLabel(step.name)}
+                            </span>
+                            {step.status === "running" && (
+                              <span className="ml-auto text-xs text-muted-foreground/60 truncate max-w-[100px]">
+                                {step.preview?.slice(0, 40)}
+                              </span>
                             )}
                           </div>
                         ))}
                       </div>
                     )}
 
-                    {/* Streaming text or typing dots */}
-                    <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2.5 text-sm leading-relaxed">
-                      {streamingContent ? (
+                    {/* Thinking dots or token stream */}
+                    <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2.5 text-sm leading-relaxed max-w-[88%]">
+                      {streamTokens ? (
                         <span className="whitespace-pre-wrap">
-                          {streamingContent}
-                          <span className="inline-block w-0.5 h-3.5 bg-current ml-0.5 animate-pulse" />
+                          {streamTokens}
+                          <span className="inline-block w-0.5 h-3.5 bg-current ml-0.5 animate-pulse align-text-bottom" />
                         </span>
                       ) : (
-                        <div className="flex gap-1 items-center">
+                        <div className="flex gap-1 items-center py-0.5">
                           <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
                           <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
                           <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
@@ -264,8 +333,7 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
             </span>
           </div>
           <Button
-            size="sm"
-            variant="ghost"
+            size="sm" variant="ghost"
             onClick={() => applyFlowToCanvas(pendingFlow)}
             className="h-6 px-2 text-xs gap-1 shrink-0 text-muted-foreground hover:text-foreground"
           >
@@ -300,8 +368,7 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
           <div className="flex items-center justify-between px-2 pb-2 pt-0.5">
             <span className="text-xs text-muted-foreground/40 select-none">↵ yuborish · ⇧↵ yangi qator</span>
             <Button
-              size="icon"
-              className="h-7 w-7 rounded-lg"
+              size="icon" className="h-7 w-7 rounded-lg"
               onClick={sendMessage}
               disabled={!input.trim() || isLoading || isInitializing}
             >
@@ -365,9 +432,7 @@ function FormattedMessage({ text }: { text: string }) {
           );
         }
         return (
-          <p key={i} className={line === "" ? "h-2" : ""}>
-            {applyInline(line)}
-          </p>
+          <p key={i} className={line === "" ? "h-2" : ""}>{applyInline(line)}</p>
         );
       })}
     </div>
@@ -377,12 +442,8 @@ function FormattedMessage({ text }: { text: string }) {
 function applyInline(text: string): React.ReactNode {
   const parts = text.split(/(\*\*?.+?\*\*?)/g);
   return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={i}>{part.slice(2, -2)}</strong>;
-    }
-    if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
-      return <em key={i}>{part.slice(1, -1)}</em>;
-    }
+    if (part.startsWith("**") && part.endsWith("**")) return <strong key={i}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith("*") && part.endsWith("*") && part.length > 2) return <em key={i}>{part.slice(1, -1)}</em>;
     return part;
   });
 }
