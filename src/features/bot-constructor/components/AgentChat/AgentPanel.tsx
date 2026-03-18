@@ -80,11 +80,12 @@ interface Step {
 interface AgentPanelProps {
   projectId: string;
   onCollapse: () => void;
+  initialPrompt?: string;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────
 
-export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
+export function AgentPanel({ projectId, onCollapse, initialPrompt }: AgentPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -97,6 +98,7 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const stepsRef = useRef<Step[]>([]);
   const wsCleanupRef = useRef<(() => void) | null>(null);
+  const initialPromptSentRef = useRef(false);
 
   const { setNodes, setEdges, formatFlow } = useFlowStore();
 
@@ -140,12 +142,14 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
     setSteps([]);
   };
 
-  const sendMessage = async () => {
-    const text = input.trim();
+  const sendMessage = useCallback(async (textOverride?: string) => {
+    const text = (textOverride ?? input).trim();
     if (!text || isLoading || isInitializing) return;
 
-    setInput("");
-    if (inputRef.current) inputRef.current.style.height = "auto";
+    if (!textOverride) {
+      setInput("");
+      if (inputRef.current) inputRef.current.style.height = "auto";
+    }
 
     const userMsg: Message = { id: Date.now().toString(), role: "user", content: text };
     setMessages(prev => [...prev, userMsg]);
@@ -200,7 +204,17 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
     });
 
     wsCleanupRef.current = cleanup;
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [input, isLoading, isInitializing, projectId, applyFlow]);
+
+  // Auto-send initialPrompt once after initialization (no prior messages)
+  useEffect(() => {
+    if (!isInitializing && initialPrompt && !initialPromptSentRef.current && messages.length <= 1) {
+      initialPromptSentRef.current = true;
+      sendMessage(initialPrompt);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitializing]);
 
   // Cleanup WebSocket on unmount
   useEffect(() => () => { wsCleanupRef.current?.(); }, []);

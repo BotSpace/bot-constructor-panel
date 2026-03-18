@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Constructor from "@/features/bot-constructor/constructor";
 import useProjectStore from "@/features/bot-constructor/store/project";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DebugConsole } from "@/components/layout/components/debug-console/debug-console";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
@@ -17,8 +17,10 @@ import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function Page() {
+function PageInner() {
   const { id }: { id: string } = useParams();
+  const searchParams = useSearchParams();
+  const initialPrompt = searchParams.get("prompt") ?? undefined;
   const { loadProject, project } = useProjectStore();
   const { loadCollections } = useCollectionStore();
   const [aiOpen, setAiOpen] = useState(true);
@@ -55,6 +57,7 @@ export default function Page() {
           <AgentPanel
             projectId={id}
             onCollapse={() => setAiOpen(false)}
+            initialPrompt={initialPrompt}
           />
         )}
       </div>
@@ -82,6 +85,14 @@ export default function Page() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<ConstructorLoadingSkeletons />}>
+      <PageInner />
+    </Suspense>
   );
 }
 
