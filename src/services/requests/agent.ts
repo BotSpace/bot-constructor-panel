@@ -6,10 +6,8 @@ const AGENT_BASE = "https://api.botspace.uz/api/agent";
 
 export interface AgentSession {
   session_id: string;
-  phase: string;
   turn_count: number;
   has_flow: boolean;
-  requirements: string[];
   created_at: string;
   updated_at: string;
 }
@@ -17,10 +15,8 @@ export interface AgentSession {
 export interface AgentChatResponse {
   session_id: string;
   reply: string;
-  phase: string;
   has_flow: boolean;
   flow_json: { nodes: any[]; edges: any[] } | null;
-  requirements: string[];
 }
 
 export interface AgentMessage {

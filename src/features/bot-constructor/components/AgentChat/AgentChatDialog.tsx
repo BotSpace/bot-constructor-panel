@@ -26,7 +26,8 @@ import {
   Loader2,
   Zap,
   ChevronDown,
-  ChevronRight,
+  RotateCcw,
+  CheckCircle2,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -52,19 +53,13 @@ interface AgentChatDialogProps {
   projectId?: string;
 }
 
-const phaseLabel: Record<string, string> = {
-  chat: "Suhbat",
-  generating: "Generatsiya...",
-  done: "Tayyor ✓",
-};
-
 export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDialogProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessions, setSessions] = useState<AgentSession[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [phase, setPhase] = useState<string>("chat");
+  const [hasFlow, setHasFlow] = useState(false);
   const [pendingFlow, setPendingFlow] = useState<{ nodes: any[]; edges: any[] } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -89,7 +84,6 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
     }
   }, []);
 
-  // Load history for an existing session
   const loadSessionHistory = useCallback(async (sid: string) => {
     try {
       const history = await getAgentHistory(sid);
@@ -117,7 +111,7 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
             "Salom! 👋 Men Botmother AI agentiman. Qanday Telegram bot yaratishni xohlaysiz? Bot haqida batafsil aytib bering.",
         },
       ]);
-      setPhase("chat");
+      setHasFlow(false);
       setPendingFlow(null);
       await loadSessions();
     } catch {
@@ -127,7 +121,6 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
 
   const openSession = useCallback(async (sid: string) => {
     setSessionId(sid);
-    setPhase("chat");
     setPendingFlow(null);
     const storageKey = `agent_session_${projectId ?? "default"}`;
     localStorage.setItem(storageKey, sid);
@@ -164,16 +157,14 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
 
       if (savedId) {
         try {
-          // Try to restore directly by session id — faster and more reliable than list search
           const session = await getAgentSession(savedId);
           setSessionId(savedId);
-          setPhase(session.phase);
+          setHasFlow(session.has_flow);
           await loadSessionHistory(savedId);
-          loadSessions(); // refresh sidebar list in background (don't await)
+          loadSessions();
           setTimeout(() => inputRef.current?.focus(), 200);
           return;
         } catch {
-          // Session not found or expired — clear stale id and fall through to create new
           localStorage.removeItem(storageKey);
         }
       }
@@ -184,6 +175,19 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
 
     init();
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-apply flow to canvas
+  const applyFlowToCanvas = useCallback(
+    (flow: { nodes: any[]; edges: any[] }, silent = false) => {
+      setNodes(flow.nodes || []);
+      setEdges(flow.edges || []);
+      setTimeout(() => formatFlow(), 50);
+      if (!silent) {
+        toast.success(`Flow qo'llandi! (${flow.nodes?.length ?? 0} ta node)`);
+      }
+    },
+    [setNodes, setEdges, formatFlow]
+  );
 
   const sendMessage = async () => {
     const text = input.trim();
@@ -199,8 +203,12 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
         ...prev,
         { id: (Date.now() + 1).toString(), role: "assistant", content: res.reply },
       ]);
-      setPhase(res.phase);
-      if (res.flow_json) setPendingFlow(res.flow_json);
+      setHasFlow(res.has_flow);
+      if (res.flow_json) {
+        setPendingFlow(res.flow_json);
+        // Auto-apply flow immediately — user can continue chatting to refine
+        applyFlowToCanvas(res.flow_json);
+      }
       loadSessions();
     } catch {
       toast.error("Xabar yuborishda xatolik");
@@ -209,14 +217,10 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
     }
   };
 
-  const applyFlow = () => {
+  // Manual re-apply (e.g. user changed canvas and wants to restore AI version)
+  const reApplyFlow = () => {
     if (!pendingFlow) return;
-    setNodes(pendingFlow.nodes || []);
-    setEdges(pendingFlow.edges || []);
-    // Auto-format after applying
-    setTimeout(() => formatFlow(), 50);
-    toast.success("Flow qo'llandi!");
-    onOpenChange(false);
+    applyFlowToCanvas(pendingFlow);
   };
 
   const currentSession = sessions.find((s) => s.session_id === sessionId);
@@ -245,7 +249,6 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[220px]">
-              {/* New chat */}
               <DropdownMenuItem
                 onClick={createNewSession}
                 className="gap-2 text-primary focus:text-primary"
@@ -282,11 +285,18 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Phase badge + close */}
+          {/* Status badge + close */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <Badge variant="outline" className="text-xs">
-              {phaseLabel[phase] ?? phase}
-            </Badge>
+            {hasFlow ? (
+              <Badge variant="outline" className="text-xs text-green-600 border-green-500/50 gap-1">
+                <CheckCircle2 className="h-3 w-3" />
+                Tayyor
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-xs">
+                Suhbat
+              </Badge>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -359,16 +369,23 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
           </div>
         </ScrollArea>
 
-        {/* Flow banner */}
+        {/* Flow applied banner — shows re-apply option */}
         {pendingFlow && (
           <div className="mx-4 mb-2 rounded-xl border border-green-500/30 bg-green-500/10 px-3 py-2 flex items-center justify-between gap-2 shrink-0">
             <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-              <Zap className="h-4 w-4 shrink-0" />
-              <span className="text-xs font-medium">Flow tayyor! Constructorga qo'llash mumkin.</span>
+              <CheckCircle2 className="h-4 w-4 shrink-0" />
+              <span className="text-xs font-medium">
+                Flow canvas'ga qo'llandi ({pendingFlow.nodes?.length ?? 0} node)
+              </span>
             </div>
-            <Button size="sm" onClick={applyFlow} className="h-7 text-xs gap-1 shrink-0">
-              <ChevronRight className="h-3 w-3" />
-              Qo'llash
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={reApplyFlow}
+              className="h-7 text-xs gap-1 shrink-0 border-green-500/40 hover:bg-green-500/10"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Qayta
             </Button>
           </div>
         )}
@@ -404,6 +421,11 @@ export function AgentChatDialog({ open, onOpenChange, projectId }: AgentChatDial
               )}
             </Button>
           </div>
+          {pendingFlow && (
+            <p className="text-xs text-muted-foreground mt-1.5 text-center">
+              Suhbatni davom ettiring — AI flowni yangilab boradi
+            </p>
+          )}
         </div>
       </DrawerContent>
     </Drawer>
