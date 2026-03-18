@@ -318,7 +318,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt }: AgentPanelP
           />
           <div className="flex items-center justify-between px-2 pb-2 pt-0.5">
             <span className="text-xs text-muted-foreground/40 select-none">↵ yuborish · ⇧↵ yangi qator</span>
-            <Button size="icon" className="h-7 w-7 rounded-lg" onClick={sendMessage}
+            <Button size="icon" className="h-7 w-7 rounded-lg" onClick={() => sendMessage()}
               disabled={!input.trim() || isLoading || isInitializing}>
               {isLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
             </Button>
