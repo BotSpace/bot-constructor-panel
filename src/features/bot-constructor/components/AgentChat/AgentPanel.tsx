@@ -4,9 +4,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import {
   getProjectSession,
-  chatWithAgent,
+  streamChatWithAgent,
   type AgentMessage,
-  type AgentChatResponse,
+  type StreamEvent,
 } from "@/services/requests/agent";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,11 +20,18 @@ import {
   RotateCcw,
   CheckCircle2,
   Sparkles,
+  Wrench,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Message extends AgentMessage {
   id: string;
+}
+
+interface LiveEvent {
+  type: "tool_call" | "tool_result";
+  name: string;
+  detail?: string;
 }
 
 interface AgentPanelProps {
@@ -41,6 +48,10 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
   const [pendingFlow, setPendingFlow] = useState<{ nodes: any[]; edges: any[] } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
+  // Streaming state
+  const [streamingContent, setStreamingContent] = useState("");
+  const [liveEvents, setLiveEvents] = useState<LiveEvent[]>([]);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -52,9 +63,9 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom]);
+  }, [messages, streamingContent, liveEvents, scrollToBottom]);
 
-  // Load project session on mount (single request: session + history)
+  // Load project session on mount
   useEffect(() => {
     let cancelled = false;
     const init = async () => {
@@ -96,7 +107,7 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
 
   const sendMessage = async () => {
     const text = input.trim();
-    if (!text || !sessionId || isLoading) return;
+    if (!text || isLoading || isInitializing) return;
 
     setInput("");
     if (inputRef.current) inputRef.current.style.height = "auto";
@@ -104,24 +115,45 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
     const userMsg: Message = { id: Date.now().toString(), role: "user", content: text };
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
+    setStreamingContent("");
+    setLiveEvents([]);
 
     try {
-      const res: AgentChatResponse = await chatWithAgent(sessionId, text);
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: res.reply,
-      }]);
-      setHasFlow(res.has_flow);
-      if (res.flow_json) {
-        setPendingFlow(res.flow_json);
-        applyFlowToCanvas(res.flow_json);
-        toast.success(`Flow qo'llandi — ${res.flow_json.nodes?.length ?? 0} ta node`);
-      }
+      await streamChatWithAgent(projectId, text, (event: StreamEvent) => {
+        if (event.type === "token") {
+          setStreamingContent(prev => prev + event.content);
+        } else if (event.type === "tool_call") {
+          setLiveEvents(prev => [...prev, { type: "tool_call", name: event.name, detail: event.input }]);
+        } else if (event.type === "tool_result") {
+          setLiveEvents(prev => [...prev, { type: "tool_result", name: event.name, detail: event.preview }]);
+        } else if (event.type === "done") {
+          setStreamingContent("");
+          setLiveEvents([]);
+          setMessages(prev => [...prev, {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: event.reply,
+          }]);
+          setHasFlow(event.has_flow);
+          if (event.flow_json) {
+            setPendingFlow(event.flow_json);
+            applyFlowToCanvas(event.flow_json);
+            toast.success(`Flow qo'llandi — ${event.flow_json.nodes?.length ?? 0} ta node`);
+          }
+          setIsLoading(false);
+        } else if (event.type === "error") {
+          setStreamingContent("");
+          setLiveEvents([]);
+          toast.error(event.message || "Xatolik yuz berdi");
+          setMessages(prev => prev.filter(m => m.id !== userMsg.id));
+          setIsLoading(false);
+        }
+      });
     } catch {
+      setStreamingContent("");
+      setLiveEvents([]);
       toast.error("Xabar yuborishda xatolik");
       setMessages(prev => prev.filter(m => m.id !== userMsg.id));
-    } finally {
       setIsLoading(false);
     }
   };
@@ -168,16 +200,50 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
                 <MessageBubble key={msg.id} message={msg} />
               ))}
 
+              {/* Live streaming bubble */}
               {isLoading && (
                 <div className="flex gap-2 items-start mt-1">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary mt-0.5">
                     <Bot className="h-3 w-3" />
                   </div>
-                  <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2.5">
-                    <div className="flex gap-1 items-center">
-                      <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
-                      <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
-                      <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
+                  <div className="max-w-[88%] space-y-1.5">
+                    {/* Tool event pills */}
+                    {liveEvents.length > 0 && (
+                      <div className="flex flex-col gap-1">
+                        {liveEvents.slice(-4).map((ev, i) => (
+                          <div
+                            key={i}
+                            className={cn(
+                              "flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg",
+                              ev.type === "tool_call"
+                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                : "bg-muted text-muted-foreground"
+                            )}
+                          >
+                            <Wrench className="h-3 w-3 shrink-0" />
+                            <span className="font-mono truncate">{ev.name}</span>
+                            {ev.type === "tool_result" && (
+                              <CheckCircle2 className="h-3 w-3 shrink-0 text-green-500" />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Streaming text or typing dots */}
+                    <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2.5 text-sm leading-relaxed">
+                      {streamingContent ? (
+                        <span className="whitespace-pre-wrap">
+                          {streamingContent}
+                          <span className="inline-block w-0.5 h-3.5 bg-current ml-0.5 animate-pulse" />
+                        </span>
+                      ) : (
+                        <div className="flex gap-1 items-center">
+                          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
+                          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
+                          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -309,7 +375,6 @@ function FormattedMessage({ text }: { text: string }) {
 }
 
 function applyInline(text: string): React.ReactNode {
-  // Bold: **text** or *text*
   const parts = text.split(/(\*\*?.+?\*\*?)/g);
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
