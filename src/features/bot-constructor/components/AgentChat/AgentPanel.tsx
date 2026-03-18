@@ -81,11 +81,12 @@ interface AgentPanelProps {
   projectId: string;
   onCollapse: () => void;
   initialPrompt?: string;
+  onBuildingChange?: (isBuilding: boolean) => void;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────
 
-export function AgentPanel({ projectId, onCollapse, initialPrompt }: AgentPanelProps) {
+export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingChange }: AgentPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -182,6 +183,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt }: AgentPanelP
 
       } else if (event.type === "done") {
         resetStream();
+        onBuildingChange?.(false);
         setMessages(prev => [...prev, {
           id: (Date.now() + 1).toString(),
           role: "assistant",
@@ -197,6 +199,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt }: AgentPanelP
 
       } else if (event.type === "error") {
         resetStream();
+        onBuildingChange?.(false);
         toast.error(event.message || "Xatolik yuz berdi");
         setMessages(prev => prev.filter(m => m.id !== userMsg.id));
         setIsLoading(false);
@@ -211,6 +214,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt }: AgentPanelP
   useEffect(() => {
     if (!isInitializing && initialPrompt && !initialPromptSentRef.current && messages.length <= 1) {
       initialPromptSentRef.current = true;
+      onBuildingChange?.(true);
       sendMessage(initialPrompt);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

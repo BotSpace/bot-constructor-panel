@@ -24,6 +24,7 @@ function PageInner() {
   const { loadProject, project } = useProjectStore();
   const { loadCollections } = useCollectionStore();
   const [aiOpen, setAiOpen] = useState(true);
+  const [isAiBuilding, setIsAiBuilding] = useState(!!initialPrompt);
 
   useEffect(() => {
     if (project) {
@@ -58,6 +59,7 @@ function PageInner() {
             projectId={id}
             onCollapse={() => setAiOpen(false)}
             initialPrompt={initialPrompt}
+            onBuildingChange={setIsAiBuilding}
           />
         )}
       </div>
@@ -70,6 +72,9 @@ function PageInner() {
           <DebugConsole />
           <BottomPanel aiPanelOpen={aiOpen} onToggleAI={() => setAiOpen(v => !v)} />
         </ReactFlowProvider>
+
+        {/* AI building skeleton overlay */}
+        {isAiBuilding && <AiBuildingOverlay />}
 
         {/* Open AI panel button (visible when panel is collapsed) */}
         {!aiOpen && (
@@ -93,6 +98,71 @@ export default function Page() {
     <Suspense fallback={<ConstructorLoadingSkeletons />}>
       <PageInner />
     </Suspense>
+  );
+}
+
+// Skeleton node positions (simulate a real-looking flow)
+const SKELETON_NODES = [
+  { w: 200, h: 72,  top: "18%", left: "32%" },
+  { w: 220, h: 88,  top: "42%", left: "20%" },
+  { w: 220, h: 88,  top: "42%", left: "54%" },
+  { w: 200, h: 72,  top: "66%", left: "32%" },
+  { w: 180, h: 64,  top: "66%", left: "62%" },
+];
+
+function AiBuildingOverlay() {
+  return (
+    <div className="absolute inset-0 z-10 pointer-events-none">
+      {/* Subtle backdrop */}
+      <div className="absolute inset-0 bg-background/30 backdrop-blur-[1px]" />
+
+      {/* Skeleton nodes */}
+      {SKELETON_NODES.map((node, i) => (
+        <div
+          key={i}
+          className="absolute rounded-xl border border-border bg-card shadow-sm overflow-hidden"
+          style={{
+            width: node.w,
+            height: node.h,
+            top: node.top,
+            left: node.left,
+            animationDelay: `${i * 120}ms`,
+          }}
+        >
+          {/* Node header bar */}
+          <div className="h-7 w-full bg-muted/60 animate-pulse" />
+          {/* Node body lines */}
+          <div className="p-2.5 space-y-2">
+            <Skeleton className="h-3 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+        </div>
+      ))}
+
+      {/* Animated connecting lines (SVG) */}
+      <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <line x1="42%" y1="26%" x2="30%" y2="42%" stroke="currentColor" strokeWidth="1.5"
+          strokeDasharray="6 4" className="text-border animate-pulse opacity-60" />
+        <line x1="42%" y1="26%" x2="64%" y2="42%" stroke="currentColor" strokeWidth="1.5"
+          strokeDasharray="6 4" className="text-border animate-pulse opacity-60" />
+        <line x1="30%" y1="56%" x2="42%" y2="66%" stroke="currentColor" strokeWidth="1.5"
+          strokeDasharray="6 4" className="text-border animate-pulse opacity-60" />
+        <line x1="64%" y1="56%" x2="72%" y2="66%" stroke="currentColor" strokeWidth="1.5"
+          strokeDasharray="6 4" className="text-border animate-pulse opacity-60" />
+      </svg>
+
+      {/* Center status badge */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full border bg-card/90 backdrop-blur-sm px-4 py-2 shadow-lg">
+        <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
+        <span className="text-xs font-medium text-muted-foreground">AI bot quryapti...</span>
+        <span className="flex gap-0.5">
+          {[0, 150, 300].map(d => (
+            <span key={d} className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce"
+              style={{ animationDelay: `${d}ms` }} />
+          ))}
+        </span>
+      </div>
+    </div>
   );
 }
 
