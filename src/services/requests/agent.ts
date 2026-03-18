@@ -54,44 +54,38 @@ export async function chatWithAgent(
   return res.data;
 }
 
-/** Stream agent responses via SSE. Calls onEvent for each event. */
-export async function streamChatWithAgent(
+/** Connect WebSocket and stream agent events. Returns a cleanup function. */
+export function wsChatWithAgent(
   projectId: string,
   message: string,
-  onEvent: (event: StreamEvent) => void
-): Promise<void> {
-  const session = await getSession();
-  const token = (session?.user as any)?.access ?? "";
+  token: string,
+  onEvent: (event: StreamEvent) => void,
+  onClose?: () => void,
+): () => void {
+  const wsBase = AGENT_BASE.replace(/^http/, "ws");
+  const ws = new WebSocket(`${wsBase}/projects/${projectId}/chat/ws`);
 
-  const response = await fetch(`${AGENT_BASE}/projects/${projectId}/chat/stream`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ message }),
-  });
+  ws.onopen = () => {
+    ws.send(JSON.stringify({ token, message }));
+  };
 
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  if (!response.body) throw new Error("No response body");
+  ws.onmessage = (e) => {
+    try {
+      onEvent(JSON.parse(e.data) as StreamEvent);
+    } catch {}
+  };
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
+  ws.onerror = () => {
+    onEvent({ type: "error", message: "WebSocket ulanish xatosi" });
+  };
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const parts = buffer.split("\n\n");
-    buffer = parts.pop() ?? "";
-    for (const part of parts) {
-      const line = part.trim();
-      if (line.startsWith("data: ")) {
-        try {
-          onEvent(JSON.parse(line.slice(6)) as StreamEvent);
-        } catch {}
-      }
+  ws.onclose = () => {
+    onClose?.();
+  };
+
+  return () => {
+    if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+      ws.close();
     }
-  }
+  };
 }
