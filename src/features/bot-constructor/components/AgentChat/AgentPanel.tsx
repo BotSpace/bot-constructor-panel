@@ -100,10 +100,8 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
   const [pendingFlow, setPendingFlow] = useState<{ nodes: any[]; edges: any[] } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
-  // Streaming
-  const [streamTokens, setStreamTokens] = useState("");
+  // Streaming (tool activity only — no token stream)
   const [activity, setActivity] = useState<ActivityStep[]>([]);
-  const [isThinking, setIsThinking] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -115,7 +113,7 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  useEffect(() => { scrollToBottom(); }, [messages, streamTokens, activity, scrollToBottom]);
+  useEffect(() => { scrollToBottom(); }, [messages, activity, scrollToBottom]);
 
   useEffect(() => {
     let cancelled = false;
@@ -157,9 +155,7 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
   }, [setNodes, setEdges, formatFlow]);
 
   const resetStreamState = () => {
-    setStreamTokens("");
     setActivity([]);
-    setIsThinking(false);
     activityRef.current = [];
   };
 
@@ -177,13 +173,7 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
 
     try {
       await streamChatWithAgent(projectId, text, (event: StreamEvent) => {
-        if (event.type === "thinking") {
-          setIsThinking(true);
-        } else if (event.type === "token") {
-          setIsThinking(false);
-          setStreamTokens(prev => prev + event.content);
-        } else if (event.type === "tool_call") {
-          setIsThinking(false);
+        if (event.type === "tool_call") {
           const step: ActivityStep = { key: `${event.name}-${Date.now()}`, name: event.name, status: "running", preview: event.input };
           activityRef.current = [...activityRef.current, step];
           setActivity([...activityRef.current]);
@@ -299,21 +289,16 @@ export function AgentPanel({ projectId, onCollapse }: AgentPanelProps) {
                       </div>
                     )}
 
-                    {/* Thinking dots or token stream */}
-                    <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2.5 text-sm leading-relaxed max-w-[88%]">
-                      {streamTokens ? (
-                        <span className="whitespace-pre-wrap">
-                          {streamTokens}
-                          <span className="inline-block w-0.5 h-3.5 bg-current ml-0.5 animate-pulse align-text-bottom" />
-                        </span>
-                      ) : (
+                    {/* Waiting dots */}
+                    {activity.every(s => s.status === "done") && (
+                      <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2.5 max-w-[88%]">
                         <div className="flex gap-1 items-center py-0.5">
                           <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
                           <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
                           <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
