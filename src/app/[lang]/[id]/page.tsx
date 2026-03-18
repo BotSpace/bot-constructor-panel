@@ -112,26 +112,27 @@ const SKELETON_NODES = [
 
 function AiBuildingOverlay() {
   return (
-    <div className="absolute inset-0 z-10 pointer-events-none">
-      {/* Subtle backdrop */}
-      <div className="absolute inset-0 bg-background/30 backdrop-blur-[1px]" />
+    // pointer-events-auto + opaque bg — hamma interaktsiyani bloklaydi, orqa ko'rinmaydi
+    <div className="absolute inset-0 z-10 pointer-events-auto bg-background">
+
+      {/* Dot-grid pattern (React Flow style) */}
+      <svg className="absolute inset-0 w-full h-full opacity-[0.06]" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="1" fill="currentColor" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#dots)" />
+      </svg>
 
       {/* Skeleton nodes */}
       {SKELETON_NODES.map((node, i) => (
         <div
           key={i}
           className="absolute rounded-xl border border-border bg-card shadow-sm overflow-hidden"
-          style={{
-            width: node.w,
-            height: node.h,
-            top: node.top,
-            left: node.left,
-            animationDelay: `${i * 120}ms`,
-          }}
+          style={{ width: node.w, height: node.h, top: node.top, left: node.left }}
         >
-          {/* Node header bar */}
-          <div className="h-7 w-full bg-muted/60 animate-pulse" />
-          {/* Node body lines */}
+          <div className="h-7 w-full bg-muted animate-pulse" />
           <div className="p-2.5 space-y-2">
             <Skeleton className="h-3 w-3/4" />
             <Skeleton className="h-3 w-1/2" />
@@ -139,20 +140,20 @@ function AiBuildingOverlay() {
         </div>
       ))}
 
-      {/* Animated connecting lines (SVG) */}
-      <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      {/* Dashed connecting lines */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <line x1="42%" y1="26%" x2="30%" y2="42%" stroke="currentColor" strokeWidth="1.5"
-          strokeDasharray="6 4" className="text-border animate-pulse opacity-60" />
+          strokeDasharray="6 4" className="text-border animate-pulse opacity-50" />
         <line x1="42%" y1="26%" x2="64%" y2="42%" stroke="currentColor" strokeWidth="1.5"
-          strokeDasharray="6 4" className="text-border animate-pulse opacity-60" />
+          strokeDasharray="6 4" className="text-border animate-pulse opacity-50" />
         <line x1="30%" y1="56%" x2="42%" y2="66%" stroke="currentColor" strokeWidth="1.5"
-          strokeDasharray="6 4" className="text-border animate-pulse opacity-60" />
+          strokeDasharray="6 4" className="text-border animate-pulse opacity-50" />
         <line x1="64%" y1="56%" x2="72%" y2="66%" stroke="currentColor" strokeWidth="1.5"
-          strokeDasharray="6 4" className="text-border animate-pulse opacity-60" />
+          strokeDasharray="6 4" className="text-border animate-pulse opacity-50" />
       </svg>
 
-      {/* Center status badge */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full border bg-card/90 backdrop-blur-sm px-4 py-2 shadow-lg">
+      {/* Status badge */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full border bg-card px-4 py-2 shadow-lg">
         <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
         <span className="text-xs font-medium text-muted-foreground">AI bot quryapti...</span>
         <span className="flex gap-0.5">
