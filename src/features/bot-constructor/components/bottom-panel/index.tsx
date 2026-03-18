@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { BottomPanelButton } from './components/button'
 import { Bot, Database, Key, Keyboard, Plus, Search } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
@@ -14,47 +14,29 @@ import { useLinkToParent } from '@/components/common/link-to-parrent'
 import { useParams } from 'next/navigation'
 import { ReleasePanel } from '@/components/layout/components/relas/relas'
 import DebugingButtons from '@/components/layout/components/debug/debug'
-import BottomButtonGroup from './components/button-group'
 import { NodeSelectionDialog } from '../NodeSelectionDialog'
 import { ShortcutsDialog } from '../ShortcutsDialog'
-import { AgentChatDialog } from '../AgentChat/AgentChatDialog'
 import { useFlowStore } from '../../store'
-import useProjectStore from '../../store/project'
 import { useReactFlow } from 'reactflow'
 import { ElementItemType } from '@/types/element-types'
 import { CollectionIframeDialog } from '../CollectionIframe/CollectionIframe'
 import { EnvManageDialog } from '../EnvManageDialog/EnvManageDialog'
 
-type Props = {}
+interface Props {
+    aiPanelOpen?: boolean;
+    onToggleAI?: () => void;
+}
 
-function BottomPanel({ }: Props) {
-
+function BottomPanel({ aiPanelOpen, onToggleAI }: Props) {
     const { isOpen, height, toggle } = debugConsoleStore();
     const { toggleSearchPanel } = useSearchStore();
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false);
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
-    const [agentOpen, setAgentOpen] = useState(false);
     const [envManageOpen, setEnvManageOpen] = useState(false);
-    const { addNode, nodes } = useFlowStore();
-    const { project } = useProjectStore();
-    const hasAutoOpened = useRef(false);
-
-    // Auto-open AI panel when project has no nodes (empty canvas = new project)
-    useEffect(() => {
-        if (project && !hasAutoOpened.current) {
-            hasAutoOpened.current = true;
-            if (nodes.length === 0) {
-                setAgentOpen(true);
-            }
-        }
-    }, [project, nodes.length]);
+    const { addNode } = useFlowStore();
     const { getViewport } = useReactFlow();
 
     const { id } = useParams();
-
-    const { handleClick: backToCollection } = useLinkToParent({
-        href: `/bot/${id}/collection`,
-    });
 
     const { handleClick: backToHome } = useLinkToParent({
         href: `/bot/${id}`,
@@ -75,49 +57,61 @@ function BottomPanel({ }: Props) {
                 <Card className='p-2 pointer-events-auto rounded-2xl'>
                     <CardContent className='p-2 flex items-center justify-center gap-2'>
 
-                        {/* Home button */}
+                        {/* Home */}
                         <BottomPanelButton onClick={backToHome}>
                             <ArrowLeftIcon />
                         </BottomPanelButton>
 
-                        {/* terminal button */}
+                        {/* Terminal */}
                         <BottomPanelButton onClick={toggle}>
                             <SquareCommandIcon />
                         </BottomPanelButton>
 
-
+                        {/* Search */}
                         <BottomPanelButton onClick={toggleSearchPanel}>
                             <Search size={20} />
                         </BottomPanelButton>
 
+                        {/* Add node */}
                         <BottomPanelButton onClick={() => setNodeDialogOpen(true)}>
                             <Plus size={20} />
                         </BottomPanelButton>
 
+                        {/* Collections */}
                         <BottomPanelButton>
                             <CollectionIframeDialog>
                                 <Database size={20} />
                             </CollectionIframeDialog>
                         </BottomPanelButton>
 
-                        <BottomPanelButton onClick={() => setShortcutsOpen(true)} title="Shortcutlar (?)">
+                        {/* Shortcuts */}
+                        <BottomPanelButton onClick={() => setShortcutsOpen(true)} title="Shortcutlar">
                             <Keyboard size={20} />
                         </BottomPanelButton>
 
-                        <BottomPanelButton onClick={() => setEnvManageOpen(true)} title="Kalitlarni boshqarish">
+                        {/* Env vars */}
+                        <BottomPanelButton onClick={() => setEnvManageOpen(true)} title="Kalitlar">
                             <Key size={20} />
                         </BottomPanelButton>
 
-                        <BottomPanelButton className='relative inline-flex overflow-hidden p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50' onClick={() => setAgentOpen(true)} title="AI Agent">
+                        {/* AI toggle — glowing when open */}
+                        <BottomPanelButton
+                            onClick={onToggleAI}
+                            title={aiPanelOpen ? "AI panelni yopish" : "AI panelni ochish"}
+                            className={cn(
+                                'relative inline-flex overflow-hidden p-[1px] focus:outline-none',
+                                aiPanelOpen && 'ring-2 ring-primary/50'
+                            )}
+                        >
                             <span className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
-                            <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl bg-transparent px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
-                                <Bot size={20} />
+                            <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl bg-background/80 px-3 py-1 text-sm font-medium backdrop-blur-3xl">
+                                <Bot size={20} className={aiPanelOpen ? "text-primary" : ""} />
                             </span>
                         </BottomPanelButton>
 
                         <DebugingButtons />
 
-                        <Separator className='!h-[2px] !h-[40px]' orientation="vertical" />
+                        <Separator className='!h-[40px]' orientation="vertical" />
 
                         <ReleasePanel />
                     </CardContent>
@@ -133,12 +127,6 @@ function BottomPanel({ }: Props) {
             <ShortcutsDialog
                 open={shortcutsOpen}
                 onOpenChange={setShortcutsOpen}
-            />
-
-            <AgentChatDialog
-                open={agentOpen}
-                onOpenChange={setAgentOpen}
-                projectId={id as string}
             />
 
             <EnvManageDialog
