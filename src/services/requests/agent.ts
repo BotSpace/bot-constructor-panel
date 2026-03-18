@@ -2,14 +2,11 @@ import { instanceAuth } from "@/services/instance";
 
 const AGENT_BASE = "https://api.botspace.uz/api/agent";
 
-// ── Types ────────────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────
 
-export interface AgentSession {
-  session_id: string;
-  turn_count: number;
-  has_flow: boolean;
-  created_at: string;
-  updated_at: string;
+export interface AgentMessage {
+  role: "user" | "assistant";
+  content: string;
 }
 
 export interface AgentChatResponse {
@@ -19,22 +16,23 @@ export interface AgentChatResponse {
   flow_json: { nodes: any[]; edges: any[] } | null;
 }
 
-export interface AgentMessage {
-  role: "user" | "assistant";
-  content: string;
+export interface ProjectSession {
+  session_id: string;
+  has_flow: boolean;
+  turn_count: number;
+  created_at: string;
+  updated_at: string;
+  messages: AgentMessage[];
 }
 
-// ── API ──────────────────────────────────────────────────────────────────
+// ── API ───────────────────────────────────────────────────────────────────
 
-/** Create a new agent session for a project */
-export async function createAgentSession(projectId?: string): Promise<{ session_id: string }> {
-  const res = await instanceAuth.post(`${AGENT_BASE}/sessions`, projectId ? { project_id: projectId } : {});
-  return res.data;
-}
-
-/** Get session info */
-export async function getAgentSession(sessionId: string): Promise<AgentSession> {
-  const res = await instanceAuth.get(`${AGENT_BASE}/sessions/${sessionId}`);
+/**
+ * Get or create the single AI session for a project.
+ * Returns session info + full message history in one request.
+ */
+export async function getProjectSession(projectId: string): Promise<ProjectSession> {
+  const res = await instanceAuth.get(`${AGENT_BASE}/projects/${projectId}/session`);
   return res.data;
 }
 
@@ -44,27 +42,5 @@ export async function chatWithAgent(
   message: string
 ): Promise<AgentChatResponse> {
   const res = await instanceAuth.post(`${AGENT_BASE}/sessions/${sessionId}/chat`, { message });
-  return res.data;
-}
-
-/** Get conversation history */
-export async function getAgentHistory(sessionId: string): Promise<AgentMessage[]> {
-  const res = await instanceAuth.get(`${AGENT_BASE}/sessions/${sessionId}/history`);
-  return res.data;
-}
-
-/** Reset session */
-export async function resetAgentSession(sessionId: string): Promise<void> {
-  await instanceAuth.post(`${AGENT_BASE}/sessions/${sessionId}/reset`);
-}
-
-/** Delete session */
-export async function deleteAgentSession(sessionId: string): Promise<void> {
-  await instanceAuth.delete(`${AGENT_BASE}/sessions/${sessionId}`);
-}
-
-/** List all sessions */
-export async function listAgentSessions(): Promise<AgentSession[]> {
-  const res = await instanceAuth.get(`${AGENT_BASE}/sessions`);
   return res.data;
 }
