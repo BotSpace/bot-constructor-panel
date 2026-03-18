@@ -216,6 +216,10 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
       initialPromptSentRef.current = true;
       onBuildingChange?.(true);
       sendMessage(initialPrompt);
+      // Remove ?prompt= from URL so page refresh doesn't re-trigger
+      const url = new URL(window.location.href);
+      url.searchParams.delete("prompt");
+      window.history.replaceState(null, "", url.toString());
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitializing]);
