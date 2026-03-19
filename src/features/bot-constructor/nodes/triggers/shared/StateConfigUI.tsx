@@ -53,7 +53,7 @@ const StateConfigComponent = ({
   };
 
   return (
-    <div className="space-y-3 pt-2 border-t border-gray-700/50">
+    <div className="space-y-3 pt-2 border-t border-border">
       <div className="flex items-center gap-2">
         <Checkbox
           id={`state-enabled-${nodeId}`}
@@ -74,7 +74,7 @@ const StateConfigComponent = ({
           <div className="space-y-1.5">
             <Label
               htmlFor={`state-key-${nodeId}`}
-              className="text-xs text-gray-400 flex items-center gap-1.5 font-medium"
+              className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium"
             >
               <Key className="h-3 w-3" />
               State Key
@@ -85,9 +85,9 @@ const StateConfigComponent = ({
               placeholder="Masalan: user_message, phone, etc."
               value={state.key || ""}
               onChange={(e) => handleKeyChange(e.target.value)}
-              className="w-full h-9 bg-gray-800/50 border-gray-600/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm"
+              className="w-full h-9 bg-muted/50 border-border focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm"
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               Ma'lumot <code className="text-purple-400">state_{state.key || "key"}</code> ga saqlanadi
             </p>
           </div>
@@ -95,7 +95,7 @@ const StateConfigComponent = ({
           <div className="space-y-1.5">
             <Label
               htmlFor={`state-type-${nodeId}`}
-              className="text-xs text-gray-400 flex items-center gap-1.5 font-medium"
+              className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium"
             >
               <Type className="h-3 w-3" />
               Ma'lumot Turi

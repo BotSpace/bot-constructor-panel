@@ -60,7 +60,7 @@ export function SourceHandles({
       type="source"
       position={pos}
       id={handleId}
-      className={cn(`!w-6 !h-14 !bg-sky-500 !rounded-[10px] !border-gray-800 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`, className)}
+      className={cn(`!w-6 !h-14 !bg-sky-500 !rounded-[10px] !border-white/20 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`, className)}
     >
       <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
     </Handle>

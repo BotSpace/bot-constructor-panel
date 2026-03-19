@@ -7,7 +7,7 @@ export function EditMessageSource() {
     <Handle
       type="source"
       position={Position.Right}
-      className="!w-4 !h-4 !bg-orange-500 !border-2 !border-gray-800 flex items-center justify-center"
+      className="!w-4 !h-4 !bg-orange-500 !border-2 !border-white/20 flex items-center justify-center"
       id="edit-message-source"
       style={{ top: "50%" }}
       title="Tahrirlanadigan Xabar"
