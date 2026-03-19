@@ -63,8 +63,7 @@ export default async function RootLayout({
               <NotificationProvider>
                 <ThemeProvider
                   attribute="class"
-                  defaultTheme="system"
-                  enableSystem
+                  defaultTheme="dark"
                 >
                   <NextIntlClientProvider messages={messages}>
                     {children}
