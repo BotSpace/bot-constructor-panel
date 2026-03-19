@@ -364,6 +364,22 @@ export function useElements(): ElementTypes[] {
           color: "bg-green-500/10 text-green-400 border-green-500/20",
           triggerId: "FormNode",
         },
+        {
+          type: "for_loop",
+          name: "For Loop",
+          description: "Ro'yxat elementlari bo'yicha aylanib chiqadi",
+          icon: "🔁",
+          color: "bg-green-500/10 text-green-400 border-green-500/20",
+          triggerId: "ForLoopNode",
+        },
+        {
+          type: "for_loop_continue",
+          name: "Loop Continue",
+          description: "Loop iteratsiyasini tugatadi va keyingi elementga o'tadi",
+          icon: "↩️",
+          color: "bg-green-500/10 text-green-400 border-green-500/20",
+          triggerId: "ForLoopContinueNode",
+        },
       ],
     },
     {

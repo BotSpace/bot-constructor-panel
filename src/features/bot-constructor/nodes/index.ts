@@ -48,6 +48,8 @@ import {
   CallbackQueryAnswerNode,
   CheckMembershipNode,
   FormNode,
+  ForLoopNode,
+  ForLoopContinueNode,
 } from "./custom";
 
 export const Triggers = {
@@ -103,6 +105,8 @@ export const CustomNodesFlowControl = {
   VariableNode,
   CheckMembershipNode,
   FormNode,
+  ForLoopNode,
+  ForLoopContinueNode,
 };
 
 export const CustomIntegration = {

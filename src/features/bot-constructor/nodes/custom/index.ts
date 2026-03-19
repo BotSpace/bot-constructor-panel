@@ -14,6 +14,8 @@ export * from "./RandomNode";
 export * from "./VariableNode";
 export * from "./CheckMembershipNode";
 export * from "./FormNode";
+export * from "./ForLoopNode";
+export * from "./ForLoopContinueNode";
 
 // Integration nodes
 export * from "./HTTPRequestNode";
