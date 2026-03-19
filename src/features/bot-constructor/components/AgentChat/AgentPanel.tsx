@@ -108,6 +108,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   const initialPromptSentRef = useRef(false);
 
   const { setNodes, setEdges, formatFlow } = useFlowStore();
+  const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -139,9 +140,32 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   }, [projectId]);
 
   const applyFlow = useCallback((flow: { nodes: any[]; edges: any[] }) => {
-    setNodes(flow.nodes || []);
+    // Compare incoming nodes with current to detect added vs modified
+    const { nodes: prevNodes } = useFlowStore.getState();
+    const prevMap: Record<string, any> = {};
+    prevNodes.forEach(n => { prevMap[n.id] = n; });
+
+    const annotated = (flow.nodes || []).map((node: any) => {
+      if (!prevMap[node.id]) return { ...node, className: "ai-node-added" };
+      if (JSON.stringify(prevMap[node.id].data) !== JSON.stringify(node.data))
+        return { ...node, className: "ai-node-modified" };
+      return node;
+    });
+
+    const highlighted = new Set(annotated.filter((n: any) => n.className).map((n: any) => n.id));
+
+    setNodes(annotated);
     setEdges(flow.edges || []);
     setTimeout(() => formatFlow(), 50);
+
+    // Clear highlights after 5s
+    if (highlighted.size > 0) {
+      if (highlightTimeoutRef.current) clearTimeout(highlightTimeoutRef.current);
+      highlightTimeoutRef.current = setTimeout(() => {
+        const { nodes: cur } = useFlowStore.getState();
+        setNodes(cur.map(n => highlighted.has(n.id) ? { ...n, className: undefined } : n));
+      }, 5000);
+    }
   }, [setNodes, setEdges, formatFlow]);
 
   const resetStream = () => {
@@ -240,8 +264,11 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitializing]);
 
-  // Cleanup WebSocket on unmount
-  useEffect(() => () => { wsCleanupRef.current?.(); }, []);
+  // Cleanup on unmount
+  useEffect(() => () => {
+    wsCleanupRef.current?.();
+    if (highlightTimeoutRef.current) clearTimeout(highlightTimeoutRef.current);
+  }, []);
 
   return (
     <div className="flex flex-col h-full bg-background w-full">
