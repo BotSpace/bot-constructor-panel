@@ -51,7 +51,7 @@ function PageInner() {
       <div
         className={cn(
           "h-full shrink-0 transition-all duration-200 overflow-hidden",
-          aiOpen ? "w-[360px] border-r border-border" : "w-0 border-0"
+          aiOpen ? "w-[420px] border-r border-border" : "w-0 border-0"
         )}
       >
         {aiOpen && (
@@ -170,7 +170,7 @@ function AiBuildingOverlay() {
 function ConstructorLoadingSkeletons() {
   return (
     <div className="flex h-screen">
-      <div className="w-[360px] border-r p-4 flex flex-col gap-3">
+      <div className="w-[420px] border-r p-4 flex flex-col gap-3">
         <Skeleton className="h-8 w-full" />
         <Skeleton className="h-[60%] w-full" />
         <Skeleton className="h-12 w-full mt-auto" />

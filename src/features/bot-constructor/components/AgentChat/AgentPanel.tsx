@@ -103,6 +103,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const stepsRef = useRef<Step[]>([]);
+  const planRef = useRef<string | null>(null);
   const wsCleanupRef = useRef<(() => void) | null>(null);
   const initialPromptSentRef = useRef(false);
 
@@ -145,6 +146,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
 
   const resetStream = () => {
     stepsRef.current = [];
+    planRef.current = null;
     setSteps([]);
     setPlanContent(null);
   };
@@ -169,6 +171,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
 
     const cleanup = wsChatWithAgent(projectId, text, token, (event: StreamEvent) => {
       if (event.type === "plan") {
+        planRef.current = event.content;
         setPlanContent(event.content);
 
       } else if (event.type === "tool_call") {
@@ -191,7 +194,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
         setSteps([...updated]);
 
       } else if (event.type === "done") {
-        const savedPlan = planContent || undefined;
+        const savedPlan = planRef.current || undefined;
         const savedSteps = stepsRef.current.filter(s => s.status === "done");
         resetStream();
         onBuildingChange?.(false);
@@ -264,7 +267,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
 
       {/* Messages */}
       <ScrollArea className="flex-1 overflow-hidden">
-        <div className="flex flex-col gap-2 p-3">
+        <div className="flex flex-col gap-4 p-4">
           {isInitializing ? (
             <div className="flex items-center justify-center gap-2 py-16 text-muted-foreground text-sm">
               <Loader2 className="h-4 w-4 animate-spin" /> Yuklanmoqda...
@@ -290,12 +293,10 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
                         ))}
                       </div>
                     ) : !planContent ? (
-                      <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2.5 w-fit">
-                        <div className="flex gap-1 items-center">
-                          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
-                          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
-                          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
-                        </div>
+                      <div className="flex gap-1 items-center py-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
                       </div>
                     ) : null}
                   </div>
@@ -430,7 +431,7 @@ function MessageBubble({ message }: { message: Message }) {
       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary mt-0.5">
         <Bot className="h-3 w-3" />
       </div>
-      <div className="flex-1 min-w-0 space-y-1.5 max-w-[88%]">
+      <div className="flex-1 min-w-0 space-y-1.5">
         {/* Collapsed activity summary */}
         {hasActivity && (
           <button
@@ -473,7 +474,7 @@ function MessageBubble({ message }: { message: Message }) {
         )}
 
         {/* Main reply */}
-        <div className="rounded-2xl rounded-tl-sm bg-muted px-3 py-2 text-sm leading-relaxed">
+        <div className="text-sm leading-relaxed">
           <FormattedMessage text={message.content} />
         </div>
       </div>

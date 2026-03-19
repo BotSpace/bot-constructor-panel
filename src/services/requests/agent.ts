@@ -5,9 +5,17 @@ const AGENT_BASE = "https://api.botspace.uz/api/agent";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
+export interface AgentStep {
+  key: string;
+  name: string;
+  status: "running" | "done" | "error";
+}
+
 export interface AgentMessage {
   role: "user" | "assistant";
   content: string;
+  plan?: string;
+  steps?: AgentStep[];
 }
 
 export type StreamEvent =
