@@ -13,6 +13,7 @@ export interface AgentMessage {
 export type StreamEvent =
   | { type: "thinking" }
   | { type: "token"; content: string }
+  | { type: "plan"; content: string }
   | { type: "tool_call"; name: string; input: string }
   | { type: "tool_result"; name: string; preview: string }
   | { type: "done"; reply: string; has_flow: boolean; flow_json: { nodes: any[]; edges: any[] } | null }

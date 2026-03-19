@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import {
   Bot, Send, Loader2, ChevronLeft, RotateCcw,
   CheckCircle2, Sparkles, Search, Database, Terminal,
-  Globe, Users, Settings, Package, FileText, Zap, Wrench,
+  Globe, Users, Settings, Package, FileText, Zap, Wrench, Map,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -94,6 +94,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   const [pendingFlow, setPendingFlow] = useState<{ nodes: any[]; edges: any[] } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [steps, setSteps] = useState<Step[]>([]);
+  const [planContent, setPlanContent] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -141,6 +142,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   const resetStream = () => {
     stepsRef.current = [];
     setSteps([]);
+    setPlanContent(null);
   };
 
   const sendMessage = useCallback(async (textOverride?: string) => {
@@ -162,7 +164,10 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
     const token = (session?.user as any)?.access ?? "";
 
     const cleanup = wsChatWithAgent(projectId, text, token, (event: StreamEvent) => {
-      if (event.type === "tool_call") {
+      if (event.type === "plan") {
+        setPlanContent(event.content);
+
+      } else if (event.type === "tool_call") {
         const step: Step = {
           key: `${event.name}-${Date.now()}`,
           name: event.name,
@@ -266,14 +271,17 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
                   <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary mt-0.5">
                     <Bot className="h-3 w-3" />
                   </div>
-                  <div className="flex-1 min-w-0 space-y-1">
+                  <div className="flex-1 min-w-0 space-y-1.5">
+                    {/* Plan card — shown while agent is planning */}
+                    {planContent && <PlanCard content={planContent} />}
+
                     {steps.length > 0 ? (
                       <div className="rounded-xl border border-border overflow-hidden bg-card">
                         {steps.map(step => (
                           <StepRow key={step.key} step={step} />
                         ))}
                       </div>
-                    ) : (
+                    ) : !planContent ? (
                       <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2.5 w-fit">
                         <div className="flex gap-1 items-center">
                           <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
@@ -281,7 +289,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
                           <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
                         </div>
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               )}
@@ -332,6 +340,23 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
             </Button>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Plan card ─────────────────────────────────────────────────────────────
+
+function PlanCard({ content }: { content: string }) {
+  return (
+    <div className="rounded-xl border border-primary/20 overflow-hidden bg-primary/[0.04]">
+      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-primary/10 bg-primary/[0.06]">
+        <Map className="h-3.5 w-3.5 text-primary/70 shrink-0" />
+        <span className="text-xs font-medium text-primary/80">Reja</span>
+        <Loader2 className="h-3 w-3 text-primary/50 animate-spin ml-auto" />
+      </div>
+      <div className="px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+        <FormattedMessage text={content} />
       </div>
     </div>
   );
