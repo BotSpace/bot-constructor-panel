@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { useLinkToParent } from "@/components/common/link-to-parrent";
 import { ReleasePanel } from "@/components/layout/components/relas/relas";
 import { EnvManageDialog } from "@/features/bot-constructor/components/EnvManageDialog/EnvManageDialog";
+import DebugingButtons from "@/components/layout/components/debug/debug";
 
 function PageInner() {
   const { id }: { id: string } = useParams();
@@ -110,21 +111,24 @@ function MobileView({
   const { handleClick: backToHome } = useLinkToParent({ href: `/bot/${id}` });
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-background overflow-hidden">
+    <div
+      className="flex flex-col h-[100dvh] bg-background overflow-hidden"
+      style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+    >
       {/* ── Top bar ── */}
-      <div className="shrink-0 flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-background/95 backdrop-blur">
+      <div className="shrink-0 flex items-center gap-2 px-3 py-2 border-b border-border bg-background">
         {/* Back */}
         <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={backToHome}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
 
         {/* Project name */}
-        <div className="flex-1 min-w-0 text-center">
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold truncate">{project.name}</p>
-          <p className="text-[10px] text-muted-foreground">AI rejimi</p>
+          <p className="text-[10px] text-muted-foreground leading-none">AI rejimi</p>
         </div>
 
-        {/* Actions */}
+        {/* Env + Release */}
         <div className="flex items-center gap-1 shrink-0">
           <Button
             variant="ghost"
@@ -137,6 +141,11 @@ function MobileView({
           </Button>
           <ReleasePanel />
         </div>
+      </div>
+
+      {/* ── Debug controls strip ── */}
+      <div className="shrink-0 px-3 py-1.5 border-b border-border bg-background overflow-x-auto">
+        <DebugingButtons />
       </div>
 
       {/* ── AI Chat (full remaining height) ── */}
