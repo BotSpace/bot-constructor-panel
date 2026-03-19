@@ -83,7 +83,7 @@ interface Message extends AgentMessage {
 
 interface AgentPanelProps {
   projectId: string;
-  onCollapse: () => void;
+  onCollapse?: () => void;
   initialPrompt?: string;
   onBuildingChange?: (isBuilding: boolean) => void;
 }
@@ -286,9 +286,11 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
               <span className="text-xs">Tayyor</span>
             </div>
           )}
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={onCollapse}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
+          {onCollapse && (
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={onCollapse}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
