@@ -43,6 +43,8 @@ export interface ElementItemType {
     | "variable"
     | "check_membership"
     | "form"
+    | "for_loop"
+    | "for_loop_continue"
     // Integration
     | "http_request"
     | "callback_answer"
