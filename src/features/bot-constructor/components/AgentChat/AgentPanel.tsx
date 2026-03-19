@@ -86,11 +86,12 @@ interface AgentPanelProps {
   onCollapse?: () => void;
   initialPrompt?: string;
   onBuildingChange?: (isBuilding: boolean) => void;
+  hideHeader?: boolean;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────
 
-export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingChange }: AgentPanelProps) {
+export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingChange, hideHeader }: AgentPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -274,25 +275,27 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
     <div className="flex flex-col h-full bg-background w-full">
 
       {/* Header */}
-      <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border shrink-0">
-        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-          <Sparkles className="h-3.5 w-3.5" />
+      {!hideHeader && (
+        <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border shrink-0">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+          </div>
+          <span className="text-sm font-semibold flex-1">AI Agent</span>
+          <div className="flex items-center gap-2 shrink-0">
+            {hasFlow && (
+              <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span className="text-xs">Tayyor</span>
+              </div>
+            )}
+            {onCollapse && (
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={onCollapse}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
-        <span className="text-sm font-semibold flex-1">AI Agent</span>
-        <div className="flex items-center gap-2 shrink-0">
-          {hasFlow && (
-            <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              <span className="text-xs">Tayyor</span>
-            </div>
-          )}
-          {onCollapse && (
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={onCollapse}>
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* Messages */}
       <ScrollArea className="flex-1 overflow-hidden">

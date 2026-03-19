@@ -143,9 +143,9 @@ function MobileView({
       <div className="flex-1 overflow-hidden">
         <AgentPanel
           projectId={id}
-          onCollapse={undefined}
           initialPrompt={initialPrompt}
           onBuildingChange={() => {}}
+          hideHeader
         />
       </div>
 
