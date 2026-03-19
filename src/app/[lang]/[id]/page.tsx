@@ -128,24 +128,24 @@ function MobileView({
           <p className="text-[10px] text-muted-foreground leading-none">AI rejimi</p>
         </div>
 
-        {/* Env + Release */}
-        <div className="flex items-center gap-1 shrink-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setEnvOpen(true)}
-            title="Kalitlar"
-          >
-            <Key className="h-4 w-4" />
-          </Button>
-          <ReleasePanel />
-        </div>
+        {/* Env */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 shrink-0"
+          onClick={() => setEnvOpen(true)}
+          title="Kalitlar"
+        >
+          <Key className="h-4 w-4" />
+        </Button>
       </div>
 
-      {/* ── Debug controls strip ── */}
+      {/* ── Debug + Publish strip ── */}
       <div className="shrink-0 px-3 py-1.5 border-b border-border bg-background overflow-x-auto">
-        <DebugingButtons />
+        <div className="flex items-center gap-2 w-max">
+          <DebugingButtons />
+          <ReleasePanel />
+        </div>
       </div>
 
       {/* ── AI Chat (full remaining height) ── */}
