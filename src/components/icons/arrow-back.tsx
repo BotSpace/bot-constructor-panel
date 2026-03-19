@@ -12,24 +12,11 @@ export const ArrowLeftIcon = (props: React.SVGProps<SVGSVGElement>) => {
         >
             <path
                 d="M20 12H4M4 12L10 6M4 12L10 18"
-                stroke="url(#paint0_linear)"
+                stroke="currentColor"
                 strokeWidth={1.5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
             />
-            <defs>
-                <linearGradient
-                    id="paint0_linear"
-                    x1="12"
-                    y1="6"
-                    x2="12"
-                    y2="18"
-                    gradientUnits="userSpaceOnUse"
-                >
-                    <stop stopColor="#fff" />
-                    <stop offset="1" stopColor="#fff" />
-                </linearGradient>
-            </defs>
         </svg>
     );
 };
