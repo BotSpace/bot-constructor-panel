@@ -68,13 +68,17 @@ function toolCfg(name: string) {
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
-interface Message extends AgentMessage { id: string }
-
 interface Step {
   key: string;
   name: string;
   status: "running" | "done" | "error";
   preview?: string;
+}
+
+interface Message extends AgentMessage {
+  id: string;
+  plan?: string;
+  steps?: Step[];
 }
 
 interface AgentPanelProps {
@@ -187,12 +191,16 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
         setSteps([...updated]);
 
       } else if (event.type === "done") {
+        const savedPlan = planContent || undefined;
+        const savedSteps = stepsRef.current.filter(s => s.status === "done");
         resetStream();
         onBuildingChange?.(false);
         setMessages(prev => [...prev, {
           id: (Date.now() + 1).toString(),
           role: "assistant",
           content: event.reply,
+          plan: savedPlan,
+          steps: savedSteps.length > 0 ? savedSteps : undefined,
         }]);
         setHasFlow(event.has_flow);
         if (event.flow_json) {
@@ -403,6 +411,8 @@ function StepRow({ step }: { step: Step }) {
 // ── Message bubble ────────────────────────────────────────────────────────
 
 function MessageBubble({ message }: { message: Message }) {
+  const [expanded, setExpanded] = useState(false);
+
   if (message.role === "user") {
     return (
       <div className="flex justify-end">
@@ -412,14 +422,76 @@ function MessageBubble({ message }: { message: Message }) {
       </div>
     );
   }
+
+  const hasActivity = message.plan || (message.steps && message.steps.length > 0);
+
   return (
     <div className="flex gap-2 items-start">
       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary mt-0.5">
         <Bot className="h-3 w-3" />
       </div>
-      <div className="max-w-[88%] rounded-2xl rounded-tl-sm bg-muted px-3 py-2 text-sm leading-relaxed">
-        <FormattedMessage text={message.content} />
+      <div className="flex-1 min-w-0 space-y-1.5 max-w-[88%]">
+        {/* Collapsed activity summary */}
+        {hasActivity && (
+          <button
+            onClick={() => setExpanded(v => !v)}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-muted-foreground transition-colors"
+          >
+            <ChevronLeft className={cn("h-3 w-3 transition-transform", expanded ? "-rotate-90" : "rotate-180")} />
+            {message.steps && message.steps.length > 0 && (
+              <span>{message.steps.length} ta tool</span>
+            )}
+            {message.plan && message.steps && message.steps.length > 0 && (
+              <span className="text-muted-foreground/40">·</span>
+            )}
+            {message.plan && <span>Reja</span>}
+          </button>
+        )}
+
+        {/* Expanded: plan + steps */}
+        {hasActivity && expanded && (
+          <div className="space-y-1">
+            {message.plan && (
+              <div className="rounded-xl border border-primary/20 overflow-hidden bg-primary/[0.04]">
+                <div className="flex items-center gap-2 px-3 py-1.5 border-b border-primary/10 bg-primary/[0.06]">
+                  <Map className="h-3.5 w-3.5 text-primary/70 shrink-0" />
+                  <span className="text-xs font-medium text-primary/80">Reja</span>
+                </div>
+                <div className="px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+                  <FormattedMessage text={message.plan} />
+                </div>
+              </div>
+            )}
+            {message.steps && message.steps.length > 0 && (
+              <div className="rounded-xl border border-border overflow-hidden bg-card">
+                {message.steps.map(step => (
+                  <HistoryStepRow key={step.key} step={step} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Main reply */}
+        <div className="rounded-2xl rounded-tl-sm bg-muted px-3 py-2 text-sm leading-relaxed">
+          <FormattedMessage text={message.content} />
+        </div>
       </div>
+    </div>
+  );
+}
+
+function HistoryStepRow({ step }: { step: Step }) {
+  const cfg = toolCfg(step.name);
+  const style = CAT_STYLE[cfg.cat];
+  const { Icon } = style;
+  return (
+    <div className="flex items-center gap-3 px-3 py-1.5 text-xs border-b border-border last:border-0">
+      <div className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-md", style.bg)}>
+        <Icon className={cn("h-3 w-3", style.icon)} />
+      </div>
+      <span className="flex-1 text-muted-foreground truncate">{cfg.label}</span>
+      <CheckCircle2 className="h-3 w-3 shrink-0 text-green-500" />
     </div>
   );
 }
