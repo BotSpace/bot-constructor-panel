@@ -66,7 +66,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
     <Card
       className={`w-80 rounded-xl border shadow-lg transition-all overflow-hidden ${selected
         ? "border-sky-500/80 shadow-xl shadow-sky-500/10 ring-2 ring-sky-500/20"
-        : "border-gray-700/50 shadow-md"
+        : "border-border shadow-md"
         }`}
     >
       <TargetHandles />
@@ -74,11 +74,11 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
       <CardHeader className="pb-3 px-6 pt-6">
         <div
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-sm flex items-center justify-between cursor-pointer group rounded-lg p-2 -m-2 hover:bg-gray-800/50 transition-colors"
+          className="text-sm flex items-center justify-between cursor-pointer group rounded-lg p-2 -m-2 hover:bg-muted/60 transition-colors"
         >
           <div className="flex items-center gap-2 flex-1">
             <Database className="h-4 w-4 text-purple-400 flex-shrink-0" />
-            <span className="font-medium text-gray-200">State</span>
+            <span className="font-medium text-foreground">State</span>
             {data.key && (
               <Badge
                 variant="secondary"
@@ -92,12 +92,12 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
             <div
               className={`w-2 h-2 rounded-full transition-all ${isConfigured
                 ? "bg-green-500 shadow-sm shadow-green-500/50"
-                : "bg-gray-600"
+                : "bg-muted-foreground/40"
                 }`}
               title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
             />
             <ChevronDown
-              className={`h-4 w-4 text-gray-400 transform transition-transform duration-200 ${isExpanded ? "rotate-0" : "-rotate-90"
+              className={`h-4 w-4 text-muted-foreground transform transition-transform duration-200 ${isExpanded ? "rotate-0" : "-rotate-90"
                 }`}
             />
           </div>
@@ -125,7 +125,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
           <div className="space-y-1.5">
             <Label
               htmlFor="key"
-              className="text-xs text-gray-400 flex items-center gap-1.5 font-medium"
+              className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium"
             >
               <Key className="h-3 w-3" />
               State Key
@@ -136,7 +136,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
               placeholder="Masalan: user_phone, user_name..."
               value={data.key || ""}
               onChange={handleKeyChange}
-              className="w-full bg-gray-800/50 border-gray-600/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+              className="w-full bg-muted/50 border-border focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
               required
             />
           </div>
@@ -144,7 +144,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
           <div className="space-y-1.5">
             <Label
               htmlFor="type"
-              className="text-xs text-gray-400 flex items-center gap-1.5 font-medium"
+              className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium"
             >
               <Type className="h-3 w-3" />
               Saqlanadigan ma'lumot
@@ -163,7 +163,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
               <div className="space-y-1.5 animate-in fade-in-50 slide-in-from-top-1 duration-200 mt-2">
                 <Label
                   htmlFor="customType"
-                  className="text-xs text-gray-400 flex items-center gap-1.5 font-medium"
+                  className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium"
                 >
                   <Database className="h-3 w-3" />
                   Custom Type
@@ -174,10 +174,10 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
                   placeholder="Masalan: custom_field, my_data..."
                   value={data.customType || ""}
                   onChange={handleCustomTypeChange}
-                  className="w-full bg-gray-800/50 border-purple-500/30 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                  className="w-full bg-muted/50 border-border focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
                   O'zingizning custom ma'lumot turingizni kiriting
                 </p>
               </div>

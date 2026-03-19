@@ -70,7 +70,7 @@ export function Combobox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-full justify-between bg-gray-800/50 border-gray-600/50 hover:bg-gray-700/50 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20",
+            "w-full justify-between bg-muted/50 border-border hover:bg-muted focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20",
             triggerClassName
           )}
         >
@@ -81,7 +81,7 @@ export function Combobox({
       <PopoverContent
         className={cn("w-[var(--radix-popover-trigger-width)] p-0", className)}
       >
-        <Command className="bg-[#212529] border-gray-700/50">
+        <Command className="bg-popover border-border">
           <CommandInput placeholder={searchPlaceholder} className="text-sm" />
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
@@ -98,7 +98,7 @@ export function Combobox({
                       onValueChange(option.value === value ? "" : option.value);
                       setOpen(false);
                     }}
-                    className="cursor-pointer focus:bg-gray-800/50 focus:text-purple-400"
+                    className="cursor-pointer focus:bg-muted focus:text-primary"
                   >
                     <Check
                       className={cn(
