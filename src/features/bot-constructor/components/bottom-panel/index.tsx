@@ -1,9 +1,9 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from './components/button'
-import { Bot, Database, Key, Keyboard, Plus, Search } from 'lucide-react'
+import { Bot, Database, Key, Keyboard, MoreHorizontal, Plus, Search } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -21,93 +21,216 @@ import { useReactFlow } from 'reactflow'
 import { ElementItemType } from '@/types/element-types'
 import { CollectionIframeDialog } from '../CollectionIframe/CollectionIframe'
 import { EnvManageDialog } from '../EnvManageDialog/EnvManageDialog'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 interface Props {
     aiPanelOpen?: boolean;
     onToggleAI?: () => void;
 }
 
+// Card horizontal padding (card p-2 + CardContent p-2, both sides) = 32px
+// Fixed items (Home + DebugButtons + Separator + Release) with their gaps ≈ 227px
+// Each optional slot (icon button + gap-2) = 48px
+// More button = 48px
+const FIXED_W = 227
+const SLOT = 48
+const MORE_W = 48
+const ALL_COUNT = 7
+
 function BottomPanel({ aiPanelOpen, onToggleAI }: Props) {
-    const { isOpen, height, toggle } = debugConsoleStore();
-    const { toggleSearchPanel } = useSearchStore();
-    const [nodeDialogOpen, setNodeDialogOpen] = useState(false);
-    const [shortcutsOpen, setShortcutsOpen] = useState(false);
-    const [envManageOpen, setEnvManageOpen] = useState(false);
-    const { addNode } = useFlowStore();
-    const { getViewport } = useReactFlow();
+    const { isOpen, height, toggle } = debugConsoleStore()
+    const { toggleSearchPanel } = useSearchStore()
+    const [nodeDialogOpen, setNodeDialogOpen] = useState(false)
+    const [shortcutsOpen, setShortcutsOpen] = useState(false)
+    const [envManageOpen, setEnvManageOpen] = useState(false)
+    const [collectionOpen, setCollectionOpen] = useState(false)
+    const { addNode } = useFlowStore()
+    const { getViewport } = useReactFlow()
+    const { id } = useParams()
 
-    const { id } = useParams();
-
-    const { handleClick: backToHome } = useLinkToParent({
-        href: `/bot/${id}`,
-    });
+    const { handleClick: backToHome } = useLinkToParent({ href: `/bot/${id}` })
 
     const handleAddNode = useCallback((element: ElementItemType) => {
-        const { x, y, zoom } = getViewport();
-        const centerX = (-x + window.innerWidth / 2) / zoom;
-        const centerY = (-y + window.innerHeight / 2) / zoom;
-        addNode(element, { x: centerX, y: centerY });
-    }, [getViewport, addNode]);
+        const { x, y, zoom } = getViewport()
+        const centerX = (-x + window.innerWidth / 2) / zoom
+        const centerY = (-y + window.innerHeight / 2) / zoom
+        addNode(element, { x: centerX, y: centerY })
+    }, [getViewport, addNode])
+
+    // ── Overflow / priority+ logic ────────────────────────────────────────────
+    const wrapRef = useRef<HTMLDivElement>(null)
+    const [visibleCount, setVisibleCount] = useState(ALL_COUNT)
+
+    useEffect(() => {
+        const el = wrapRef.current
+        if (!el) return
+        const observer = new ResizeObserver(([entry]) => {
+            const w = entry.contentRect.width
+            if (w >= FIXED_W + ALL_COUNT * SLOT) {
+                setVisibleCount(ALL_COUNT)
+            } else {
+                setVisibleCount(Math.max(0, Math.floor((w - FIXED_W - MORE_W) / SLOT)))
+            }
+        })
+        observer.observe(el)
+        return () => observer.disconnect()
+    }, [])
+
+    // Items ordered by priority: index 0 = highest priority (last to overflow),
+    // index ALL_COUNT-1 = lowest priority (first to overflow).
+    // Visible items = slice(0, visibleCount); overflowed = slice(visibleCount).
+    const items = [
+        {
+            key: 'ai',
+            inline: (
+                <BottomPanelButton
+                    onClick={onToggleAI}
+                    title={aiPanelOpen ? 'AI panelni yopish' : 'AI panelni ochish'}
+                    className={cn(
+                        'relative inline-flex overflow-hidden p-[1px] focus:outline-none',
+                        aiPanelOpen && 'ring-2 ring-primary/50'
+                    )}
+                >
+                    <span className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
+                    <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl bg-background/80 px-3 py-1 text-sm font-medium backdrop-blur-3xl">
+                        <Bot size={20} className={aiPanelOpen ? 'text-primary' : ''} />
+                    </span>
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="ai" onClick={onToggleAI}>
+                    <Bot size={16} className="mr-2" />
+                    {aiPanelOpen ? 'AI panelni yopish' : 'AI panelni ochish'}
+                </DropdownMenuItem>
+            ),
+        },
+        {
+            key: 'env',
+            inline: (
+                <BottomPanelButton onClick={() => setEnvManageOpen(true)} title="Kalitlar">
+                    <Key size={20} />
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="env" onClick={() => setEnvManageOpen(true)}>
+                    <Key size={16} className="mr-2" />
+                    Kalitlar
+                </DropdownMenuItem>
+            ),
+        },
+        {
+            key: 'terminal',
+            inline: (
+                <BottomPanelButton onClick={toggle}>
+                    <SquareCommandIcon />
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="terminal" onClick={toggle}>
+                    <SquareCommandIcon className="mr-2 h-4 w-4" />
+                    Terminal
+                </DropdownMenuItem>
+            ),
+        },
+        {
+            key: 'add',
+            inline: (
+                <BottomPanelButton onClick={() => setNodeDialogOpen(true)}>
+                    <Plus size={20} />
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="add" onClick={() => setNodeDialogOpen(true)}>
+                    <Plus size={16} className="mr-2" />
+                    Node qo'shish
+                </DropdownMenuItem>
+            ),
+        },
+        {
+            key: 'search',
+            inline: (
+                <BottomPanelButton onClick={toggleSearchPanel}>
+                    <Search size={20} />
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="search" onClick={toggleSearchPanel}>
+                    <Search size={16} className="mr-2" />
+                    Qidiruv
+                </DropdownMenuItem>
+            ),
+        },
+        {
+            key: 'collections',
+            inline: (
+                <BottomPanelButton onClick={() => setCollectionOpen(true)}>
+                    <Database size={20} />
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="collections" onClick={() => setCollectionOpen(true)}>
+                    <Database size={16} className="mr-2" />
+                    Ma'lumotlar
+                </DropdownMenuItem>
+            ),
+        },
+        {
+            key: 'shortcuts',
+            inline: (
+                <BottomPanelButton onClick={() => setShortcutsOpen(true)} title="Shortcutlar">
+                    <Keyboard size={20} />
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="shortcuts" onClick={() => setShortcutsOpen(true)}>
+                    <Keyboard size={16} className="mr-2" />
+                    Shortcutlar
+                </DropdownMenuItem>
+            ),
+        },
+    ]
+
+    const visible = items.slice(0, visibleCount)
+    const overflowed = items.slice(visibleCount)
 
     return (
         <>
             <div
+                ref={wrapRef}
                 style={isOpen ? { bottom: `${height + 20}px` } : {}}
-                className={cn(`sticky bottom-[15px] gap-2 flex items-center justify-center pointer-events-none`)}>
+                className={cn('sticky bottom-[15px] gap-2 flex items-center justify-center pointer-events-none')}
+            >
                 <Card className='p-2 pointer-events-auto rounded-2xl'>
                     <CardContent className='p-2 flex items-center justify-center gap-2'>
 
-                        {/* Home */}
+                        {/* Home — always visible */}
                         <BottomPanelButton onClick={backToHome}>
                             <ArrowLeftIcon />
                         </BottomPanelButton>
 
-                        {/* Terminal */}
-                        <BottomPanelButton onClick={toggle}>
-                            <SquareCommandIcon />
-                        </BottomPanelButton>
+                        {/* Visible optional items */}
+                        {visible.map(item => (
+                            <React.Fragment key={item.key}>{item.inline}</React.Fragment>
+                        ))}
 
-                        {/* Search */}
-                        <BottomPanelButton onClick={toggleSearchPanel}>
-                            <Search size={20} />
-                        </BottomPanelButton>
-
-                        {/* Add node */}
-                        <BottomPanelButton onClick={() => setNodeDialogOpen(true)}>
-                            <Plus size={20} />
-                        </BottomPanelButton>
-
-                        {/* Collections */}
-                        <BottomPanelButton>
-                            <CollectionIframeDialog>
-                                <Database size={20} />
-                            </CollectionIframeDialog>
-                        </BottomPanelButton>
-
-                        {/* Shortcuts */}
-                        <BottomPanelButton onClick={() => setShortcutsOpen(true)} title="Shortcutlar">
-                            <Keyboard size={20} />
-                        </BottomPanelButton>
-
-                        {/* Env vars */}
-                        <BottomPanelButton onClick={() => setEnvManageOpen(true)} title="Kalitlar">
-                            <Key size={20} />
-                        </BottomPanelButton>
-
-                        {/* AI toggle — glowing when open */}
-                        <BottomPanelButton
-                            onClick={onToggleAI}
-                            title={aiPanelOpen ? "AI panelni yopish" : "AI panelni ochish"}
-                            className={cn(
-                                'relative inline-flex overflow-hidden p-[1px] focus:outline-none',
-                                aiPanelOpen && 'ring-2 ring-primary/50'
-                            )}
-                        >
-                            <span className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
-                            <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl bg-background/80 px-3 py-1 text-sm font-medium backdrop-blur-3xl">
-                                <Bot size={20} className={aiPanelOpen ? "text-primary" : ""} />
-                            </span>
-                        </BottomPanelButton>
+                        {/* More — shown when items overflow */}
+                        {overflowed.length > 0 && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <BottomPanelButton title="Ko'proq">
+                                        <MoreHorizontal size={20} />
+                                    </BottomPanelButton>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="center" side="top">
+                                    {overflowed.map(item => item.overflow)}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
 
                         <DebugingButtons />
 
@@ -133,6 +256,11 @@ function BottomPanel({ aiPanelOpen, onToggleAI }: Props) {
                 open={envManageOpen}
                 onOpenChange={setEnvManageOpen}
                 projectId={id as string}
+            />
+
+            <CollectionIframeDialog
+                open={collectionOpen}
+                onOpenChange={setCollectionOpen}
             />
         </>
     )

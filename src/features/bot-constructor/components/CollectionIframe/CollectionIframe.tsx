@@ -8,16 +8,22 @@ import { cn } from "@/lib/utils"
 import { useParams } from "next/navigation"
 import { useState } from "react"
 
-export function CollectionIframeDialog({ children }: { children: React.ReactNode }) {
+export function CollectionIframeDialog({
+    children,
+    open,
+    onOpenChange,
+}: {
+    children?: React.ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+}) {
 
     const [isLoading, setisLoading] = useState(true)
     const { lang, id } = useParams()
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                {children}
-            </DialogTrigger>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            {children && <DialogTrigger asChild>{children}</DialogTrigger>}
             <DialogContent className="sm:max-w-[1020px] h-[90vh] p-0 overflow-hidden">
                 {
                     isLoading && <Skeleton
