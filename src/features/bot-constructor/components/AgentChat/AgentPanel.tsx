@@ -100,6 +100,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   const [hasFlow, setHasFlow] = useState(false);
   const [pendingFlow, setPendingFlow] = useState<{ nodes: any[]; edges: any[] } | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [shouldResume, setShouldResume] = useState(false);
   const [steps, setSteps] = useState<Step[]>([]);
   const [planContent, setPlanContent] = useState<string | null>(null);
   const [modules, setModules] = useState<string[]>([]);
@@ -133,6 +134,10 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
             ? data.messages.map((m, i) => ({ ...m, id: String(i) }))
             : [{ id: "w", role: "assistant", content: "Salom! 👋 Men Botmother AI agentiman.\n\nQanday Telegram bot yaratishni xohlaysiz? Tafsilot bering — hoziroq flow yarataman." }]
         );
+        // Agent was running when the page was refreshed — reconnect to get the result
+        if (data.phase === "running") {
+          setShouldResume(true);
+        }
       } catch {
         if (!cancelled) setMessages([{ id: "e", role: "assistant", content: "Ulanishda xatolik. Sahifani yangilang." }]);
       } finally {
@@ -144,6 +149,41 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
     })();
     return () => { cancelled = true; };
   }, [projectId]);
+
+  // Resume after page refresh: WS reconnect with empty message
+  useEffect(() => {
+    if (!shouldResume || isInitializing) return;
+    setShouldResume(false);
+    setIsLoading(true);
+    (async () => {
+      const session = await getSession();
+      const token = (session?.user as any)?.access ?? "";
+      const cleanup = wsChatWithAgent(projectId, "", token, (event: StreamEvent) => {
+        if (event.type === "done") {
+          resetStream();
+          onBuildingChange?.(false);
+          setMessages(prev => [...prev, {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: event.reply,
+          }]);
+          setHasFlow(event.has_flow);
+          if (event.flow_json) {
+            setPendingFlow(event.flow_json);
+            applyFlow(event.flow_json);
+            toast.success(`Flow qo'llandi — ${event.flow_json.nodes?.length ?? 0} ta node`);
+          }
+          setIsLoading(false);
+        } else if (event.type === "error") {
+          resetStream();
+          onBuildingChange?.(false);
+          setIsLoading(false);
+        }
+      });
+      wsCleanupRef.current = cleanup;
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldResume, isInitializing]);
 
   const applyFlow = useCallback((flow: { nodes: any[]; edges: any[] }) => {
     // Compare incoming nodes with current to detect added vs modified
