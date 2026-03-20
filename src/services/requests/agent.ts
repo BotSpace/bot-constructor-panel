@@ -39,6 +39,7 @@ export interface ProjectSession {
   session_id: string;
   has_flow: boolean;
   turn_count: number;
+  phase?: string;
   created_at: string;
   updated_at: string;
   messages: AgentMessage[];
