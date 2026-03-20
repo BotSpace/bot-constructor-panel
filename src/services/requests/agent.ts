@@ -26,7 +26,7 @@ export type StreamEvent =
   | { type: "tool_result"; name: string; preview: string }
   | { type: "module_progress"; completed: number; total: number; completed_name?: string; next_index?: number; status?: string; message?: string }
   | { type: "flow_update"; flow_json: { nodes: any[]; edges: any[] } }
-  | { type: "done"; reply: string; has_flow: boolean; flow_json: { nodes: any[]; edges: any[] } | null }
+  | { type: "done"; reply: string; has_flow: boolean; flow_json: { nodes: any[]; edges: any[] } | null; modules?: string[] | null; current_module_index?: number | null; total_modules?: number | null }
   | { type: "error"; message: string };
 
 export interface AgentChatResponse {
