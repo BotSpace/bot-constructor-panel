@@ -18,15 +18,27 @@ export interface AgentMessage {
   steps?: AgentStep[];
 }
 
+export interface TaskItem {
+  index: number;
+  title: string;
+  status: "pending" | "running" | "done";
+}
+
 export type StreamEvent =
   | { type: "thinking" }
   | { type: "token"; content: string }
   | { type: "plan"; content: string; modules?: string[] }
+  | { type: "tasks_plan"; tasks: TaskItem[]; total: number }
+  | { type: "task_start"; index: number; title: string; completed: number; total: number }
+  | { type: "task_done"; index: number; title: string; completed: number; total: number }
+  | { type: "tasks_complete"; completed: number; total: number; message: string }
   | { type: "tool_call"; name: string; input: string }
   | { type: "tool_result"; name: string; preview: string }
-  | { type: "module_progress"; completed: number; total: number; completed_name?: string; next_index?: number; status?: string; message?: string }
   | { type: "flow_update"; flow_json: { nodes: any[]; edges: any[] } }
-  | { type: "done"; reply: string; has_flow: boolean; flow_json: { nodes: any[]; edges: any[] } | null; modules?: string[] | null; current_module_index?: number | null; total_modules?: number | null }
+  | { type: "setup"; content: string }
+  | { type: "node"; name: string }
+  | { type: "ping" }
+  | { type: "done"; reply: string; has_flow: boolean; flow_json: { nodes: any[]; edges: any[] } | null }
   | { type: "error"; message: string };
 
 export interface AgentChatResponse {
