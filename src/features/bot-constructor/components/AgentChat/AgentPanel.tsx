@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import {
   Bot, Send, Loader2, ChevronLeft, RotateCcw,
   CheckCircle2, Sparkles, Search, Database, Terminal,
-  Globe, Users, Settings, Package, FileText, Zap, Wrench, Map,
+  Globe, Users, Settings, Package, FileText, Zap, Wrench, Map, Circle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -79,6 +79,8 @@ interface Message extends AgentMessage {
   id: string;
   plan?: string;
   steps?: Step[];
+  modules?: string[];
+  completedModules?: number;
 }
 
 interface AgentPanelProps {
@@ -100,11 +102,14 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   const [isInitializing, setIsInitializing] = useState(true);
   const [steps, setSteps] = useState<Step[]>([]);
   const [planContent, setPlanContent] = useState<string | null>(null);
+  const [modules, setModules] = useState<string[]>([]);
+  const [completedModuleCount, setCompletedModuleCount] = useState(0);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const stepsRef = useRef<Step[]>([]);
   const planRef = useRef<string | null>(null);
+  const modulesRef = useRef<string[]>([]);
   const wsCleanupRef = useRef<(() => void) | null>(null);
   const initialPromptSentRef = useRef(false);
 
@@ -174,6 +179,9 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
     planRef.current = null;
     setSteps([]);
     setPlanContent(null);
+    modulesRef.current = [];
+    setModules([]);
+    setCompletedModuleCount(0);
   };
 
   const sendMessage = useCallback(async (textOverride?: string) => {
@@ -198,6 +206,22 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
       if (event.type === "plan") {
         planRef.current = event.content;
         setPlanContent(event.content);
+        if (event.modules && event.modules.length >= 2) {
+          modulesRef.current = event.modules;
+          setModules(event.modules);
+          setCompletedModuleCount(0);
+        }
+
+      } else if (event.type === "module_progress") {
+        if (event.status === "complete") {
+          // All modules done — update final count
+          setCompletedModuleCount(event.completed);
+        } else {
+          // Module N completed, moving to next — clear tool steps for fresh module view
+          setCompletedModuleCount(event.completed);
+          stepsRef.current = [];
+          setSteps([]);
+        }
 
       } else if (event.type === "tool_call") {
         const step: Step = {
@@ -221,6 +245,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
       } else if (event.type === "done") {
         const savedPlan = planRef.current || undefined;
         const savedSteps = stepsRef.current.filter(s => s.status === "done");
+        const savedModules = modulesRef.current.length >= 2 ? [...modulesRef.current] : undefined;
         resetStream();
         onBuildingChange?.(false);
         setMessages(prev => [...prev, {
@@ -229,6 +254,8 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
           content: event.reply,
           plan: savedPlan,
           steps: savedSteps.length > 0 ? savedSteps : undefined,
+          modules: savedModules,
+          completedModules: savedModules ? savedModules.length : undefined,
         }]);
         setHasFlow(event.has_flow);
         if (event.flow_json) {
@@ -318,6 +345,15 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
                     {/* Plan card — shown while agent is planning */}
                     {planContent && <PlanCard content={planContent} />}
 
+                    {/* Module progress — shown during multi-module builds */}
+                    {modules.length >= 2 && (
+                      <ModuleProgressCard
+                        modules={modules}
+                        completedCount={completedModuleCount}
+                        isBuilding
+                      />
+                    )}
+
                     {steps.length > 0 ? (
                       <div className="rounded-xl border border-border overflow-hidden bg-card">
                         {steps.map(step => (
@@ -381,6 +417,55 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
             </Button>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Module progress card ───────────────────────────────────────────────────
+
+interface ModuleProgressCardProps {
+  modules: string[];
+  completedCount: number;
+  isBuilding: boolean;
+}
+
+function ModuleProgressCard({ modules, completedCount, isBuilding }: ModuleProgressCardProps) {
+  // currentIndex = first not-yet-completed module
+  const currentIndex = isBuilding ? completedCount : -1;
+
+  return (
+    <div className="rounded-xl border border-border overflow-hidden bg-card">
+      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border bg-muted/30">
+        <Zap className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+        <span className="text-xs font-medium text-foreground">Bosqichli qurilish</span>
+        <span className="ml-auto text-xs text-muted-foreground">{Math.min(completedCount, modules.length)}/{modules.length}</span>
+      </div>
+      <div className="divide-y divide-border">
+        {modules.map((mod, i) => {
+          const done = i < completedCount;
+          const active = i === currentIndex;
+          return (
+            <div key={i} className={cn(
+              "flex items-center gap-2.5 px-3 py-2 text-xs transition-colors",
+              active && "bg-primary/[0.04]",
+            )}>
+              {done ? (
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-green-500" />
+              ) : active ? (
+                <Loader2 className="h-3.5 w-3.5 shrink-0 text-primary animate-spin" />
+              ) : (
+                <Circle className="h-3.5 w-3.5 shrink-0 text-muted-foreground/30" />
+              )}
+              <span className={cn(
+                "flex-1 min-w-0 truncate",
+                done ? "text-muted-foreground line-through" : active ? "text-foreground font-medium" : "text-muted-foreground/60",
+              )}>
+                {i + 1}. {mod}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -456,7 +541,7 @@ function MessageBubble({ message }: { message: Message }) {
     );
   }
 
-  const hasActivity = message.plan || (message.steps && message.steps.length > 0);
+  const hasActivity = message.plan || (message.steps && message.steps.length > 0) || (message.modules && message.modules.length >= 2);
 
   return (
     <div className="flex gap-2 items-start">
@@ -471,6 +556,12 @@ function MessageBubble({ message }: { message: Message }) {
             className="flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-muted-foreground transition-colors"
           >
             <ChevronLeft className={cn("h-3 w-3 transition-transform", expanded ? "-rotate-90" : "rotate-180")} />
+            {message.modules && message.modules.length >= 2 && (
+              <span>{message.completedModules ?? message.modules.length}/{message.modules.length} bosqich</span>
+            )}
+            {message.modules && message.modules.length >= 2 && (message.steps?.length || message.plan) && (
+              <span className="text-muted-foreground/40">·</span>
+            )}
             {message.steps && message.steps.length > 0 && (
               <span>{message.steps.length} ta tool</span>
             )}
@@ -481,9 +572,16 @@ function MessageBubble({ message }: { message: Message }) {
           </button>
         )}
 
-        {/* Expanded: plan + steps */}
+        {/* Expanded: modules + plan + steps */}
         {hasActivity && expanded && (
           <div className="space-y-1">
+            {message.modules && message.modules.length >= 2 && (
+              <ModuleProgressCard
+                modules={message.modules}
+                completedCount={message.completedModules ?? message.modules.length}
+                isBuilding={false}
+              />
+            )}
             {message.plan && (
               <div className="rounded-xl border border-primary/20 overflow-hidden bg-primary/[0.04]">
                 <div className="flex items-center gap-2 px-3 py-1.5 border-b border-primary/10 bg-primary/[0.06]">
