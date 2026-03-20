@@ -8,6 +8,7 @@ import {
   wsChatWithAgent,
   type AgentMessage,
   type StreamEvent,
+  type TaskItem,
 } from "@/services/requests/agent";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,6 +28,8 @@ type ToolCat = "plugin" | "cms" | "debug" | "deploy" | "project" | "users" | "ot
 const TOOL_CFG: Record<string, { label: string; cat: ToolCat }> = {
   search_plugins:           { label: "Plugin qidirish",          cat: "plugin"  },
   get_plugin:               { label: "Plugin schema",             cat: "plugin"  },
+  validate_plugin_params:   { label: "Plugin parametrlari",       cat: "plugin"  },
+  list_categories:          { label: "Kategoriyalar ro'yxati",    cat: "plugin"  },
   list_collections:         { label: "Kolleksiyalar ro'yxati",    cat: "cms"     },
   get_collection:           { label: "Kolleksiya ma'lumoti",      cat: "cms"     },
   create_collection:        { label: "Kolleksiya yaratish",       cat: "cms"     },
@@ -79,8 +82,7 @@ interface Message extends AgentMessage {
   id: string;
   plan?: string;
   steps?: Step[];
-  modules?: string[];
-  completedModules?: number;
+  tasks?: TaskItem[];
 }
 
 interface AgentPanelProps {
@@ -103,18 +105,15 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   const [shouldResume, setShouldResume] = useState(false);
   const [steps, setSteps] = useState<Step[]>([]);
   const [planContent, setPlanContent] = useState<string | null>(null);
-  const [modules, setModules] = useState<string[]>([]);
-  const [completedModuleCount, setCompletedModuleCount] = useState(0);
+  const [tasks, setTasks] = useState<TaskItem[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const stepsRef = useRef<Step[]>([]);
   const planRef = useRef<string | null>(null);
-  const modulesRef = useRef<string[]>([]);
+  const tasksRef = useRef<TaskItem[]>([]);
   const wsCleanupRef = useRef<(() => void) | null>(null);
   const initialPromptSentRef = useRef(false);
-  // sendMessageRef always points to latest sendMessage (avoids stale-closure in auto-continue)
-  const sendMessageRef = useRef<((msg?: string, autoContinue?: boolean) => Promise<void>) | null>(null);
 
   const { setNodes, setEdges, formatFlow } = useFlowStore();
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -219,48 +218,61 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   const resetStream = () => {
     stepsRef.current = [];
     planRef.current = null;
+    tasksRef.current = [];
     setSteps([]);
     setPlanContent(null);
-    modulesRef.current = [];
-    setModules([]);
-    setCompletedModuleCount(0);
+    setTasks([]);
   };
 
-  const sendMessage = useCallback(async (textOverride?: string, autoContinue = false) => {
+  const sendMessage = useCallback(async (textOverride?: string) => {
     const text = (textOverride ?? input).trim();
-    // autoContinue bypasses the loading guard so the frontend can chain modules
-    if (!autoContinue && (!text || isLoading || isInitializing)) return;
-    if (!text) return;
+    if (!text || isLoading || isInitializing) return;
 
-    let userMsg: Message | null = null;
-    if (!autoContinue) {
-      setInput("");
-      if (inputRef.current) inputRef.current.style.height = "auto";
-      userMsg = { id: Date.now().toString(), role: "user", content: text };
-      setMessages(prev => [...prev, userMsg!]);
-      setIsLoading(true);
-      resetStream();
-    } else {
-      // Between modules: clear tool steps so next module starts fresh in UI
-      stepsRef.current = [];
-      setSteps([]);
-    }
+    setInput("");
+    if (inputRef.current) inputRef.current.style.height = "auto";
+    const userMsg: Message = { id: Date.now().toString(), role: "user", content: text };
+    setMessages(prev => [...prev, userMsg]);
+    setIsLoading(true);
+    resetStream();
 
     const session = await getSession();
     const token = (session?.user as any)?.access ?? "";
 
     const cleanup = wsChatWithAgent(projectId, text, token, (event: StreamEvent) => {
-      if (event.type === "plan") {
+      if (event.type === "ping" || event.type === "node") {
+        // heartbeat / graph node transition — ignore
+
+      } else if (event.type === "plan") {
         planRef.current = event.content;
         setPlanContent(event.content);
-        if (event.modules && event.modules.length >= 2) {
-          modulesRef.current = event.modules;
-          setModules(event.modules);
-          setCompletedModuleCount(0);
-        }
 
-      } else if (event.type === "module_progress") {
-        setCompletedModuleCount(event.completed);
+      } else if (event.type === "tasks_plan") {
+        // Full task list received — show progress tracker
+        tasksRef.current = event.tasks;
+        setTasks([...event.tasks]);
+
+      } else if (event.type === "task_start") {
+        // Mark specific task as running
+        const updated = tasksRef.current.map(t =>
+          t.index === event.index ? { ...t, status: "running" as const } : t
+        );
+        tasksRef.current = updated;
+        setTasks([...updated]);
+
+      } else if (event.type === "task_done") {
+        // Mark specific task as done
+        const updated = tasksRef.current.map(t =>
+          t.index === event.index ? { ...t, status: "done" as const } : t
+        );
+        tasksRef.current = updated;
+        setTasks([...updated]);
+
+      } else if (event.type === "tasks_complete") {
+        toast.success(event.message || "Barcha bosqichlar tayyor!");
+
+      } else if (event.type === "setup") {
+        // Collections created / debug bot started — show as toast
+        if (event.content) toast.success(event.content, { duration: 4000 });
 
       } else if (event.type === "flow_update") {
         applyFlow(event.flow_json);
@@ -286,25 +298,10 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
         setSteps([...updated]);
 
       } else if (event.type === "done") {
-        // Check if there are more modules to build
-        const hasMoreModules =
-          event.total_modules != null &&
-          event.current_module_index != null &&
-          event.current_module_index < event.total_modules;
-
-        if (hasMoreModules) {
-          // Intermediate module done — update canvas, keep loading, auto-continue
-          setCompletedModuleCount(event.current_module_index!);
-          if (event.flow_json) { setPendingFlow(event.flow_json); applyFlow(event.flow_json); }
-          // Small delay so the UI shows the completed module before next starts
-          setTimeout(() => sendMessageRef.current?.("davom", true), 600);
-          return;
-        }
-
-        // All modules done (or non-modular) — finalize
+        // Agent finished entire build (all modules done internally)
         const savedPlan = planRef.current || undefined;
         const savedSteps = stepsRef.current.filter(s => s.status === "done");
-        const savedModules = modulesRef.current.length >= 2 ? [...modulesRef.current] : undefined;
+        const savedTasks = tasksRef.current.length >= 2 ? [...tasksRef.current] : undefined;
         resetStream();
         onBuildingChange?.(false);
         setMessages(prev => [...prev, {
@@ -313,8 +310,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
           content: event.reply,
           plan: savedPlan,
           steps: savedSteps.length > 0 ? savedSteps : undefined,
-          modules: savedModules,
-          completedModules: savedModules ? savedModules.length : undefined,
+          tasks: savedTasks,
         }]);
         setHasFlow(event.has_flow);
         if (event.flow_json) {
@@ -336,9 +332,6 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
     wsCleanupRef.current = cleanup;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input, isLoading, isInitializing, projectId, applyFlow]);
-
-  // Keep ref pointing to latest sendMessage (auto-continue uses this to avoid stale closure)
-  useEffect(() => { sendMessageRef.current = sendMessage; }, [sendMessage]);
 
   // Auto-send initialPrompt once after initialization (no prior messages)
   useEffect(() => {
@@ -407,13 +400,9 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
                     {/* Plan card — shown while agent is planning */}
                     {planContent && <PlanCard content={planContent} />}
 
-                    {/* Module progress — shown during multi-module builds */}
-                    {modules.length >= 2 && (
-                      <ModuleProgressCard
-                        modules={modules}
-                        completedCount={completedModuleCount}
-                        isBuilding
-                      />
+                    {/* Task progress — shown during multi-module builds */}
+                    {tasks.length >= 2 && (
+                      <TaskProgressCard tasks={tasks} isBuilding />
                     )}
 
                     {steps.length > 0 ? (
@@ -484,31 +473,29 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   );
 }
 
-// ── Module progress card ───────────────────────────────────────────────────
+// ── Task progress card ─────────────────────────────────────────────────────
 
-interface ModuleProgressCardProps {
-  modules: string[];
-  completedCount: number;
-  isBuilding: boolean;
+interface TaskProgressCardProps {
+  tasks: TaskItem[];
+  isBuilding?: boolean;
 }
 
-function ModuleProgressCard({ modules, completedCount, isBuilding }: ModuleProgressCardProps) {
-  // currentIndex = first not-yet-completed module
-  const currentIndex = isBuilding ? completedCount : -1;
+function TaskProgressCard({ tasks }: TaskProgressCardProps) {
+  const doneCount = tasks.filter(t => t.status === "done").length;
 
   return (
     <div className="rounded-xl border border-border overflow-hidden bg-card">
       <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border bg-muted/30">
         <Zap className="h-3.5 w-3.5 text-amber-500 shrink-0" />
         <span className="text-xs font-medium text-foreground">Bosqichli qurilish</span>
-        <span className="ml-auto text-xs text-muted-foreground">{Math.min(completedCount, modules.length)}/{modules.length}</span>
+        <span className="ml-auto text-xs text-muted-foreground">{doneCount}/{tasks.length}</span>
       </div>
       <div className="divide-y divide-border">
-        {modules.map((mod, i) => {
-          const done = i < completedCount;
-          const active = i === currentIndex;
+        {tasks.map((task) => {
+          const done = task.status === "done";
+          const active = task.status === "running";
           return (
-            <div key={i} className={cn(
+            <div key={task.index} className={cn(
               "flex items-center gap-2.5 px-3 py-2 text-xs transition-colors",
               active && "bg-primary/[0.04]",
             )}>
@@ -523,7 +510,7 @@ function ModuleProgressCard({ modules, completedCount, isBuilding }: ModuleProgr
                 "flex-1 min-w-0 truncate",
                 done ? "text-muted-foreground line-through" : active ? "text-foreground font-medium" : "text-muted-foreground/60",
               )}>
-                {i + 1}. {mod}
+                {task.index + 1}. {task.title}
               </span>
             </div>
           );
@@ -603,7 +590,8 @@ function MessageBubble({ message }: { message: Message }) {
     );
   }
 
-  const hasActivity = message.plan || (message.steps && message.steps.length > 0) || (message.modules && message.modules.length >= 2);
+  const hasActivity = message.plan || (message.steps && message.steps.length > 0) || (message.tasks && message.tasks.length >= 2);
+  const doneTasks = message.tasks?.filter(t => t.status === "done").length ?? 0;
 
   return (
     <div className="flex gap-2 items-start">
@@ -618,10 +606,10 @@ function MessageBubble({ message }: { message: Message }) {
             className="flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-muted-foreground transition-colors"
           >
             <ChevronLeft className={cn("h-3 w-3 transition-transform", expanded ? "-rotate-90" : "rotate-180")} />
-            {message.modules && message.modules.length >= 2 && (
-              <span>{message.completedModules ?? message.modules.length}/{message.modules.length} bosqich</span>
+            {message.tasks && message.tasks.length >= 2 && (
+              <span>{doneTasks}/{message.tasks.length} bosqich</span>
             )}
-            {message.modules && message.modules.length >= 2 && (message.steps?.length || message.plan) && (
+            {message.tasks && message.tasks.length >= 2 && (message.steps?.length || message.plan) && (
               <span className="text-muted-foreground/40">·</span>
             )}
             {message.steps && message.steps.length > 0 && (
@@ -634,15 +622,11 @@ function MessageBubble({ message }: { message: Message }) {
           </button>
         )}
 
-        {/* Expanded: modules + plan + steps */}
+        {/* Expanded: tasks + plan + steps */}
         {hasActivity && expanded && (
           <div className="space-y-1">
-            {message.modules && message.modules.length >= 2 && (
-              <ModuleProgressCard
-                modules={message.modules}
-                completedCount={message.completedModules ?? message.modules.length}
-                isBuilding={false}
-              />
+            {message.tasks && message.tasks.length >= 2 && (
+              <TaskProgressCard tasks={message.tasks} isBuilding={false} />
             )}
             {message.plan && (
               <div className="rounded-xl border border-primary/20 overflow-hidden bg-primary/[0.04]">
