@@ -21,9 +21,10 @@ export interface AgentMessage {
 export type StreamEvent =
   | { type: "thinking" }
   | { type: "token"; content: string }
-  | { type: "plan"; content: string }
+  | { type: "plan"; content: string; modules?: string[] }
   | { type: "tool_call"; name: string; input: string }
   | { type: "tool_result"; name: string; preview: string }
+  | { type: "module_progress"; completed: number; total: number; completed_name?: string; next_index?: number; status?: string; message?: string }
   | { type: "done"; reply: string; has_flow: boolean; flow_json: { nodes: any[]; edges: any[] } | null }
   | { type: "error"; message: string };
 
