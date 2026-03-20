@@ -113,6 +113,8 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
   const modulesRef = useRef<string[]>([]);
   const wsCleanupRef = useRef<(() => void) | null>(null);
   const initialPromptSentRef = useRef(false);
+  // sendMessageRef always points to latest sendMessage (avoids stale-closure in auto-continue)
+  const sendMessageRef = useRef<((msg?: string, autoContinue?: boolean) => Promise<void>) | null>(null);
 
   const { setNodes, setEdges, formatFlow } = useFlowStore();
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -224,21 +226,26 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
     setCompletedModuleCount(0);
   };
 
-  const sendMessage = useCallback(async (textOverride?: string) => {
+  const sendMessage = useCallback(async (textOverride?: string, autoContinue = false) => {
     const text = (textOverride ?? input).trim();
-    if (!text || isLoading || isInitializing) return;
+    // autoContinue bypasses the loading guard so the frontend can chain modules
+    if (!autoContinue && (!text || isLoading || isInitializing)) return;
+    if (!text) return;
 
-    if (!textOverride) {
+    let userMsg: Message | null = null;
+    if (!autoContinue) {
       setInput("");
       if (inputRef.current) inputRef.current.style.height = "auto";
+      userMsg = { id: Date.now().toString(), role: "user", content: text };
+      setMessages(prev => [...prev, userMsg!]);
+      setIsLoading(true);
+      resetStream();
+    } else {
+      // Between modules: clear tool steps so next module starts fresh in UI
+      stepsRef.current = [];
+      setSteps([]);
     }
 
-    const userMsg: Message = { id: Date.now().toString(), role: "user", content: text };
-    setMessages(prev => [...prev, userMsg]);
-    setIsLoading(true);
-    resetStream();
-
-    // Get auth token
     const session = await getSession();
     const token = (session?.user as any)?.access ?? "";
 
@@ -253,18 +260,9 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
         }
 
       } else if (event.type === "module_progress") {
-        if (event.status === "complete") {
-          // All modules done — update final count
-          setCompletedModuleCount(event.completed);
-        } else {
-          // Module N completed, moving to next — clear tool steps for fresh module view
-          setCompletedModuleCount(event.completed);
-          stepsRef.current = [];
-          setSteps([]);
-        }
+        setCompletedModuleCount(event.completed);
 
       } else if (event.type === "flow_update") {
-        // Intermediate flow update — show progress on canvas as each module is built
         applyFlow(event.flow_json);
         setPendingFlow(event.flow_json);
 
@@ -288,6 +286,22 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
         setSteps([...updated]);
 
       } else if (event.type === "done") {
+        // Check if there are more modules to build
+        const hasMoreModules =
+          event.total_modules != null &&
+          event.current_module_index != null &&
+          event.current_module_index < event.total_modules;
+
+        if (hasMoreModules) {
+          // Intermediate module done — update canvas, keep loading, auto-continue
+          setCompletedModuleCount(event.current_module_index!);
+          if (event.flow_json) { setPendingFlow(event.flow_json); applyFlow(event.flow_json); }
+          // Small delay so the UI shows the completed module before next starts
+          setTimeout(() => sendMessageRef.current?.("davom", true), 600);
+          return;
+        }
+
+        // All modules done (or non-modular) — finalize
         const savedPlan = planRef.current || undefined;
         const savedSteps = stepsRef.current.filter(s => s.status === "done");
         const savedModules = modulesRef.current.length >= 2 ? [...modulesRef.current] : undefined;
@@ -314,7 +328,7 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
         resetStream();
         onBuildingChange?.(false);
         toast.error(event.message || "Xatolik yuz berdi");
-        setMessages(prev => prev.filter(m => m.id !== userMsg.id));
+        if (userMsg) setMessages(prev => prev.filter(m => m.id !== userMsg!.id));
         setIsLoading(false);
       }
     });
@@ -322,6 +336,9 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
     wsCleanupRef.current = cleanup;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input, isLoading, isInitializing, projectId, applyFlow]);
+
+  // Keep ref pointing to latest sendMessage (auto-continue uses this to avoid stale closure)
+  useEffect(() => { sendMessageRef.current = sendMessage; }, [sendMessage]);
 
   // Auto-send initialPrompt once after initialization (no prior messages)
   useEffect(() => {
