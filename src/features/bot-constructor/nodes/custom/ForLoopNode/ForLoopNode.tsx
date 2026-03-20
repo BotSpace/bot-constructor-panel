@@ -37,11 +37,11 @@ const ForLoopNodeComponent = ({
       {!isCollapsed && (
         <CardContent className="flex flex-col gap-4 pt-4">
           <div className="flex flex-col gap-2">
-            <Label>Ro'yxat (items)</Label>
+            <Label>Ro'yxat (dataKey)</Label>
             <Input
               placeholder="{{users}} yoki {{items}}"
-              value={data.items || ""}
-              onChange={(e) => handleUpdate({ items: e.target.value })}
+              value={data.dataKey || ""}
+              onChange={(e) => handleUpdate({ dataKey: e.target.value })}
             />
             <p className="text-xs text-muted-foreground">
               Aylanib chiqiladigan ro'yxat o'zgaruvchisi
@@ -49,11 +49,11 @@ const ForLoopNodeComponent = ({
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label>Element o'zgaruvchisi</Label>
+            <Label>Element o'zgaruvchisi (itemVariable)</Label>
             <Input
               placeholder="item"
-              value={data.item_variable || ""}
-              onChange={(e) => handleUpdate({ item_variable: e.target.value })}
+              value={data.itemVariable || ""}
+              onChange={(e) => handleUpdate({ itemVariable: e.target.value })}
             />
             <p className="text-xs text-muted-foreground">
               Har bir elementga beriluvchi nom (masalan: item, user)
