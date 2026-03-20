@@ -263,6 +263,11 @@ export function AgentPanel({ projectId, onCollapse, initialPrompt, onBuildingCha
           setSteps([]);
         }
 
+      } else if (event.type === "flow_update") {
+        // Intermediate flow update — show progress on canvas as each module is built
+        applyFlow(event.flow_json);
+        setPendingFlow(event.flow_json);
+
       } else if (event.type === "tool_call") {
         const step: Step = {
           key: `${event.name}-${Date.now()}`,

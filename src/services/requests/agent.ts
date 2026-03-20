@@ -25,6 +25,7 @@ export type StreamEvent =
   | { type: "tool_call"; name: string; input: string }
   | { type: "tool_result"; name: string; preview: string }
   | { type: "module_progress"; completed: number; total: number; completed_name?: string; next_index?: number; status?: string; message?: string }
+  | { type: "flow_update"; flow_json: { nodes: any[]; edges: any[] } }
   | { type: "done"; reply: string; has_flow: boolean; flow_json: { nodes: any[]; edges: any[] } | null }
   | { type: "error"; message: string };
 
