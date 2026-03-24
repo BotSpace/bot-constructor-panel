@@ -70,6 +70,32 @@
   background: hsl(var(--muted) / 0.3);
 }
 
+/* ── NodeEditPanel body — reset card/node styles ───────────────────────── */
+
+/* Hide the node's own header (panel has its own) */
+.node-edit-panel-body [data-node-header] {
+  display: none !important;
+}
+
+/* Make the node card fill the panel width, remove border/shadow */
+.node-edit-panel-body > * {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Also remove border/radius from inner card wrappers */
+.node-edit-panel-body .card,
+.node-edit-panel-body [class*="rounded-xl"],
+.node-edit-panel-body [class*="rounded-lg"] {
+  border-radius: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+
 /* ── Per-node-type icon box colors (muted, professional) ─────────────────
    Uses .node-icon-box class set in NodeHeader / TriggerHeader.
    Colors are 700-level (dark) to avoid eye strain — n8n style.

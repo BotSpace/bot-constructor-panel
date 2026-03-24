@@ -21,6 +21,8 @@ import { EnvManageDialog } from "@/features/bot-constructor/components/EnvManage
 import DebugingButtons from "@/components/layout/components/debug/debug";
 import { SaveStatusBadge } from "@/features/bot-constructor/components/save-status-badge";
 import { Separator } from "@/components/ui/separator";
+import { NodeEditPanel } from "@/features/bot-constructor/components/NodeEditPanel";
+import { Plus } from "lucide-react";
 
 function PageInner() {
   const { id }: { id: string } = useParams();
@@ -32,6 +34,7 @@ function PageInner() {
   const [aiOpen, setAiOpen] = useState(false);
   const [isAiBuilding, setIsAiBuilding] = useState(!!initialPrompt);
   const [envOpen, setEnvOpen] = useState(false);
+  const [addNodeOpen, setAddNodeOpen] = useState(false);
 
   useEffect(() => {
     if (project) {
@@ -62,6 +65,7 @@ function PageInner() {
         id={id}
         aiOpen={aiOpen}
         onToggleAI={() => setAiOpen((v) => !v)}
+        onAddNode={() => setAddNodeOpen(true)}
       />
 
       {/* ── Content row ────────────────────────────────────────── */}
@@ -92,11 +96,16 @@ function PageInner() {
             <BottomPanel
               aiPanelOpen={aiOpen}
               onToggleAI={() => setAiOpen((v) => !v)}
+              addNodeOpen={addNodeOpen}
+              onAddNodeOpenChange={setAddNodeOpen}
             />
           </ReactFlowProvider>
 
           {isAiBuilding && <AiBuildingOverlay />}
         </div>
+
+        {/* Node edit panel (right) */}
+        <NodeEditPanel />
       </div>
     </main>
   );
@@ -108,11 +117,13 @@ function N8nTopBar({
   id,
   aiOpen,
   onToggleAI,
+  onAddNode,
 }: {
   project: { name: string };
   id: string;
   aiOpen: boolean;
   onToggleAI: () => void;
+  onAddNode: () => void;
 }) {
   const { handleClick: backToHome } = useLinkToParent({ href: `/bot/${id}` });
 
@@ -141,6 +152,20 @@ function N8nTopBar({
 
       <div className="flex-1" />
 
+      {/* Add node — n8n style */}
+      <Button
+        variant="default"
+        size="sm"
+        className="h-8 gap-1.5 text-xs"
+        onClick={onAddNode}
+        title="Node qo'shish (Ctrl+N)"
+      >
+        <Plus className="h-3.5 w-3.5" />
+        Node qo'shish
+      </Button>
+
+      <Separator orientation="vertical" className="h-5 mx-0.5" />
+
       {/* AI toggle */}
       <Button
         variant={aiOpen ? "secondary" : "ghost"}
@@ -149,9 +174,7 @@ function N8nTopBar({
         onClick={onToggleAI}
         title={aiOpen ? "AI panelni yopish" : "AI panelni ochish"}
       >
-        <Sparkles
-          className={cn("h-3.5 w-3.5", aiOpen && "text-primary")}
-        />
+        <Sparkles className={cn("h-3.5 w-3.5", aiOpen && "text-primary")} />
         AI
       </Button>
     </div>

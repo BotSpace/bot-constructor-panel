@@ -34,7 +34,7 @@ import { useIsMobile } from "@/hooks/use-is-mobile";
 import { instanceAuth } from "@/services/instance";
 import { useTheme } from "next-themes";
 import { NodeSelectionDialog } from "./components/NodeSelectionDialog";
-import { Connection } from "reactflow";
+import { Connection, Node } from "reactflow";
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
@@ -221,7 +221,14 @@ export default function Constructor() {
   );
 
   // Store'dan kerakli qismlarni olamiz
-  const { formatFlow, collapseAllNodes, expandAllNodes } = useFlowStore();
+  const { formatFlow, collapseAllNodes, expandAllNodes, setEditingNodeId } = useFlowStore();
+
+  const handleNodeClick = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      setEditingNodeId(node.id);
+    },
+    [setEditingNodeId]
+  );
 
   function handleFormating() {
     const toastId = toast.loading("Formating ...");
@@ -478,6 +485,7 @@ export default function Constructor() {
               onConnectEnd={handleConnectEnd}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
+              onNodeClick={handleNodeClick}
               onNodeDrag={handleNodeDrag}
               onNodeDragStop={handleNodeDragStop}
               panOnScroll
