@@ -47,8 +47,8 @@ export const TriggerHeader = ({
       className="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer select-none hover:bg-muted/40 transition-colors rounded-t-[inherit]"
       role="button"
     >
-      {/* N8n-style orange icon box for triggers */}
-      <div className="w-7 h-7 rounded-md flex items-center justify-center shrink-0 bg-orange-500 [&_svg]:w-4 [&_svg]:h-4 [&_svg]:text-white [&_svg]:stroke-white">
+      {/* N8n-style trigger icon box — amber-700 via CSS */}
+      <div className="node-icon-box w-7 h-7 rounded-md flex items-center justify-center shrink-0 bg-amber-700 [&_svg]:w-4 [&_svg]:h-4 [&_svg]:text-white [&_svg]:stroke-white">
         {renderIcon()}
       </div>
 

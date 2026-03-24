@@ -46,8 +46,8 @@ export function SourceHandles({
       position={pos}
       id={id}
       className={cn(
-        "!w-3 !h-3 !rounded-full !bg-muted-foreground/40 !border-2 !border-background",
-        "hover:!bg-sky-500 hover:!border-sky-300 hover:!scale-125 !transition-all !duration-150",
+        "!w-3 !h-3 !rounded-full !bg-zinc-400/60 !border-2 !border-background",
+        "hover:!bg-blue-600 hover:!border-blue-400 hover:!scale-125 !transition-all !duration-150",
         className
       )}
     />
