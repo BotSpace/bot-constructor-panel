@@ -3,6 +3,7 @@
 import React, { SVGProps, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
+  BackgroundVariant,
   Controls,
   MiniMap,
   useReactFlow,
@@ -17,8 +18,6 @@ import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
 import { useMousePosition } from "./hooks/useMousePosition";
 import { useParams } from "next/navigation";
 import useProjectStore from "./store/project";
-import { SaveStatusBadge } from "./components/save-status-badge";
-
 import {
   ContextMenu,
   ContextMenuContent,
@@ -71,7 +70,7 @@ export default function Constructor() {
   const [snapToGrid, setSnapToGrid] = useState(false);
   const mousePosition = useMousePosition();
   const { resolvedTheme } = useTheme();
-  const edgeColor = resolvedTheme === "dark" ? "#fff" : "#374151";
+  const edgeColor = resolvedTheme === "dark" ? "#4b5563" : "#9ca3af";
 
   // Node selection dialog state
   const [showNodeDialog, setShowNodeDialog] = useState(false);
@@ -491,15 +490,24 @@ export default function Constructor() {
               snapToGrid={snapToGrid}
               snapGrid={snapToGrid ? [20, 20] : undefined}
               connectionLineStyle={{
-                strokeWidth: 4,
+                strokeWidth: 2,
                 stroke: edgeColor,
               }}
               connectionLineComponent={FloatingConnectionLine}
               connectionMode={ConnectionMode.Loose}
             >
-              <SaveStatusBadge className="absolute top-2 right-2 z-20" />
-              <Background gap={24} color="#666" />
-              {!isMobile && <MiniMap />}
+              <Background
+                variant={BackgroundVariant.Lines}
+                gap={32}
+                size={1}
+                color={resolvedTheme === "dark" ? "#1f2937" : "#e5e7eb"}
+              />
+              {!isMobile && (
+                <MiniMap
+                  style={{ background: resolvedTheme === "dark" ? "#111827" : "#f9fafb" }}
+                  maskColor={resolvedTheme === "dark" ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.6)"}
+                />
+              )}
               <Controls />
             </ReactFlow>
           </div>
