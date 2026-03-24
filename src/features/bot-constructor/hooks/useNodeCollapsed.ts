@@ -7,7 +7,7 @@ import { useFlowStore } from "../store";
  * Listens to global collapseAllSignal and expandAllSignal from the store.
  */
 export function useNodeCollapsed(
-  defaultValue = false
+  defaultValue = true
 ): [boolean, Dispatch<SetStateAction<boolean>>] {
   const [isCollapsed, setIsCollapsed] = useState(defaultValue);
   const collapseAllSignal = useFlowStore(
@@ -38,7 +38,7 @@ export function useNodeCollapsed(
  * Listens to global collapseAllSignal and expandAllSignal from the store.
  */
 export function useNodeExpanded(
-  defaultValue = true
+  defaultValue = false
 ): [boolean, Dispatch<SetStateAction<boolean>>] {
   const [isExpanded, setIsExpanded] = useState(defaultValue);
   const collapseAllSignal = useFlowStore(

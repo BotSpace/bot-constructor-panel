@@ -1,25 +1,23 @@
 import { ReactNode } from "react";
-import { CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { ChevronDown, Delete, LayoutGrid, Trash } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useFlowStore } from "@/features/bot-constructor/store";
+import { ChevronDown, LayoutGrid } from "lucide-react";
 
 interface NodeHeaderProps {
-  /** Node'ning asosiy ikonasi */
+  /** Node icon (Lucide component or emoji) */
   icon: ReactNode;
-  /** Node'ning nomi (sarlavhasi) */
+  /** Node title */
   title: string;
-  /** Node ID (ixtiyoriy) */
+  /** Node ID (optional, unused but kept for API compat) */
   nodeId?: string;
-  /** Color class (ixtiyoriy) */
-  /** Tugmalar sonini ko'rsatish uchun (ixtiyoriy) */
+  /** Number of keyboard buttons configured */
   buttonCount?: number;
-  /** Node yig'ilgan (collapsed) holatidami? */
+  /** Whether node body is collapsed */
   isCollapsed?: boolean;
-  /** Sarlavha bosilganda chaqiriladigan funksiya */
+  /** Called when header is clicked */
   onToggleCollapse?: () => void;
+  /** Tailwind bg class for the icon square, e.g. "bg-sky-500" */
+  color?: string;
 }
 
 export const NodeHeader = ({
@@ -28,38 +26,54 @@ export const NodeHeader = ({
   buttonCount = 0,
   isCollapsed = false,
   onToggleCollapse,
+  color = "bg-sky-500",
 }: NodeHeaderProps) => {
-  const deleteSelectedElement = useFlowStore((state) => state.deleteSelectedElements);
-
   return (
-    <CardHeader onClick={onToggleCollapse}>
+    <div
+      onClick={onToggleCollapse}
+      className="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer select-none hover:bg-muted/40 transition-colors rounded-t-[inherit]"
+      role="button"
+    >
+      {/* N8n-style colored icon box */}
       <div
-        className="h flex flex-row items-center justify-between p-3 cursor-pointer hover:bg-secondary rounded-md transition-colors"
-        role="button"
+        className={cn(
+          "w-7 h-7 rounded-md flex items-center justify-center shrink-0",
+          "[&_svg]:w-4 [&_svg]:h-4 [&_svg]:text-white [&_svg]:stroke-white",
+          color
+        )}
       >
-        <CardTitle className="flex items-center gap-2 text-base font-semibold">
-          {icon}
-          {title}
-        </CardTitle>
-
-        <div className="flex items-center gap-2">
-          {buttonCount > 0 && (
-            <Badge variant="secondary" className="font-normal">
-              <LayoutGrid className="w-3 h-3 mr-1" />
-              {buttonCount}
-            </Badge>
-          )}
-
-          {onToggleCollapse && (
-            <ChevronDown
-              className={cn(
-                "w-4 h-4 transition-transform",
-                isCollapsed && "transform -rotate-90"
-              )}
-            />
-          )}
-        </div>
+        {typeof icon === "string" ? (
+          <span className="text-sm leading-none">{icon}</span>
+        ) : (
+          icon
+        )}
       </div>
-    </CardHeader>
+
+      {/* Title */}
+      <span className="flex-1 text-sm font-medium leading-none truncate">
+        {title}
+      </span>
+
+      {/* Right: button count badge + collapse chevron */}
+      <div className="flex items-center gap-1.5 shrink-0">
+        {buttonCount > 0 && (
+          <Badge
+            variant="secondary"
+            className="h-4 px-1.5 text-[10px] font-normal gap-0.5"
+          >
+            <LayoutGrid className="w-2.5 h-2.5" />
+            {buttonCount}
+          </Badge>
+        )}
+        {onToggleCollapse && (
+          <ChevronDown
+            className={cn(
+              "w-3.5 h-3.5 text-muted-foreground transition-transform duration-200",
+              isCollapsed && "-rotate-90"
+            )}
+          />
+        )}
+      </div>
+    </div>
   );
 };
