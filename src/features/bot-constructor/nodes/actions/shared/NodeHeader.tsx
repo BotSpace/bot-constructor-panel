@@ -26,7 +26,7 @@ export const NodeHeader = ({
   buttonCount = 0,
   isCollapsed = false,
   onToggleCollapse,
-  color = "bg-sky-500",
+  color = "bg-zinc-600",
 }: NodeHeaderProps) => {
   return (
     <div
@@ -34,10 +34,10 @@ export const NodeHeader = ({
       className="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer select-none hover:bg-muted/40 transition-colors rounded-t-[inherit]"
       role="button"
     >
-      {/* N8n-style colored icon box */}
+      {/* N8n-style colored icon box — color overridden per node type via CSS */}
       <div
         className={cn(
-          "w-7 h-7 rounded-md flex items-center justify-center shrink-0",
+          "node-icon-box w-7 h-7 rounded-md flex items-center justify-center shrink-0",
           "[&_svg]:w-4 [&_svg]:h-4 [&_svg]:text-white [&_svg]:stroke-white",
           color
         )}

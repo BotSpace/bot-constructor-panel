@@ -70,6 +70,88 @@
   background: hsl(var(--muted) / 0.3);
 }
 
+/* ── Per-node-type icon box colors (muted, professional) ─────────────────
+   Uses .node-icon-box class set in NodeHeader / TriggerHeader.
+   Colors are 700-level (dark) to avoid eye strain — n8n style.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Triggers — amber-700 */
+.react-flow__node-CommandTriggerNode .node-icon-box,
+.react-flow__node-MessageTriggerNode .node-icon-box,
+.react-flow__node-CronTriggerNode .node-icon-box {
+  background-color: #b45309 !important;
+}
+
+/* Send text & media — blue-700 */
+.react-flow__node-SendTextMessageNode .node-icon-box,
+.react-flow__node-SendPhotoNode .node-icon-box,
+.react-flow__node-SendVideoNode .node-icon-box,
+.react-flow__node-SendAudioNode .node-icon-box,
+.react-flow__node-SendFileNode .node-icon-box,
+.react-flow__node-SendAnimationNode .node-icon-box,
+.react-flow__node-SendVoiceNode .node-icon-box,
+.react-flow__node-SendVideoNoteNode .node-icon-box {
+  background-color: #1d4ed8 !important;
+}
+
+/* Send other (location, contact, poll, sticker, etc.) — sky-700 */
+.react-flow__node-SendLocationNode .node-icon-box,
+.react-flow__node-SendContactNode .node-icon-box,
+.react-flow__node-SendPollNode .node-icon-box,
+.react-flow__node-SendStickerNode .node-icon-box,
+.react-flow__node-SendMediaGroupNode .node-icon-box,
+.react-flow__node-SendDiceNode .node-icon-box {
+  background-color: #0369a1 !important;
+}
+
+/* Message operations (edit, delete, forward, pin…) — slate-600 */
+.react-flow__node-EditMessageNode .node-icon-box,
+.react-flow__node-EditOrSendMessageNode .node-icon-box,
+.react-flow__node-ForwardMessageNode .node-icon-box,
+.react-flow__node-CopyMessageNode .node-icon-box,
+.react-flow__node-PinMessageNode .node-icon-box,
+.react-flow__node-UnpinMessageNode .node-icon-box,
+.react-flow__node-DeleteMessageNode .node-icon-box,
+.react-flow__node-ChatActionNode .node-icon-box,
+.react-flow__node-DownloadFileNode .node-icon-box,
+.react-flow__node-SendToAdminNode .node-icon-box {
+  background-color: #475569 !important;
+}
+
+/* Flow control (if / else / loop / delay / random) — violet-700 */
+.react-flow__node-IfConditionNode .node-icon-box,
+.react-flow__node-ElseIfNode .node-icon-box,
+.react-flow__node-ElseNode .node-icon-box,
+.react-flow__node-DelayNode .node-icon-box,
+.react-flow__node-RandomNode .node-icon-box,
+.react-flow__node-ForLoopNode .node-icon-box,
+.react-flow__node-ForLoopContinueNode .node-icon-box,
+.react-flow__node-CheckMembershipNode .node-icon-box,
+.react-flow__node-FormNode .node-icon-box {
+  background-color: #6d28d9 !important;
+}
+
+/* Data / state / variable — teal-700 */
+.react-flow__node-StateNode .node-icon-box,
+.react-flow__node-VariableNode .node-icon-box,
+.react-flow__node-CollectionNode .node-icon-box,
+.react-flow__node-LoadCollectionItemNode .node-icon-box {
+  background-color: #0f766e !important;
+}
+
+/* Integration (HTTP, subflow, callback) — emerald-700 */
+.react-flow__node-HTTPRequestNode .node-icon-box,
+.react-flow__node-SubFlowNode .node-icon-box,
+.react-flow__node-SubFlowExitNode .node-icon-box,
+.react-flow__node-CallbackQueryAnswerNode .node-icon-box {
+  background-color: #047857 !important;
+}
+
+/* Code — zinc-600 (neutral, developer feel) */
+.react-flow__node-CustomCodeNode .node-icon-box {
+  background-color: #52525b !important;
+}
+
 body,
 * {
   scroll-behavior: smooth;
