@@ -1,7 +1,11 @@
 import React from "react";
 import { Handle, Position } from "reactflow";
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 
 export function ElseMessageSource() {
+  const inPanel = useIsInNodePanel();
+  if (inPanel) return null;
+
   return (
     <Handle
       type="source"

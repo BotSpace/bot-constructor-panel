@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from './components/button'
-import { Bot, Database, Key, Keyboard, MoreHorizontal, Plus, Search } from 'lucide-react'
+import { Bot, Database, Key, Keyboard, MoreHorizontal, Search } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -31,6 +31,8 @@ import {
 interface Props {
     aiPanelOpen?: boolean;
     onToggleAI?: () => void;
+    addNodeOpen?: boolean;
+    onAddNodeOpenChange?: (open: boolean) => void;
 }
 
 // Card horizontal padding (card p-2 + CardContent p-2, both sides) = 32px
@@ -40,13 +42,19 @@ interface Props {
 const FIXED_W = 227
 const SLOT = 48
 const MORE_W = 48
-const ALL_COUNT = 7
+const ALL_COUNT = 6
 
-function BottomPanel({ aiPanelOpen, onToggleAI }: Props) {
+function BottomPanel({ aiPanelOpen, onToggleAI, addNodeOpen, onAddNodeOpenChange }: Props) {
     const { isOpen, height, toggle } = debugConsoleStore()
     const { toggleSearchPanel } = useSearchStore()
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false)
     const [shortcutsOpen, setShortcutsOpen] = useState(false)
+    // Sync external open state (from top bar button)
+    const effectiveNodeDialogOpen = addNodeOpen ?? nodeDialogOpen
+    const setEffectiveNodeDialogOpen = (v: boolean) => {
+        setNodeDialogOpen(v)
+        onAddNodeOpenChange?.(v)
+    }
     const [envManageOpen, setEnvManageOpen] = useState(false)
     const [collectionOpen, setCollectionOpen] = useState(false)
     const { addNode } = useFlowStore()
@@ -134,20 +142,6 @@ function BottomPanel({ aiPanelOpen, onToggleAI }: Props) {
                 <DropdownMenuItem key="terminal" onClick={toggle}>
                     <SquareCommandIcon className="mr-2 h-4 w-4" />
                     Terminal
-                </DropdownMenuItem>
-            ),
-        },
-        {
-            key: 'add',
-            inline: (
-                <BottomPanelButton onClick={() => setNodeDialogOpen(true)}>
-                    <Plus size={20} />
-                </BottomPanelButton>
-            ),
-            overflow: (
-                <DropdownMenuItem key="add" onClick={() => setNodeDialogOpen(true)}>
-                    <Plus size={16} className="mr-2" />
-                    Node qo'shish
                 </DropdownMenuItem>
             ),
         },
@@ -242,8 +236,8 @@ function BottomPanel({ aiPanelOpen, onToggleAI }: Props) {
             </div>
 
             <NodeSelectionDialog
-                open={nodeDialogOpen}
-                onOpenChange={setNodeDialogOpen}
+                open={effectiveNodeDialogOpen}
+                onOpenChange={setEffectiveNodeDialogOpen}
                 onSelect={handleAddNode}
             />
 

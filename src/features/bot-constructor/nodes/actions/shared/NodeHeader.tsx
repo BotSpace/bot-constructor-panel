@@ -31,6 +31,7 @@ export const NodeHeader = ({
   return (
     <div
       onClick={onToggleCollapse}
+      data-node-header
       className="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer select-none hover:bg-muted/40 transition-colors rounded-t-[inherit]"
       role="button"
     >

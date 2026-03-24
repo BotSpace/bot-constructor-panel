@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { Handle, Position, useEdges, useNodeId, useNodes } from "reactflow";
 import { cn } from "@/lib/utils";
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 
 interface SourceHandlerProps {
   id?: string;
@@ -13,6 +14,7 @@ export function SourceHandles({
   position,
   className,
 }: SourceHandlerProps) {
+  const inPanel = useIsInNodePanel();
   const nodes = useNodes();
   const edges = useEdges();
   const sourceNodeId = useNodeId();
@@ -37,6 +39,8 @@ export function SourceHandles({
     },
     [sourceNode, edges, nodes, sourceNodeId, position]
   );
+
+  if (inPanel) return null;
 
   const pos = getHandlePosition(id);
 

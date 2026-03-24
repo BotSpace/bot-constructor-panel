@@ -51,6 +51,10 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
       set((state) => ({ expandAllSignal: state.expandAllSignal + 1 }));
     },
 
+    // Right-panel editing
+    editingNodeId: null,
+    setEditingNodeId: (id: string | null) => set({ editingNodeId: id }),
+
     // Barcha slice'larni birlashtiramiz
     // Har bir slice'ga (set, get) ni uzatamiz
     ...createFlowSlice(set, get, {} as any),
