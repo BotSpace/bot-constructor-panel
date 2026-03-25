@@ -19,6 +19,10 @@ import { useLinkToParent } from "@/components/common/link-to-parrent";
 import { ReleasePanel } from "@/components/layout/components/relas/relas";
 import { EnvManageDialog } from "@/features/bot-constructor/components/EnvManageDialog/EnvManageDialog";
 import DebugingButtons from "@/components/layout/components/debug/debug";
+import { SaveStatusBadge } from "@/features/bot-constructor/components/save-status-badge";
+import { Separator } from "@/components/ui/separator";
+import { NodeEditPanel } from "@/features/bot-constructor/components/NodeEditPanel";
+import { Plus } from "lucide-react";
 
 function PageInner() {
   const { id }: { id: string } = useParams();
@@ -26,9 +30,11 @@ function PageInner() {
   const initialPrompt = searchParams.get("prompt") ?? undefined;
   const { loadProject, project } = useProjectStore();
   const { loadCollections } = useCollectionStore();
-  const [aiOpen, setAiOpen] = useState(true);
+  // AI panel closed by default — n8n style
+  const [aiOpen, setAiOpen] = useState(false);
   const [isAiBuilding, setIsAiBuilding] = useState(!!initialPrompt);
   const [envOpen, setEnvOpen] = useState(false);
+  const [addNodeOpen, setAddNodeOpen] = useState(false);
 
   useEffect(() => {
     if (project) {
@@ -45,55 +51,133 @@ function PageInner() {
 
   if (!project) return <ConstructorLoadingSkeletons isMobile={isMobile} />;
 
-  // ── Mobile: faqat AI chat rejimi ──────────────────────────────────────
+  // ── Mobile ─────────────────────────────────────────────────────────────────
   if (isMobile) {
     return <MobileView id={id} initialPrompt={initialPrompt} project={project} />;
   }
 
-  // ── Desktop: to'liq konstruktor ───────────────────────────────────────
+  // ── Desktop ─────────────────────────────────────────────────────────────────
   return (
-    <main className="flex h-screen overflow-hidden bg-background">
-      {/* AI Panel (left) */}
-      <div
-        className={cn(
-          "h-full shrink-0 transition-all duration-200 overflow-hidden",
-          aiOpen ? "w-[420px] border-r border-border" : "w-0 border-0"
-        )}
-      >
-        {aiOpen && (
-          <AgentPanel
-            projectId={id}
-            onCollapse={() => setAiOpen(false)}
-            initialPrompt={initialPrompt}
-            onBuildingChange={setIsAiBuilding}
-          />
-        )}
-      </div>
+    <main className="flex flex-col h-screen overflow-hidden bg-background">
+      {/* ── N8n-style top bar ─────────────────────────────────── */}
+      <N8nTopBar
+        project={project}
+        id={id}
+        aiOpen={aiOpen}
+        onToggleAI={() => setAiOpen((v) => !v)}
+        onAddNode={() => setAddNodeOpen(true)}
+      />
 
-      {/* Canvas (right) */}
-      <div className="flex-1 flex flex-col overflow-hidden relative min-w-0">
-        <ReactFlowProvider>
-          <Constructor />
-          <SearchPanel />
-          <DebugConsole />
-          <BottomPanel aiPanelOpen={aiOpen} onToggleAI={() => setAiOpen(v => !v)} />
-        </ReactFlowProvider>
+      {/* ── Content row ────────────────────────────────────────── */}
+      <div className="flex flex-1 overflow-hidden min-h-0">
+        {/* AI Panel (left) */}
+        <div
+          className={cn(
+            "h-full shrink-0 transition-all duration-200 overflow-hidden",
+            aiOpen ? "w-[400px] border-r border-border" : "w-0 border-0"
+          )}
+        >
+          {aiOpen && (
+            <AgentPanel
+              projectId={id}
+              onCollapse={() => setAiOpen(false)}
+              initialPrompt={initialPrompt}
+              onBuildingChange={setIsAiBuilding}
+            />
+          )}
+        </div>
 
-        {isAiBuilding && <AiBuildingOverlay />}
+        {/* Canvas */}
+        <div className="flex-1 flex flex-col overflow-hidden relative min-w-0">
+          <ReactFlowProvider>
+            <Constructor />
+            <SearchPanel />
+            <DebugConsole />
+            <BottomPanel
+              aiPanelOpen={aiOpen}
+              onToggleAI={() => setAiOpen((v) => !v)}
+              addNodeOpen={addNodeOpen}
+              onAddNodeOpenChange={setAddNodeOpen}
+            />
+          </ReactFlowProvider>
 
-        {!aiOpen && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="absolute top-3 left-3 z-20 gap-1.5 h-8 shadow-sm"
-            onClick={() => setAiOpen(true)}
-          >
-            <Sparkles className="h-3.5 w-3.5 text-primary" />
-            <span className="text-xs">AI</span>
-          </Button>
-        )}
+          {isAiBuilding && <AiBuildingOverlay />}
+        </div>
+
+        {/* Node edit panel (right) */}
+        <NodeEditPanel />
       </div>
     </main>
+  );
+}
+
+// ── N8n-style top bar ─────────────────────────────────────────────────────────
+function N8nTopBar({
+  project,
+  id,
+  aiOpen,
+  onToggleAI,
+  onAddNode,
+}: {
+  project: { name: string };
+  id: string;
+  aiOpen: boolean;
+  onToggleAI: () => void;
+  onAddNode: () => void;
+}) {
+  const { handleClick: backToHome } = useLinkToParent({ href: `/bot/${id}` });
+
+  return (
+    <div className="h-11 shrink-0 flex items-center gap-2 px-3 border-b border-border bg-background z-10">
+      {/* Back */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 shrink-0"
+        onClick={backToHome}
+        title="Orqaga"
+      >
+        <ArrowLeft className="h-4 w-4" />
+      </Button>
+
+      <Separator orientation="vertical" className="h-5 mx-0.5" />
+
+      {/* Project name */}
+      <span className="text-sm font-semibold truncate max-w-[220px]">
+        {project.name}
+      </span>
+
+      {/* Save status */}
+      <SaveStatusBadge />
+
+      <div className="flex-1" />
+
+      {/* Add node — n8n style */}
+      <Button
+        variant="default"
+        size="sm"
+        className="h-8 gap-1.5 text-xs"
+        onClick={onAddNode}
+        title="Node qo'shish (Ctrl+N)"
+      >
+        <Plus className="h-3.5 w-3.5" />
+        Node qo'shish
+      </Button>
+
+      <Separator orientation="vertical" className="h-5 mx-0.5" />
+
+      {/* AI toggle */}
+      <Button
+        variant={aiOpen ? "secondary" : "ghost"}
+        size="sm"
+        className="h-8 gap-1.5 text-xs"
+        onClick={onToggleAI}
+        title={aiOpen ? "AI panelni yopish" : "AI panelni ochish"}
+      >
+        <Sparkles className={cn("h-3.5 w-3.5", aiOpen && "text-primary")} />
+        AI
+      </Button>
+    </div>
   );
 }
 
@@ -117,18 +201,13 @@ function MobileView({
     >
       {/* ── Top bar ── */}
       <div className="shrink-0 flex items-center gap-2 px-3 py-2 border-b border-border bg-background">
-        {/* Back */}
         <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={backToHome}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-
-        {/* Project name */}
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold truncate">{project.name}</p>
           <p className="text-[10px] text-muted-foreground leading-none">AI rejimi</p>
         </div>
-
-        {/* Env */}
         <Button
           variant="ghost"
           size="icon"
@@ -148,7 +227,7 @@ function MobileView({
         </div>
       </div>
 
-      {/* ── AI Chat (full remaining height) ── */}
+      {/* ── AI Chat ── */}
       <div className="flex-1 overflow-hidden">
         <AgentPanel
           projectId={id}
@@ -158,12 +237,7 @@ function MobileView({
         />
       </div>
 
-      {/* Env vars dialog */}
-      <EnvManageDialog
-        open={envOpen}
-        onOpenChange={setEnvOpen}
-        projectId={id}
-      />
+      <EnvManageDialog open={envOpen} onOpenChange={setEnvOpen} projectId={id} />
     </div>
   );
 }
@@ -176,7 +250,7 @@ export default function Page() {
   );
 }
 
-// Skeleton node positions (simulate a real-looking flow)
+// ── AI building overlay ───────────────────────────────────────────────────────
 const SKELETON_NODES = [
   { w: 200, h: 72,  top: "18%", left: "32%" },
   { w: 220, h: 88,  top: "42%", left: "20%" },
@@ -226,9 +300,12 @@ function AiBuildingOverlay() {
         <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
         <span className="text-xs font-medium text-muted-foreground">AI bot quryapti...</span>
         <span className="flex gap-0.5">
-          {[0, 150, 300].map(d => (
-            <span key={d} className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce"
-              style={{ animationDelay: `${d}ms` }} />
+          {[0, 150, 300].map((d) => (
+            <span
+              key={d}
+              className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce"
+              style={{ animationDelay: `${d}ms` }}
+            />
           ))}
         </span>
       </div>
@@ -236,6 +313,7 @@ function AiBuildingOverlay() {
   );
 }
 
+// ── Loading skeletons ─────────────────────────────────────────────────────────
 function ConstructorLoadingSkeletons({ isMobile }: { isMobile: boolean }) {
   if (isMobile) {
     return (
@@ -259,12 +337,15 @@ function ConstructorLoadingSkeletons({ isMobile }: { isMobile: boolean }) {
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="w-[420px] border-r p-4 flex flex-col gap-3">
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-[60%] w-full" />
-        <Skeleton className="h-12 w-full mt-auto" />
+    <div className="flex flex-col h-screen">
+      {/* Top bar skeleton */}
+      <div className="h-11 border-b flex items-center gap-2 px-3">
+        <Skeleton className="h-8 w-8 rounded-md" />
+        <Skeleton className="h-4 w-40" />
+        <div className="flex-1" />
+        <Skeleton className="h-8 w-16 rounded-md" />
       </div>
+      {/* Canvas skeleton */}
       <div className="flex-1 grid grid-cols-12 grid-rows-12 gap-4 p-4">
         <Skeleton className="col-span-3 row-span-4 col-start-3 row-start-3" />
         <Skeleton className="col-span-3 col-start-4 row-start-8" />

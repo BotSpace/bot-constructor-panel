@@ -1,64 +1,58 @@
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { useFlowStore } from "../store";
+import { useIsInNodePanel } from "../contexts/NodePanelContext";
 
 /**
- * Hook that manages node collapsed state with global collapse/expand support.
- * Replaces `useState(false)` for isCollapsed in node components.
- * Listens to global collapseAllSignal and expandAllSignal from the store.
+ * Canvas mode  → always returns [true, noop]  (node stays compact)
+ * Panel mode   → returns [false, setter]       (node starts expanded)
+ * Global collapseAll / expandAll signals still work inside the panel.
  */
 export function useNodeCollapsed(
-  defaultValue = false
+  _defaultValue = true
 ): [boolean, Dispatch<SetStateAction<boolean>>] {
-  const [isCollapsed, setIsCollapsed] = useState(defaultValue);
-  const collapseAllSignal = useFlowStore(
-    (state) => state.collapseAllSignal
-  );
-  const expandAllSignal = useFlowStore(
-    (state) => state.expandAllSignal
-  );
+  const inPanel = useIsInNodePanel();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const collapseAllSignal = useFlowStore((state) => state.collapseAllSignal);
+  const expandAllSignal = useFlowStore((state) => state.expandAllSignal);
 
   useEffect(() => {
-    if (collapseAllSignal > 0) {
-      setIsCollapsed(true);
-    }
+    if (collapseAllSignal > 0) setIsCollapsed(true);
   }, [collapseAllSignal]);
 
   useEffect(() => {
-    if (expandAllSignal > 0) {
-      setIsCollapsed(false);
-    }
+    if (expandAllSignal > 0) setIsCollapsed(false);
   }, [expandAllSignal]);
+
+  // On canvas: node is always compact — toggle does nothing
+  if (!inPanel) return [true, () => {}];
 
   return [isCollapsed, setIsCollapsed];
 }
 
 /**
- * Hook that manages node expanded state with global collapse/expand support.
- * Replaces `useState(true)` for isExpanded in node components.
- * Listens to global collapseAllSignal and expandAllSignal from the store.
+ * Canvas mode  → always returns [false, noop]  (node stays compact)
+ * Panel mode   → returns [true, setter]         (node starts expanded)
  */
 export function useNodeExpanded(
-  defaultValue = true
+  _defaultValue = false
 ): [boolean, Dispatch<SetStateAction<boolean>>] {
-  const [isExpanded, setIsExpanded] = useState(defaultValue);
-  const collapseAllSignal = useFlowStore(
-    (state) => state.collapseAllSignal
-  );
-  const expandAllSignal = useFlowStore(
-    (state) => state.expandAllSignal
-  );
+  const inPanel = useIsInNodePanel();
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const collapseAllSignal = useFlowStore((state) => state.collapseAllSignal);
+  const expandAllSignal = useFlowStore((state) => state.expandAllSignal);
 
   useEffect(() => {
-    if (collapseAllSignal > 0) {
-      setIsExpanded(false);
-    }
+    if (collapseAllSignal > 0) setIsExpanded(false);
   }, [collapseAllSignal]);
 
   useEffect(() => {
-    if (expandAllSignal > 0) {
-      setIsExpanded(true);
-    }
+    if (expandAllSignal > 0) setIsExpanded(true);
   }, [expandAllSignal]);
+
+  // On canvas: always compact
+  if (!inPanel) return [false, () => {}];
 
   return [isExpanded, setIsExpanded];
 }

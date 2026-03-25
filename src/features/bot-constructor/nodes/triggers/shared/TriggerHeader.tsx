@@ -1,89 +1,93 @@
-// React va kerakli tiplarni import qilamiz
 import React, { useMemo, ReactNode } from "react";
-import { CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Settings, ChevronDown, Trash } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { ConstructorData } from "@/features/bot-constructor/data";
-import { useFlowStore } from "@/features/bot-constructor/store";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface TriggerHeaderProps {
-  /** Trigger'ning ikonasi (React komponenti yoki emoji) */
+  /** Trigger icon (React component or emoji string) */
   icon?: ReactNode;
-  /** Trigger'ning sarlavhasi */
+  /** Trigger title */
   title?: string;
-  /** Node yig'ilgan (collapsed) holatidami? */
+  /** Whether the body is expanded */
   isExpanded?: boolean;
-  /** Node sozlangan holatidami? */
+  /** Whether the trigger is fully configured */
   isConfigured?: boolean;
-  /** MessageTrigger uchun xabar turi (badge ko'rsatish uchun) */
+  /** MessageTrigger data type for badge */
   dataType?: string;
-  /** Sarlavha bosilganda chaqiriladigan funksiya */
+  /** Called when header is clicked */
   onToggle?: () => void;
 }
 
-// Komponentni export qilamiz
 export const TriggerHeader = ({
-  icon = <Settings className="h-4 w-4 text-blue-400 flex-shrink-0" />,
+  icon,
   title = "Trigger",
-  isExpanded = true,
+  isExpanded = false,
   isConfigured = false,
   dataType,
   onToggle,
 }: TriggerHeaderProps) => {
-  // Sarlavhadagi badge uchun kerakli ma'lumotlarni hisoblaymiz (faqat MessageTrigger uchun)
   const selectedTypeData = useMemo(() => {
     if (!dataType) return null;
-    return ConstructorData.MessageTypes.find((type) => type.value === dataType);
+    return ConstructorData.MessageTypes.find((t) => t.value === dataType);
   }, [dataType]);
 
   const TypeIcon = selectedTypeData?.icon;
 
-  const deleteSelectedElement = useFlowStore((state) => state.deleteSelectedElements);
-
-  // Icon'ni render qilish - agar string bo'lsa, emoji sifatida ko'rsatamiz
   const renderIcon = () => {
+    if (!icon) return null;
     if (typeof icon === "string") {
-      return <span className="text-lg flex-shrink-0">{icon}</span>;
+      return <span className="text-sm leading-none">{icon}</span>;
     }
     return icon;
   };
 
   return (
-    <CardHeader>
-      <div
-        onClick={onToggle}
-        className="text-sm flex items-center justify-between cursor-pointer group rounded-lg p-2 -m-2 hover:bg-gray-700/50"
-      >
-        <div className="flex items-center gap-2 flex-1">
-          {renderIcon()}
-          <span className="font-medium text-gray-200 truncate">{title}</span>
-
-          {TypeIcon && (
-            <Badge variant="secondary" className="border-gray-600/50">
-              <TypeIcon className="h-3 w-3 mr-1" />
-              {selectedTypeData.label}
-            </Badge>
-          )}
-        </div>
-        <div className="flex items-center gap-2 ml-2">
-
-          <div
-            className={`w-2 h-2 rounded-full transition-all ${isConfigured
-              ? "bg-green-500 shadow-sm shadow-green-500/50"
-              : "bg-gray-600"
-              }`}
-            title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
-          />
-          {onToggle && (
-            <ChevronDown
-              className={`h-4 w-4 text-gray-400 transform transition-transform duration-200 ${isExpanded ? "rotate-0" : "-rotate-90"
-                }`}
-            />
-          )}
-        </div>
+    <div
+      onClick={onToggle}
+      data-node-header
+      className="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer select-none hover:bg-muted/40 transition-colors rounded-t-[inherit]"
+      role="button"
+    >
+      {/* N8n-style trigger icon box — amber-700 via CSS */}
+      <div className="node-icon-box w-7 h-7 rounded-md flex items-center justify-center shrink-0 bg-amber-700 [&_svg]:w-4 [&_svg]:h-4 [&_svg]:text-white [&_svg]:stroke-white">
+        {renderIcon()}
       </div>
-    </CardHeader>
+
+      {/* Title + optional type sub-label */}
+      <div className="flex-1 min-w-0">
+        <span className="text-sm font-medium leading-none block truncate">
+          {title}
+        </span>
+        {TypeIcon && (
+          <div className="flex items-center gap-1 mt-0.5">
+            <TypeIcon className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
+            <span className="text-[10px] text-muted-foreground truncate">
+              {selectedTypeData?.label}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Config status dot + chevron */}
+      <div className="flex items-center gap-1.5 shrink-0">
+        <div
+          className={cn(
+            "w-1.5 h-1.5 rounded-full transition-colors",
+            isConfigured
+              ? "bg-green-500 shadow-[0_0_4px_rgba(34,197,94,0.5)]"
+              : "bg-muted-foreground/30"
+          )}
+          title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
+        />
+        {onToggle && (
+          <ChevronDown
+            className={cn(
+              "w-3.5 h-3.5 text-muted-foreground transition-transform duration-200",
+              !isExpanded && "-rotate-90"
+            )}
+          />
+        )}
+      </div>
+    </div>
   );
 };

@@ -61,8 +61,11 @@ export interface FlowStoreState
   countdownDuration: number; // Sanoq umumiy vaqti (millisekundlarda)
   startCountdown: () => void;
   stopCountdown: () => void;
-  collapseAllSignal: number; // Barcha nodelarni collapse qilish signali (counter)
-  collapseAllNodes: () => void; // Barcha nodelarni collapse qilish
-  expandAllSignal: number; // Barcha nodelarni expand qilish signali (counter)
-  expandAllNodes: () => void; // Barcha nodelarni expand qilish
+  collapseAllSignal: number;
+  collapseAllNodes: () => void;
+  expandAllSignal: number;
+  expandAllNodes: () => void;
+  // Right-panel editing
+  editingNodeId: string | null;
+  setEditingNodeId: (id: string | null) => void;
 }
