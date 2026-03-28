@@ -85,7 +85,7 @@ const ChatActionNodeInternal = ({
         </CardContent>
       )}
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

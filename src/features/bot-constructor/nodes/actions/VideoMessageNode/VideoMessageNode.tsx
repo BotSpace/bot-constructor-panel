@@ -39,6 +39,7 @@ import { ActionPanel } from "../../components/shared/ActionPanel";
 import TextArea from "../shared/text-area";
 import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
+import { NodeTextPreview } from "../../components/shared/NodeTextPreview";
 
 const SendVideoNodeComponent = ({
   id,
@@ -125,7 +126,7 @@ const SendVideoNodeComponent = ({
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
-
+      <NodeTextPreview text={data.caption} placeholder="Caption yozilmagan..." />
       {!isCollapsed && (
         <>
           <CardContent className="p-4 pt-0 flex flex-col gap-5">
@@ -265,7 +266,7 @@ const SendVideoNodeComponent = ({
       {/* Handler list */}
       <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

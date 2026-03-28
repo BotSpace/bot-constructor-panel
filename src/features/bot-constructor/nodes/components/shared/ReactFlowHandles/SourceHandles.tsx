@@ -1,23 +1,26 @@
 import React, { useCallback, useMemo } from "react";
-import { Handle, Position, useEdges, useNodeId, useNodes } from "reactflow";
+import { Handle, Position } from "reactflow";
 import { cn } from "@/lib/utils";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
+import { useFlowStore } from "@/features/bot-constructor/store";
 
 interface SourceHandlerProps {
   id?: string;
   position?: Position;
   className?: string;
+  nodeId?: string;
 }
 
 export function SourceHandles({
   id = "source-handler",
   position,
   className,
+  nodeId,
 }: SourceHandlerProps) {
   const inPanel = useIsInNodePanel();
-  const nodes = useNodes();
-  const edges = useEdges();
-  const sourceNodeId = useNodeId();
+  const nodes = useFlowStore((state) => state.nodes);
+  const edges = useFlowStore((state) => state.edges);
+  const sourceNodeId = nodeId;
 
   const sourceNode = useMemo(
     () => nodes.find((n) => n.id === sourceNodeId),
@@ -50,7 +53,7 @@ export function SourceHandles({
       position={pos}
       id={id}
       className={cn(
-        "!w-3 !h-3 !rounded-full !bg-zinc-400/60 !border-2 !border-background",
+        "!w-4 !h-4 !rounded-full !bg-zinc-400/60 !border-2 !border-background",
         "hover:!bg-blue-600 hover:!border-blue-400 hover:!scale-125 !transition-all !duration-150",
         className
       )}

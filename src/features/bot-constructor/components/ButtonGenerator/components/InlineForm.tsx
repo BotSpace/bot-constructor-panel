@@ -1,50 +1,30 @@
-// FAYL: constructor/components/ButtonGenerator/components/InlineForm.tsx (YANGILANGAN)
+"use client";
+
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { PlusCircle, Database, LayoutGrid } from "lucide-react";
+  PlusCircle,
+  Link,
+  Code2,
+  Globe,
+  LogIn,
+  Search,
+  MessageSquare,
+} from "lucide-react";
 import { ButtonConfig, LoginUrlConfig } from "../types";
 import { WebAppForm } from "./WebAppForm";
 import { LoginUrlForm } from "./LoginUrlForm";
-import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
-import { useCollectionStore } from "@/features/collections/store/collection-list";
-import { useReactQueryAction } from "@/services/react-query";
-import { APIDetailCreateResponse } from "@/types/http/response";
-import { CollectionDetail } from "@/types/http/collection";
-import { Separator } from "@/components/ui/separator";
-import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
-import { Filter } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { useNodes, useEdges } from "reactflow";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import SeparatorWithTitle from "@/components/common/separetor";
-import { Badge } from "@/components/ui/badge";
 import { CollectionButtonForm } from "./CollectionButtonForm";
+import { cn } from "@/lib/utils";
+import { useFlowStore } from "@/features/bot-constructor/store";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
+import { Separator } from "@/components/ui/separator";
 
 interface InlineFormProps {
   onAdd: (button: ButtonConfig) => void;
   disabled: boolean;
-  data?: SendTextMessageNodeData;
   nodeId: string;
 }
 
@@ -56,63 +36,27 @@ type InlineType =
   | "switch_inline_query"
   | "switch_inline_query_current_chat";
 
-const inlineOptions: {
+const inlineTypes: {
   value: InlineType;
   label: string;
+  icon: React.ElementType;
   placeholder?: string;
 }[] = [
-  { value: "callback", label: "Callback Data", placeholder: "buyruq_nomi" },
-  { value: "url", label: "URL (Havola)", placeholder: "https://example.com" },
-  { value: "web_app", label: "Web App" },
-  { value: "login_url", label: "Login URL" },
-  {
-    value: "switch_inline_query",
-    label: "Switch Inline (Global)",
-    placeholder: "qidiruv so`rovi...",
-  },
-  {
-    value: "switch_inline_query_current_chat",
-    label: "Switch Inline (Hozirgi chat)",
-    placeholder: "qidiruv so`rovi...",
-  },
+  { value: "callback", label: "Callback", icon: Code2, placeholder: "buyruq_nomi" },
+  { value: "url", label: "URL", icon: Link, placeholder: "https://example.com" },
+  { value: "web_app", label: "Web App", icon: Globe },
+  { value: "login_url", label: "Login URL", icon: LogIn },
+  { value: "switch_inline_query", label: "Inline (Global)", icon: Search, placeholder: "so'rov..." },
+  { value: "switch_inline_query_current_chat", label: "Inline (Chat)", icon: MessageSquare, placeholder: "so'rov..." },
 ];
 
-// Common buttons configuration (Best Practice: Configuration over Code)
-const commonButtonGroups = [
-  {
-    title: "Navigatsiya",
-    buttons: [
-      { label: "⬅️ Ortga", value: "back", variant: "outline" as const },
-      { label: "Oldinga ➡️", value: "next", variant: "outline" as const },
-      {
-        label: "⏭ O'tkazib yuborish",
-        value: "skip",
-        variant: "outline" as const,
-      },
-    ],
-  },
-  {
-    title: "Tasdiqlash",
-    buttons: [
-      { label: "✅ Tasdiqlash", value: "confirm", variant: "default" as const },
-      {
-        label: "❌ Bekor qilish",
-        value: "cancel",
-        variant: "destructive" as const,
-      },
-    ],
-  },
-  {
-    title: "Menyu",
-    buttons: [
-      {
-        label: "🏠 Bosh menyu",
-        value: "main_menu",
-        variant: "secondary" as const,
-      },
-      { label: "📋 Menyu", value: "menu", variant: "secondary" as const },
-    ],
-  },
+const quickButtons = [
+  { emoji: "⬅️", label: "Ortga", value: "back" },
+  { emoji: "➡️", label: "Oldinga", value: "next" },
+  { emoji: "⏭", label: "O'tkazish", value: "skip" },
+  { emoji: "✅", label: "Tasdiqlash", value: "confirm" },
+  { emoji: "❌", label: "Bekor", value: "cancel" },
+  { emoji: "🏠", label: "Bosh menyu", value: "main_menu" },
 ];
 
 export const InlineForm = ({ onAdd, disabled, nodeId }: InlineFormProps) => {
@@ -122,200 +66,149 @@ export const InlineForm = ({ onAdd, disabled, nodeId }: InlineFormProps) => {
   const [loginConfig, setLoginConfig] = useState<Partial<LoginUrlConfig>>({});
   const [webAppUrl, setWebAppUrl] = useState("");
 
-  // Collection ma'lumotlari
-  const { data: collections } = useCollectionStore();
-  const [selectedCollection, setSelectedCollection] = useState<string>("");
-  const [selectedField, setSelectedField] = useState<string>("");
-  const [filters, setFilters] = useState<Filter[]>([]);
+  const nodes = useFlowStore((s) => s.nodes);
+  const edges = useFlowStore((s) => s.edges);
+  const availableStateKeys = useMemo(
+    () => getAvailableStateKeys(nodes, edges, nodeId),
+    [nodes, edges, nodeId]
+  );
 
-  // Layout settings - pagination uchun
-  const [columns, setColumns] = useState<number>(2);
-  const [rows, setRows] = useState<number>(5);
-  const [enablePagination, setEnablePagination] = useState<boolean>(true);
+  const selectedType = inlineTypes.find((t) => t.value === actionType)!;
 
-  // Collection field'larini olish
-  const { data: collectionFields } = useReactQueryAction<
-    APIDetailCreateResponse<CollectionDetail>
-  >({
-    url: selectedCollection
-      ? `collection/${selectedCollection}/?project=[id]`
-      : "",
-    enabled: !!selectedCollection,
-  });
-
-  // State keys'larni olish (faqat zanjiriga ulangan StateNode va Trigger'lardan)
-  const nodes = useNodes();
-  const edges = useEdges();
-  const availableStateKeys = useMemo(() => {
-    return getAvailableStateKeys(nodes, edges, nodeId);
-  }, [nodes, edges, nodeId]);
-
-  // Collection o'zgarganda filter'larni tozalash
-  const handleCollectionChange = (collectionName: string) => {
-    setSelectedCollection(collectionName);
-    setSelectedField("");
-    setFilters([]);
-    setColumns(2);
-    setRows(5);
-    setEnablePagination(true);
-  };
-
-  const handleAddClick = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text) {
-      alert("Iltimos, tugma matnini kiriting.");
-      return;
-    }
+    if (!text.trim()) return;
 
     const newButton: Partial<ButtonConfig> = {
       id: `btn-${Date.now()}`,
-      text,
+      text: text.trim(),
       type: actionType,
     };
 
-    switch (actionType) {
-      case "login_url":
-        if (!loginConfig.url) {
-          alert("Login URL manzilini kiriting.");
-          return;
-        }
-        newButton.loginUrl = loginConfig as LoginUrlConfig;
-        break;
-      case "web_app":
-        if (!webAppUrl) {
-          alert("Web App URL manzilini kiriting.");
-          return;
-        }
-        newButton.webApp = { url: webAppUrl };
-        break;
-      default:
-        if (!value) {
-          alert("Iltimos, amal uchun qiymat kiriting.");
-          return;
-        }
-        newButton.value = value;
-        break;
+    if (actionType === "login_url") {
+      if (!loginConfig.url) return;
+      newButton.loginUrl = loginConfig as LoginUrlConfig;
+    } else if (actionType === "web_app") {
+      if (!webAppUrl) return;
+      newButton.webApp = { url: webAppUrl };
+    } else {
+      if (!value.trim()) return;
+      newButton.value = value.trim();
     }
 
     onAdd(newButton as ButtonConfig);
-    // Formalarni tozalash
     setText("");
     setValue("");
     setLoginConfig({});
     setWebAppUrl("");
   };
 
-  const selectedOption = inlineOptions.find((opt) => opt.value === actionType);
-
-  // Common buttonlarni qo'shish funksiyasi
-  const handleAddCommonButton = (btnLabel: string, btnValue: string) => {
-    const newButton: ButtonConfig = {
-      id: `btn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Unikal ID
-      text: btnLabel,
+  const addQuickButton = (label: string, val: string) => {
+    onAdd({
+      id: `btn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      text: label,
       type: "callback",
-      value: btnValue,
-    };
-
-    onAdd(newButton);
+      value: val,
+    });
   };
 
   return (
-    <>
-      <form onSubmit={handleAddClick} className="my-4 space-y-4">
-        <div className="grid grid-cols-6 gap-2">
-          <div className="col-span-4 flex flex-col gap-1.5">
-            <Label htmlFor="inline-text">Tugma matni</Label>
-            <Input
-              id="inline-text"
-              placeholder="Masalan, Bizning sayt"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-          </div>
-          <div className="col-span-2 flex flex-col gap-1.5">
-            <Label>Amal turi</Label>
-            <Select
-              value={actionType}
-              onValueChange={(v: InlineType) => setActionType(v)}
+    <div className="space-y-5">
+      {/* Type selector */}
+      <div>
+        <Label className="text-xs text-muted-foreground mb-2 block">Tugma turi</Label>
+        <div className="grid grid-cols-3 gap-1.5">
+          {inlineTypes.map(({ value: v, label, icon: Icon }) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => setActionType(v)}
+              className={cn(
+                "flex flex-col items-center gap-1 rounded-lg border px-2 py-2.5 text-[11px] font-medium transition-all",
+                actionType === v
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground"
+              )}
             >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Amal turini tanlang..." />
-              </SelectTrigger>
-              <SelectContent>
-                {inlineOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+              <Icon className="h-3.5 w-3.5" />
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div>
+          <Label htmlFor="inline-text" className="text-xs mb-1.5 block">Tugma matni</Label>
+          <Input
+            id="inline-text"
+            placeholder="Masalan, Saytimiz"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="h-8 text-sm"
+          />
         </div>
 
-        <div className="animate-in fade-in-50">
+        <div className="animate-in fade-in-50 duration-150">
           {actionType === "login_url" && (
-            <LoginUrlForm
-              config={loginConfig}
-              onConfigChange={setLoginConfig}
-            />
+            <LoginUrlForm config={loginConfig} onConfigChange={setLoginConfig} />
           )}
           {actionType === "web_app" && (
             <WebAppForm url={webAppUrl} onUrlChange={setWebAppUrl} />
           )}
-          {(actionType === "url" ||
-            actionType === "callback" ||
-            actionType.startsWith("switch_")) && (
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="inline-value">{selectedOption?.label}</Label>
+          {actionType !== "login_url" && actionType !== "web_app" && (
+            <div>
+              <Label htmlFor="inline-value" className="text-xs mb-1.5 block">
+                {selectedType.label} qiymati
+              </Label>
               <Input
                 id="inline-value"
-                placeholder={selectedOption?.placeholder}
+                placeholder={selectedType.placeholder}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
+                className="h-8 text-sm"
               />
             </div>
           )}
         </div>
 
-        <Button type="submit" className="w-full" disabled={disabled}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Inline Tugma Qo'shish
+        <Button type="submit" className="w-full h-8 text-sm gap-2" disabled={disabled}>
+          <PlusCircle className="h-3.5 w-3.5" />
+          Inline tugma qo'shish
         </Button>
-
-        <SeparatorWithTitle>Tezkor Tugmalar (Common)</SeparatorWithTitle>
-
-        {/* Common buttons section */}
-        <div className="space-y-3">
-          {commonButtonGroups.map((group, index) => (
-            <div key={index} className="space-y-2">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {group.title}
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {group.buttons.map((btn, btnIndex) => (
-                  <Button
-                    key={btnIndex}
-                    type="button"
-                    onClick={() => handleAddCommonButton(btn.label, btn.value)}
-                    variant={btn.variant}
-                    size="sm"
-                    disabled={disabled}
-                    className="shadow-sm"
-                  >
-                    {btn.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
       </form>
 
+      <Separator />
+
+      {/* Quick buttons */}
+      <div>
+        <p className="text-xs text-muted-foreground mb-2.5 font-medium">Tezkor tugmalar</p>
+        <div className="grid grid-cols-2 gap-1.5">
+          {quickButtons.map((btn) => (
+            <button
+              key={btn.value}
+              type="button"
+              onClick={() => addQuickButton(`${btn.emoji} ${btn.label}`, btn.value)}
+              disabled={disabled}
+              className="flex items-center gap-1.5 rounded-lg border bg-background px-2.5 py-2 text-xs hover:bg-muted transition-colors disabled:opacity-40 text-left"
+            >
+              <span>{btn.emoji}</span>
+              <span className="font-medium">{btn.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Collection buttons */}
       <CollectionButtonForm
         onAdd={onAdd}
         buttonType="inline"
         disabled={disabled}
         nodeId={nodeId}
       />
-    </>
+    </div>
   );
 };

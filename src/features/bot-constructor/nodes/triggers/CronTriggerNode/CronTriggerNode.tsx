@@ -236,7 +236,7 @@ const CronTriggerNodeComponent = ({
         </CardContent>
       )}
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

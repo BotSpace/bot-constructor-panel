@@ -34,7 +34,7 @@ import { APIDetailCreateResponse } from "@/types/http/response";
 import { CollectionDetail } from "@/types/http/collection";
 import { generateId } from "@/lib/utils";
 import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
-import { useNodes, useEdges } from "reactflow";
+import { useFlowStore } from "@/features/bot-constructor/store";
 import { Filter } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 
@@ -52,7 +52,7 @@ export const CollectionButtonForm = ({
   nodeId,
 }: Props) => {
   const { data: collections } = useCollectionStore();
-  const nodes = useNodes();
+  const nodes = useFlowStore((s) => s.nodes);
 
   // --- STATELAR ---
   const [selectedCollection, setSelectedCollection] = useState<string>("");
@@ -73,7 +73,7 @@ export const CollectionButtonForm = ({
   });
 
   // Flow'dagi mavjud o'zgaruvchilarni (faqat zanjiriga ulangan StateNode va Trigger'lar) filtrlar uchun olish
-  const edges = useEdges();
+  const edges = useFlowStore((s) => s.edges);
   const availableStateKeys = useMemo(() => {
     return getAvailableStateKeys(nodes, edges, nodeId);
   }, [nodes, edges, nodeId]);

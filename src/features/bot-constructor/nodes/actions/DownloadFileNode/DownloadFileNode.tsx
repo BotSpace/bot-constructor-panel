@@ -156,7 +156,7 @@ const DownloadFileNodeInternal = ({
         </CardContent>
       )}
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

@@ -17,6 +17,7 @@ import { ParseMode } from "../../../actions/shared/types";
 import { ButtonGenerator, KeyboardConfig } from "@/features/bot-constructor/components";
 import { HandlerAdder } from "../../../actions/shared/HandlerBuilder";
 import { RecipientsManager } from "../../../actions/shared/RecipientSelector";
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 import {
   Settings2,
   Users,
@@ -73,10 +74,69 @@ const DEFAULT_RECIPIENTS = { sendToSender: true, additionalIds: [] };
 export function ActionPanel({ disableNotification, parseMode, protectContent, id, keyboard, recipients, hideHandlers = true }: ActionPanelTypes) {
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const inPanel = useIsInNodePanel();
 
   const handleUpdate = (update: Partial<any>) => {
     updateNodeData(id, update);
   };
+
+  const sections = (
+    <>
+      {recipients !== undefined && (
+        <SectionWrapper
+          icon={Users}
+          title="Qabul qiluvchilar"
+          description="Xabar kimga yuborilishini tanlang"
+        >
+          <RecipientsManager
+            recipients={recipients}
+            onUpdate={handleUpdate}
+          />
+        </SectionWrapper>
+      )}
+
+      {keyboard !== undefined && (
+        <SectionWrapper
+          icon={Keyboard}
+          title="Tugmalar"
+          description="Inline va reply tugmalarni boshqaring"
+        >
+          <ButtonGenerator initialKeyboard={keyboard} node_id={id} />
+        </SectionWrapper>
+      )}
+
+      {!hideHandlers && (
+        <SectionWrapper
+          icon={Workflow}
+          title="Handlerlar"
+          description="Xabarga javob berish qoidalari"
+        >
+          <HandlerAdder sourceNodeId={id} />
+        </SectionWrapper>
+      )}
+
+      <SectionWrapper
+        icon={SlidersHorizontal}
+        title="Qo'shimcha sozlamalar"
+        description="Xabar yuborish parametrlari"
+      >
+        <ActionNodeSettings
+          notificationDisabled={disableNotification}
+          contentProtected={protectContent}
+          parseMode={parseMode}
+          handleUpdate={handleUpdate}
+        />
+      </SectionWrapper>
+    </>
+  );
+
+  if (inPanel) {
+    return (
+      <div className="flex flex-col gap-3 w-full">
+        {sections}
+      </div>
+    );
+  }
 
   return (
     <Drawer direction="right">
@@ -90,7 +150,6 @@ export function ActionPanel({ disableNotification, parseMode, protectContent, id
         </Button>
       </DrawerTrigger>
       <DrawerContent className="h-full">
-        {/* Header */}
         <DrawerHeader className="border-b pb-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -105,64 +164,12 @@ export function ActionPanel({ disableNotification, parseMode, protectContent, id
           </div>
         </DrawerHeader>
 
-        {/* Scrollable content */}
         <ScrollArea className="flex-1 overflow-y-auto">
           <div className="flex flex-col gap-3 p-4">
-
-            {/* Qabul qiluvchilar */}
-            {recipients !== undefined && (
-              <SectionWrapper
-                icon={Users}
-                title="Qabul qiluvchilar"
-                description="Xabar kimga yuborilishini tanlang"
-              >
-                <RecipientsManager
-                  recipients={recipients}
-                  onUpdate={handleUpdate}
-                />
-              </SectionWrapper>
-            )}
-
-            {/* Tugmalar */}
-            {keyboard !== undefined && (
-              <SectionWrapper
-                icon={Keyboard}
-                title="Tugmalar"
-                description="Inline va reply tugmalarni boshqaring"
-              >
-                <ButtonGenerator initialKeyboard={keyboard} node_id={id} />
-              </SectionWrapper>
-            )}
-
-            {/* Handler builder */}
-            {!hideHandlers && (
-              <SectionWrapper
-                icon={Workflow}
-                title="Handlerlar"
-                description="Xabarga javob berish qoidalari"
-              >
-                <HandlerAdder sourceNodeId={id} />
-              </SectionWrapper>
-            )}
-
-            {/* Sozlamalar */}
-            <SectionWrapper
-              icon={SlidersHorizontal}
-              title="Qo'shimcha sozlamalar"
-              description="Xabar yuborish parametrlari"
-            >
-              <ActionNodeSettings
-                notificationDisabled={disableNotification}
-                contentProtected={protectContent}
-                parseMode={parseMode}
-                handleUpdate={handleUpdate}
-              />
-            </SectionWrapper>
-
+            {sections}
           </div>
         </ScrollArea>
 
-        {/* Footer */}
         <DrawerFooter className="border-t pt-4">
           <DrawerClose asChild>
             <Button className="w-full gap-2" variant="outline">
@@ -173,5 +180,5 @@ export function ActionPanel({ disableNotification, parseMode, protectContent, id
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }

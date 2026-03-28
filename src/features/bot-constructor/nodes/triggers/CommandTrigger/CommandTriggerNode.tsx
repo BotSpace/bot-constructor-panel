@@ -104,7 +104,7 @@ const CommandTriggerNodeComponent = ({
         </CardContent>
       )}
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

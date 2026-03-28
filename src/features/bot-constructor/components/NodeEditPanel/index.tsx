@@ -131,6 +131,7 @@ export function NodeEditPanel() {
             {NodeComponent ? (
               <NodePanelProvider>
                 <NodeComponent
+                  key={editingNodeId}
                   id={editingNodeId!}
                   data={editingNode!.data}
                   selected={false}

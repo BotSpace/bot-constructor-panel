@@ -155,7 +155,7 @@ export function FormNode({ data, id, selected }: NodeProps<FormNodeData>) {
           onClose={() => setEditingItem(null)}
         />
 
-        <SourceHandles />
+        <SourceHandles nodeId={id} />
       </CardContent>
     </Card>
   );

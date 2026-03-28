@@ -18,7 +18,7 @@ const AnimationNodeComponent = ({ id, selected }: NodeProps) => {
         <ComingSoonNodeContent node_description="GIF yoki MP4 animation yuboradi" />
       </CardContent>
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

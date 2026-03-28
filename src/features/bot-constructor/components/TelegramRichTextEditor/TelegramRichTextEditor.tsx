@@ -3,7 +3,8 @@
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
-import { useState, useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 import {
     Bold,
     Italic,
@@ -16,8 +17,6 @@ import {
     X,
 } from "lucide-react";
 import {
-    Dialog,
-    DialogContent,
     DialogHeader,
     DialogTitle,
     DialogDescription,
@@ -242,6 +241,54 @@ function EditorToolbar({
     );
 }
 
+function InlineEditorContent({ defaultValue, onChange }: {
+    defaultValue: string;
+    onChange?: (value: string) => void;
+}) {
+    const onChangeRef = useRef(onChange);
+    onChangeRef.current = onChange;
+
+    const editor = useEditor({
+        immediatelyRender: false,
+        extensions: [
+            StarterKit.configure({
+                heading: false,
+                horizontalRule: false,
+                bulletList: false,
+                orderedList: false,
+                listItem: false,
+            }),
+            Underline,
+        ],
+        content: defaultValue?.replace(/\n/g, "<br>") || "",
+        onUpdate: ({ editor }) => {
+            let html_content = editor.getHTML();
+            html_content = html_content.replace(/<\/p><p>/g, "\n");
+            html_content = html_content.replace(/<\/?p>/g, "");
+            onChangeRef.current?.(html_content);
+        },
+        editorProps: {
+            attributes: {
+                class: "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[120px] px-3 py-2 text-sm leading-relaxed",
+            },
+        },
+    });
+
+    return (
+        <div className="tg-editor rounded-lg border border-border/60 bg-background overflow-hidden shadow-sm">
+            <div className="border-b border-border/40 bg-muted/20">
+                <EditorToolbar editor={editor} />
+            </div>
+            <div className="relative">
+                <EditorContent editor={editor} />
+                <div className="absolute bottom-2 right-3 text-[10px] text-muted-foreground/60 font-mono tabular-nums">
+                    {editor?.getText().length ?? 0} belgi
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function LazyEditorContent({ defaultValue, onChange, onClose }: {
     defaultValue: string;
     onChange?: (value: string) => void;
@@ -339,29 +386,27 @@ function LazyEditorContent({ defaultValue, onChange, onClose }: {
 }
 
 export default function TelegramRichTextEditor({ defaultValue, onChange }: { defaultValue?: string, onChange?: (value: string) => void }) {
-    const [open, setOpen] = useState(false);
+    const inPanel = useIsInNodePanel();
 
-    return (
-        <>
-            <div
-                onClick={() => setOpen(true)}
-                className="text-editor-content bg-background p-3 rounded-sm border-2 cursor-text min-h-[60px]"
-                dangerouslySetInnerHTML={{ __html: defaultValue?.replace(/\n/g, "<br>") || "" }}
+    // Sidebar'da inline editor ko'rsatish
+    if (inPanel) {
+        return (
+            <InlineEditorContent
+                defaultValue={defaultValue || ""}
+                onChange={onChange}
             />
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent
-                    showCloseButton={false}
-                    className="sm:max-w-[560px] p-0 gap-0 overflow-hidden rounded-xl border-border/50 shadow-2xl"
-                >
-                    {open && (
-                        <LazyEditorContent
-                            defaultValue={defaultValue || ""}
-                            onChange={onChange}
-                            onClose={() => setOpen(false)}
-                        />
-                    )}
-                </DialogContent>
-            </Dialog>
-        </>
+        );
+    }
+
+    // Canvas'da faqat matnni ko'rsatish (node bosish → sidebar ochiladi)
+    return (
+        <div
+            className="text-editor-content bg-muted/20 p-2.5 rounded border border-border/40 min-h-[36px] text-sm text-foreground/80 leading-relaxed"
+            dangerouslySetInnerHTML={{
+                __html: defaultValue?.trim()
+                    ? defaultValue.replace(/\n/g, "<br>")
+                    : '<span class="italic text-muted-foreground/50 text-xs">Matn yozilmagan...</span>',
+            }}
+        />
     );
 }

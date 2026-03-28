@@ -128,22 +128,22 @@ function N8nTopBar({
   const { handleClick: backToHome } = useLinkToParent({ href: `/bot/${id}` });
 
   return (
-    <div className="h-11 shrink-0 flex items-center gap-2 px-3 border-b border-border bg-background z-10">
+    <div className="h-[88px] shrink-0 flex items-center gap-2 px-3 border-b border-border z-10" style={{ backgroundColor: "#212121" }}>
       {/* Back */}
       <Button
         variant="ghost"
         size="icon"
-        className="h-8 w-8 shrink-0"
+        className="h-9 w-9 shrink-0 text-white/70 hover:text-white hover:bg-white/10"
         onClick={backToHome}
         title="Orqaga"
       >
         <ArrowLeft className="h-4 w-4" />
       </Button>
 
-      <Separator orientation="vertical" className="h-5 mx-0.5" />
+      <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20" />
 
       {/* Project name */}
-      <span className="text-sm font-semibold truncate max-w-[220px]">
+      <span className="text-sm font-semibold truncate max-w-[220px] text-white">
         {project.name}
       </span>
 
@@ -156,25 +156,25 @@ function N8nTopBar({
       <Button
         variant="default"
         size="sm"
-        className="h-8 gap-1.5 text-xs"
+        className="h-9 gap-1.5 text-sm px-4"
         onClick={onAddNode}
         title="Node qo'shish (Ctrl+N)"
       >
-        <Plus className="h-3.5 w-3.5" />
+        <Plus className="h-4 w-4" />
         Node qo'shish
       </Button>
 
-      <Separator orientation="vertical" className="h-5 mx-0.5" />
+      <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20" />
 
       {/* AI toggle */}
       <Button
-        variant={aiOpen ? "secondary" : "ghost"}
+        variant="ghost"
         size="sm"
-        className="h-8 gap-1.5 text-xs"
+        className={cn("h-9 gap-1.5 text-sm px-4 text-white/70 hover:text-white hover:bg-white/10", aiOpen && "bg-white/15 text-white")}
         onClick={onToggleAI}
         title={aiOpen ? "AI panelni yopish" : "AI panelni ochish"}
       >
-        <Sparkles className={cn("h-3.5 w-3.5", aiOpen && "text-primary")} />
+        <Sparkles className="h-4 w-4" />
         AI
       </Button>
     </div>

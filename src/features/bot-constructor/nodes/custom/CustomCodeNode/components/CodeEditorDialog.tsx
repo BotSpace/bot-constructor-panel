@@ -5,7 +5,7 @@ import CodeMirror from "@uiw/react-codemirror";
 import { javascript, javascriptLanguage } from "@codemirror/lang-javascript";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { linter } from "@codemirror/lint";
-import { autocompletion, CompletionContext } from "@codemirror/autocomplete"; // CompletionContext qo'shildi
+import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Code2, AlertCircle } from "lucide-react";
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 
 interface Props {
   code: string;
@@ -23,6 +24,8 @@ interface Props {
 }
 
 export const CodeEditorDialog = ({ code, onChange, globals }: Props) => {
+  const inPanel = useIsInNodePanel();
+
   // 1. Maxsus Global o'zgaruvchilar uchun Autocomplete (Suggester)
   const globalCompletions = useMemo(() => {
     return javascriptLanguage.data.of({
@@ -71,6 +74,52 @@ export const CodeEditorDialog = ({ code, onChange, globals }: Props) => {
       };
     };
   }, [globals]);
+
+  // Sidebar'da inline CodeMirror ko'rsatish
+  if (inPanel) {
+    return (
+      <div className="space-y-2">
+        {globals.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {globals.map((g) => (
+              <span
+                key={g}
+                className="px-2 py-0.5 bg-yellow-500/10 text-yellow-500 rounded text-[10px] border border-yellow-500/20 font-mono"
+              >
+                {g}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="border border-border rounded-md overflow-hidden">
+          <CodeMirror
+            value={code}
+            height="300px"
+            theme={vscodeDark}
+            className="text-sm"
+            extensions={[
+              javascript(),
+              autocompletion({ override: [customAutocomplete] }),
+              linter(() => []),
+            ]}
+            onChange={onChange}
+            basicSetup={{
+              lineNumbers: true,
+              autocompletion: true,
+              bracketMatching: true,
+              closeBrackets: true,
+            }}
+          />
+        </div>
+
+        <p className="flex items-center gap-1 text-xs text-muted-foreground italic">
+          <AlertCircle className="w-3 h-3" />
+          Kod faqat serverda ishga tushadi.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <Dialog>

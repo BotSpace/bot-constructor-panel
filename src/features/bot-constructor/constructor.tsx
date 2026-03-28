@@ -505,10 +505,11 @@ export default function Constructor() {
               connectionMode={ConnectionMode.Loose}
             >
               <Background
-                variant={BackgroundVariant.Lines}
-                gap={32}
-                size={1}
-                color={resolvedTheme === "dark" ? "#1f2937" : "#e5e7eb"}
+                variant={BackgroundVariant.Dots}
+                gap={60}
+                size={4}
+                color="#4d4d4d"
+                style={{ backgroundColor: "#171717" }}
               />
               {!isMobile && (
                 <MiniMap

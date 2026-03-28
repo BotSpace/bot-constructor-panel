@@ -1,5 +1,6 @@
-// FAYL: constructor/components/ButtonGenerator/components/ReplyForm.tsx (YANGILANGAN)
-import { useState, useMemo } from "react";
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,114 +15,51 @@ import {
   PlusCircle,
   Smartphone,
   MapPin,
+  Navigation,
   Globe,
   BarChart3,
-  Database,
-  LayoutGrid,
-  TextIcon,
-  CheckCircle2,
-  XCircle,
-  Menu,
-  ArrowLeft,
-  ArrowRight,
-  SkipForward,
-  Home,
+  MessageSquare,
 } from "lucide-react";
 import { ButtonConfig } from "../types";
 import { WebAppForm } from "./WebAppForm";
-import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
-import { useCollectionStore } from "@/features/collections/store/collection-list";
-import { useReactQueryAction } from "@/services/react-query";
-import { APIDetailCreateResponse } from "@/types/http/response";
-import { CollectionDetail } from "@/types/http/collection";
-import { Separator } from "@/components/ui/separator";
-import SeparatorWithTitle from "@/components/common/separetor";
-import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
-import { Filter } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { useNodes, useEdges } from "reactflow";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { CollectionButtonForm } from "./CollectionButtonForm";
-import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 interface ReplyFormProps {
   onAdd: (button: ButtonConfig) => void;
   disabled: boolean;
-  data?: SendTextMessageNodeData;
   nodeId: string;
 }
 
-type ReplyType = "reply" | "web_app" | "request_poll" | "request_contact" | "request_location" | "request_poll" | "request_live_location"
+type ReplyType =
+  | "reply"
+  | "web_app"
+  | "request_contact"
+  | "request_location"
+  | "request_live_location"
+  | "request_poll";
 
-
-const replyOptions: {
+const replyTypes: {
   value: ReplyType;
   label: string;
-  icon?: React.ReactNode;
+  icon: React.ElementType;
 }[] = [
-    {
-      value: "reply",
-      label: "Matnli tugma",
-      icon: <TextIcon className="h-4 w-4" />,
-    },
-    { value: "web_app", label: "Web App", icon: <Globe className="h-4 w-4" /> },
-    {
-      value: "request_poll",
-      label: "So'rovnoma",
-      icon: <BarChart3 className="h-4 w-4" />,
-    },
-    {
-      value: "request_contact",
-      label: "Kontakt",
-      icon: <Smartphone className="h-4 w-4" />,
-    },
-    {
-      value: "request_location",
-      label: "Joylashuv",
-      icon: <MapPin className="h-4 w-4" />,
-    },
-    {
-      value: "request_live_location",
-      label: "Jonli Joylashuv",
-      icon: <MapPin className="h-4 w-4" />,
-    },
-  ];
+  { value: "reply", label: "Matn", icon: MessageSquare },
+  { value: "web_app", label: "Web App", icon: Globe },
+  { value: "request_contact", label: "Kontakt", icon: Smartphone },
+  { value: "request_location", label: "Joylashuv", icon: MapPin },
+  { value: "request_live_location", label: "Jonli joy", icon: Navigation },
+  { value: "request_poll", label: "So'rovnoma", icon: BarChart3 },
+];
 
-// Common buttons configuration (Reply tugmalar uchun text = value bo'ladi)
-const commonButtonGroups = [
-  {
-    title: "Navigatsiya",
-    buttons: [
-      { label: "⬅️ Ortga", variant: "outline" as const },
-      { label: "Oldinga ➡️", variant: "outline" as const },
-      { label: "⏭ O'tkazib yuborish", variant: "outline" as const },
-    ],
-  },
-  {
-    title: "Tasdiqlash",
-    buttons: [
-      { label: "✅ Tasdiqlash", variant: "default" as const },
-      { label: "❌ Bekor qilish", variant: "destructive" as const },
-    ],
-  },
-  {
-    title: "Menyu",
-    buttons: [
-      { label: "🏠 Bosh menyu", variant: "secondary" as const },
-      { label: "📋 Menyu", variant: "secondary" as const },
-    ],
-  },
+const quickButtons = [
+  { emoji: "⬅️", label: "Ortga" },
+  { emoji: "➡️", label: "Oldinga" },
+  { emoji: "✅", label: "Tasdiqlash" },
+  { emoji: "❌", label: "Bekor" },
+  { emoji: "🏠", label: "Bosh menyu" },
+  { emoji: "📋", label: "Menyu" },
 ];
 
 export const ReplyForm = ({ onAdd, disabled, nodeId }: ReplyFormProps) => {
@@ -130,251 +68,117 @@ export const ReplyForm = ({ onAdd, disabled, nodeId }: ReplyFormProps) => {
   const [webAppUrl, setWebAppUrl] = useState("");
   const [pollType, setPollType] = useState<"quiz" | "regular">("regular");
 
-  // Collection ma'lumotlari
-  const { data: collections } = useCollectionStore();
-  const [selectedCollection, setSelectedCollection] = useState<string>("");
-  const [selectedField, setSelectedField] = useState<string>("");
-  const [filters, setFilters] = useState<Filter[]>([]);
-
-  // Layout settings
-  const [columns, setColumns] = useState<number>(2);
-  const [rows, setRows] = useState<number>(5);
-  const [enablePagination, setEnablePagination] = useState<boolean>(true);
-
-  // Collection field'larini olish
-  const { data: collectionFields } = useReactQueryAction<
-    APIDetailCreateResponse<CollectionDetail>
-  >({
-    url: selectedCollection
-      ? `collection/${selectedCollection}/?project=[id]`
-      : "",
-    enabled: !!selectedCollection,
-  });
-
-  // State keys'larni olish (faqat zanjiriga ulangan StateNode va Trigger'lardan)
-  const nodes = useNodes();
-  const edges = useEdges();
-  const availableStateKeys = useMemo(() => {
-    return getAvailableStateKeys(nodes, edges, nodeId);
-  }, [nodes, edges, nodeId]);
-
-  const handleCollectionChange = (collectionName: string) => {
-    setSelectedCollection(collectionName);
-    setSelectedField("");
-    setFilters([]);
-    setColumns(2);
-    setRows(5);
-    setEnablePagination(true);
-  };
-
-  const handleAddClick = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!text) {
-      alert("Iltimos, tugma matnini kiriting.");
+    // Special types don't need text
+    const needsText = actionType === "reply" || actionType === "web_app";
+    if (needsText && !text.trim()) return;
+
+    const id = `btn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    if (actionType === "request_contact") {
+      onAdd({ id, text: "📱 Kontaktimni yuborish", type: "request_contact" });
+      return;
+    }
+    if (actionType === "request_location") {
+      onAdd({ id, text: "📍 Joylashuvimni yuborish", type: "request_location" });
+      return;
+    }
+    if (actionType === "request_live_location") {
+      onAdd({ id, text: "📡 Jonli joylashuv", type: "request_live_location" });
+      return;
+    }
+    if (actionType === "request_poll") {
+      onAdd({
+        id,
+        text: `📊 So'rovnoma (${pollType === "quiz" ? "Viktorina" : "Oddiy"})`,
+        type: "request_poll",
+        pollType,
+      });
       return;
     }
 
     const newButton: Partial<ButtonConfig> = {
       id: `btn-${Date.now()}`,
-      text,
+      text: text.trim(),
       type: actionType,
     };
 
-    switch (actionType) {
-      case "web_app":
-        if (!webAppUrl) {
-          alert("Web App URL manzilini kiriting.");
-          return;
-        }
-        newButton.webApp = { url: webAppUrl };
-        break;
-      case "request_poll":
-        newButton.pollType = pollType;
-        break;
-      case "reply":
-        break;
+    if (actionType === "web_app") {
+      if (!webAppUrl) return;
+      newButton.webApp = { url: webAppUrl };
     }
 
     onAdd(newButton as ButtonConfig);
     setText("");
     setWebAppUrl("");
-    setActionType("reply");
-    setPollType("regular");
   };
 
-  // Maxsus so'rovlar (Contact, Location, Poll)
-  const handleAddSpecial = (
-    type: "request_contact" | "request_location" | "request_poll"
-  ) => {
-    let newButton: ButtonConfig;
-    const uniqueId = `btn-${Date.now()}-${Math.random()
-      .toString(36)
-      .substr(2, 9)}`;
-
-    switch (type) {
-      case "request_contact":
-        newButton = {
-          id: uniqueId,
-          text: "📱 Kontaktimni yuborish",
-          type,
-        };
-        break;
-      case "request_location":
-        newButton = {
-          id: uniqueId,
-          text: "📍 Joylashuvimni yuborish",
-          type,
-        };
-        break;
-      case "request_poll":
-        newButton = {
-          id: uniqueId,
-          text: `📊 So'rovnoma yaratish (${pollType === "quiz" ? "Viktorina" : "Oddiy"
-            })`,
-          type,
-          pollType,
-        };
-        break;
-      default:
-        return;
-    }
-    onAdd(newButton);
-  };
-
-  // Common Text Buttons qo'shish
-  const handleAddCommonButton = (btnLabel: string) => {
-    const newButton: ButtonConfig = {
-      id: `btn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      text: btnLabel,
+  const addQuickButton = (label: string) => {
+    onAdd({
+      id: `btn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      text: label,
       type: "reply",
-    };
-    onAdd(newButton);
+    });
   };
+
+  const isSpecialType = !["reply", "web_app"].includes(actionType);
 
   return (
-    <div className="mt-4 space-y-4">
-      <form onSubmit={handleAddClick} className="space-y-4">
-        <div className="grid grid-cols-6 gap-2">
-          <div className="col-span-4 flex flex-col gap-1.5">
-            <Label htmlFor="reply-text">Tugma matni</Label>
+    <div className="space-y-5">
+      {/* Type selector */}
+      <div>
+        <Label className="text-xs text-muted-foreground mb-2 block">Tugma turi</Label>
+        <div className="grid grid-cols-3 gap-1.5">
+          {replyTypes.map(({ value: v, label, icon: Icon }) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => setActionType(v)}
+              className={cn(
+                "flex flex-col items-center gap-1 rounded-lg border px-2 py-2.5 text-[11px] font-medium transition-all",
+                actionType === v
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        {!isSpecialType && (
+          <div>
+            <Label htmlFor="reply-text" className="text-xs mb-1.5 block">Tugma matni</Label>
             <Input
               id="reply-text"
               placeholder="Masalan, Asosiy Menyu"
               value={text}
               onChange={(e) => setText(e.target.value)}
+              className="h-8 text-sm"
             />
           </div>
-          <div className="col-span-2 flex flex-col gap-1.5">
-            <Label>Amal turi</Label>
-            <Select
-              value={actionType}
-              onValueChange={(v: ReplyType) => setActionType(v)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Amal turini tanlang..." />
-              </SelectTrigger>
-              <SelectContent>
-                {replyOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    <div className="flex items-center gap-2">
-                      {opt.icon}
-                      {opt.label}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        )}
 
-        <div className="animate-in fade-in-50">
-          {actionType === "web_app" && (
+        {actionType === "web_app" && (
+          <div className="animate-in fade-in-50 duration-150">
             <WebAppForm url={webAppUrl} onUrlChange={setWebAppUrl} />
-          )}
-          {actionType === "request_poll" && (
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="poll-type">So'rovnoma turi</Label>
-              <Select
-                value={pollType}
-                onValueChange={(v: "quiz" | "regular") => setPollType(v)}
-              >
-                <SelectTrigger id="poll-type" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="regular">Oddiy</SelectItem>
-                  <SelectItem value="quiz">Viktorina (Quiz)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-        </div>
-
-        <Button type="submit" className="w-full" disabled={disabled}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Reply Tugma Qo'shish
-        </Button>
-      </form>
-
-      <SeparatorWithTitle>Tezkor Tugmalar (Common)</SeparatorWithTitle>
-
-      {/* Common Buttons Section */}
-      <div className="space-y-3">
-        {commonButtonGroups.map((group, index) => (
-          <div key={index} className="space-y-2">
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              {group.title}
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {group.buttons.map((btn, btnIndex) => (
-                <Button
-                  key={btnIndex}
-                  type="button"
-                  onClick={() => handleAddCommonButton(btn.label)}
-                  variant={btn.variant}
-                  size="sm"
-                  disabled={disabled}
-                  className="shadow-sm"
-                >
-                  {btn.label}
-                </Button>
-              ))}
-            </div>
           </div>
-        ))}
-      </div>
+        )}
 
-      <SeparatorWithTitle>Maxsus so'rovlar</SeparatorWithTitle>
-
-      {/* Maxsus so'rov tugmalari */}
-      <div className="grid grid-cols-2 gap-2">
-        <Button
-          variant="outline"
-          className="w-full justify-start"
-          type="button"
-          onClick={() => handleAddSpecial("request_contact")}
-          disabled={disabled}
-        >
-          <Smartphone className="mr-2 h-4 w-4" /> Kontakt
-        </Button>
-        <Button
-          variant="outline"
-          className="w-full justify-start"
-          type="button"
-          onClick={() => handleAddSpecial("request_location")}
-          disabled={disabled}
-        >
-          <MapPin className="mr-2 h-4 w-4" /> Joylashuv
-        </Button>
-
-        <div className="col-span-2 flex gap-2 items-center bg-muted/40 p-2 rounded-md border">
-          <div className="flex-grow space-y-1">
-            <Label className="text-xs">So'rovnoma turi</Label>
+        {actionType === "request_poll" && (
+          <div className="animate-in fade-in-50 duration-150">
+            <Label className="text-xs mb-1.5 block">So'rovnoma turi</Label>
             <Select
               value={pollType}
               onValueChange={(v: "quiz" | "regular") => setPollType(v)}
             >
-              <SelectTrigger className="h-8">
+              <SelectTrigger className="h-8 text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -383,21 +187,51 @@ export const ReplyForm = ({ onAdd, disabled, nodeId }: ReplyFormProps) => {
               </SelectContent>
             </Select>
           </div>
-          <Button
-            variant="outline"
-            type="button"
-            className="self-end"
-            onClick={() => handleAddSpecial("request_poll")}
-            disabled={disabled}
-          >
-            <BarChart3 className="mr-2 h-4 w-4" /> Poll Qo'shish
-          </Button>
+        )}
+
+        {isSpecialType && actionType !== "request_poll" && (
+          <div className="rounded-lg bg-muted/50 border px-3 py-2.5 text-xs text-muted-foreground">
+            Bu tugma bosilganda foydalanuvchi{" "}
+            {actionType === "request_contact" && "o'z kontakt ma'lumotlarini"}
+            {actionType === "request_location" && "joylashuvini"}
+            {actionType === "request_live_location" && "jonli joylashuvini"}
+            {" "}yuboradi.
+          </div>
+        )}
+
+        <Button type="submit" className="w-full h-8 text-sm gap-2" disabled={disabled}>
+          <PlusCircle className="h-3.5 w-3.5" />
+          Reply tugma qo'shish
+        </Button>
+      </form>
+
+      <Separator />
+
+      {/* Quick buttons */}
+      <div>
+        <p className="text-xs text-muted-foreground mb-2.5 font-medium">Tezkor tugmalar</p>
+        <div className="grid grid-cols-2 gap-1.5">
+          {quickButtons.map((btn) => (
+            <button
+              key={btn.label}
+              type="button"
+              onClick={() => addQuickButton(`${btn.emoji} ${btn.label}`)}
+              disabled={disabled}
+              className="flex items-center gap-1.5 rounded-lg border bg-background px-2.5 py-2 text-xs hover:bg-muted transition-colors disabled:opacity-40 text-left"
+            >
+              <span>{btn.emoji}</span>
+              <span className="font-medium">{btn.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
+      <Separator />
+
+      {/* Collection buttons */}
       <CollectionButtonForm
         onAdd={onAdd}
-        buttonType="inline"
+        buttonType="reply"
         disabled={disabled}
         nodeId={nodeId}
       />

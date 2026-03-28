@@ -22,6 +22,7 @@ import { ActionPanel } from "../../components/shared/ActionPanel";
 import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
 import { Textarea } from "@/components/ui/textarea";
+import { NodeTextPreview } from "../../components/shared/NodeTextPreview";
 
 const SendTextMessageNodeComponent = ({
   id,
@@ -55,6 +56,7 @@ const SendTextMessageNodeComponent = ({
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
+      <NodeTextPreview text={data.messageText} />
       {!isCollapsed && (
         <>
           <CardContent className="grid gap-2">
@@ -88,7 +90,7 @@ const SendTextMessageNodeComponent = ({
       {/* Handler list */}
       <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

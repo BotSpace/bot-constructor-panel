@@ -121,7 +121,7 @@ const ForwardMessageNodeComponent = ({
         </div>
       </CardContent>
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

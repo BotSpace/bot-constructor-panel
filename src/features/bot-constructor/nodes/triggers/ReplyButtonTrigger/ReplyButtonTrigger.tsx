@@ -216,7 +216,7 @@ const ReplyButtonTriggerNodeComponent = ({
           />
         </CardContent>
       )}
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

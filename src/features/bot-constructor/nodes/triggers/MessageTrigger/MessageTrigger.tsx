@@ -133,7 +133,7 @@ const MessageTriggerNodeComponent = ({
                 </CardContent>
             )}
 
-            <SourceHandles />
+            <SourceHandles nodeId={id} />
         </Card>
     );
 };

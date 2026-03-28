@@ -316,7 +316,7 @@ export function CollectionNode({
         </CardContent>
       )}
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 }

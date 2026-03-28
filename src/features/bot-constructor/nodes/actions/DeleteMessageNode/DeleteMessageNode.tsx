@@ -122,7 +122,7 @@ const DeleteMessageNodeComponent = ({
           )}
         </CardContent>
       )}
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

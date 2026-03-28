@@ -17,7 +17,7 @@ const SendToAdminNodeComponent = ({ id, selected }: NodeProps) => {
         Xabarni admin panelga yuboradi
       </div>
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

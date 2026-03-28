@@ -199,7 +199,7 @@ const MediaGroupNodeInternal = ({
       {/* Handler list */}
       <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };
