@@ -88,7 +88,7 @@ const ContactNodeComponent = ({
       {/* Handler list */}
       <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

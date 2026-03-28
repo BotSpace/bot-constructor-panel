@@ -21,7 +21,7 @@ const RandomNodeComponent = ({ id, data, selected }: NodeProps) => {
         <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
       </CardFooter>
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

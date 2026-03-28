@@ -65,7 +65,7 @@ const DelayNodeComponent = ({
         </CardContent>
       )}
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

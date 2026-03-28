@@ -271,7 +271,7 @@ const CallbackQueryTriggerNodeComponent = ({
         </CardContent>
       )}
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

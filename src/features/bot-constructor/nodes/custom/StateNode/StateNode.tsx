@@ -186,7 +186,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
         </CardContent>
       )}
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 }

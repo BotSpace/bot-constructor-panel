@@ -97,9 +97,16 @@ export function useNotification(): UseNotificationReturn {
     try {
       const audio = new Audio("/notification.mp3");
       audio.volume = 0.7;
-      await audio.play().catch((error) => {
-        console.error("Error playing notification audio:", error);
-      });
+      const playPromise = audio.play();
+
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          // Silently ignore autoplay policy errors
+          if (error.name !== "NotAllowedError") {
+            console.error("Error playing notification audio:", error);
+          }
+        });
+      }
     } catch (error) {
       console.error("Error loading notification audio:", error);
     }

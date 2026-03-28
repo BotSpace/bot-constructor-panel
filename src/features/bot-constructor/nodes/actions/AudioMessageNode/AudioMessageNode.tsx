@@ -31,6 +31,7 @@ import { ActionPanel } from "../../components/shared/ActionPanel";
 import TextArea from "../shared/text-area";
 import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
+import { NodeTextPreview } from "../../components/shared/NodeTextPreview";
 
 const SendAudioNodeComponent = ({
   id,
@@ -116,7 +117,7 @@ const SendAudioNodeComponent = ({
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
-
+      <NodeTextPreview text={data.caption} placeholder="Caption yozilmagan..." />
       {!isCollapsed && (
         <>
           <CardContent className="flex flex-col gap-4">
@@ -275,7 +276,7 @@ const SendAudioNodeComponent = ({
       {/* Handler list */}
       <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

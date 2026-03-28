@@ -47,7 +47,7 @@ export const CustomCodeNode = ({ id, data }: NodeProps<CustomCodeNodeData>) => {
         />
       </div>
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </div>
   );
 };

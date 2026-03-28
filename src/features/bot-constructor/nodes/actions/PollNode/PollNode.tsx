@@ -208,7 +208,7 @@ const PollNodeComponent = ({
         <ActionPanel keyboard={data.keyboard} id={id} recipients={data.recipients ?? { sendToSender: true, additionalIds: [] }} />
       </CardFooter>
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

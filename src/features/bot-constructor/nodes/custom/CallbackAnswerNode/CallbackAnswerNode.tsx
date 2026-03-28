@@ -25,7 +25,7 @@ const CallbackAnswerNodeComponent = ({
       <CardFooter>
         <ButtonGenerator initialKeyboard={data.keyboard} node_id={id} />
       </CardFooter>
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

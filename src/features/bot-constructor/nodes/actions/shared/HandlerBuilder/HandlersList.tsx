@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useCallback, useMemo, useState } from "react";
-import { Handle, Position, useEdges, useNodes } from "reactflow";
+import { Handle, Position } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,8 +33,9 @@ interface HandlersListProps {
 }
 
 export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
-    const nodes = useNodes();
-    const edges = useEdges();
+    const inPanel = useIsInNodePanel();
+    const nodes = useFlowStore((state) => state.nodes);
+    const edges = useFlowStore((state) => state.edges);
     const updateNodeData = useFlowStore((state) => state.updateNodeData);
     const [editingHandler, setEditingHandler] = useState<{
         handler: MessageTriggerNodeData;
@@ -158,12 +160,6 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
 
     return (
         <div className="space-y-2 py-4 w-full px-2">
-            <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-semibold">Yaratilgan handlerlar</h3>
-                <Badge variant="secondary" className="text-xs">
-                    {handlers.length} ta
-                </Badge>
-            </div>
 
             <div className="space-y-2 overflow-y-auto">
                 {keyboard && keyboard.active && keyboard[keyboard.active] && keyboard[keyboard.active].flat().length > 0 && (
@@ -175,7 +171,7 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                                 className="text-xs px-2 py-1 relative"
                             >
                                 {button.text}
-                                {(() => {
+                                {!inPanel && (() => {
                                     const handleId = `target-handler-${sourceNodeId}-${button.text}`;
                                     const pos = getHandlePosition(handleId);
                                     const isLeft = pos === Position.Left;
@@ -238,7 +234,7 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                                             <Trash2 className="h-3.5 w-3.5" />
                                         </Button>
                                     </div>
-                                    {(() => {
+                                    {!inPanel && (() => {
                                         const pos = getHandlePosition(handleId);
                                         const isLeft = pos === Position.Left;
                                         return (

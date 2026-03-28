@@ -98,7 +98,7 @@ export const EditMessageNode = memo(
         {/* Handler list */}
         <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
-        <SourceHandles />
+        <SourceHandles nodeId={id} />
         <EditMessageSource />
       </Card>
     );

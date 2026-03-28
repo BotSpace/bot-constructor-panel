@@ -20,7 +20,7 @@ const CopyMessageNodeComponent = ({ id, data, selected }: NodeProps) => {
       {/* Handler list */}
       <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };

@@ -29,6 +29,7 @@ import { SelectedMessageTarget } from "../../components/shared/ReactFlowHandles/
 import { ActionPanel } from "../../components/shared/ActionPanel";
 import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
+import { NodeTextPreview } from "../../components/shared/NodeTextPreview";
 
 const SendPhotoNodeComponent = ({
   id,
@@ -114,7 +115,7 @@ const SendPhotoNodeComponent = ({
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
-
+      <NodeTextPreview text={data.caption} placeholder="Caption yozilmagan..." />
       {!isCollapsed && (
         <>
           <CardContent className="flex flex-col gap-4">
@@ -244,7 +245,7 @@ const SendPhotoNodeComponent = ({
       {/* Handler list */}
       <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
-      <SourceHandles />
+      <SourceHandles nodeId={id} />
     </Card>
   );
 };
