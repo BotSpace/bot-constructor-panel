@@ -69,7 +69,7 @@ function ActionNodeSettings({
           onValueChange={(e) => handleUpdate({ parseMode: e as any })}
           value={parseMode || "None"}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger>
             <SelectValue placeholder="Matn formatlash turini tanlang" />
           </SelectTrigger>
           <SelectContent>

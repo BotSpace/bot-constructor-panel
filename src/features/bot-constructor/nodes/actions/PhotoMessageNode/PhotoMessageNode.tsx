@@ -130,7 +130,7 @@ const SendPhotoNodeComponent = ({
                     handleUpdate({ photoSourceType: value })
                   }
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger>
                     <SelectValue placeholder="Manbani tanlang..." />
                   </SelectTrigger>
                   <SelectContent>

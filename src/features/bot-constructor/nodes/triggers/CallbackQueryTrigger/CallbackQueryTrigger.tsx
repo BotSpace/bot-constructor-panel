@@ -181,7 +181,7 @@ const CallbackQueryTriggerNodeComponent = ({
                   value={data.context?.value || ""}
                   onValueChange={onValueChange}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger>
                     <SelectValue placeholder="Static callback tanlang..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -205,7 +205,7 @@ const CallbackQueryTriggerNodeComponent = ({
                   value={data.context?.value || ""}
                   onValueChange={onValueChange}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger>
                     <SelectValue placeholder="Collection callback tanlang..." />
                   </SelectTrigger>
                   <SelectContent>
