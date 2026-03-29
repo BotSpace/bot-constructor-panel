@@ -114,7 +114,7 @@ const IfConditionNodeComponent = ({
   };
 
   return (
-    <Card className={cn(" w-[600px] shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="🔀"
@@ -257,10 +257,10 @@ const IfConditionNodeComponent = ({
       <TargetHandles />
 
       {/* NEXT - o'ng tomonda (ElseIf/Else ga) */}
-      <SourceHandles className="!bg-red-500 translate-y-[-75%]" id="next" position={Position.Right} />
+      <SourceHandles className="!bg-red-500 translate-y-[-200%]" id="next" position={Position.Right} />
 
       {/* TRUE - pastda (shart bajarilsa) */}
-      <SourceHandles className="translate-y-[75%]" id="true" position={Position.Right} />
+      <SourceHandles className="translate-y-[200%]" id="true" position={Position.Right} />
     </Card>
   );
 };
