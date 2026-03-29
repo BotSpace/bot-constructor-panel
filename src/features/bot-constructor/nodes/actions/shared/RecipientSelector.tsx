@@ -101,7 +101,7 @@ export const RecipientsManager = ({
           </div>
         )}
       </div>
-      <div className="flex flex-wrap items-center gap-2 rounded-lg border p-2 min-h-[40px]">
+      <div className="flex flex-col gap-2">
         {/* === "YUBORUVCHIGA" TOGGLE TUGMASI === */}
         <button
           type="button"
@@ -112,7 +112,7 @@ export const RecipientsManager = ({
               : "Yuboruvchiga ham yuborish"
           }
           className={cn(
-            "flex items-center gap-1.5 pl-2 pr-3 py-1 text-sm rounded-md transition-colors border",
+            "flex items-center justify-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors border w-full",
             sendToSender
               ? "bg-secondary text-secondary-foreground"
               : "bg-transparent text-muted-foreground hover:bg-muted/50 border-dashed"
@@ -122,51 +122,56 @@ export const RecipientsManager = ({
           Yuboruvchiga
         </button>
 
-        {/* Qo'shilgan ID'lar ro'yxati (chiplar) */}
-        {additionalIds.map((id) => (
-          <Badge
-            key={id}
-            variant="outline"
-            className="gap-1 pl-2.5 pr-1.5 py-1 text-sm font-mono"
-          >
-            {id}
-            <button
-              onClick={() => handleRemoveRecipient(id)}
-              className="ml-1 rounded-full p-0.5 hover:bg-destructive/20"
-              title={`O'chirish: ${id}`}
+        {/* Qo'shilgan ID'lar ro'yxati */}
+        {additionalIds.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 rounded-lg border p-2 min-h-[40px]">
+            {additionalIds.map((id) => (
+              <Badge
+                key={id}
+                variant="outline"
+                className="gap-1 pl-2.5 pr-1.5 py-1 text-sm font-mono"
+              >
+                {id}
+                <button
+                  onClick={() => handleRemoveRecipient(id)}
+                  className="ml-1 rounded-full p-0.5 hover:bg-destructive/20"
+                  title={`O'chirish: ${id}`}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        {/* Yangi ID qo'shish */}
+        <div className="flex gap-2">
+          {isInputVisible ? (
+            <div className="flex-1 flex gap-2">
+              <Input
+                autoFocus
+                type="text"
+                placeholder="User/Chat ID"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={handleAddRecipient}
+                className="flex-1"
+              />
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full gap-2"
+              onClick={() => setIsInputVisible(true)}
+              title="Qo'shimcha qabul qiluvchi qo'shish"
             >
-              <X className="h-3 w-3" />
-            </button>
-          </Badge>
-        ))}
-
-        {/* Yangi ID kiritish Input'i */}
-        {isInputVisible && (
-          <Input
-            autoFocus
-            type="text"
-            placeholder="User/Chat ID"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={handleAddRecipient}
-            className="h-7 w-32 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-1"
-          />
-        )}
-
-        {/* "Qo'shish" tugmasi */}
-        {!isInputVisible && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => setIsInputVisible(true)}
-            title="Qo'shimcha qabul qiluvchi qo'shish"
-          >
-            <UserPlus className="h-4 w-4" />
-          </Button>
-        )}
+              <UserPlus className="h-4 w-4" />
+              Qabul qiluvchi qo'shish
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
