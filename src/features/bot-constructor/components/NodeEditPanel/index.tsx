@@ -140,7 +140,7 @@ export function NodeEditPanel() {
                   yPos={0}
                   zIndex={0}
                   dragging={false}
-                  type={editingNode!.type}
+                  type={editingNode!.type ?? ''}
                 />
               </NodePanelProvider>
             ) : (
