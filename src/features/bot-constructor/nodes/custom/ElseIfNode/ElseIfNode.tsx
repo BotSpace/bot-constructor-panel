@@ -58,14 +58,8 @@ const ElseIfNodeComponent = ({
   };
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-100 shadow-lg w-[150px] h-[150px]", selected && "ring-2 ring-primary")}>
       {/* Input - FAQAT chap tomonda (IF/ElseIf dan NEXT) */}
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="target-handler"
-        className="!w-4 !h-4 !bg-sky-500 !border-2 !border-gray-800"
-      />
 
       <NodeHeader
         icon="🔄"
@@ -162,20 +156,20 @@ const ElseIfNodeComponent = ({
                 {!["is_empty", "not_empty", "exists", "not_exists"].includes(
                   condition.operator
                 ) && (
-                  <div className="flex flex-col gap-1">
-                    <Input
-                      placeholder="Qiymat (masalan: 18, {{other_var}})"
-                      value={condition.value?.toString() || ""}
-                      onChange={(e) =>
-                        updateCondition(index, { value: e.target.value })
-                      }
-                      className="text-sm"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Kontekstdan qiymat olish uchun {"{{var_name}}"}
-                    </p>
-                  </div>
-                )}
+                    <div className="flex flex-col gap-1">
+                      <Input
+                        placeholder="Qiymat (masalan: 18, {{other_var}})"
+                        value={condition.value?.toString() || ""}
+                        onChange={(e) =>
+                          updateCondition(index, { value: e.target.value })
+                        }
+                        className="text-sm"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Kontekstdan qiymat olish uchun {"{{var_name}}"}
+                      </p>
+                    </div>
+                  )}
               </div>
             ))}
 
@@ -189,18 +183,12 @@ const ElseIfNodeComponent = ({
       )}
 
       {/* Input - chap tomonda (IF/ElseIf dan NEXT) */}
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="target-handler"
-        className="!w-4 !h-4 !bg-sky-500 !border-2 !border-gray-800"
-      />
 
       {/* TRUE - pastda (bu shart bajarilsa) */}
-      <SourceHandles id="true" position={Position.Bottom} />
+      <SourceHandles className="translate-y-[200%]" id="next" position={Position.Right} />
 
       {/* NEXT - o'ng tomonda (keyingi ElseIf/Else ga) */}
-      <SourceHandles id="next" position={Position.Right} />
+      <SourceHandles className="!bg-red-500 translate-y-[-200%]" id="true" position={Position.Right} />
     </Card>
   );
 };

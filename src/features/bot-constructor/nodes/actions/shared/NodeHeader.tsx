@@ -4,19 +4,12 @@ import { cn } from "@/lib/utils";
 import { ChevronDown, LayoutGrid } from "lucide-react";
 
 interface NodeHeaderProps {
-  /** Node icon (Lucide component or emoji) */
   icon: ReactNode;
-  /** Node title */
   title: string;
-  /** Node ID (optional, unused but kept for API compat) */
   nodeId?: string;
-  /** Number of keyboard buttons configured */
   buttonCount?: number;
-  /** Whether node body is collapsed */
   isCollapsed?: boolean;
-  /** Called when header is clicked */
   onToggleCollapse?: () => void;
-  /** Tailwind bg class for the icon square, e.g. "bg-sky-500" */
   color?: string;
 }
 
@@ -31,50 +24,32 @@ export const NodeHeader = ({
   return (
     <div
       onClick={onToggleCollapse}
-      data-node-header
-      className="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer select-none hover:bg-muted/40 transition-colors rounded-t-[inherit]"
+      className="relative flex flex-col items-center justify-center gap-3 px-4 py-6 cursor-pointer select-none hover:bg-muted/40 transition-colors rounded-t-[inherit]"
       role="button"
     >
-      {/* N8n-style colored icon box — color overridden per node type via CSS */}
+      {/* Katta Markazlashgan Icon */}
       <div
         className={cn(
-          "node-icon-box w-7 h-7 rounded-md flex items-center justify-center shrink-0",
-          "[&_svg]:w-4 [&_svg]:h-4 [&_svg]:text-white [&_svg]:stroke-white",
+          "w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105",
+          // Bu yerda icon ichidagi svg o'lchamini kattalashtirdik (w-8 h-8)
+          "[&_svg]:w-8 [&_svg]:h-8 [&_svg]:text-white [&_svg]:stroke-[2.5px]",
           color
         )}
       >
         {typeof icon === "string" ? (
-          <span className="text-sm leading-none">{icon}</span>
+          <span className="text-2xl">{icon}</span>
         ) : (
           icon
         )}
       </div>
 
-      {/* Title */}
-      <span className="flex-1 text-sm font-medium leading-none truncate">
-        {title}
-      </span>
-
-      {/* Right: button count badge + collapse chevron */}
-      <div className="flex items-center gap-1.5 shrink-0">
-        {buttonCount > 0 && (
-          <Badge
-            variant="secondary"
-            className="h-4 px-1.5 text-[10px] font-normal gap-0.5"
-          >
-            <LayoutGrid className="w-2.5 h-2.5" />
-            {buttonCount}
-          </Badge>
-        )}
-        {onToggleCollapse && (
-          <ChevronDown
-            className={cn(
-              "w-3.5 h-3.5 text-muted-foreground transition-transform duration-200",
-              isCollapsed && "-rotate-90"
-            )}
-          />
-        )}
+      {/* Pastdagi Title */}
+      <div className="text-center">
+        <h3 className="text-sm font-semibold tracking-wide uppercase text-foreground/80">
+          {title}
+        </h3>
       </div>
+
     </div>
   );
 };
