@@ -1,6 +1,9 @@
+"use client"
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext"
 
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -16,11 +19,13 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+  const inPanel = useIsInNodePanel()
   return (
     <div
       data-slot="card-header"
       className={cn(
-        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
+        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
+        inPanel ? "px-3" : "px-6",
         className
       )}
       {...props}
@@ -62,20 +67,22 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
+  const inPanel = useIsInNodePanel()
   return (
     <div
       data-slot="card-content"
-      className={cn("px-6", className)}
+      className={cn(inPanel ? "px-3" : "px-6", className)}
       {...props}
     />
   )
 }
 
 function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
+  const inPanel = useIsInNodePanel()
   return (
     <div
       data-slot="card-footer"
-      className={cn("flex items-center px-6 [.border-t]:pt-6", className)}
+      className={cn("flex items-center [.border-t]:pt-6", inPanel ? "px-3" : "px-6", className)}
       {...props}
     />
   )

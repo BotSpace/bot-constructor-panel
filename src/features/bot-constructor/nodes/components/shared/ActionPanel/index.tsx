@@ -52,7 +52,7 @@ function SectionWrapper({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border bg-card/50 p-4 space-y-3 transition-colors hover:bg-card/80">
+    <div className="rounded-xl border bg-card/50 px-3 py-3 space-y-3 transition-colors hover:bg-card/80">
       <div className="flex items-center gap-2.5">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
           <Icon className="h-4 w-4" />
