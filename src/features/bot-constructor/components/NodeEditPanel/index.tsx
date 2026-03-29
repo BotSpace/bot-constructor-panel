@@ -67,8 +67,8 @@ export function NodeEditPanel() {
     ? CustomNodes[editingNode!.type as keyof typeof CustomNodes]
     : null;
 
-  const color = isOpen ? getNodeColor(editingNode!.type) : "#52525b";
-  const label = isOpen ? formatNodeName(editingNode!.type) : "";
+  const color = isOpen ? getNodeColor(editingNode!.type as string) : "#52525b";
+  const label = isOpen ? formatNodeName(editingNode!.type as string) : "";
 
   return (
     <div
