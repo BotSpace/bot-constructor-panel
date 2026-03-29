@@ -96,6 +96,23 @@
   border-right: none !important;
 }
 
+/* ── Compact ReactFlow node cards ────────────────────────────────────── */
+.react-flow__node [data-slot="card"] {
+  gap: 0.25rem !important;
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+.react-flow__node [data-slot="card-content"] {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+.react-flow__node [data-slot="card-footer"] {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
 /* ── Per-node-type icon box colors (muted, professional) ─────────────────
    Uses .node-icon-box class set in NodeHeader / TriggerHeader.
    Colors are 700-level (dark) to avoid eye strain — n8n style.

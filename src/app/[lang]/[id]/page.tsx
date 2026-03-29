@@ -128,7 +128,7 @@ function N8nTopBar({
   const { handleClick: backToHome } = useLinkToParent({ href: `/bot/${id}` });
 
   return (
-    <div className="h-[88px] shrink-0 flex items-center gap-2 px-3 border-b border-border z-10" style={{ backgroundColor: "#212121" }}>
+    <div className="h-[62px] shrink-0 flex items-center gap-2 px-3 border-b border-border z-10" style={{ backgroundColor: "#212121" }}>
       {/* Back */}
       <Button
         variant="ghost"
