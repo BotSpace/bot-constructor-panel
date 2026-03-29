@@ -81,7 +81,7 @@ export function NodeEditPanel() {
       {isOpen && (
         <>
           {/* ── Panel header ─────────────────────────────────────── */}
-          <div className="shrink-0 flex items-center gap-3 px-4 py-3 border-b border-border bg-background">
+          <div className="shrink-0 flex items-center gap-3 px-4 py-3 border-b border-border" style={{ backgroundColor: '#171717' }}>
             {/* Colored node-type icon */}
             <div
               className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-white text-xs font-bold"

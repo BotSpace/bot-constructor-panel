@@ -275,7 +275,7 @@ function InlineEditorContent({ defaultValue, onChange }: {
     });
 
     return (
-        <div className="tg-editor rounded-lg border border-border/60 bg-background overflow-hidden shadow-sm">
+        <div className="tg-editor rounded-lg border border-border/60 overflow-hidden shadow-sm" style={{ backgroundColor: '#171717' }}>
             <div className="border-b border-border/40 bg-muted/20">
                 <EditorToolbar editor={editor} />
             </div>
@@ -351,7 +351,7 @@ function LazyEditorContent({ defaultValue, onChange, onClose }: {
                 </button>
             </div>
 
-            <div className="tg-editor mx-4 mb-4 rounded-lg border border-border/60 bg-background overflow-hidden shadow-sm">
+            <div className="tg-editor mx-4 mb-4 rounded-lg border border-border/60 overflow-hidden shadow-sm" style={{ backgroundColor: '#171717' }}>
                 <div className="border-b border-border/40 bg-muted/20">
                     <EditorToolbar editor={editor} />
                 </div>
