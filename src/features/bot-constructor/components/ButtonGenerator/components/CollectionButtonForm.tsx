@@ -135,7 +135,7 @@ export const CollectionButtonForm = ({
             value={selectedCollection}
             onValueChange={handleCollectionChange}
           >
-            <SelectTrigger className="w-full bg-background">
+            <SelectTrigger className="bg-background">
               <SelectValue placeholder="Collection tanlash..." />
             </SelectTrigger>
             <SelectContent>

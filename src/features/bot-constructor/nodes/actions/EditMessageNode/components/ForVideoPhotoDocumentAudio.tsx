@@ -54,7 +54,7 @@ function ForVideoPhotoDocumentAudio({ handleUpdate, data, id }: Props) {
           onValueChange={(e) => handleUpdate({ parseMode: e as any })}
           value={data.parseMode}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger>
             <SelectValue placeholder="Select a markdown type" />
           </SelectTrigger>
           <SelectContent>

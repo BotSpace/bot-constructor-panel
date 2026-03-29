@@ -139,7 +139,7 @@ const SendVideoNodeComponent = ({
                   handleUpdate({ videoSourceType: value })
                 }
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger>
                   <SelectValue placeholder="Manbani tanlang..." />
                 </SelectTrigger>
                 <SelectContent>

@@ -127,7 +127,7 @@ const SendFileNodeComponent = ({
                   handleUpdate({ fileSourceType: value })
                 }
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger>
                   <SelectValue placeholder="Manbani tanlang..." />
                 </SelectTrigger>
                 <SelectContent>

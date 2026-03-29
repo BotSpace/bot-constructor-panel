@@ -170,7 +170,7 @@ export function HandlerAdder({
                             setMessageContext({});
                         }}
                     >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger>
                             <SelectValue placeholder="Xabar turini tanlang..." />
                         </SelectTrigger>
                         <SelectContent>
