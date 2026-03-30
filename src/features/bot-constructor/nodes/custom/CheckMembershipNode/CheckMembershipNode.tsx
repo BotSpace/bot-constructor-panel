@@ -67,7 +67,7 @@ const CheckMembershipNodeComponent = ({
   };
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="👥"
@@ -171,13 +171,13 @@ const CheckMembershipNodeComponent = ({
         type="source"
         position={Position.Bottom}
         id="is-member"
-        className="translate-x-[100px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
+        className="translate-x-[30px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
       />
       <Handle
         type="source"
         position={Position.Bottom}
         id="not-member"
-        className="translate-x-[-100px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
+        className="translate-x-[-30px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
       />
     </Card>
   );

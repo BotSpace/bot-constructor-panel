@@ -57,7 +57,7 @@ const DeleteMessageNodeComponent = ({
   const isConfigured = deleteFromContext || !!connectedMessageNode;
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
 
       {/* Custom Delete Source Handle (Right side) - O'chiriladigan messageni tanlash uchun */}

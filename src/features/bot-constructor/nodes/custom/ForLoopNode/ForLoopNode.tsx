@@ -25,7 +25,7 @@ const ForLoopNodeComponent = ({
   };
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="🔁"
@@ -75,14 +75,14 @@ const ForLoopNodeComponent = ({
 
       {/* loop-body handle — yuqori (har bir element) */}
       <SourceHandles
-        className="!bg-green-500 translate-y-[-75%]"
+        className="!bg-green-500 translate-y-[-200%]"
         id="loop-body"
         position={Position.Right}
       />
 
       {/* no-items handle — pastki (ro'yxat bo'sh) */}
       <SourceHandles
-        className="!bg-orange-400 translate-y-[75%]"
+        className="!bg-orange-400 translate-y-[200%]"
         id="no-items"
         position={Position.Right}
       />

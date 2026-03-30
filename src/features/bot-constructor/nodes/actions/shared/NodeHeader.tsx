@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ChevronDown, LayoutGrid } from "lucide-react";
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 
 interface NodeHeaderProps {
   icon: ReactNode;
@@ -21,6 +22,9 @@ export const NodeHeader = ({
   onToggleCollapse,
   color = "bg-zinc-600",
 }: NodeHeaderProps) => {
+  const inPanel = useIsInNodePanel();
+  if (inPanel) return null;
+
   return (
     <div
       onClick={onToggleCollapse}

@@ -103,7 +103,7 @@ const SendFileNodeComponent = ({
     )?.flat().length || 0;
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <SelectedMessageTarget />
 
@@ -245,11 +245,11 @@ const SendFileNodeComponent = ({
           <CardFooter className="flex flex-col gap-2">
             <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} recipients={data.recipients ?? { sendToSender: true, additionalIds: [] }} />
           </CardFooter>
+
+          {/* Handler list */}
+          <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
         </>
       )}
-
-      {/* Handler list */}
-      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles nodeId={id} />
     </Card>
