@@ -2,6 +2,7 @@ import React, { useMemo, ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { ConstructorData } from "@/features/bot-constructor/data";
 import { cn } from "@/lib/utils";
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 
 interface TriggerHeaderProps {
   /** Trigger icon (React component or emoji string) */
@@ -31,7 +32,10 @@ export const TriggerHeader = ({
     return ConstructorData.MessageTypes.find((t) => t.value === dataType);
   }, [dataType]);
 
+  const inPanel = useIsInNodePanel();
   const TypeIcon = selectedTypeData?.icon;
+
+  if (inPanel) return null;
 
   const renderIcon = () => {
     if (!icon) return null;

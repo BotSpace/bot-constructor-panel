@@ -57,7 +57,7 @@ const PollNodeComponent = ({
   };
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="📊"
@@ -204,9 +204,11 @@ const PollNodeComponent = ({
         </CardContent>
       )}
 
-      <CardFooter className="flex flex-col gap-2">
-        <ActionPanel keyboard={data.keyboard} id={id} recipients={data.recipients ?? { sendToSender: true, additionalIds: [] }} />
-      </CardFooter>
+      {!isCollapsed && (
+        <CardFooter className="flex flex-col gap-2">
+          <ActionPanel keyboard={data.keyboard} id={id} recipients={data.recipients ?? { sendToSender: true, additionalIds: [] }} />
+        </CardFooter>
+      )}
 
       <SourceHandles nodeId={id} />
     </Card>

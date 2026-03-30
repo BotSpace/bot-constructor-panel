@@ -30,8 +30,8 @@ function PageInner() {
   const initialPrompt = searchParams.get("prompt") ?? undefined;
   const { loadProject, project } = useProjectStore();
   const { loadCollections } = useCollectionStore();
-  // AI panel closed by default — n8n style
-  const [aiOpen, setAiOpen] = useState(false);
+  // AI panel opens automatically if prompt is provided
+  const [aiOpen, setAiOpen] = useState(!!initialPrompt);
   const [isAiBuilding, setIsAiBuilding] = useState(!!initialPrompt);
   const [envOpen, setEnvOpen] = useState(false);
   const [addNodeOpen, setAddNodeOpen] = useState(false);

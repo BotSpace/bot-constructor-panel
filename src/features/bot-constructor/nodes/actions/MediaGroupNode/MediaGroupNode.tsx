@@ -57,7 +57,7 @@ const MediaGroupNodeInternal = ({
   };
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="🖼️"
@@ -192,12 +192,16 @@ const MediaGroupNodeInternal = ({
         </CardContent>
       )}
 
-      <CardFooter className="flex flex-col gap-2">
-        <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} id={id} />
-      </CardFooter>
+      {!isCollapsed && (
+        <>
+          <CardFooter className="flex flex-col gap-2">
+            <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} id={id} />
+          </CardFooter>
 
-      {/* Handler list */}
-      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
+          {/* Handler list */}
+          <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
+        </>
+      )}
 
       <SourceHandles nodeId={id} />
     </Card>
