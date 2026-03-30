@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { CronTriggerNodeData } from "./types";
-import { TriggerHeader } from "../shared/TriggerHeader";
+import { NodeHeader } from "../../actions/shared/NodeHeader";
 
 import {
   Select,
@@ -25,7 +25,7 @@ const CronTriggerNodeComponent = ({
   data,
   selected,
 }: NodeProps<CronTriggerNodeData>) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
   // --- PARSING & DEFAULTS ---
@@ -108,19 +108,24 @@ const CronTriggerNodeComponent = ({
 
   return (
     <Card
-      className={cn("w-[350px] shadow-lg", selected && "ring-2 ring-primary")}
+      className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}
     >
       <TargetHandles />
 
-      <TriggerHeader
+      <NodeHeader
         icon="⏰"
         title="Cron Trigger"
-        isExpanded={isExpanded}
-        isConfigured={isConfigured}
-        onToggle={() => setIsExpanded(!isExpanded)}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
 
-      {isExpanded && (
+      {data.schedule && (
+        <div className="px-3 pb-2 text-xs font-mono text-primary truncate">
+          {data.schedule}
+        </div>
+      )}
+
+      {!isCollapsed && (
         <CardContent className="flex flex-col gap-4 pt-4">
           <div className="space-y-2">
             <Label className="text-[11px] font-bold uppercase text-muted-foreground">

@@ -45,7 +45,7 @@ const SendTextMessageNodeComponent = ({
     )?.flat().length || 0;
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary relative")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary relative")}>
       <TargetHandles />
       {/* <SelectedMessageTarget /> */}
 
@@ -56,7 +56,7 @@ const SendTextMessageNodeComponent = ({
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
-      <NodeTextPreview text={data.messageText} />
+      {/* <NodeTextPreview text={data.messageText} /> */}
       {!isCollapsed && (
         <>
           <CardContent className="grid gap-2">
@@ -84,6 +84,7 @@ const SendTextMessageNodeComponent = ({
           <CardFooter className="flex flex-col gap-2">
             <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} parseMode={data.parseMode} protectContent={data.protectContent} id={id} recipients={data.recipients ?? { sendToSender: true, additionalIds: [] }} />
           </CardFooter>
+
         </>
       )}
 

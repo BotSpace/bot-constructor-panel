@@ -13,6 +13,7 @@ import { SourceHandles, TargetHandles } from "../../components";
 import { Plus, X } from "lucide-react";
 import { HandlersList } from "../shared/HandlerBuilder/HandlersList";
 import { HandlerData } from "../TextMessageNode/types";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 
 export interface ForwardMessageNodeData {
   recipientIds?: string[];
@@ -25,6 +26,7 @@ const ForwardMessageNodeComponent = ({
   selected,
 }: NodeProps<ForwardMessageNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
   const recipientIds = data.recipientIds || [""];
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const previousLengthRef = useRef(recipientIds.length);
@@ -73,53 +75,55 @@ const ForwardMessageNodeComponent = ({
   };
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
 
-      <NodeHeader icon="➡️" title="Xabarni uzatish" />
+      <NodeHeader icon="➡️" title="Xabarni uzatish" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
 
-      <CardContent className="flex flex-col gap-4">
-        <div className="grid gap-2">
-          <Label>Qabul qiluvchilar</Label>
-          <div className="flex flex-col gap-2">
-            {recipientIds.map((recipientId, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <Input
-                  ref={(el) => {
-                    inputRefs.current[index] = el;
-                  }}
-                  placeholder="User/Chat ID"
-                  value={recipientId}
-                  onChange={(e) => handleRecipientChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="flex-1"
-                />
-                {recipientIds.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveRecipient(index)}
-                    className="h-9 w-9 shrink-0"
-                    title="O'chirish"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleAddRecipient}
-              className="w-full"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Yangi qabul qiluvchi qo'shish
-            </Button>
+      {!isCollapsed && (
+        <CardContent className="flex flex-col gap-4">
+          <div className="grid gap-2">
+            <Label>Qabul qiluvchilar</Label>
+            <div className="flex flex-col gap-2">
+              {recipientIds.map((recipientId, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Input
+                    ref={(el) => {
+                      inputRefs.current[index] = el;
+                    }}
+                    placeholder="User/Chat ID"
+                    value={recipientId}
+                    onChange={(e) => handleRecipientChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    className="flex-1"
+                  />
+                  {recipientIds.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveRecipient(index)}
+                      className="h-9 w-9 shrink-0"
+                      title="O'chirish"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAddRecipient}
+                className="w-full"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Yangi qabul qiluvchi qo'shish
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardContent>
+        </CardContent>
+      )}
 
       <SourceHandles nodeId={id} />
     </Card>

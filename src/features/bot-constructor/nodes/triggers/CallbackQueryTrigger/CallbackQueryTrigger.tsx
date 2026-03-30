@@ -1,16 +1,14 @@
 // FAYL: constructor/nodes/triggers/CallbackQueryTrigger/CallbackQueryTrigger.tsx (YANGILANGAN - Collection support)
 
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo } from "react";
 import { NodeProps, useNodes, useEdges } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { CallbackQueryTriggerData } from "./types";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import {
   Select,
   SelectContent,
@@ -22,13 +20,12 @@ import { Label } from "@/components/ui/label";
 import { FilterSelector } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/FilterSelector";
 import { ValueInput } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/ParameterInput/ValueInput";
 import { ConstructorData } from "@/features/bot-constructor/data";
-import { MousePointerClick } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ElseMessageSource } from "../../components/shared/ReactFlowHandles/ElseMessageSource";
 import { KeyboardConfig } from "@/features/bot-constructor/components";
-import { TriggerHeader } from "../shared/TriggerHeader";
+import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { StateConfigUI, getStateTypesForCallbackQueryTrigger } from "../shared";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
@@ -53,7 +50,7 @@ const CallbackQueryTriggerNodeComponent = ({
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const nodes = useNodes();
   const edges = useEdges();
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   // --- 1. OTA-ONA NODE'DAN CALLBACK TUGMALARINI OLISH (STATIC + COLLECTION) ---
   const availableCallbacks = useMemo(() => {
@@ -146,19 +143,24 @@ const CallbackQueryTriggerNodeComponent = ({
   }, [data.context?.value]);
 
   return (
-    <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <ElseMessageSource />
 
-      <TriggerHeader
-        icon={<MousePointerClick className="h-4 w-4 text-primary flex-shrink-0" />}
-        title="Callback Handler"
-        isExpanded={isExpanded}
-        isConfigured={isConfigured}
-        onToggle={() => setIsExpanded(!isExpanded)}
+      <NodeHeader
+        icon="🖱️"
+        title="Callback"
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
 
-      {isExpanded && (
+      {data.context?.value && (
+        <div className="px-3 pb-2 text-xs font-mono text-primary truncate">
+          {data.context.value}
+        </div>
+      )}
+
+      {!isCollapsed && (
         <CardContent className="space-y-4 pt-2">
           <div className="space-y-1.5">
             <Label className="text-xs text-muted-foreground">

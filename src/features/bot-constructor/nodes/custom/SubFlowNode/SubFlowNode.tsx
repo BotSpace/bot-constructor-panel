@@ -47,7 +47,7 @@ const SubFlowNodeComponent = ({
   const outputs = data.outputs || [];
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="🔌"

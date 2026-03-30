@@ -1,17 +1,16 @@
-import { Node, useEdges, useNodes } from "reactflow";
+import { Edge, Node } from "reactflow";
 import { ActionsTextAndMedia } from "../nodes";
 
 /**
  * Berilgan tugundan (startNodeId) boshlab tepaga (source tomonga) qarab yuradi
  * va birinchi uchragan Action tugunni qaytaradi.
  */
-export const findNearestParentAction = (startNodeId: string): Node | null => {
-  // Action (xabar yuboruvchi) tugun turlari ro'yxati.
-  // Loyihangizdagi type nomlariga qarab bularni to'g'rilang.
+export const findNearestParentAction = (
+  startNodeId: string,
+  nodes: Node[],
+  edges: Edge[]
+): Node | null => {
   const ACTION_NODE_TYPES = Object.keys(ActionsTextAndMedia);
-
-  const nodes = useNodes();
-  const edges = useEdges();
 
   let currentId = startNodeId;
 

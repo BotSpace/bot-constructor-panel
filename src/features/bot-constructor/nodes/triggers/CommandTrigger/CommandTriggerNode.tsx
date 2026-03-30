@@ -1,6 +1,6 @@
 // FAYL: constructor/nodes/triggers/CommandTrigger/CommandTriggerNode.tsx
 
-import { memo, useState, useMemo } from "react";
+import { memo, useMemo } from "react";
 import { NodeProps } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { CommandTriggerNodeData } from "./types";
@@ -10,11 +10,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Command } from "lucide-react";
 
 import { SourceHandles, TargetHandles } from "../../components";
-import { TriggerHeader } from "../shared/TriggerHeader";
+import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { StateConfigUI, getStateTypesForCommandTrigger } from "../shared";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 
 const CommandTriggerNodeComponent = ({
   id,
@@ -22,40 +22,34 @@ const CommandTriggerNodeComponent = ({
   selected,
 }: NodeProps<CommandTriggerNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const handleUpdate = (update: Partial<CommandTriggerNodeData>) => {
     updateNodeData(id, update);
   };
-
-  // Node sozlangaligini tekshirish (buyruq matni kiritilgan bo'lishi kerak)
-  const isConfigured = !!data.command?.trim();
 
   const availableStateTypes = useMemo(() => {
     return getStateTypesForCommandTrigger();
   }, []);
 
   return (
-    <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
 
-      <TriggerHeader
-        icon={<Command className="h-4 w-4 text-blue-400 flex-shrink-0" />}
-        title="Command Handler"
-        isExpanded={isExpanded}
-        isConfigured={isConfigured}
-        onToggle={() => setIsExpanded(!isExpanded)}
+      <NodeHeader
+        icon="⌨️"
+        title="Command"
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
-
-      {isExpanded && (
+      {!isCollapsed && (
         <CardContent className="flex flex-col gap-4">
-          {/* Buyruq kiritish maydoni */}
           <div>
             <Label
               htmlFor={`command-input-${id}`}
               className="text-xs text-muted-foreground"
             >
-              Buyruq matni (masalan, "start")
+              Buyruq matni
             </Label>
             <div className="relative mt-1">
               <Input
@@ -67,7 +61,6 @@ const CommandTriggerNodeComponent = ({
             </div>
           </div>
 
-          {/* Qo'shimcha argumentlarni ushlash uchun checkbox */}
           <div className="flex items-center space-x-2">
             <Checkbox
               id={`with-args-${id}`}
@@ -78,11 +71,11 @@ const CommandTriggerNodeComponent = ({
               htmlFor={`with-args-${id}`}
               className="text-sm font-normal cursor-pointer"
             >
-              Argumentlarni ushlash (deep linking)
+              Argumentlarni ushlash
             </Label>
           </div>
 
-          <Label className="mt-2">
+          <Label className="mt-2 flex items-center gap-2">
             <Checkbox
               checked={data.global}
               onCheckedChange={(e) =>
@@ -94,7 +87,6 @@ const CommandTriggerNodeComponent = ({
             Global
           </Label>
 
-          {/* State Configuration */}
           <StateConfigUI
             state={data.state}
             onStateChange={(state) => handleUpdate({ state })}

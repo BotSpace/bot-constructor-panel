@@ -246,10 +246,11 @@ const SendFileNodeComponent = ({
             <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} recipients={data.recipients ?? { sendToSender: true, additionalIds: [] }} />
           </CardFooter>
 
-          {/* Handler list */}
-          <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
         </>
       )}
+
+      {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles nodeId={id} />
     </Card>

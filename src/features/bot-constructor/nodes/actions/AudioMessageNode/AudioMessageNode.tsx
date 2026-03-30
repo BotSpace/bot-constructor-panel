@@ -106,7 +106,7 @@ const SendAudioNodeComponent = ({
     )?.flat().length || 0;
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <SelectedMessageTarget />
 
@@ -270,6 +270,7 @@ const SendAudioNodeComponent = ({
           <CardFooter className="flex flex-col gap-2">
             <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} protectContent={data.protectContent} id={id} recipients={data.recipients ?? { sendToSender: true, additionalIds: [] }} />
           </CardFooter>
+
         </>
       )}
 

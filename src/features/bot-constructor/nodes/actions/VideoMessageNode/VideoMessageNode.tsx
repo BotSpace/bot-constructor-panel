@@ -115,7 +115,7 @@ const SendVideoNodeComponent = ({
     )?.flat().length || 0;
 
   return (
-    <Card className={cn("w-96 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <SelectedMessageTarget />
 
