@@ -13,7 +13,7 @@ const ElseNodeComponent = ({ id, data, selected }: NodeProps<ElseNodeData>) => {
   const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   return (
-    <Card className={cn("w-100 shadow-lg w-[150px] h-[150px]", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       {/* Input - chap tomonda (IF/ElseIf dan NEXT) */}
       <Handle
         type="target"

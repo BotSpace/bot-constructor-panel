@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import React, { useState } from "react";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
 import AddItemModal from "./components/add-item-modal";
@@ -27,6 +28,7 @@ import { FormItem } from "./components/form-item";
 export function FormNode({ data, id, selected }: NodeProps<FormNodeData>) {
   console.log("🚀 ~ FormNode ~ data:", data);
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
   const [editingItem, setEditingItem] = useState<
     FormNodeData["items"][0] | null
   >(null);
@@ -119,44 +121,45 @@ export function FormNode({ data, id, selected }: NodeProps<FormNodeData>) {
   const sortableIds = sortedItems.map((_, index) => `form-item-${index}`);
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader icon="📝" title="Form" />
-      <CardContent className="space-y-3">
-        {sortedItems.length > 0 && (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={sortableIds}
-              strategy={verticalListSortingStrategy}
+      <NodeHeader icon="📝" title="Form" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      {!isCollapsed && (
+        <CardContent className="space-y-3">
+          {sortedItems.length > 0 && (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
             >
-              <div className="space-y-2 nodrag">
-                {sortedItems.map((item, index) => (
-                  <FormItem
-                    key={`form-item-${index}`}
-                    item={item}
-                    index={index}
-                    onRemove={() => handleRemoveItem(index)}
-                    onEdit={() => handleStartEdit(index)}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
-        )}
+              <SortableContext
+                items={sortableIds}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2 nodrag">
+                  {sortedItems.map((item, index) => (
+                    <FormItem
+                      key={`form-item-${index}`}
+                      item={item}
+                      index={index}
+                      onRemove={() => handleRemoveItem(index)}
+                      onEdit={() => handleStartEdit(index)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          )}
 
-        <AddItemModal
-          onAddItem={handleAddItem}
-          onEditItem={handleEditItem}
-          editingItem={editingItem}
-          onClose={() => setEditingItem(null)}
-        />
-
-        <SourceHandles nodeId={id} />
-      </CardContent>
+          <AddItemModal
+            onAddItem={handleAddItem}
+            onEditItem={handleEditItem}
+            editingItem={editingItem}
+            onClose={() => setEditingItem(null)}
+          />
+        </CardContent>
+      )}
+      <SourceHandles nodeId={id} />
     </Card>
   );
 }

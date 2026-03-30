@@ -1,6 +1,7 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { memo } from "react";
 import { NodeProps } from "reactflow";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { EditMessageNodeData, MessageIdSource } from "./types";
 import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
@@ -25,8 +26,11 @@ import { Input } from "@/components/ui/input";
 export const EditMessageNode = memo(
   ({ id, data, selected }: NodeProps<EditMessageNodeData>) => {
     const updateNodeData = useFlowStore((state) => state.updateNodeData);
+    const nodes = useFlowStore((state) => state.nodes);
+    const edges = useFlowStore((state) => state.edges);
+    const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
-    const nearestParentAction = findNearestParentAction(id);
+    const nearestParentAction = findNearestParentAction(id, nodes, edges);
     const parentActionType =
       nearestParentAction?.type as ElementItemType["triggerId"];
 
@@ -38,62 +42,67 @@ export const EditMessageNode = memo(
     return (
       <Card
         className={cn(
-          "w-100 shadow-lg relative",
+          "w-[150px] h-[150px] shadow-lg relative",
           selected && "ring-2 ring-primary"
         )}
       >
         <TargetHandles />
-        <NodeHeader icon="✍️" title="Edit Message" nodeId={id} />
+        <NodeHeader icon="✍️" title="Edit Message" nodeId={id} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
 
-        <CardContent>
-          <Select
-            onValueChange={(value) =>
-              handleUpdate({ messageIdSource: value as MessageIdSource })
-            }
-            value={data.messageIdSource}
-          >
-            <SelectTrigger className="w-full mb-4">
-              <SelectValue placeholder="Select an option" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="this_message">Yuqoridagi xabar</SelectItem>
-              <SelectItem value="connected_node">Ko'rsatilgan xabar</SelectItem>
-              <SelectItem value="message_id">Ko'rsatilgan xabar</SelectItem>
-            </SelectContent>
-          </Select>
+        {!isCollapsed && (
+          <>
+            <CardContent>
+              <Select
+                onValueChange={(value) =>
+                  handleUpdate({ messageIdSource: value as MessageIdSource })
+                }
+                value={data.messageIdSource}
+              >
+                <SelectTrigger className="w-full mb-4">
+                  <SelectValue placeholder="Select an option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="this_message">Yuqoridagi xabar</SelectItem>
+                  <SelectItem value="connected_node">Ko'rsatilgan xabar</SelectItem>
+                  <SelectItem value="message_id">Ko'rsatilgan xabar</SelectItem>
+                </SelectContent>
+              </Select>
 
-          {data.messageIdSource === "message_id" ? (
-            <>
-              <Input
-                value={data.messageId || ""}
-                onChange={(e) => handleUpdate({ messageId: e.target.value })}
-                placeholder="Enter message id"
-              />
-            </>
-          ) : parentActionType === "SendTextMessageNode" ||
-            !parentActionType ? (
-            <ForTextMessageNode
-              data={data}
-              handleUpdate={handleUpdate}
-              id={id}
-            />
-          ) : (
-            (parentActionType === "SendPhotoNode" ||
-              parentActionType === "SendVideoNode" ||
-              parentActionType === "SendFileNode" ||
-              parentActionType === "SendAudioNode") && (
-              <ForVideoPhotoDocumentAudio
-                data={data}
-                handleUpdate={handleUpdate}
-                id={id}
-              />
-            )
-          )}
-        </CardContent>
+              {data.messageIdSource === "message_id" ? (
+                <>
+                  <Input
+                    value={data.messageId || ""}
+                    onChange={(e) => handleUpdate({ messageId: e.target.value })}
+                    placeholder="Enter message id"
+                  />
+                </>
+              ) : parentActionType === "SendTextMessageNode" ||
+                !parentActionType ? (
+                <ForTextMessageNode
+                  data={data}
+                  handleUpdate={handleUpdate}
+                  id={id}
+                />
+              ) : (
+                (parentActionType === "SendPhotoNode" ||
+                  parentActionType === "SendVideoNode" ||
+                  parentActionType === "SendFileNode" ||
+                  parentActionType === "SendAudioNode") && (
+                  <ForVideoPhotoDocumentAudio
+                    data={data}
+                    handleUpdate={handleUpdate}
+                    id={id}
+                  />
+                )
+              )}
+            </CardContent>
 
-        <CardFooter className="flex flex-col gap-2">
-          <ActionPanel keyboard={data.keyboard} parseMode={data.parseMode} id={id} />
-        </CardFooter>
+            <CardFooter className="flex flex-col gap-2">
+              <ActionPanel keyboard={data.keyboard} parseMode={data.parseMode} id={id} />
+            </CardFooter>
+
+          </>
+        )}
 
         {/* Handler list */}
         <HandlersList keyboard={data.keyboard} sourceNodeId={id} />

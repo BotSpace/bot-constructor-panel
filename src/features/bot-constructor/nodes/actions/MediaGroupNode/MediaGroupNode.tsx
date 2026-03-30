@@ -197,11 +197,11 @@ const MediaGroupNodeInternal = ({
           <CardFooter className="flex flex-col gap-2">
             <ActionPanel keyboard={data.keyboard} disableNotification={data.disableNotification} id={id} />
           </CardFooter>
-
-          {/* Handler list */}
-          <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
         </>
       )}
+
+      {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles nodeId={id} />
     </Card>

@@ -40,7 +40,7 @@ const EditOrSendMessageNodeComponent = ({
     )?.flat().length || 0;
 
   return (
-    <Card className={cn("w-100 shadow-lg", selected && "ring-2 ring-primary relative")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary relative")}>
       <TargetHandles />
 
       <NodeHeader
@@ -88,10 +88,13 @@ const EditOrSendMessageNodeComponent = ({
               hideHandlers
             />
           </CardFooter>
+
         </>
       )}
 
+      {/* Handler list */}
       <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
+
       <SourceHandles nodeId={id} />
     </Card>
   );

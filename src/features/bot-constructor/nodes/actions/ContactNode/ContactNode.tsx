@@ -85,10 +85,11 @@ const ContactNodeComponent = ({
             <ActionPanel keyboard={data.keyboard} id={id} recipients={data.recipients ?? { sendToSender: true, additionalIds: [] }} />
           </CardFooter>
 
-          {/* Handler list */}
-          <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
         </>
       )}
+
+      {/* Handler list */}
+      <HandlersList keyboard={data.keyboard} sourceNodeId={id} />
 
       <SourceHandles nodeId={id} />
     </Card>

@@ -64,7 +64,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
 
   return (
     <Card
-      className={`w-80 rounded-xl border shadow-lg transition-all overflow-hidden ${selected
+      className={`w-[150px] rounded-xl border shadow-lg transition-all overflow-hidden ${selected
         ? "border-sky-500/80 shadow-xl shadow-sky-500/10 ring-2 ring-sky-500/20"
         : "border-border shadow-md"
         }`}

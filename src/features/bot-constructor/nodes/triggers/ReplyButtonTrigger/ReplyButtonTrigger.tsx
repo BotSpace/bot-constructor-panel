@@ -1,22 +1,22 @@
 "use client";
 
-import { FormEvent, memo, useMemo, useState } from "react";
+import { memo, useMemo } from "react";
 import { NodeProps, useNodes, useEdges } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ReplyButtonTriggerData } from "./types";
-import { AlertCircle, CornerDownLeft } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SourceHandles, TargetHandles } from "../../components";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TriggerHeader } from "../shared/TriggerHeader";
+import { NodeHeader } from "../../actions/shared/NodeHeader";
 import {
   ButtonConfig,
   KeyboardConfig,
 } from "@/features/bot-constructor/components";
 import { StateConfigUI, getStateTypesForReplyButtonTrigger } from "../shared";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 
 // YORDAMCHI INTERFEYS: Ota-ona node'ning `data` obyekti qanday bo'lishini tasvirlaydi
 // --- O'ZGARTIRISH: `keyboard` ixtiyoriy qilindi, xatolikdan saqlanish uchun ---
@@ -32,7 +32,7 @@ const ReplyButtonTriggerNodeComponent = ({
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const nodes = useNodes();
   const edges = useEdges();
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   // --- O'ZGARTIRISH: Mantiq to'liq yangilandi va soddalashtirildi ---
   const availableReplyButtons = useMemo(() => {
@@ -113,19 +113,26 @@ const ReplyButtonTriggerNodeComponent = ({
     return getStateTypesForReplyButtonTrigger();
   }, []);
 
+  const selectedButtonNames = data.selectedButtons?.map((b) => b.text).join(", ");
+
   return (
-    <Card className={cn("w-80 shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
 
-      <TriggerHeader
-        icon={<CornerDownLeft className="h-4 w-4 text-primary flex-shrink-0" />}
-        title="Reply Tugma Handleri"
-        isExpanded={isExpanded}
-        isConfigured={isConfigured}
-        onToggle={() => setIsExpanded(!isExpanded)}
+      <NodeHeader
+        icon="↩️"
+        title="Reply Tugma"
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
 
-      {isExpanded && (
+      {selectedButtonNames && (
+        <div className="px-3 pb-2 text-xs font-mono text-primary truncate">
+          {selectedButtonNames}
+        </div>
+      )}
+
+      {!isCollapsed && (
         <CardContent className="flex flex-col gap-3">
           {!data.catchNoButton && (
             <>
