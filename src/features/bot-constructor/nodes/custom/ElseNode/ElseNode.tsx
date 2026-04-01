@@ -42,8 +42,7 @@ const ElseNodeComponent = ({ id, data, selected }: NodeProps<ElseNodeData>) => {
         </CardContent>
       )}
 
-      {/* TRUE - pastda (doim bajariladi) */}
-      <SourceHandles id="true" position={Position.Bottom} />
+      <SourceHandles id="true" position={Position.Right} />
     </Card>
   );
 };

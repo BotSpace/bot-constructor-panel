@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useMemo } from "react";
-import { NodeProps, useNodes, useEdges } from "reactflow";
+import { NodeProps } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -30,8 +30,8 @@ const ReplyButtonTriggerNodeComponent = ({
   selected,
 }: NodeProps<ReplyButtonTriggerData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const nodes = useNodes();
-  const edges = useEdges();
+  const nodes = useFlowStore((state) => state.nodes);
+  const edges = useFlowStore((state) => state.edges);
   const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   // --- O'ZGARTIRISH: Mantiq to'liq yangilandi va soddalashtirildi ---

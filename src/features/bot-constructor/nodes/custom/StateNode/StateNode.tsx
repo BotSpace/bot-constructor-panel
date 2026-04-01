@@ -6,7 +6,7 @@ import { Combobox } from "@/components/ui/combobox";
 
 import React, { useMemo } from "react";
 import { useNodeExpanded } from "@/features/bot-constructor/hooks/useNodeCollapsed";
-import { NodeProps, useEdges, useNodes } from "reactflow";
+import { NodeProps } from "reactflow";
 import { Database, ChevronDown, Key, Type, AlertCircle } from "lucide-react";
 import { StateNodeData } from "./types";
 import { SourceHandles, TargetHandles } from "../../components";
@@ -16,8 +16,8 @@ import { findNearestTriggerNode, getDynamicFilters } from "./getDynamicFilters";
 export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
   const [isExpanded, setIsExpanded] = useNodeExpanded();
 
-  const nodes = useNodes();
-  const edges = useEdges();
+  const nodes = useFlowStore((state) => state.nodes);
+  const edges = useFlowStore((state) => state.edges);
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 

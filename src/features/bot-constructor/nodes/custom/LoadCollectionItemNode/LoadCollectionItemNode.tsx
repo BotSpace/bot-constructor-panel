@@ -22,7 +22,6 @@ import { useReactQueryAction } from "@/services/react-query";
 import { APIDetailCreateResponse } from "@/types/http/response";
 import { CollectionDetail } from "@/types/http/collection";
 import { Badge } from "@/components/ui/badge";
-import { useNodes, useEdges } from "reactflow";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
@@ -50,8 +49,8 @@ function LoadCollectionItemNode({
   });
 
   // Get available state keys (faqat zanjiriga ulangan)
-  const nodes = useNodes();
-  const edges = useEdges();
+  const nodes = useFlowStore((state) => state.nodes);
+  const edges = useFlowStore((state) => state.edges);
   const availableStateKeys = useMemo(() => {
     return getAvailableStateKeys(nodes, edges, id);
   }, [nodes, edges, id]);
