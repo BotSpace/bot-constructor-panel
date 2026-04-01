@@ -7,7 +7,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendTextMessageNodeData } from "../types";
 import { Badge } from "@/components/ui/badge";
-import { useNodes, useEdges } from "reactflow";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
@@ -34,8 +33,8 @@ function AccordionItemWrapper({ collection, id, dynamicMessages }: Props) {
   });
 
   // State keys'larni olish (faqat zanjiriga ulangan StateNode va Trigger'lardan)
-  const nodes = useNodes();
-  const edges = useEdges();
+  const nodes = useFlowStore((state) => state.nodes);
+  const edges = useFlowStore((state) => state.edges);
   const availableStateKeys = useMemo(() => {
     return getAvailableStateKeys(nodes, edges, id);
   }, [nodes, edges, id]);

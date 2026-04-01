@@ -1,7 +1,7 @@
 // FAYL: constructor/nodes/triggers/CallbackQueryTrigger/CallbackQueryTrigger.tsx (YANGILANGAN - Collection support)
 
 import { memo, useMemo } from "react";
-import { NodeProps, useNodes, useEdges } from "reactflow";
+import { NodeProps } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { CallbackQueryTriggerData } from "./types";
 import {
@@ -48,8 +48,8 @@ const CallbackQueryTriggerNodeComponent = ({
   selected,
 }: NodeProps<CallbackQueryTriggerData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const nodes = useNodes();
-  const edges = useEdges();
+  const nodes = useFlowStore((state) => state.nodes);
+  const edges = useFlowStore((state) => state.edges);
   const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   // --- 1. OTA-ONA NODE'DAN CALLBACK TUGMALARINI OLISH (STATIC + COLLECTION) ---

@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useMemo } from "react";
-import { useNodeExpanded } from "@/features/bot-constructor/hooks/useNodeCollapsed";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
+import { Card, CardContent } from "@/components/ui/card";
+import { NodeHeader } from "../../actions/shared/NodeHeader";
 import {
   Select,
   SelectContent,
@@ -13,14 +14,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Database, ChevronDown, ArrowRight, Key } from "lucide-react";
+import { ArrowRight, Database, Key } from "lucide-react";
 import {
   APIDetailCreateResponse,
   APIListResponse,
 } from "@/types/http/response";
 import { useReactQueryAction } from "@/services/react-query/use-react-query-action";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
-import { NodeProps, useNodes, useEdges } from "reactflow";
+import { NodeProps } from "reactflow";
 
 import { CollectionNodeData } from "./types";
 import { useFlowStore } from "@/features/bot-constructor/store";
@@ -33,9 +34,9 @@ export function CollectionNode({
   selected,
 }: NodeProps<CollectionNodeData>) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const nodes = useNodes();
-  const edges = useEdges();
-  const [isExpanded, setIsExpanded] = useNodeExpanded();
+  const nodes = useFlowStore((state) => state.nodes);
+  const edges = useFlowStore((state) => state.edges);
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const { data: Collections } = useReactQueryAction<
     APIListResponse<CollectionListItem[]>
@@ -110,56 +111,23 @@ export function CollectionNode({
 
   return (
     <Card
-      className={`w-[150px] rounded-xl border shadow-lg transition-all overflow-hidden ${selected
+      className={`w-[150px] min-h-[150px] rounded-xl border shadow-lg transition-all overflow-hidden ${selected
         ? "border-sky-500/80 shadow-xl shadow-sky-500/10 ring-2 ring-sky-500/20"
         : "border-border shadow-md"
         }`}
     >
       <TargetHandles />
 
-      <CardHeader className="pb-3 px-6 pt-6">
-        <div
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-sm flex items-center justify-between cursor-pointer group rounded-lg p-2 -m-2 hover:bg-muted/60 transition-colors"
-        >
-          <div className="flex items-center gap-2 flex-1">
-            <Database className="h-4 w-4 text-purple-400 flex-shrink-0" />
-            <span className="font-medium text-foreground">Collection</span>
-            {data.collection_name && (
-              <Badge
-                variant="secondary"
-                className="border-border text-xs px-1.5 py-0"
-              >
-                {data.collection_name}
-              </Badge>
-            )}
-            {CollectionData?.data && (
-              <Badge
-                variant="outline"
-                className="border-blue-500/50 text-blue-400 text-xs px-1.5 py-0"
-              >
-                {CollectionData.data.fields.length} fields
-              </Badge>
-            )}
-          </div>
-          <div className="flex items-center gap-2 ml-2">
-            <div
-              className={`w-2 h-2 rounded-full transition-all ${isConfigured
-                ? "bg-green-500 shadow-sm shadow-green-500/50"
-                : "bg-muted-foreground/40"
-                }`}
-              title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
-            />
-            <ChevronDown
-              className={`h-4 w-4 text-muted-foreground transform transition-transform duration-200 ${isExpanded ? "rotate-0" : "-rotate-90"
-                }`}
-            />
-          </div>
-        </div>
-      </CardHeader>
+      <NodeHeader
+        icon="🗄️"
+        title="Collection"
+        nodeId={id}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+      />
 
-      {isExpanded && (
-        <CardContent className="px-6 pb-6 pt-0 space-y-4">
+      {!isCollapsed && (
+        <CardContent className="px-3 pb-4 pt-0 space-y-4">
           <div className="space-y-1.5">
             <Label className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium">
               <Database className="h-3 w-3" />

@@ -3,8 +3,8 @@ import { Node, Edge, Position } from "reactflow";
 
 type Direction = "TB" | "LR";
 
-const DEFAULT_NODE_WIDTH = 320;
-const DEFAULT_NODE_HEIGHT = 200;
+const DEFAULT_NODE_WIDTH = 150;
+const DEFAULT_NODE_HEIGHT = 150;
 
 /**
  * Cycle-safe dagre layout.
@@ -64,8 +64,8 @@ export const getFormatFlow = (
 
   dagreGraph.setGraph({
     rankdir: direction,
-    nodesep: 80,
-    ranksep: 250,
+    nodesep: 60,
+    ranksep: 120,
   });
 
   nodes.forEach((node) => {

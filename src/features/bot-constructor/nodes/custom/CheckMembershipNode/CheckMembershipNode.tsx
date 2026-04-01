@@ -169,15 +169,15 @@ const CheckMembershipNodeComponent = ({
       {/* Conditional Output Handles */}
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         id="is-member"
-        className="translate-x-[30px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
+        className="translate-y-[-10px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
       />
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         id="not-member"
-        className="translate-x-[-30px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
+        className="translate-y-[10px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
       />
     </Card>
   );

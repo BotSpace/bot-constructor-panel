@@ -1,6 +1,6 @@
 "use client";
 
-import { NodeProps, useNodes, useEdges } from "reactflow";
+import { NodeProps } from "reactflow";
 import { memo, useMemo } from "react";
 import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,8 +30,8 @@ const DeleteMessageNodeComponent = ({
 }: NodeProps<DeleteMessageNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
-  const nodes = useNodes();
-  const edges = useEdges();
+  const nodes = useFlowStore((state) => state.nodes);
+  const edges = useFlowStore((state) => state.edges);
 
   const handleUpdate = (update: Partial<DeleteMessageNodeData>) => {
     updateNodeData(id, update);
