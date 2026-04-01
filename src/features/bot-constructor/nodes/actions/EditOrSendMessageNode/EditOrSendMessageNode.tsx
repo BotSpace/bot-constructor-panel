@@ -50,7 +50,6 @@ const EditOrSendMessageNodeComponent = ({
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
-      <NodeTextPreview text={data.messageText} />
       {!isCollapsed && (
         <>
           <CardContent className="grid gap-2">
