@@ -46,7 +46,7 @@ function FloatingEdge({
     const targetNode = nodes.find((node) => node.id === target);
     
     // Get target node name for label
-    const targetNodeTitle = targetNode?.data?.title || targetNode?.type?.replace('Node', '') || 'Node';
+    const targetNodeTitle = (targetNode?.data as any)?.title || targetNode?.type?.replace('Node', '') || 'Node';
 
     // Dynamically determine direction based on node positions
     let dynSourcePos = sourcePosition;

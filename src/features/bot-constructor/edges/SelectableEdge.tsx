@@ -34,7 +34,7 @@ function SelectableEdge({
 
   // Get target node name for label
   const targetNode = nodes.find((n) => n.id === target);
-  const targetNodeTitle = targetNode?.data?.title || targetNode?.type?.replace('Node', '') || 'Node';
+  const targetNodeTitle = (targetNode?.data as any)?.title || targetNode?.type?.replace('Node', '') || 'Node';
 
   // Calculate path using React Flow's smooth step path
   const [edgePath, labelX, labelY] = getSmoothStepPath({
