@@ -6,14 +6,17 @@ import {
     Position,
     getBezierPath,
     useNodes,
+    EdgeLabelRenderer,
 } from "reactflow";
 import { useEdgeColor } from "./useEdgeColor";
 
 /**
- * FloatingEdge - Edge that dynamically exits from left or right
- * based on relative positions of source and target nodes
+ * FloatingEdge - Enhanced edge with dynamic routing, colors and animations
  *
  * Features:
+ * - Color-coded by handle type (success=green, error=red, default=blue)
+ * - Animated flow indicator
+ * - Edge labels for handle names
  * - Dynamically determines exit/entry side (left or right)
  * - Uses handle Y positions from ReactFlow (edges come out of buttons/handles)
  * - Uses Bezier curves for smooth connections
@@ -29,12 +32,14 @@ function FloatingEdge({
     targetY,
     sourcePosition,
     targetPosition,
+    sourceHandleId,
     markerEnd,
     style = {},
     selected,
+    label,
 }: EdgeProps) {
     const nodes = useNodes();
-    const { stroke: edgeColor, selectedStroke } = useEdgeColor();
+    const { stroke: edgeColor, selectedStroke } = useEdgeColor(sourceHandleId);
 
     // Find source and target nodes for dynamic direction
     const sourceNode = nodes.find((node) => node.id === source);
@@ -112,7 +117,7 @@ function FloatingEdge({
     }
 
     // Use Bezier path with dynamic positions
-    const [edgePath] = getBezierPath({
+    const [edgePath, labelX, labelY] = getBezierPath({
         sourceX: dynSourceX,
         sourceY,
         targetX: dynTargetX,
@@ -122,12 +127,12 @@ function FloatingEdge({
     });
 
     // Get original style values
-    const originalStrokeWidth = (style as any)?.strokeWidth || 4;
+    const originalStrokeWidth = (style as any)?.strokeWidth || 2.5;
 
     // Selected state styling - more visible
     const selectedStyle = {
         stroke: selectedStroke,
-        strokeWidth: 5,
+        strokeWidth: 4,
     };
 
     // Default style
@@ -141,6 +146,9 @@ function FloatingEdge({
 
     // Marker color also changes when selected
     const markerColor = selected ? selectedStroke : edgeColor;
+
+    // Get label from handle ID
+    const handleLabel = sourceHandleId?.replace(/[-_]/g, " ").toUpperCase();
 
     return (
         <>
@@ -160,7 +168,20 @@ function FloatingEdge({
                 </marker>
             )}
 
-            {/* Edge path */}
+            {/* Animated dashed line underneath for flow indication */}
+            <path
+                d={edgePath}
+                fill="none"
+                stroke={edgeColor}
+                strokeWidth={dynamicStyle.strokeWidth}
+                strokeDasharray="5,5"
+                strokeOpacity={0.3}
+                style={{
+                    animation: "dashdraw 0.5s linear infinite",
+                }}
+            />
+
+            {/* Main Edge path */}
             <BaseEdge
                 id={id}
                 path={edgePath}
@@ -172,6 +193,39 @@ function FloatingEdge({
                         "stroke-width 0.15s ease-in-out, stroke 0.15s ease-in-out",
                 }}
             />
+
+            {/* Edge Label */}
+            {(selected || label) && (
+                <EdgeLabelRenderer>
+                    <div
+                        style={{
+                            position: "absolute",
+                            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+                            pointerEvents: "all",
+                        }}
+                        className="nodrag nopan"
+                    >
+                        <div
+                            className="px-2 py-0.5 text-[10px] font-medium rounded-full shadow-sm"
+                            style={{
+                                backgroundColor: edgeColor,
+                                color: "white",
+                                opacity: selected ? 1 : 0.7,
+                            }}
+                        >
+                            {label || handleLabel || "NEXT"}
+                        </div>
+                    </div>
+                </EdgeLabelRenderer>
+            )}
+
+            <style jsx global>{`
+                @keyframes dashdraw {
+                    to {
+                        stroke-dashoffset: -10;
+                    }
+                }
+            `}</style>
         </>
     );
 }

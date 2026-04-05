@@ -1,15 +1,17 @@
 "use client";
 import { memo } from "react";
-import { BaseEdge, type EdgeProps, getSmoothStepPath } from "reactflow";
+import { BaseEdge, type EdgeProps, getSmoothStepPath, EdgeLabelRenderer } from "reactflow";
 import { useEdgeColor } from "./useEdgeColor";
 
 /**
- * SelectableEdge - Minimal custom edge that shows selected state
+ * SelectableEdge - Enhanced custom edge with animations and labels
  *
  * Features:
- * - Shows visual feedback when selected (color and stroke width change)
- * - Uses React Flow's default step path
- * - Maintains original styling when not selected
+ * - Color-coded by handle type (success=green, error=red, default=blue)
+ * - Animated flow indicator
+ * - Edge labels for handle names
+ * - Visual feedback when selected (color and stroke width change)
+ * - Smooth step path for cleaner look
  */
 function SelectableEdge({
   id,
@@ -19,14 +21,16 @@ function SelectableEdge({
   targetY,
   sourcePosition,
   targetPosition,
+  sourceHandleId,
   style = {},
   markerEnd,
   selected,
+  label,
 }: EdgeProps) {
-  const { stroke: edgeColor, selectedStroke } = useEdgeColor();
+  const { stroke: edgeColor, selectedStroke } = useEdgeColor(sourceHandleId);
 
   // Calculate path using React Flow's smooth step path
-  const [edgePath] = getSmoothStepPath({
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
     targetX,
@@ -37,12 +41,12 @@ function SelectableEdge({
   });
 
   // Get original style values
-  const originalStrokeWidth = (style as any)?.strokeWidth || 4;
+  const originalStrokeWidth = (style as any)?.strokeWidth || 2.5;
 
   // Selected state styling - more visible
   const selectedStyle = {
     stroke: selectedStroke,
-    strokeWidth: 5,
+    strokeWidth: 4,
   };
 
   // Default style
@@ -56,6 +60,9 @@ function SelectableEdge({
 
   // Marker color also changes when selected
   const markerColor = selected ? selectedStroke : edgeColor;
+
+  // Get label from handle ID
+  const handleLabel = sourceHandleId?.replace(/[-_]/g, " ").toUpperCase();
 
   return (
     <>
@@ -75,7 +82,20 @@ function SelectableEdge({
         </marker>
       )}
 
-      {/* Edge path */}
+      {/* Animated dashed line underneath for flow indication */}
+      <path
+        d={edgePath}
+        fill="none"
+        stroke={edgeColor}
+        strokeWidth={dynamicStyle.strokeWidth}
+        strokeDasharray="5,5"
+        strokeOpacity={0.3}
+        style={{
+          animation: "dashdraw 0.5s linear infinite",
+        }}
+      />
+
+      {/* Main Edge path */}
       <BaseEdge
         id={id}
         path={edgePath}
@@ -87,6 +107,39 @@ function SelectableEdge({
             "stroke-width 0.15s ease-in-out, stroke 0.15s ease-in-out",
         }}
       />
+
+      {/* Edge Label */}
+      {(selected || label) && (
+        <EdgeLabelRenderer>
+          <div
+            style={{
+              position: "absolute",
+              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+              pointerEvents: "all",
+            }}
+            className="nodrag nopan"
+          >
+            <div
+              className="px-2 py-0.5 text-[10px] font-medium rounded-full shadow-sm"
+              style={{
+                backgroundColor: edgeColor,
+                color: "white",
+                opacity: selected ? 1 : 0.7,
+              }}
+            >
+              {label || handleLabel || "NEXT"}
+            </div>
+          </div>
+        </EdgeLabelRenderer>
+      )}
+
+      <style jsx global>{`
+        @keyframes dashdraw {
+          to {
+            stroke-dashoffset: -10;
+          }
+        }
+      `}</style>
     </>
   );
 }
