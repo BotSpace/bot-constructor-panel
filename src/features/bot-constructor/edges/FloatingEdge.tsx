@@ -41,9 +41,9 @@ function FloatingEdge({
     const nodes = useNodes();
     const { stroke: edgeColor, selectedStroke } = useEdgeColor(sourceHandleId);
 
-    // Find source and target nodes for dynamic direction
+    // Get target node name for label
+    const targetNodeTitle = targetNode?.data?.title || targetNode?.type?.replace('Node', '') || 'Node';
     const sourceNode = nodes.find((node) => node.id === source);
-    const targetNode = nodes.find((node) => node.id === target);
 
     // Dynamically determine direction based on node positions
     let dynSourcePos = sourcePosition;
@@ -195,7 +195,7 @@ function FloatingEdge({
             />
 
             {/* Edge Label */}
-            {(selected || label) && (
+            {selected && (
                 <EdgeLabelRenderer>
                     <div
                         style={{
@@ -213,7 +213,7 @@ function FloatingEdge({
                                 opacity: selected ? 1 : 0.7,
                             }}
                         >
-                            {label || handleLabel || "NEXT"}
+                            {label || targetNodeTitle}
                         </div>
                     </div>
                 </EdgeLabelRenderer>

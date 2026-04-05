@@ -1,6 +1,6 @@
 "use client";
 import { memo } from "react";
-import { BaseEdge, type EdgeProps, getSmoothStepPath, EdgeLabelRenderer } from "reactflow";
+import { BaseEdge, type EdgeProps, getSmoothStepPath, EdgeLabelRenderer, useNodes } from "reactflow";
 import { useEdgeColor } from "./useEdgeColor";
 
 /**
@@ -9,12 +9,14 @@ import { useEdgeColor } from "./useEdgeColor";
  * Features:
  * - Color-coded by handle type (success=green, error=red, default=blue)
  * - Animated flow indicator
- * - Edge labels for handle names
+ * - Edge labels showing target node name
  * - Visual feedback when selected (color and stroke width change)
  * - Smooth step path for cleaner look
  */
 function SelectableEdge({
   id,
+  source,
+  target,
   sourceX,
   sourceY,
   targetX,
@@ -27,7 +29,12 @@ function SelectableEdge({
   selected,
   label,
 }: EdgeProps) {
+  const nodes = useNodes();
   const { stroke: edgeColor, selectedStroke } = useEdgeColor(sourceHandleId);
+
+  // Get target node name for label
+  const targetNode = nodes.find((n) => n.id === target);
+  const targetNodeTitle = targetNode?.data?.title || targetNode?.type?.replace('Node', '') || 'Node';
 
   // Calculate path using React Flow's smooth step path
   const [edgePath, labelX, labelY] = getSmoothStepPath({
@@ -60,9 +67,6 @@ function SelectableEdge({
 
   // Marker color also changes when selected
   const markerColor = selected ? selectedStroke : edgeColor;
-
-  // Get label from handle ID
-  const handleLabel = sourceHandleId?.replace(/[-_]/g, " ").toUpperCase();
 
   return (
     <>
@@ -109,7 +113,7 @@ function SelectableEdge({
       />
 
       {/* Edge Label */}
-      {(selected || label) && (
+      {selected && (
         <EdgeLabelRenderer>
           <div
             style={{
@@ -127,7 +131,7 @@ function SelectableEdge({
                 opacity: selected ? 1 : 0.7,
               }}
             >
-              {label || handleLabel || "NEXT"}
+              {label || targetNodeTitle}
             </div>
           </div>
         </EdgeLabelRenderer>
