@@ -55,6 +55,10 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     editingNodeId: null,
     setEditingNodeId: (id: string | null) => set({ editingNodeId: id }),
 
+    // Edge visibility toggle
+    edgesVisible: true,
+    toggleEdgesVisibility: () => set((state) => ({ edgesVisible: !state.edgesVisible })),
+
     // Barcha slice'larni birlashtiramiz
     // Har bir slice'ga (set, get) ni uzatamiz
     ...createFlowSlice(set, get, {} as any),
