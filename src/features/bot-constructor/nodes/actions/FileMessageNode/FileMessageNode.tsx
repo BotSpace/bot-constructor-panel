@@ -103,7 +103,7 @@ const SendFileNodeComponent = ({
     )?.flat().length || 0;
 
   return (
-    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <SelectedMessageTarget />
 
@@ -117,7 +117,7 @@ const SendFileNodeComponent = ({
 
       {!isCollapsed && (
         <>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent className="flex flex-col gap-3">
             {/* Fayl manbasi */}
             <div className="grid gap-2">
               <Label>Fayl manbasi</Label>

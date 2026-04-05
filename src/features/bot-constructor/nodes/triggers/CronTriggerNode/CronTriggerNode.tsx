@@ -108,7 +108,7 @@ const CronTriggerNodeComponent = ({
 
   return (
     <Card
-      className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}
+      className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}
     >
       <TargetHandles />
 
@@ -126,7 +126,7 @@ const CronTriggerNodeComponent = ({
       )}
 
       {!isCollapsed && (
-        <CardContent className="flex flex-col gap-4 pt-4">
+        <CardContent className="flex flex-col gap-3 pt-4">
           <div className="space-y-2">
             <Label className="text-[11px] font-bold uppercase text-muted-foreground">
               Takrorlanish

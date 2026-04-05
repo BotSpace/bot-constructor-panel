@@ -38,7 +38,7 @@ const VariableNodeComponent = ({
   const needsValue = !["delete", "toggle"].includes(currentOperation);
 
   return (
-    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="🔢"
@@ -48,7 +48,7 @@ const VariableNodeComponent = ({
       />
 
       {!isCollapsed && (
-        <CardContent className="flex flex-col gap-4 pt-4">
+        <CardContent className="flex flex-col gap-3 pt-4">
           {/* Operation */}
           <div className="flex flex-col gap-2">
             <Label>Operatsiya</Label>

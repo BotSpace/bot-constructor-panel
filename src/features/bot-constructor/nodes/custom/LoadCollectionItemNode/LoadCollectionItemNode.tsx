@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { NodeHeader } from "../../actions/shared/NodeHeader";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 
 function LoadCollectionItemNode({
   id,
@@ -33,6 +34,7 @@ function LoadCollectionItemNode({
 }: NodeProps<LoadCollectionItemNodeData>) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const { data: collections } = useCollectionStore();
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const handleUpdate = (update: Partial<LoadCollectionItemNodeData>) => {
     updateNodeData(id, update);
@@ -56,61 +58,60 @@ function LoadCollectionItemNode({
   }, [nodes, edges, id]);
 
   return (
-    <>
+    <Card
+      className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}
+    >
       <TargetHandles />
-      <Card
-        className={cn("w-[700px] shadow-lg", selected && "ring-2 ring-primary")}
-      >
-        <NodeHeader
-          icon={<Database className="text-primary" />}
-          title="Collectiondan item yuklash"
-        />
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            {/* Collection Selection */}
-            <div className="space-y-2">
-              <Label>Collection</Label>
-              <Select
+      <NodeHeader
+        icon={<Database className="text-primary" />}
+        title="Load Item"
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+      />
+      {!isCollapsed && (
+        <CardContent className="space-y-4 pt-4">
+          {/* Collection Selection */}
+          <div className="space-y-2">
+            <Label>Collection</Label>
+            <Select
+              value={data.collection?.name ?? ""}
+              onValueChange={(value) => {
+                const selected = collections?.find((c) => c.name === value);
+                handleUpdate({
+                  collection: selected || null,
+                  filters: [], // Reset filters when collection changes
+                });
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select collection" />
+              </SelectTrigger>
+              <SelectContent>
+                {collections?.map((collection) => (
+                  <SelectItem key={collection.id} value={collection.name}>
+                    {collection.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-                value={data.collection?.name ?? ""}
-                onValueChange={(value) => {
-                  const selected = collections?.find((c) => c.name === value);
-                  handleUpdate({
-                    collection: selected || null,
-                    filters: [], // Reset filters when collection changes
-                  });
-                }}
-              >
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Select collection" />
-                </SelectTrigger>
-                <SelectContent>
-                  {collections?.map((collection) => (
-                    <SelectItem key={collection.id} value={collection.name}>
-                      {collection.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Context Key */}
-            <div className="space-y-2 w-full">
-              <Label>Context Key</Label>
-              <Input
-                placeholder="e.g., selected_film"
-                value={data.contextKey || ""}
-                onChange={(e) => handleUpdate({ contextKey: e.target.value })}
-                required
-              />
-              {data.contextKey && data.contextKey.length <= 0 && (
-                <p className="text-red-500">Context key must be at least 1 character long</p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Use: {"{"}
-                {"{"}collection.{data.contextKey || "key"}.fieldname{"}}"}
-              </p>
-            </div>
+          {/* Context Key */}
+          <div className="space-y-2">
+            <Label>Context Key</Label>
+            <Input
+              placeholder="e.g., selected_film"
+              value={data.contextKey || ""}
+              onChange={(e) => handleUpdate({ contextKey: e.target.value })}
+              required
+            />
+            {data.contextKey && data.contextKey.length <= 0 && (
+              <p className="text-xs text-red-500">Context key required</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Use: {"{"}
+              {"{"}collection.{data.contextKey || "key"}.fieldname{"}}"}
+            </p>
           </div>
 
           {/* Filters */}
@@ -168,14 +169,14 @@ function LoadCollectionItemNode({
             </div>
           )}
         </CardContent>
-      </Card>
+      )}
 
       {/* Not found - o'ng tomonda (ElseIf/Else ga) */}
       <SourceHandles className="!bg-red-500 translate-y-[-75%]" id="not_found" position={Position.Right} />
 
       {/* Found - pastda (shart bajarilsa) */}
       <SourceHandles className="translate-y-[75%]" id="found" position={Position.Right} />
-    </>
+    </Card>
   );
 }
 

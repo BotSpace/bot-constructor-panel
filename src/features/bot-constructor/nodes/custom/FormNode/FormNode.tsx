@@ -121,11 +121,11 @@ export function FormNode({ data, id, selected }: NodeProps<FormNodeData>) {
   const sortableIds = sortedItems.map((_, index) => `form-item-${index}`);
 
   return (
-    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader icon="📝" title="Form" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
       {!isCollapsed && (
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 pt-4">
           {sortedItems.length > 0 && (
             <DndContext
               sensors={sensors}

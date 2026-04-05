@@ -44,7 +44,7 @@ const StickerNodeInternal = ({
   const sourceType = data.stickerSourceType || "file_id";
 
   return (
-    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="🎭"
@@ -54,7 +54,7 @@ const StickerNodeInternal = ({
       />
 
       {!isCollapsed && (
-        <CardContent className="flex flex-col gap-4 pt-4">
+        <CardContent className="flex flex-col gap-3 pt-4">
           <div className="flex flex-col gap-2">
             <Label>Sticker manbai</Label>
             <Select

@@ -33,7 +33,7 @@ const UnpinMessageNodeComponent = ({
   };
 
   return (
-    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="📌"
@@ -43,7 +43,7 @@ const UnpinMessageNodeComponent = ({
       />
 
       {!isCollapsed && (
-        <CardContent className="flex flex-col gap-4 pt-4">
+        <CardContent className="flex flex-col gap-3 pt-4">
           <div className="flex items-center justify-between">
             <Label>Barcha qadalgan xabarlarni olib tashlash</Label>
             <Switch

@@ -57,7 +57,7 @@ const MediaGroupNodeInternal = ({
   };
 
   return (
-    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="🖼️"
@@ -67,7 +67,7 @@ const MediaGroupNodeInternal = ({
       />
 
       {!isCollapsed && (
-        <CardContent className="flex flex-col gap-4 pt-4">
+        <CardContent className="flex flex-col gap-3 pt-4">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <Label>Media elementlar (2-10 ta)</Label>

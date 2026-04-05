@@ -114,7 +114,7 @@ const IfConditionNodeComponent = ({
   };
 
   return (
-    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="🔀"
@@ -124,7 +124,7 @@ const IfConditionNodeComponent = ({
       />
 
       {!isCollapsed && (
-        <CardContent className="flex flex-col gap-4 pt-4">
+        <CardContent className="flex flex-col gap-3 pt-4">
           {/* Logic Operator */}
           <div className="flex flex-col gap-2">
             <Label>Mantiq operatori</Label>
