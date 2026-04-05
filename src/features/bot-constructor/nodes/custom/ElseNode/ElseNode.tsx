@@ -32,6 +32,7 @@ const ElseNodeComponent = ({ id, data, selected }: NodeProps<ElseNodeData>) => {
         title="Else (Aks holda)"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-cyan-500"
       />
 
       {!isCollapsed && (

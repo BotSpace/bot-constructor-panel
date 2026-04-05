@@ -77,7 +77,7 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
         title="State"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
-        color="bg-purple-500"
+        color="bg-orange-500"
       />
 
       {!isCollapsed && (

@@ -56,6 +56,7 @@ const SubFlowNodeComponent = ({
         title={data.pluginName || "Plugin"}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-indigo-500"
       />
 
       {!isCollapsed && (

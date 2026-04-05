@@ -35,6 +35,7 @@ const ContactNodeComponent = ({
         title="Kontakt"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-teal-500"
       />
 
       {!isCollapsed && (

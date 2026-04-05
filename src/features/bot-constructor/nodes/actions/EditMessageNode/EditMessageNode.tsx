@@ -47,7 +47,9 @@ export const EditMessageNode = memo(
         )}
       >
         <TargetHandles />
-        <NodeHeader icon="✍️" title="Edit Message" nodeId={id} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+        <NodeHeader icon="✍️" title="Edit Message" nodeId={id} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} 
+          color="bg-slate-600"
+        />
 
         {!isCollapsed && (
           <>

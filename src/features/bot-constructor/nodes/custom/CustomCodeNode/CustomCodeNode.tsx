@@ -30,6 +30,7 @@ export const CustomCodeNode = ({ id, data, selected }: NodeProps<CustomCodeNodeD
         nodeId={id}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-green-600"
       />
 
       {!isCollapsed && (

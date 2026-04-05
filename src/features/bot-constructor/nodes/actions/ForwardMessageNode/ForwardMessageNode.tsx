@@ -78,7 +78,9 @@ const ForwardMessageNodeComponent = ({
     <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
 
-      <NodeHeader icon="➡️" title="Xabarni uzatish" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      <NodeHeader icon="➡️" title="Xabarni uzatish" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} 
+        color="bg-slate-400"
+      />
 
       {!isCollapsed && (
         <CardContent className="flex flex-col gap-4">

@@ -51,6 +51,7 @@ const SendTextMessageNodeComponent = ({
 
       <NodeHeader
         icon={<LetterText className="text-primary" />}
+        color="bg-slate-500"
         title="Xabar yuborish"
         buttonCount={buttonCount}
         isCollapsed={isCollapsed}

@@ -73,6 +73,7 @@ const MessageTriggerNodeComponent = ({
         title="Xabar"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-blue-600"
       />
 
 

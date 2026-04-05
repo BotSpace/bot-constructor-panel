@@ -124,6 +124,7 @@ export function CollectionNode({
         nodeId={id}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-orange-400"
       />
 
       {!isCollapsed && (

@@ -113,6 +113,7 @@ const DownloadFileNodeInternal = ({
         title="Fayl yuklab olish"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-gray-600"
       />
 
       {!isCollapsed && (

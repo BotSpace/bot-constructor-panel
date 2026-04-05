@@ -66,6 +66,7 @@ const ElseIfNodeComponent = ({
         title="Else If (Aks holda agar)"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-teal-600"
       />
 
       {!isCollapsed && (

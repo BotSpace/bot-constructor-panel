@@ -56,6 +56,7 @@ const ChatActionNodeInternal = ({
         title="Harakat ko'rsatish"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-gray-400"
       />
 
       {!isCollapsed && (

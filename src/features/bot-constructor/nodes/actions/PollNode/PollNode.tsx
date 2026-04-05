@@ -64,6 +64,7 @@ const PollNodeComponent = ({
         title="So'rovnoma"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-indigo-400"
       />
 
       {!isCollapsed && (

@@ -41,6 +41,7 @@ const CommandTriggerNodeComponent = ({
         title="Command"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-blue-500"
       />
       {!isCollapsed && (
         <CardContent className="flex flex-col gap-4">

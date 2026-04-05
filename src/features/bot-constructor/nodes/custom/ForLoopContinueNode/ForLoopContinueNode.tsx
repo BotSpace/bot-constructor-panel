@@ -16,7 +16,9 @@ const ForLoopContinueNodeComponent = ({
   return (
     <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader icon="↩️" title="Loop Continue" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      <NodeHeader icon="↩️" title="Loop Continue" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} 
+        color="bg-purple-600"
+      />
       {!isCollapsed && (
         <div className="px-4 pb-4 text-sm text-muted-foreground text-center">
           Loop iteratsiyasini tugatadi va keyingi elementga o'tadi

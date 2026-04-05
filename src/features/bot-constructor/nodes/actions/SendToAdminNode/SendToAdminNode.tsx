@@ -14,7 +14,9 @@ const SendToAdminNodeComponent = ({ id, selected }: NodeProps) => {
   return (
     <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader icon="👤" title="Admin'ga yuborish" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      <NodeHeader icon="👤" title="Admin'ga yuborish" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} 
+        color="bg-red-500"
+      />
       {!isCollapsed && (
         <div className="p-4 text-sm text-muted-foreground text-center">
           Xabarni admin panelga yuboradi

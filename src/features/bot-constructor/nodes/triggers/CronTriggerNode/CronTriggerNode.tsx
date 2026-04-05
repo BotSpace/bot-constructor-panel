@@ -117,6 +117,7 @@ const CronTriggerNodeComponent = ({
         title="Cron Trigger"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-sky-500"
       />
 
       {data.schedule && (

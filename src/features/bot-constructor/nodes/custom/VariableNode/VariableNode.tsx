@@ -45,6 +45,7 @@ const VariableNodeComponent = ({
         title="O'zgaruvchi"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-orange-500"
       />
 
       {!isCollapsed && (

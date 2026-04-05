@@ -75,6 +75,7 @@ const CheckMembershipNodeComponent = ({
         title="A'zolikni tekshirish"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-emerald-500"
       />
 
       {!isCollapsed && (
