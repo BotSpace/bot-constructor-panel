@@ -1,0 +1,452 @@
+{
+  "nodes": [
+    {
+      "id": "trigger-1",
+      "type": "CommandTrigger",
+      "position": { "x": 100, "y": 100 },
+      "data": {
+        "command": "/start",
+        "description": "Start command test"
+      }
+    },
+    {
+      "id": "trigger-2",
+      "type": "MessageTrigger",
+      "position": { "x": 100, "y": 300 },
+      "data": {
+        "messageType": "text",
+        "pattern": ".*"
+      }
+    },
+    {
+      "id": "trigger-3",
+      "type": "CallbackQueryTrigger",
+      "position": { "x": 100, "y": 500 },
+      "data": {
+        "callbackData": "button_clicked"
+      }
+    },
+    {
+      "id": "trigger-4",
+      "type": "ReplyButtonTrigger",
+      "position": { "x": 100, "y": 700 },
+      "data": {
+        "buttonText": "Test Button"
+      }
+    },
+    {
+      "id": "trigger-5",
+      "type": "CronTriggerNode",
+      "position": { "x": 100, "y": 900 },
+      "data": {
+        "schedule": "0 9 * * *",
+        "timezone": "Asia/Tashkent"
+      }
+    },
+    {
+      "id": "action-1",
+      "type": "TextMessageNode",
+      "position": { "x": 400, "y": 100 },
+      "data": {
+        "messageText": "Hello World!",
+        "parseMode": "HTML",
+        "keyboard": null,
+        "recipients": { "sendToSender": true, "additionalIds": [] }
+      }
+    },
+    {
+      "id": "action-2",
+      "type": "PhotoMessageNode",
+      "position": { "x": 400, "y": 300 },
+      "data": {
+        "photo": "",
+        "caption": "Test photo",
+        "keyboard": null
+      }
+    },
+    {
+      "id": "action-3",
+      "type": "VideoMessageNode",
+      "position": { "x": 400, "y": 500 },
+      "data": {
+        "video": "",
+        "caption": "Test video",
+        "keyboard": null
+      }
+    },
+    {
+      "id": "action-4",
+      "type": "AudioMessageNode",
+      "position": { "x": 400, "y": 700 },
+      "data": {
+        "audio": "",
+        "caption": "Test audio"
+      }
+    },
+    {
+      "id": "action-5",
+      "type": "FileMessageNode",
+      "position": { "x": 400, "y": 900 },
+      "data": {
+        "file": "",
+        "caption": "Test file"
+      }
+    },
+    {
+      "id": "action-6",
+      "type": "AnimationNode",
+      "position": { "x": 400, "y": 1100 },
+      "data": {
+        "animation": "",
+        "caption": "Test animation"
+      }
+    },
+    {
+      "id": "action-7",
+      "type": "VoiceNode",
+      "position": { "x": 400, "y": 1300 },
+      "data": {
+        "voice": "",
+        "caption": "Test voice"
+      }
+    },
+    {
+      "id": "action-8",
+      "type": "VideoNoteNode",
+      "position": { "x": 400, "y": 1500 },
+      "data": {
+        "videoNote": ""
+      }
+    },
+    {
+      "id": "action-9",
+      "type": "LocationNode",
+      "position": { "x": 700, "y": 100 },
+      "data": {
+        "latitude": 41.2995,
+        "longitude": 69.2401
+      }
+    },
+    {
+      "id": "action-10",
+      "type": "ContactNode",
+      "position": { "x": 700, "y": 300 },
+      "data": {
+        "phoneNumber": "+998901234567",
+        "firstName": "John",
+        "lastName": "Doe"
+      }
+    },
+    {
+      "id": "action-11",
+      "type": "PollNode",
+      "position": { "x": 700, "y": 500 },
+      "data": {
+        "question": "Test poll?",
+        "options": ["Yes", "No"]
+      }
+    },
+    {
+      "id": "action-12",
+      "type": "DiceNode",
+      "position": { "x": 700, "y": 700 },
+      "data": {
+        "emoji": "🎲"
+      }
+    },
+    {
+      "id": "action-13",
+      "type": "ChatActionNode",
+      "position": { "x": 700, "y": 900 },
+      "data": {
+        "action": "typing"
+      }
+    },
+    {
+      "id": "action-14",
+      "type": "EditMessageNode",
+      "position": { "x": 700, "y": 1100 },
+      "data": {
+        "messageText": "Edited message",
+        "messageId": ""
+      }
+    },
+    {
+      "id": "action-15",
+      "type": "DeleteMessageNode",
+      "position": { "x": 700, "y": 1300 },
+      "data": {
+        "messageId": ""
+      }
+    },
+    {
+      "id": "action-16",
+      "type": "PinMessageNode",
+      "position": { "x": 700, "y": 1500 },
+      "data": {
+        "messageId": "",
+        "disableNotification": false
+      }
+    },
+    {
+      "id": "action-17",
+      "type": "ForwardMessageNode",
+      "position": { "x": 1000, "y": 100 },
+      "data": {
+        "fromChatId": "",
+        "messageId": ""
+      }
+    },
+    {
+      "id": "action-18",
+      "type": "CopyMessageNode",
+      "position": { "x": 1000, "y": 300 },
+      "data": {
+        "fromChatId": "",
+        "messageId": ""
+      }
+    },
+    {
+      "id": "action-19",
+      "type": "MediaGroupNode",
+      "position": { "x": 1000, "y": 500 },
+      "data": {
+        "media": [],
+        "caption": "Test media group"
+      }
+    },
+    {
+      "id": "action-20",
+      "type": "SendToAdminNode",
+      "position": { "x": 1000, "y": 700 },
+      "data": {
+        "messageText": "Admin notification"
+      }
+    },
+    {
+      "id": "action-21",
+      "type": "DownloadFileNode",
+      "position": { "x": 1000, "y": 900 },
+      "data": {
+        "fileId": "",
+        "contextKey": "downloaded_file"
+      }
+    },
+    {
+      "id": "action-22",
+      "type": "StickerNode",
+      "position": { "x": 1000, "y": 1100 },
+      "data": {
+        "sticker": ""
+      }
+    },
+    {
+      "id": "action-23",
+      "type": "UnpinMessageNode",
+      "position": { "x": 1000, "y": 1300 },
+      "data": {
+        "messageId": ""
+      }
+    },
+    {
+      "id": "action-24",
+      "type": "EditOrSendMessageNode",
+      "position": { "x": 1000, "y": 1500 },
+      "data": {
+        "messageText": "Edit or send",
+        "keyboard": null
+      }
+    },
+    {
+      "id": "custom-1",
+      "type": "VariableNode",
+      "position": { "x": 1300, "y": 100 },
+      "data": {
+        "operation": "set",
+        "variableName": "test_var",
+        "value": "test_value"
+      }
+    },
+    {
+      "id": "custom-2",
+      "type": "ConditionNode",
+      "position": { "x": 1300, "y": 300 },
+      "data": {
+        "operator": "AND",
+        "conditions": []
+      }
+    },
+    {
+      "id": "custom-3",
+      "type": "ElseIfNode",
+      "position": { "x": 1300, "y": 500 },
+      "data": {
+        "operator": "AND",
+        "conditions": []
+      }
+    },
+    {
+      "id": "custom-4",
+      "type": "ElseNode",
+      "position": { "x": 1300, "y": 700 },
+      "data": {}
+    },
+    {
+      "id": "custom-5",
+      "type": "ForLoopNode",
+      "position": { "x": 1300, "y": 900 },
+      "data": {
+        "dataKey": "items",
+        "itemKey": "item",
+        "indexKey": "index"
+      }
+    },
+    {
+      "id": "custom-6",
+      "type": "ForLoopContinueNode",
+      "position": { "x": 1300, "y": 1100 },
+      "data": {}
+    },
+    {
+      "id": "custom-7",
+      "type": "HTTPRequestNode",
+      "position": { "x": 1600, "y": 100 },
+      "data": {
+        "method": "GET",
+        "url": "https://api.example.com",
+        "headers": {},
+        "body": "",
+        "contextKey": "api_response"
+      }
+    },
+    {
+      "id": "custom-8",
+      "type": "CustomCodeNode",
+      "position": { "x": 1600, "y": 300 },
+      "data": {
+        "code": "print('Hello from Python')",
+        "language": "python"
+      }
+    },
+    {
+      "id": "custom-9",
+      "type": "DelayNode",
+      "position": { "x": 1600, "y": 500 },
+      "data": {
+        "delay": 5,
+        "unit": "seconds"
+      }
+    },
+    {
+      "id": "custom-10",
+      "type": "RandomNode",
+      "position": { "x": 1600, "y": 700 },
+      "data": {
+        "min": 1,
+        "max": 100
+      }
+    },
+    {
+      "id": "custom-11",
+      "type": "FormNode",
+      "position": { "x": 1600, "y": 900 },
+      "data": {
+        "items": []
+      }
+    },
+    {
+      "id": "custom-12",
+      "type": "StateNode",
+      "position": { "x": 1600, "y": 1100 },
+      "data": {
+        "state": "default"
+      }
+    },
+    {
+      "id": "custom-13",
+      "type": "CallbackAnswerNode",
+      "position": { "x": 1900, "y": 100 },
+      "data": {
+        "text": "Callback answer",
+        "showAlert": false
+      }
+    },
+    {
+      "id": "custom-14",
+      "type": "CheckMembershipNode",
+      "position": { "x": 1900, "y": 300 },
+      "data": {
+        "channelId": "",
+        "channelUsername": ""
+      }
+    },
+    {
+      "id": "custom-15",
+      "type": "SubFlowNode",
+      "position": { "x": 1900, "y": 500 },
+      "data": {
+        "pluginName": "Test Plugin",
+        "params": {}
+      }
+    },
+    {
+      "id": "custom-16",
+      "type": "SubFlowExitNode",
+      "position": { "x": 1900, "y": 700 },
+      "data": {
+        "outputs": {}
+      }
+    },
+    {
+      "id": "custom-17",
+      "type": "CollectionNode",
+      "position": { "x": 1900, "y": 900 },
+      "data": {
+        "collection": null,
+        "operation": "create",
+        "data": {}
+      }
+    },
+    {
+      "id": "custom-18",
+      "type": "LoadCollectionItemNode",
+      "position": { "x": 1900, "y": 1100 },
+      "data": {
+        "collection": null,
+        "contextKey": "loaded_item",
+        "filters": []
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "trigger-1",
+      "target": "action-1",
+      "type": "smoothstep"
+    },
+    {
+      "id": "e2",
+      "source": "trigger-2",
+      "target": "action-2",
+      "type": "smoothstep"
+    },
+    {
+      "id": "e3",
+      "source": "action-1",
+      "target": "custom-1",
+      "type": "smoothstep"
+    },
+    {
+      "id": "e4",
+      "source": "custom-1",
+      "target": "custom-2",
+      "type": "smoothstep"
+    }
+  ],
+  "viewport": {
+    "x": 0,
+    "y": 0,
+    "zoom": 0.5
+  }
+}

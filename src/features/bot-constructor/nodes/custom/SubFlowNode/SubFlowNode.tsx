@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PlusIcon, Trash2, GripVertical } from "lucide-react";
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 
 const SubFlowNodeComponent = ({
   id,
@@ -30,6 +31,7 @@ const SubFlowNodeComponent = ({
 }: NodeProps<SubFlowNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
+  const inPanel = useIsInNodePanel();
 
   const handleParamChange = useCallback(
     (key: string, value: unknown) => {
@@ -47,7 +49,7 @@ const SubFlowNodeComponent = ({
   const outputs = data.outputs || [];
 
   return (
-    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
       <NodeHeader
         icon="🔌"
@@ -57,7 +59,7 @@ const SubFlowNodeComponent = ({
       />
 
       {!isCollapsed && (
-        <CardContent className="flex flex-col gap-4 pt-4">
+        <CardContent className="flex flex-col gap-3 pt-4">
           {data.pluginDescription && (
             <p className="text-xs text-muted-foreground">
               {data.pluginDescription}
@@ -111,29 +113,33 @@ const SubFlowNodeComponent = ({
       )}
 
       {/* Har bir output uchun alohida source handle */}
-      {outputs.length > 0 ? (
-        outputs.map((out, idx) => (
-          <Handle
-            key={out.name}
-            type="source"
-            position={Position.Right}
-            id={`output-${out.name}`}
-            className="!w-6 !h-6 !bg-emerald-500 !rounded-full !border-2 !border-background translate-x-[-5px]"
-            style={{ top: `${((idx + 1) / (outputs.length + 1)) * 100}%` }}
-            title={out.name}
-          >
-            <PlusIcon size={10} className="w-2 h-2 text-white pointer-events-none ml-[7px] mt-[5px]" />
-          </Handle>
-        ))
-      ) : (
-        <Handle
-          type="source"
-          position={Position.Right}
-          id="source-handler"
-          className="!w-6 !h-14 !bg-sky-500 !rounded-[10px] !border-gray-800 flex items-center justify-center translate-x-[-5px]"
-        >
-          <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
-        </Handle>
+      {!inPanel && (
+        <>
+          {outputs.length > 0 ? (
+            outputs.map((out, idx) => (
+              <Handle
+                key={out.name}
+                type="source"
+                position={Position.Right}
+                id={`output-${out.name}`}
+                className="!w-6 !h-6 !bg-emerald-500 !rounded-full !border-2 !border-background translate-x-[-5px]"
+                style={{ top: `${((idx + 1) / (outputs.length + 1)) * 100}%` }}
+                title={out.name}
+              >
+                <PlusIcon size={10} className="w-2 h-2 text-white pointer-events-none ml-[7px] mt-[5px]" />
+              </Handle>
+            ))
+          ) : (
+            <Handle
+              type="source"
+              position={Position.Right}
+              id="source-handler"
+              className="!w-6 !h-14 !bg-sky-500 !rounded-[10px] !border-gray-800 flex items-center justify-center translate-x-[-5px]"
+            >
+              <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
+            </Handle>
+          )}
+        </>
       )}
     </Card>
   );

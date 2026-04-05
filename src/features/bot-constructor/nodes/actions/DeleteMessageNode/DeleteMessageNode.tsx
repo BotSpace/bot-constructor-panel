@@ -57,7 +57,7 @@ const DeleteMessageNodeComponent = ({
   const isConfigured = deleteFromContext || !!connectedMessageNode;
 
   return (
-    <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
+    <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
 
       {/* Custom Delete Source Handle (Right side) - O'chiriladigan messageni tanlash uchun */}
@@ -71,7 +71,7 @@ const DeleteMessageNodeComponent = ({
       />
 
       {!isCollapsed && (
-        <CardContent className="flex flex-col gap-4 pt-4">
+        <CardContent className="flex flex-col gap-3 pt-4">
           <div className="flex items-center justify-between">
             <Label>Contextdan xabarni o'chirish</Label>
             <Switch

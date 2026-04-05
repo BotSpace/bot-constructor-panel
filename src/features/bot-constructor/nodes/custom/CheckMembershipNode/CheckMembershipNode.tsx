@@ -1,6 +1,6 @@
 "use client";
 
-import { NodeProps } from "reactflow";
+import { NodeProps, Handle, Position } from "reactflow";
 import { memo } from "react";
 import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,7 +10,6 @@ import { TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Handle, Position } from "reactflow";
 import {
   Select,
   SelectContent,
@@ -20,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 
 interface ChannelInfo {
   id: string;
@@ -38,6 +38,7 @@ const CheckMembershipNodeComponent = ({
 }: NodeProps<CheckMembershipNodeData>) => {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
+  const inPanel = useIsInNodePanel();
 
   const handleUpdate = (update: Partial<CheckMembershipNodeData>) => {
     updateNodeData(id, update);
@@ -167,18 +168,22 @@ const CheckMembershipNodeComponent = ({
       )}
 
       {/* Conditional Output Handles */}
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="is-member"
-        className="translate-y-[-10px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="not-member"
-        className="translate-y-[10px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
-      />
+      {!inPanel && (
+        <>
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="is-member"
+            className="translate-y-[-10px] !w-3 !h-3 !bg-green-500 !border-2 !border-white"
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="not-member"
+            className="translate-y-[10px] !w-3 !h-3 !bg-red-500 !border-2 !border-white"
+          />
+        </>
+      )}
     </Card>
   );
 };

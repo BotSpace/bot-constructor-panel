@@ -72,7 +72,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     };
 
     ws.onerror = (error) => {
-      console.error("WS error:", error);
+      // WebSocket error - odatda connection muammosi
+      // Backend server ishlamasa yoki token muddati o'tgan bo'lsa chiqadi
+      if (process.env.NODE_ENV === 'development') {
+        console.warn("WS connection error - backend may be unavailable");
+      }
     };
 
     ws.onclose = () => {

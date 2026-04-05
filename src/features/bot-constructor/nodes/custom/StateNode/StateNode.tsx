@@ -1,20 +1,21 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Combobox } from "@/components/ui/combobox";
 
 import React, { useMemo } from "react";
-import { useNodeExpanded } from "@/features/bot-constructor/hooks/useNodeCollapsed";
+import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { NodeProps } from "reactflow";
-import { Database, ChevronDown, Key, Type, AlertCircle } from "lucide-react";
+import { Database, Key, Type, AlertCircle } from "lucide-react";
 import { StateNodeData } from "./types";
 import { SourceHandles, TargetHandles } from "../../components";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { findNearestTriggerNode, getDynamicFilters } from "./getDynamicFilters";
+import { NodeHeader } from "../../actions/shared/NodeHeader";
+import { cn } from "@/lib/utils";
 
 export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
-  const [isExpanded, setIsExpanded] = useNodeExpanded();
+  const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
 
   const nodes = useFlowStore((state) => state.nodes);
   const edges = useFlowStore((state) => state.edges);
@@ -64,49 +65,23 @@ export function StateNode({ id, data, selected }: NodeProps<StateNodeData>) {
 
   return (
     <Card
-      className={`w-[150px] rounded-xl border shadow-lg transition-all overflow-hidden ${selected
-        ? "border-sky-500/80 shadow-xl shadow-sky-500/10 ring-2 ring-sky-500/20"
-        : "border-border shadow-md"
-        }`}
+      className={cn(
+        "w-[150px] shadow-lg",
+        selected && "ring-2 ring-primary"
+      )}
     >
       <TargetHandles />
 
-      <CardHeader className="pb-3 px-6 pt-6">
-        <div
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-sm flex items-center justify-between cursor-pointer group rounded-lg p-2 -m-2 hover:bg-muted/60 transition-colors"
-        >
-          <div className="flex items-center gap-2 flex-1">
-            <Database className="h-4 w-4 text-purple-400 flex-shrink-0" />
-            <span className="font-medium text-foreground">State</span>
-            {data.key && (
-              <Badge
-                variant="secondary"
-                className="border-gray-600/50 text-xs px-1.5 py-0"
-              >
-                {data.key}
-              </Badge>
-            )}
-          </div>
-          <div className="flex items-center gap-2 ml-2">
-            <div
-              className={`w-2 h-2 rounded-full transition-all ${isConfigured
-                ? "bg-green-500 shadow-sm shadow-green-500/50"
-                : "bg-muted-foreground/40"
-                }`}
-              title={isConfigured ? "Sozlangan" : "Sozlanmagan"}
-            />
-            <ChevronDown
-              className={`h-4 w-4 text-muted-foreground transform transition-transform duration-200 ${isExpanded ? "rotate-0" : "-rotate-90"
-                }`}
-            />
-          </div>
-        </div>
-      </CardHeader>
+      <NodeHeader
+        icon={<Database className="text-purple-400" />}
+        title="State"
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-purple-500"
+      />
 
-      {isExpanded && (
-        <CardContent className="px-6 pb-6 pt-0 space-y-4">
-          {triggerNode ? (
+      {!isCollapsed && (
+        <CardContent className="px-4 pb-4 pt-4 space-y-3">{triggerNode ? (
             <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-purple-500/10 border border-purple-500/20">
               <Database className="h-3.5 w-3.5 text-purple-400 flex-shrink-0" />
               <span className="text-xs text-purple-300 truncate">

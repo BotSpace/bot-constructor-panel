@@ -42,7 +42,7 @@ export const EditMessageNode = memo(
     return (
       <Card
         className={cn(
-          "w-[150px] h-[150px] shadow-lg relative",
+          "w-[150px] shadow-lg relative",
           selected && "ring-2 ring-primary"
         )}
       >
@@ -51,7 +51,7 @@ export const EditMessageNode = memo(
 
         {!isCollapsed && (
           <>
-            <CardContent>
+            <CardContent className="pt-4">
               <Select
                 onValueChange={(value) =>
                   handleUpdate({ messageIdSource: value as MessageIdSource })
