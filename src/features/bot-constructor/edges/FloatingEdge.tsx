@@ -41,9 +41,12 @@ function FloatingEdge({
     const nodes = useNodes();
     const { stroke: edgeColor, selectedStroke } = useEdgeColor(sourceHandleId);
 
+    // Find source and target nodes for dynamic direction and label
+    const sourceNode = nodes.find((node) => node.id === source);
+    const targetNode = nodes.find((node) => node.id === target);
+    
     // Get target node name for label
     const targetNodeTitle = targetNode?.data?.title || targetNode?.type?.replace('Node', '') || 'Node';
-    const sourceNode = nodes.find((node) => node.id === source);
 
     // Dynamically determine direction based on node positions
     let dynSourcePos = sourcePosition;
