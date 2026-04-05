@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from './components/button'
-import { Bot, Database, Key, Keyboard, MoreHorizontal, Search } from 'lucide-react'
+import { Bot, Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -42,7 +42,7 @@ interface Props {
 const FIXED_W = 227
 const SLOT = 48
 const MORE_W = 48
-const ALL_COUNT = 6
+const ALL_COUNT = 7 // Increased from 6 to 7
 
 function BottomPanel({ aiPanelOpen, onToggleAI, addNodeOpen, onAddNodeOpenChange }: Props) {
     const { isOpen, height, toggle } = debugConsoleStore()
@@ -57,7 +57,7 @@ function BottomPanel({ aiPanelOpen, onToggleAI, addNodeOpen, onAddNodeOpenChange
     }
     const [envManageOpen, setEnvManageOpen] = useState(false)
     const [collectionOpen, setCollectionOpen] = useState(false)
-    const { addNode } = useFlowStore()
+    const { addNode, edgesVisible, toggleEdgesVisibility } = useFlowStore()
     const { getViewport } = useReactFlow()
     const { id } = useParams()
 
@@ -93,6 +93,23 @@ function BottomPanel({ aiPanelOpen, onToggleAI, addNodeOpen, onAddNodeOpenChange
     // index ALL_COUNT-1 = lowest priority (first to overflow).
     // Visible items = slice(0, visibleCount); overflowed = slice(visibleCount).
     const items = [
+        {
+            key: 'edges',
+            inline: (
+                <BottomPanelButton 
+                    onClick={toggleEdgesVisibility}
+                    title={edgesVisible ? "Edgelarni yashirish" : "Edgelarni ko'rsatish"}
+                >
+                    {edgesVisible ? <Eye size={20} /> : <EyeOff size={20} />}
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="edges" onClick={toggleEdgesVisibility}>
+                    {edgesVisible ? <Eye size={16} className="mr-2" /> : <EyeOff size={16} className="mr-2" />}
+                    {edgesVisible ? "Edgelarni yashirish" : "Edgelarni ko'rsatish"}
+                </DropdownMenuItem>
+            ),
+        },
         {
             key: 'ai',
             inline: (
