@@ -519,10 +519,13 @@ export default function Constructor() {
                   maskColor={resolvedTheme === "dark" ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.6)"}
                 />
               )}
-              <Controls>
+              <Controls />
+              
+              {/* Custom edge visibility toggle button */}
+              <div className="absolute bottom-4 left-4 z-10 flex flex-col gap-2">
                 <button
                   onClick={toggleEdgesVisibility}
-                  className="react-flow__controls-button"
+                  className="flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 bg-white shadow-md transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
                   title={edgesVisible ? "Edgelarni yashirish" : "Edgelarni ko'rsatish"}
                   aria-label={edgesVisible ? "Hide edges" : "Show edges"}
                 >
@@ -535,7 +538,7 @@ export default function Constructor() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      style={{ width: '100%', maxWidth: 16, maxHeight: 16 }}
+                      className="h-4 w-4 text-gray-700 dark:text-gray-300"
                     >
                       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                       <line x1="1" y1="1" x2="23" y2="23" />
@@ -549,14 +552,14 @@ export default function Constructor() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      style={{ width: '100%', maxWidth: 16, maxHeight: 16 }}
+                      className="h-4 w-4 text-gray-700 dark:text-gray-300"
                     >
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
                   )}
                 </button>
-              </Controls>
+              </div>
             </ReactFlow>
           </div>
         </ContextMenuTrigger>
