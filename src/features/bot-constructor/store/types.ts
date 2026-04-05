@@ -68,4 +68,7 @@ export interface FlowStoreState
   // Right-panel editing
   editingNodeId: string | null;
   setEditingNodeId: (id: string | null) => void;
+  // Edge visibility toggle
+  edgesVisible: boolean;
+  toggleEdgesVisibility: () => void;
 }
