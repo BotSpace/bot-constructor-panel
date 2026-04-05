@@ -32,6 +32,7 @@ const DelayNodeComponent = ({
         title="Kutish"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-amber-400"
       />
 
       {!isCollapsed && (

@@ -123,7 +123,9 @@ export function FormNode({ data, id, selected }: NodeProps<FormNodeData>) {
   return (
     <Card className={cn("w-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader icon="📝" title="Form" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      <NodeHeader icon="📝" title="Form" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} 
+        color="bg-amber-500"
+      />
       {!isCollapsed && (
         <CardContent className="space-y-3 pt-4">
           {sortedItems.length > 0 && (

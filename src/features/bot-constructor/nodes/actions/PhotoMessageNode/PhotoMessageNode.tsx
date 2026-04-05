@@ -110,6 +110,7 @@ const SendPhotoNodeComponent = ({
 
       <NodeHeader
         icon={<Camera className="text-primary" />}
+        color="bg-purple-400"
         title="Rasm Yuborish"
         buttonCount={buttonCount}
         isCollapsed={isCollapsed}

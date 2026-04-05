@@ -33,6 +33,7 @@ const SubFlowExitNodeComponent = ({
         title={`Chiqish: ${data.exitName || "default"}`}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-indigo-600"
       />
 
       {!isCollapsed && (

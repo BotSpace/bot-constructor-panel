@@ -15,7 +15,9 @@ const VideoNoteNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
     <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader icon="📹" title="Video xabar" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      <NodeHeader icon="📹" title="Video xabar" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} 
+        color="bg-purple-600"
+      />
       {!isCollapsed && (
         <>
           <ComingSoonNodeContent node_description="Dumaloq video xabar yuboradi" />

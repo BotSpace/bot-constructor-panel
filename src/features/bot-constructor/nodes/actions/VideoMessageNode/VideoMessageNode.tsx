@@ -121,6 +121,7 @@ const SendVideoNodeComponent = ({
 
       <NodeHeader
         icon={<Video className="text-primary" />}
+        color="bg-purple-500"
         title="video Yuborish"
         buttonCount={buttonCount}
         isCollapsed={isCollapsed}

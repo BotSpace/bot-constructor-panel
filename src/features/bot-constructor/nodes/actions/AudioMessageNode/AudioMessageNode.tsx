@@ -112,6 +112,7 @@ const SendAudioNodeComponent = ({
 
       <NodeHeader
         icon={<FiMusic className="text-primary" />}
+        color="bg-violet-400"
         title="Audio yuborish"
         buttonCount={buttonCount}
         isCollapsed={isCollapsed}

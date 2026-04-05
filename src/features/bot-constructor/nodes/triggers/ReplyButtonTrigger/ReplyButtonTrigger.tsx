@@ -124,6 +124,7 @@ const ReplyButtonTriggerNodeComponent = ({
         title="Reply Tugma"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-cyan-500"
       />
 
       {selectedButtonNames && (

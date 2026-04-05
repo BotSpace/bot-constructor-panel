@@ -152,6 +152,7 @@ const CallbackQueryTriggerNodeComponent = ({
         title="Callback"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-indigo-500"
       />
 
       {data.context?.value && (

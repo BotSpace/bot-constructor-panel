@@ -45,6 +45,7 @@ const EditOrSendMessageNodeComponent = ({
 
       <NodeHeader
         icon={<PenLine className="text-primary" />}
+        color="bg-slate-600"
         title="Edit yoki Yuborish"
         buttonCount={buttonCount}
         isCollapsed={isCollapsed}

@@ -68,6 +68,7 @@ const DeleteMessageNodeComponent = ({
         title="Xabarni o'chirish"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-slate-700"
       />
 
       {!isCollapsed && (

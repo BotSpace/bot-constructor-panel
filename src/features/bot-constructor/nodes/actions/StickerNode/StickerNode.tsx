@@ -51,6 +51,7 @@ const StickerNodeInternal = ({
         title="Sticker yuborish"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-pink-500"
       />
 
       {!isCollapsed && (

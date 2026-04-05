@@ -34,6 +34,7 @@ const LocationNodeComponent = ({
         title="Joylashuv"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-emerald-500"
       />
 
       {!isCollapsed && (

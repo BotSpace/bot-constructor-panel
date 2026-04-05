@@ -15,7 +15,9 @@ const VoiceNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
     <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader icon="🎤" title="Ovozli xabar" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      <NodeHeader icon="🎤" title="Ovozli xabar" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} 
+        color="bg-violet-500"
+      />
       {!isCollapsed && (
         <>
           <ComingSoonNodeContent node_description="Voice message yuboradi" />

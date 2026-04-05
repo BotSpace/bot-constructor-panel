@@ -14,7 +14,9 @@ const PinMessageNodeComponent = ({ id, data, selected }: NodeProps) => {
   return (
     <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader icon="📌" title="Xabarni qadash" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      <NodeHeader icon="📌" title="Xabarni qadash" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} 
+        color="bg-slate-600"
+      />
       {!isCollapsed && (
         <>
           <div className="p-4 text-sm text-muted-foreground text-center">

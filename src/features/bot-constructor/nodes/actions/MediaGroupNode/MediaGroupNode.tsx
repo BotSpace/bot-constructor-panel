@@ -64,6 +64,7 @@ const MediaGroupNodeInternal = ({
         title="Media guruh yuborish"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-purple-500"
       />
 
       {!isCollapsed && (

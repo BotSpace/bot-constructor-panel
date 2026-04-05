@@ -15,7 +15,9 @@ const AnimationNodeComponent = ({ id, selected }: NodeProps) => {
   return (
     <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader icon="🎬" title="GIF yuborish" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      <NodeHeader icon="🎬" title="GIF yuborish" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} 
+        color="bg-fuchsia-500"
+      />
       {!isCollapsed && (
         <CardContent>
           <ComingSoonNodeContent node_description="GIF yoki MP4 animation yuboradi" />

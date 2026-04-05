@@ -64,6 +64,7 @@ function LoadCollectionItemNode({
       <TargetHandles />
       <NodeHeader
         icon={<Database className="text-primary" />}
+        color="bg-orange-600"
         title="Load Item"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}

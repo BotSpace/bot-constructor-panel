@@ -19,7 +19,9 @@ const CallbackAnswerNodeComponent = ({
   return (
     <Card className={cn("w-[150px] h-[150px] shadow-lg", selected && "ring-2 ring-primary")}>
       <TargetHandles />
-      <NodeHeader icon="↩️" title="Callback Javob" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      <NodeHeader icon="↩️" title="Callback Javob" isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} 
+        color="bg-indigo-400"
+      />
       {!isCollapsed && (
         <>
           <div className="p-4 text-sm text-muted-foreground text-center">

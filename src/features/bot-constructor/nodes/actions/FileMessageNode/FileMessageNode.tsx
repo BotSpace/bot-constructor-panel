@@ -109,6 +109,7 @@ const SendFileNodeComponent = ({
 
       <NodeHeader
         icon={<FileText className="text-primary" />}
+        color="bg-gray-500"
         title="Xabar yuborish"
         buttonCount={buttonCount}
         isCollapsed={isCollapsed}

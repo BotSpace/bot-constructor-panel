@@ -41,6 +41,7 @@ const HTTPRequestNodeComponent = ({
         title="HTTP So'rov"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-green-500"
       />
 
       {!isCollapsed && (

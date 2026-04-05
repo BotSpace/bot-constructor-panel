@@ -40,6 +40,7 @@ const UnpinMessageNodeComponent = ({
         title="Qadalni olib tashlash"
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        color="bg-slate-600"
       />
 
       {!isCollapsed && (
