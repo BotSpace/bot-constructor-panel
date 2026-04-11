@@ -11,7 +11,7 @@ import { PlanCard } from "./components/plan-card";
 import SaleForLongTime from "./components/sale-for-long-time";
 
 type Props = {
-    onSelectPlan: (plan_id: number) => void;
+    onSelectPlan: (plan_id: number, months: number) => void;
     header: React.ReactNode;
     isUserUseFreePlan?: boolean;
 };
@@ -69,7 +69,7 @@ function SelectPlan({ onSelectPlan, header, isUserUseFreePlan = false }: Props) 
                             isCurrent={false}
                             isPopular={plan.is_top}
                             isProcessing={false}
-                            onSelectPlan={onSelectPlan}
+                            onSelectPlan={(plan_id) => onSelectPlan(plan_id, currentPeriod.months)}
                             buttonText="Tanlash"
                         />
                     ))}
