@@ -1,6 +1,6 @@
-# CLAUDE.md — Bot Constructor Panel
+# CLAUDE.md
 
-This file provides guidance for AI assistants working on this codebase.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ---
 
@@ -42,9 +42,12 @@ npm run dev:mono      # Dev with Turbopack in monorepo mode (MONO=1, port 3001)
 npm run build         # Production build
 npm run start         # Start production server
 npm run lint          # Run ESLint
+npm run type-check    # TypeScript type checking
 npm run prepare       # Setup Husky git hooks
 node scripts/analyze-project.js  # Analyze codebase statistics
 ```
+
+**Husky pre-push hook** is currently disabled (skips `npm run build` due to network restrictions in CI). Re-enable when Google Fonts network access is resolved.
 
 ---
 

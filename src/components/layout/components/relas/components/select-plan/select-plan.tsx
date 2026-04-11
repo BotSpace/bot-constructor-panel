@@ -11,20 +11,17 @@ import { PlanCard } from "./components/plan-card";
 import SaleForLongTime from "./components/sale-for-long-time";
 
 type Props = {
-    updateForm: (key: string, value: string) => void;
+    onSelectPlan: (plan_id: number) => void;
     header: React.ReactNode;
+    isUserUseFreePlan?: boolean;
 };
 
-function SelectPlan({ updateForm, header }: Props) {
-
-    const isUserUseFreePlan = true
-
+function SelectPlan({ onSelectPlan, header, isUserUseFreePlan = false }: Props) {
     const [billingPeriod, setBillingPeriod] =
         useState<BillingPeriodKey>("3 months");
 
     const handleBillingChange = (key: BillingPeriodKey) => {
         setBillingPeriod(key);
-        updateForm("sale_for_long_time", key);
     };
 
     const currentPeriod = BILLING_PERIODS.find(
@@ -38,6 +35,7 @@ function SelectPlan({ updateForm, header }: Props) {
     });
 
     const plans = plansResponse?.data?.results ?? [];
+
     return (
         <>
             {header}
@@ -55,8 +53,8 @@ function SelectPlan({ updateForm, header }: Props) {
 
             {!isLoading && !plans.length && (
                 <div className="rounded-2xl border border-border bg-card/60 p-8 text-center text-sm text-muted-foreground">
-                    Tariflar ro'yxatini yuklashda muammo yuz berdi. Iltimos,
-                    birozdan so'ng qayta urinib ko'ring.
+                    Tariflar ro&apos;yxatini yuklashda muammo yuz berdi. Iltimos,
+                    birozdan so&apos;ng qayta urinib ko&apos;ring.
                 </div>
             )}
 
@@ -71,10 +69,8 @@ function SelectPlan({ updateForm, header }: Props) {
                             isCurrent={false}
                             isPopular={plan.is_top}
                             isProcessing={false}
-                            onSelectPlan={(plan_id) =>
-                                updateForm("plan_id", plan_id.toString())
-                            }
-                            buttonText="Sotib olish"
+                            onSelectPlan={onSelectPlan}
+                            buttonText="Tanlash"
                         />
                     ))}
                 </div>
