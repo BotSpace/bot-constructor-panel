@@ -52,10 +52,13 @@ function ReleasePanel() {
       .post("/relase/", body)
       .then(() => {
         toast.success("Telegram bot release qilindi", { id: toastId });
+        setPlanDialogOpen(false);
       })
       .catch((err) => {
+        const d = err?.response?.data?.data;
         const message =
-          err?.response?.data?.plan_id?.[0] ??
+          d?.plan_id?.[0] ??
+          d?.detail ??
           err?.response?.data?.detail ??
           "Xatolik yuz berdi";
         toast.error(message, { id: toastId });
@@ -97,7 +100,6 @@ function ReleasePanel() {
           title="Tarifni tanlang"
           description="Botni ishga tushirish uchun tarifni tanlang."
           onSelectPlan={(plan_id, months) => {
-            setPlanDialogOpen(false);
             handleCreateRelease(plan_id, months);
           }}
         />
@@ -123,7 +125,6 @@ function ReleasePanel() {
           title="Tarifni tanlang"
           description="Botni ishga tushirish uchun tarifni tanlang."
           onSelectPlan={(plan_id, months) => {
-            setPlanDialogOpen(false);
             handleCreateRelease(plan_id, months);
           }}
         />
@@ -214,11 +215,14 @@ function ReleaseDropDown({
       .post(`/project/${id}/plan/upgrade/`, { plan_id, months })
       .then(() => {
         toast.success("Tarif muvaffaqiyatli o'zgartirildi", { id: toastId });
+        setChangePlanOpen(false);
       })
       .catch((err) => {
+        const d = err?.response?.data?.data;
         const message =
+          d?.detail ??
+          d?.plan_id?.[0] ??
           err?.response?.data?.detail ??
-          err?.response?.data?.plan_id?.[0] ??
           "Xatolik yuz berdi";
         toast.error(message, { id: toastId });
       });
@@ -299,7 +303,6 @@ function ReleaseDropDown({
         title="Tarifni o'zgartirish"
         description="Yangi tarifni va to'lov muddatini tanlang."
         onSelectPlan={(plan_id, months) => {
-          setChangePlanOpen(false);
           handleUpgradePlan(plan_id, months);
         }}
       />
