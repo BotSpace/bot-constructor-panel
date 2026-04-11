@@ -23,6 +23,7 @@ import { AddEditEnvDialog } from "../add-env";
 import {
   Bot,
   ChevronRight,
+  CreditCard,
   ExternalLink,
   ListTree,
   RotateCcwKey,
@@ -40,13 +41,12 @@ function ReleasePanel() {
   const { loading, project } = useProjectStore();
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
 
-  function handleCreateRelease(plan_id?: number) {
+  function handleCreateRelease(plan_id?: number, months?: number) {
     const toastId = toast.loading("Release qilinmoqda...");
 
     const body: Record<string, unknown> = { project: id };
-    if (plan_id !== undefined) {
-      body.plan_id = plan_id;
-    }
+    if (plan_id !== undefined) body.plan_id = plan_id;
+    if (months !== undefined) body.months = months;
 
     instanceAuth
       .post("/relase/", body)
@@ -63,7 +63,6 @@ function ReleasePanel() {
   }
 
   function handleTokenSuccess() {
-    // After saving the token: if first release → open plan dialog, else publish directly
     if (!project?.release) {
       setPlanDialogOpen(true);
     } else {
@@ -73,7 +72,7 @@ function ReleasePanel() {
 
   if (loading) return null;
 
-  // No release bot configured → prompt for token first
+  // No release bot token → prompt for token first
   if (!project?.release_bot) {
     return (
       <>
@@ -84,7 +83,10 @@ function ReleasePanel() {
           dialog_description="Telegram release bot tokenini kiriting"
           onSuccess={handleTokenSuccess}
         >
-          <Button id="version-switcher" className="cursor-pointer bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200">
+          <Button
+            id="version-switcher"
+            className="cursor-pointer bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200"
+          >
             Publish
           </Button>
         </AddEditEnvDialog>
@@ -92,16 +94,18 @@ function ReleasePanel() {
         <PlanSelectionDialog
           open={planDialogOpen}
           onOpenChange={setPlanDialogOpen}
-          onSelectPlan={(plan_id) => {
+          title="Tarifni tanlang"
+          description="Botni ishga tushirish uchun tarifni tanlang."
+          onSelectPlan={(plan_id, months) => {
             setPlanDialogOpen(false);
-            handleCreateRelease(plan_id);
+            handleCreateRelease(plan_id, months);
           }}
         />
       </>
     );
   }
 
-  // Token exists but no release yet → first release, needs plan selection
+  // Token exists but no release yet → first release needs plan selection
   if (!project?.release) {
     return (
       <>
@@ -116,9 +120,11 @@ function ReleasePanel() {
         <PlanSelectionDialog
           open={planDialogOpen}
           onOpenChange={setPlanDialogOpen}
-          onSelectPlan={(plan_id) => {
+          title="Tarifni tanlang"
+          description="Botni ishga tushirish uchun tarifni tanlang."
+          onSelectPlan={(plan_id, months) => {
             setPlanDialogOpen(false);
-            handleCreateRelease(plan_id);
+            handleCreateRelease(plan_id, months);
           }}
         />
       </>
@@ -137,7 +143,7 @@ function ReleasePanel() {
     );
   }
 
-  // Release exists → show dropdown
+  // Release exists → show dropdown with re-publish + change tariff
   return (
     <ReleaseDropDown
       lang={lang}
@@ -147,15 +153,19 @@ function ReleasePanel() {
   );
 }
 
-// Plan selection dialog shown before first release
+// Shared plan selection dialog
 function PlanSelectionDialog({
   open,
   onOpenChange,
+  title,
+  description,
   onSelectPlan,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelectPlan: (plan_id: number) => void;
+  title: string;
+  description: string;
+  onSelectPlan: (plan_id: number, months: number) => void;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -163,10 +173,8 @@ function PlanSelectionDialog({
         <SelectPlan
           header={
             <DialogHeader>
-              <DialogTitle>Tarifni tanlang</DialogTitle>
-              <DialogDescription>
-                Botni ishga tushirish uchun tarifni tanlang.
-              </DialogDescription>
+              <DialogTitle>{title}</DialogTitle>
+              <DialogDescription>{description}</DialogDescription>
             </DialogHeader>
           }
           onSelectPlan={onSelectPlan}
@@ -193,70 +201,109 @@ function ReleaseDropDown({
   onPublish: () => void;
 }) {
   const { project } = useProjectStore();
+  const [changePlanOpen, setChangePlanOpen] = useState(false);
 
   const { handleClick } = useLinkToParent({
     href: `/${lang}/bot/${id}/release`,
     onClick: (e) => console.log("Clicked!"),
   });
 
+  function handleUpgradePlan(plan_id: number, months: number) {
+    const toastId = toast.loading("Tarif o'zgartirilmoqda...");
+    instanceAuth
+      .post(`/project/${id}/plan/upgrade/`, { plan_id, months })
+      .then(() => {
+        toast.success("Tarif muvaffaqiyatli o'zgartirildi", { id: toastId });
+      })
+      .catch((err) => {
+        const message =
+          err?.response?.data?.detail ??
+          err?.response?.data?.plan_id?.[0] ??
+          "Xatolik yuz berdi";
+        toast.error(message, { id: toastId });
+      });
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          id="version-switcher"
-          className="cursor-pointer bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200"
-        >
-          Version {project?.release?.version}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end">
-        <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href={"https://t.me/" + project?.username}>
-              <Bot />
-              <span className="text-muted-foreground">
-                @{project?.username}
-              </span>
-              <DropdownMenuShortcut>
-                <ExternalLink />
-              </DropdownMenuShortcut>
-            </Link>
-          </DropdownMenuItem>
-          {project?.release?.status && (
-            <DropdownMenuItem onClick={handleClick}>
-              <ListTree />
-              Version {project.release.version}
-              <StatusBadge status={project.release.status} />
-              <DropdownMenuShortcut>
-                <ChevronRight />
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-          )}
-          <AddEditEnvDialog
-            env_name="RELEASE_BOT_TOKEN"
-            project_id={id}
-            dialog_title="Release Bot yangilash"
-            dialog_description="Yangi bot tokenini kiriting"
-            isEdit={true}
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            id="version-switcher"
+            className="cursor-pointer bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200"
           >
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <RotateCcwKey className="h-4 w-4" />
-              <span>Token yangilash</span>
+            Version {project?.release?.version}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="end">
+          <DropdownMenuGroup>
+            <DropdownMenuItem asChild>
+              <Link href={"https://t.me/" + project?.username}>
+                <Bot />
+                <span className="text-muted-foreground">
+                  @{project?.username}
+                </span>
+                <DropdownMenuShortcut>
+                  <ExternalLink />
+                </DropdownMenuShortcut>
+              </Link>
             </DropdownMenuItem>
-          </AddEditEnvDialog>
-          <DropdownMenuSeparator className="my-2" />
-          <DropdownMenuItem asChild>
-            <Button
-              onClick={onPublish}
-              variant="secondary"
-              className="bg-blue-500 cursor-pointer text-white hover:bg-blue-600 transition-colors duration-200 w-full text-center"
+            {project?.release?.status && (
+              <DropdownMenuItem onClick={handleClick}>
+                <ListTree />
+                Version {project.release.version}
+                <StatusBadge status={project.release.status} />
+                <DropdownMenuShortcut>
+                  <ChevronRight />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            )}
+            <AddEditEnvDialog
+              env_name="RELEASE_BOT_TOKEN"
+              project_id={id}
+              dialog_title="Release Bot yangilash"
+              dialog_description="Yangi bot tokenini kiriting"
+              isEdit={true}
             >
-              Publish
-            </Button>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <RotateCcwKey className="h-4 w-4" />
+                <span>Token yangilash</span>
+              </DropdownMenuItem>
+            </AddEditEnvDialog>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                setChangePlanOpen(true);
+              }}
+            >
+              <CreditCard className="h-4 w-4" />
+              <span>Tarifni o&apos;zgartirish</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="my-2" />
+            <DropdownMenuItem asChild>
+              <Button
+                onClick={onPublish}
+                variant="secondary"
+                className="bg-blue-500 cursor-pointer text-white hover:bg-blue-600 transition-colors duration-200 w-full text-center"
+              >
+                Publish
+              </Button>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <PlanSelectionDialog
+        open={changePlanOpen}
+        onOpenChange={setChangePlanOpen}
+        title="Tarifni o'zgartirish"
+        description="Yangi tarifni va to'lov muddatini tanlang."
+        onSelectPlan={(plan_id, months) => {
+          setChangePlanOpen(false);
+          handleUpgradePlan(plan_id, months);
+        }}
+      />
+    </>
   );
 }
 
