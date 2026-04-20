@@ -1,1 +1,0 @@
-export { SendPollNode } from "./PollNode";

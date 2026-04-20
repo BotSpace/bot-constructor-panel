@@ -1,137 +1,42 @@
-import {
-  SendTextMessageNode,
-  SendPhotoNode,
-  SendVideoNode,
-  SendAudioNode,
-  SendFileNode,
-  EditMessageNode,
-  EditOrSendMessageNode,
-  SendAnimationNode,
-  SendVoiceNode,
-  SendVideoNoteNode,
-  SendLocationNode,
-  SendContactNode,
-  SendPollNode,
-  SendStickerNode,
-  SendMediaGroupNode,
-  SendDiceNode,
-  ForwardMessageNode,
-  SendToAdminNode,
-  CopyMessageNode,
-  PinMessageNode,
-  UnpinMessageNode,
-  DeleteMessageNode,
-  ChatActionNode,
-  DownloadFileNode,
-} from "./actions";
+import { getRuntimeNodeRegistry, runtimeNodeComponents } from "./registry";
+import { ComponentType } from "react";
+import { NodeProps } from "reactflow";
 
-import {
-  CommandTriggerNode,
-  CronTriggerNode,
-  MessageTriggerNode,
-} from "./triggers";
+const registry = getRuntimeNodeRegistry().filter(
+  (entry) => entry.status === "runtime"
+);
 
-import {
-  CustomCodeNode,
-  StateNode,
-  CollectionNode,
-  LoadCollectionItemNode,
-  SubFlowNode,
-  SubFlowExitNode,
-  IfConditionNode,
-  ElseIfNode,
-  ElseNode,
-  DelayNode,
-  RandomNode,
-  VariableNode,
-  HTTPRequestNode,
-  CallbackQueryAnswerNode,
-  CheckMembershipNode,
-  FormNode,
-  ForLoopNode,
-  ForLoopContinueNode,
-} from "./custom";
+function pickNodesByCategory(category: string) {
+  return registry
+    .filter((entry) => entry.category === category)
+    .reduce<Record<string, ComponentType<NodeProps>>>(
+      (accumulator, entry) => {
+        const component = runtimeNodeComponents[entry.type] as
+          | ComponentType<NodeProps>
+          | undefined;
 
-export const Triggers = {
-  CommandTriggerNode,
-  CronTriggerNode,
-  MessageTriggerNode,
-};
+        if (component) {
+          accumulator[entry.type] = component;
+        }
 
-export const ActionsTextAndMedia = {
-  // Actions - Text and Media
-  SendTextMessageNode,
-  SendPhotoNode,
-  SendVideoNode,
-  SendAudioNode,
-  SendFileNode,
-  SendAnimationNode,
-  SendVoiceNode,
-  SendVideoNoteNode,
-  SendLocationNode,
-  SendContactNode,
-  SendPollNode,
-  SendStickerNode,
-  SendMediaGroupNode,
-  SendDiceNode,
-};
+        return accumulator;
+      },
+      {}
+    );
+}
 
-export const ActionsMessageOperations = {
-  EditMessageNode,
-  EditOrSendMessageNode,
-  ForwardMessageNode,
-  SendToAdminNode,
-  CopyMessageNode,
-  PinMessageNode,
-  UnpinMessageNode,
-  DeleteMessageNode,
-  ChatActionNode,
-  DownloadFileNode,
-};
-
-export const CustomNodesCodeAndData = {
-  CustomCodeNode,
-  StateNode,
-  CollectionNode,
-  LoadCollectionItemNode,
-};
-
-export const CustomNodesFlowControl = {
-  IfConditionNode,
-  ElseIfNode,
-  ElseNode,
-  DelayNode,
-  RandomNode,
-  VariableNode,
-  CheckMembershipNode,
-  FormNode,
-  ForLoopNode,
-  ForLoopContinueNode,
-};
-
-export const CustomIntegration = {
-  HTTPRequestNode,
-  CallbackQueryAnswerNode,
-  SubFlowNode,
-  SubFlowExitNode,
-};
+export const Triggers = pickNodesByCategory("triggers");
+export const ActionsTextAndMedia = pickNodesByCategory("actions");
+export const ActionsMessageOperations = pickNodesByCategory("messageOperations");
+export const CustomNodesCodeAndData = pickNodesByCategory("customLogic");
+export const CustomNodesFlowControl = pickNodesByCategory("flowControl");
+export const CustomIntegration = pickNodesByCategory("integrations");
 
 export const CustomNodes = {
-  // Triggers
   ...Triggers,
-
-  // Actions - Text and Media
   ...ActionsTextAndMedia,
-
-  // Actions - Message Operations
   ...ActionsMessageOperations,
-
-  // Custom - Code and Data
   ...CustomNodesCodeAndData,
-
-  // Custom - Flow Control
   ...CustomNodesFlowControl,
-
-  // Custom - Integration
   ...CustomIntegration,
 };

@@ -1,0 +1,1662 @@
+[
+  {
+    "type": "CommandTriggerNode",
+    "status": "runtime",
+    "category": "triggers",
+    "titleKey": "constructor.triggers.command.name",
+    "descriptionKey": "constructor.triggers.command.description",
+    "titleFallback": "Buyruq kelganda",
+    "descriptionFallback": "/start yoki /help kabi buyruq yuborganda.",
+    "iconName": "keyboard",
+    "colorToken": "trigger-blue",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "triggers",
+      "sortOrder": 10,
+      "elementType": "command"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "text",
+        "key": "command",
+        "label": "Buyruq matni",
+        "placeholder": "/start"
+      },
+      {
+        "type": "checkbox",
+        "key": "withArgs",
+        "label": "Argumentlarni ushlash"
+      },
+      {
+        "type": "checkbox",
+        "key": "global",
+        "label": "Global"
+      },
+      {
+        "type": "stateConfig",
+        "key": "state",
+        "variant": "commandTrigger"
+      }
+    ],
+    "defaults": {
+      "command": "",
+      "withArgs": false,
+      "global": true
+    }
+  },
+  {
+    "type": "CronTriggerNode",
+    "status": "runtime",
+    "category": "triggers",
+    "titleKey": "constructor.triggers.cron.name",
+    "descriptionKey": "constructor.triggers.cron.description",
+    "titleFallback": "Cron triggeri",
+    "descriptionFallback": "Belgilangan vaqtda bajariladigan ishlar.",
+    "iconName": "clock",
+    "colorToken": "trigger-blue",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "triggers",
+      "sortOrder": 30,
+      "elementType": "cron"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [{ "type": "widget", "widgetKey": "cronTrigger" }],
+    "defaults": {
+      "schedule": "0 9 * * *",
+      "enabled": true,
+      "targetChatIds": []
+    }
+  },
+  {
+    "type": "MessageTriggerNode",
+    "status": "runtime",
+    "category": "triggers",
+    "titleKey": "constructor.triggers.message.name",
+    "descriptionKey": "constructor.triggers.message.description",
+    "titleFallback": "Xabar kelganda",
+    "descriptionFallback": "Foydalanuvchidan xabar kelganda.",
+    "iconName": "message",
+    "colorToken": "trigger-blue",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "triggers",
+      "sortOrder": 20,
+      "elementType": "message"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      { "preset": "else-source" },
+      { "preset": "source-default" }
+    ],
+    "content": [{ "type": "widget", "widgetKey": "messageTrigger" }],
+    "defaults": {
+      "type": "any",
+      "filter": "any",
+      "global": true,
+      "context": {}
+    }
+  },
+  {
+    "type": "SendTextMessageNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.textMessage.name",
+    "descriptionKey": "constructor.actions.textMessage.description",
+    "titleFallback": "Matn yuborish",
+    "descriptionFallback": "Foydalanuvchiga matnli xabar yuboradi.",
+    "iconName": "message",
+    "colorToken": "action-amber",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 10,
+      "elementType": "message"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [{ "type": "widget", "widgetKey": "textMessage" }],
+    "footer": [
+      { "type": "actionPanel", "hideHandlers": true },
+      { "type": "handlersList" }
+    ],
+    "defaults": {
+      "messageText": "",
+      "parseMode": "None",
+      "disableNotification": false,
+      "protectContent": false,
+      "recipients": { "sendToSender": true, "additionalIds": [] },
+      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+    }
+  },
+  {
+    "type": "SendPhotoNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.photo.name",
+    "descriptionKey": "constructor.actions.photo.description",
+    "titleFallback": "Rasm yuborish",
+    "descriptionFallback": "Foydalanuvchiga rasm yuboradi.",
+    "iconName": "photo",
+    "colorToken": "action-purple",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 20,
+      "elementType": "photo"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      { "preset": "selected-message-target" },
+      { "preset": "source-default" }
+    ],
+    "preview": {
+      "key": "caption",
+      "placeholder": "Caption yozilmagan..."
+    },
+    "content": [{ "type": "widget", "widgetKey": "photoMessage" }],
+    "footer": [
+      { "type": "actionPanel", "hideHandlers": true },
+      { "type": "handlersList" }
+    ],
+    "defaults": {
+      "photoSourceType": "upload",
+      "caption": "",
+      "disableNotification": false,
+      "protectContent": false,
+      "recipients": { "sendToSender": true, "additionalIds": [] },
+      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+    }
+  },
+  {
+    "type": "SendVideoNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.video.name",
+    "descriptionKey": "constructor.actions.video.description",
+    "titleFallback": "Video yuborish",
+    "descriptionFallback": "Foydalanuvchiga video yuboradi.",
+    "iconName": "video",
+    "colorToken": "action-red",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 30,
+      "elementType": "video"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      { "preset": "selected-message-target" },
+      { "preset": "source-default" }
+    ],
+    "preview": {
+      "key": "caption",
+      "placeholder": "Caption yozilmagan..."
+    },
+    "content": [{ "type": "widget", "widgetKey": "videoMessage" }],
+    "footer": [
+      { "type": "actionPanel", "hideHandlers": true },
+      { "type": "handlersList" }
+    ],
+    "defaults": {
+      "videoSourceType": "upload",
+      "caption": "",
+      "disableNotification": false,
+      "protectContent": false,
+      "recipients": { "sendToSender": true, "additionalIds": [] },
+      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+    }
+  },
+  {
+    "type": "SendAudioNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.audio.name",
+    "descriptionKey": "constructor.actions.audio.description",
+    "titleFallback": "Audio yuborish",
+    "descriptionFallback": "Foydalanuvchiga audio fayl yuboradi.",
+    "iconName": "music",
+    "colorToken": "action-pink",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 40,
+      "elementType": "audio"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      { "preset": "selected-message-target" },
+      { "preset": "source-default" }
+    ],
+    "preview": {
+      "key": "caption",
+      "placeholder": "Caption yozilmagan..."
+    },
+    "content": [{ "type": "widget", "widgetKey": "audioMessage" }],
+    "footer": [
+      { "type": "actionPanel", "hideHandlers": true },
+      { "type": "handlersList" }
+    ],
+    "defaults": {
+      "audioSourceType": "upload",
+      "caption": "",
+      "performer": "",
+      "title": "",
+      "disableNotification": false,
+      "protectContent": false,
+      "recipients": { "sendToSender": true, "additionalIds": [] },
+      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+    }
+  },
+  {
+    "type": "SendFileNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.file.name",
+    "descriptionKey": "constructor.actions.file.description",
+    "titleFallback": "Fayl yuborish",
+    "descriptionFallback": "Foydalanuvchiga hujjat yoki boshqa turdagi fayl yuboradi.",
+    "iconName": "file",
+    "colorToken": "action-gray",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 50,
+      "elementType": "file"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      { "preset": "selected-message-target" },
+      { "preset": "source-default" }
+    ],
+    "preview": {
+      "key": "caption",
+      "placeholder": "Caption yozilmagan..."
+    },
+    "content": [{ "type": "widget", "widgetKey": "fileMessage" }],
+    "footer": [
+      { "type": "actionPanel", "hideHandlers": true },
+      { "type": "handlersList" }
+    ],
+    "defaults": {
+      "fileSourceType": "upload",
+      "caption": "",
+      "disableNotification": false,
+      "protectContent": false,
+      "recipients": { "sendToSender": true, "additionalIds": [] },
+      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+    }
+  },
+  {
+    "type": "SendAnimationNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.animation.name",
+    "descriptionKey": "constructor.actions.animation.description",
+    "titleFallback": "GIF yuborish",
+    "descriptionFallback": "GIF yoki MP4 animation yuboradi.",
+    "iconName": "clapperboard",
+    "colorToken": "action-fuchsia",
+    "size": { "width": 150, "height": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 60,
+      "elementType": "animation"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "description",
+        "textKey": "constructor.actions.animation.description",
+        "textFallback": "GIF yoki MP4 animation yuboradi."
+      }
+    ],
+    "defaults": {}
+  },
+  {
+    "type": "SendVoiceNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.voice.name",
+    "descriptionKey": "constructor.actions.voice.description",
+    "titleFallback": "Ovozli xabar",
+    "descriptionFallback": "Voice message yuboradi.",
+    "iconName": "microphone",
+    "colorToken": "action-violet",
+    "size": { "width": 150, "height": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 70,
+      "elementType": "voice"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "description",
+        "textKey": "constructor.actions.voice.description",
+        "textFallback": "Voice message yuboradi."
+      }
+    ],
+    "footer": [{ "type": "handlersList" }],
+    "defaults": {
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": [],
+        "replyOptions": {
+          "remove_after_use": true,
+          "resize_keyboard": true,
+          "one_time_keyboard": false,
+          "is_persistent": false
+        }
+      },
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      }
+    }
+  },
+  {
+    "type": "SendVideoNoteNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.videoNote.name",
+    "descriptionKey": "constructor.actions.videoNote.description",
+    "titleFallback": "Video xabar",
+    "descriptionFallback": "Dumaloq video xabar yuboradi.",
+    "iconName": "video",
+    "colorToken": "action-purple",
+    "size": { "width": 150, "height": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 80,
+      "elementType": "video_note"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "description",
+        "textKey": "constructor.actions.videoNote.description",
+        "textFallback": "Dumaloq video xabar yuboradi."
+      }
+    ],
+    "footer": [{ "type": "handlersList" }],
+    "defaults": {
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": [],
+        "replyOptions": {
+          "remove_after_use": true,
+          "resize_keyboard": true,
+          "one_time_keyboard": false,
+          "is_persistent": false
+        }
+      },
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      }
+    }
+  },
+  {
+    "type": "SendLocationNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.location.name",
+    "descriptionKey": "constructor.actions.location.description",
+    "titleFallback": "Joylashuv",
+    "descriptionFallback": "Geografik joylashuvni yuboradi.",
+    "iconName": "location",
+    "colorToken": "action-emerald",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 90,
+      "elementType": "location"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "number",
+        "key": "latitude",
+        "label": "Latitude",
+        "placeholder": "41.311151",
+        "step": 0.000001
+      },
+      {
+        "type": "number",
+        "key": "longitude",
+        "label": "Longitude",
+        "placeholder": "69.279737",
+        "step": 0.000001
+      }
+    ],
+    "footer": [
+      { "type": "actionPanel", "variant": "messageBasic" },
+      { "type": "handlersList" }
+    ],
+    "defaults": {
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": [],
+        "replyOptions": {
+          "remove_after_use": true,
+          "resize_keyboard": true,
+          "one_time_keyboard": false,
+          "is_persistent": false
+        }
+      },
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      }
+    }
+  },
+  {
+    "type": "SendContactNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.contact.name",
+    "descriptionKey": "constructor.actions.contact.description",
+    "titleFallback": "Kontakt",
+    "descriptionFallback": "Kontakt ma'lumotlarini yuboradi.",
+    "iconName": "contact",
+    "colorToken": "action-teal",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 100,
+      "elementType": "contact"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "text",
+        "key": "phoneNumber",
+        "label": "Telefon raqam",
+        "placeholder": "+998901234567"
+      },
+      {
+        "type": "text",
+        "key": "firstName",
+        "label": "Ism",
+        "placeholder": "Alisher"
+      },
+      {
+        "type": "text",
+        "key": "lastName",
+        "label": "Familiya (ixtiyoriy)",
+        "placeholder": "Navoiy"
+      },
+      {
+        "type": "textarea",
+        "key": "vcard",
+        "label": "VCard (ixtiyoriy)",
+        "placeholder": "BEGIN:VCARD\nVERSION:3.0\n...",
+        "rows": 4,
+        "helpText": "Qo'shimcha kontakt ma'lumotlari uchun VCard format"
+      }
+    ],
+    "footer": [
+      { "type": "actionPanel", "variant": "messageBasic" },
+      { "type": "handlersList" }
+    ],
+    "defaults": {
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": [],
+        "replyOptions": {
+          "remove_after_use": true,
+          "resize_keyboard": true,
+          "one_time_keyboard": false,
+          "is_persistent": false
+        }
+      },
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      }
+    }
+  },
+  {
+    "type": "SendPollNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.poll.name",
+    "descriptionKey": "constructor.actions.poll.description",
+    "titleFallback": "So'rovnoma",
+    "descriptionFallback": "So'rovnoma yoki test yaratadi.",
+    "iconName": "poll",
+    "colorToken": "action-fuchsia",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 110,
+      "elementType": "poll"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [{ "type": "widget", "widgetKey": "pollMessage" }],
+    "footer": [
+      { "type": "actionPanel", "hideHandlers": true },
+      { "type": "handlersList" }
+    ],
+    "defaults": {
+      "question": "",
+      "options": [],
+      "isAnonymous": true,
+      "type": "regular",
+      "allowsMultipleAnswers": false,
+      "keyboard": { "active": "inline", "inline": [], "reply": [] },
+      "recipients": { "sendToSender": true, "additionalIds": [] }
+    }
+  },
+  {
+    "type": "SendStickerNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.sticker.name",
+    "descriptionKey": "constructor.actions.sticker.description",
+    "titleFallback": "Sticker",
+    "descriptionFallback": "Sticker yuboradi.",
+    "iconName": "sticker",
+    "colorToken": "action-pink",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 120,
+      "elementType": "sticker"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "select",
+        "key": "stickerSourceType",
+        "label": "Sticker manbai",
+        "options": [
+          { "value": "file_id", "label": "File ID" },
+          { "value": "url", "label": "URL" }
+        ]
+      },
+      {
+        "type": "text",
+        "key": "stickerFileId",
+        "label": "Sticker File ID",
+        "placeholder": "CAACAgIAAxkBAAIC...",
+        "visibleWhen": { "key": "stickerSourceType", "equals": "file_id" }
+      },
+      {
+        "type": "text",
+        "key": "stickerUrl",
+        "label": "Sticker URL",
+        "placeholder": "https://example.com/sticker.webp",
+        "visibleWhen": { "key": "stickerSourceType", "equals": "url" }
+      }
+    ],
+    "defaults": {
+      "stickerSourceType": "file_id"
+    }
+  },
+  {
+    "type": "SendMediaGroupNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.mediaGroup.name",
+    "descriptionKey": "constructor.actions.mediaGroup.description",
+    "titleFallback": "Media guruh",
+    "descriptionFallback": "Bir nechta rasm/video birgalikda yuboradi (2-10 ta).",
+    "iconName": "gallery",
+    "colorToken": "action-indigo",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 130,
+      "elementType": "media_group"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [{ "type": "widget", "widgetKey": "mediaGroup" }],
+    "footer": [
+      { "type": "actionPanel", "hideHandlers": true },
+      { "type": "handlersList" }
+    ],
+    "defaults": {
+      "mediaItems": [],
+      "disableNotification": false,
+      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+    }
+  },
+  {
+    "type": "SendDiceNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.dice.name",
+    "descriptionKey": "constructor.actions.dice.description",
+    "titleFallback": "O'yin",
+    "descriptionFallback": "Tasodifiy o'yin (kub, darts, basketbol va h.k.).",
+    "iconName": "dice",
+    "colorToken": "action-amber",
+    "size": { "width": 150, "height": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 140,
+      "elementType": "dice"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "select",
+        "key": "emoji",
+        "label": "O'yin turi",
+        "options": [
+          { "value": "🎲", "label": "🎲 Kub (1-6)" },
+          { "value": "🎯", "label": "🎯 Darts (1-6)" },
+          { "value": "🏀", "label": "🏀 Basketbol (1-5)" },
+          { "value": "⚽", "label": "⚽ Futbol (1-5)" },
+          { "value": "🎳", "label": "🎳 Bouling (1-6)" },
+          { "value": "🎰", "label": "🎰 Slot mashina (1-64)" }
+        ],
+        "helpText": "Animatsiyali o'yin yuboradi. Natija tasodifiy bo'ladi."
+      }
+    ],
+    "defaults": {
+      "emoji": "🎲"
+    }
+  },
+  {
+    "type": "EditMessageNode",
+    "status": "runtime",
+    "category": "messageOperations",
+    "titleKey": "constructor.actions.editMessage.name",
+    "descriptionKey": "constructor.actions.editMessage.description",
+    "titleFallback": "Xabarni tahrirlash",
+    "descriptionFallback": "Yuborilgan xabarni tahrirlash.",
+    "iconName": "edit",
+    "colorToken": "message-op-slate",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 150,
+      "elementType": "edit_message"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      { "preset": "source-default" },
+      { "preset": "edit-message-source" }
+    ],
+    "content": [{ "type": "widget", "widgetKey": "editMessage" }],
+    "footer": [
+      { "type": "actionPanel", "hideHandlers": true },
+      { "type": "handlersList" }
+    ],
+    "defaults": {
+      "messageIdSource": "this_message",
+      "messageId": null,
+      "newText": "",
+      "newCaption": "",
+      "parseMode": "None",
+      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+    }
+  },
+  {
+    "type": "EditOrSendMessageNode",
+    "status": "runtime",
+    "category": "messageOperations",
+    "titleKey": "constructor.actions.editOrSend.name",
+    "descriptionKey": "constructor.actions.editOrSend.description",
+    "titleFallback": "Edit yoki Yuborish",
+    "descriptionFallback": "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi.",
+    "iconName": "edit",
+    "colorToken": "message-op-teal",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 160,
+      "elementType": "edit_or_send_message"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "preview": {
+      "key": "messageText",
+      "placeholder": "Matn yozilmagan..."
+    },
+    "content": [{ "type": "widget", "widgetKey": "editOrSendMessage" }],
+    "footer": [
+      { "type": "actionPanel", "hideHandlers": true },
+      { "type": "handlersList" }
+    ],
+    "defaults": {
+      "messageText": "",
+      "parseMode": "None",
+      "disableNotification": false,
+      "recipients": { "sendToSender": true, "additionalIds": [] },
+      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+    }
+  },
+  {
+    "type": "ForwardMessageNode",
+    "status": "runtime",
+    "category": "messageOperations",
+    "titleKey": "constructor.messageOperations.forward.name",
+    "descriptionKey": "constructor.messageOperations.forward.description",
+    "titleFallback": "Xabarni uzatish",
+    "descriptionFallback": "Xabarni boshqa chatga yoki guruhga uzatadi.",
+    "iconName": "forward",
+    "colorToken": "message-op-slate-light",
+    "size": { "width": 150, "height": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "messageOperations",
+      "sortOrder": 10,
+      "elementType": "forward_message"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "stringArray",
+        "key": "recipientIds",
+        "label": "Qabul qiluvchilar",
+        "itemPlaceholder": "User/Chat ID",
+        "addButtonLabel": "Yangi qabul qiluvchi qo'shish"
+      }
+    ],
+    "defaults": {
+      "recipientIds": [""]
+    }
+  },
+  {
+    "type": "SendToAdminNode",
+    "status": "runtime",
+    "category": "messageOperations",
+    "titleKey": "constructor.messageOperations.sendToAdmin.name",
+    "descriptionKey": "constructor.messageOperations.sendToAdmin.description",
+    "titleFallback": "Admin'ga yuborish",
+    "descriptionFallback": "Xabarni admin'ga yuboradi.",
+    "iconName": "admin",
+    "colorToken": "message-op-red",
+    "size": { "width": 150, "height": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "messageOperations",
+      "sortOrder": 20,
+      "elementType": "send_to_admin"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "description",
+        "textKey": "constructor.messageOperations.sendToAdmin.description",
+        "textFallback": "Xabarni admin'ga yuboradi."
+      }
+    ],
+    "defaults": {}
+  },
+  {
+    "type": "CopyMessageNode",
+    "status": "runtime",
+    "category": "messageOperations",
+    "titleKey": "constructor.messageOperations.copy.name",
+    "descriptionKey": "constructor.messageOperations.copy.description",
+    "titleFallback": "Xabarni nusxalash",
+    "descriptionFallback": "Xabarni nusxalab yuboradi.",
+    "iconName": "copy",
+    "colorToken": "message-op-slate",
+    "size": { "width": 150, "height": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "messageOperations",
+      "sortOrder": 30,
+      "elementType": "copy_message"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "description",
+        "textKey": "constructor.messageOperations.copy.description",
+        "textFallback": "Xabarni nusxalab yuboradi."
+      }
+    ],
+    "footer": [{ "type": "handlersList" }],
+    "defaults": {
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": [],
+        "replyOptions": {
+          "remove_after_use": true,
+          "resize_keyboard": true,
+          "one_time_keyboard": false,
+          "is_persistent": false
+        }
+      }
+    }
+  },
+  {
+    "type": "PinMessageNode",
+    "status": "runtime",
+    "category": "messageOperations",
+    "titleKey": "constructor.messageOperations.pin.name",
+    "descriptionKey": "constructor.messageOperations.pin.description",
+    "titleFallback": "Xabarni qadash",
+    "descriptionFallback": "Xabarni guruhda qadab qo'yadi.",
+    "iconName": "pin",
+    "colorToken": "message-op-slate",
+    "size": { "width": 150, "height": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "messageOperations",
+      "sortOrder": 40,
+      "elementType": "pin_message"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "description",
+        "textKey": "constructor.messageOperations.pin.description",
+        "textFallback": "Xabarni guruhda qadab qo'yadi."
+      }
+    ],
+    "footer": [{ "type": "handlersList" }],
+    "defaults": {
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": [],
+        "replyOptions": {
+          "remove_after_use": true,
+          "resize_keyboard": true,
+          "one_time_keyboard": false,
+          "is_persistent": false
+        }
+      }
+    }
+  },
+  {
+    "type": "UnpinMessageNode",
+    "status": "runtime",
+    "category": "messageOperations",
+    "titleKey": "constructor.messageOperations.unpin.name",
+    "descriptionKey": "constructor.messageOperations.unpin.description",
+    "titleFallback": "Qadalni olib tashlash",
+    "descriptionFallback": "Qadangan xabarni olib tashlaydi.",
+    "iconName": "unpin",
+    "colorToken": "message-op-slate",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "messageOperations",
+      "sortOrder": 50,
+      "elementType": "unpin_message"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "switch",
+        "key": "unpinAll",
+        "label": "Barcha qadalgan xabarlarni olib tashlash"
+      },
+      {
+        "type": "number",
+        "key": "messageId",
+        "label": "Xabar ID (ixtiyoriy)",
+        "placeholder": "Oxirgi qadalgan xabar",
+        "visibleWhen": { "key": "unpinAll", "notEquals": true },
+        "helpText": "Bo'sh qoldirilsa, oxirgi qadalgan xabar olib tashlanadi"
+      }
+    ],
+    "defaults": {
+      "unpinAll": false
+    }
+  },
+  {
+    "type": "DeleteMessageNode",
+    "status": "runtime",
+    "category": "messageOperations",
+    "titleKey": "constructor.messageOperations.delete.name",
+    "descriptionKey": "constructor.messageOperations.delete.description",
+    "titleFallback": "Xabarni o'chirish",
+    "descriptionFallback": "Xabarni o'chiradi.",
+    "iconName": "trash",
+    "colorToken": "message-op-red",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "messageOperations",
+      "sortOrder": 60,
+      "elementType": "delete_message"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      { "preset": "source-default" },
+      { "preset": "delete-message-source" }
+    ],
+    "content": [{ "type": "widget", "widgetKey": "deleteMessage" }],
+    "defaults": {
+      "deleteFromContext": false
+    }
+  },
+  {
+    "type": "ChatActionNode",
+    "status": "runtime",
+    "category": "messageOperations",
+    "titleKey": "constructor.messageOperations.chatAction.name",
+    "descriptionKey": "constructor.messageOperations.chatAction.description",
+    "titleFallback": "Harakat ko'rsatish",
+    "descriptionFallback": "Typing yoki upload ko'rsatkichini ko'rsatadi.",
+    "iconName": "typing",
+    "colorToken": "message-op-gray",
+    "size": { "width": 150, "height": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "messageOperations",
+      "sortOrder": 70,
+      "elementType": "chat_action"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "select",
+        "key": "action",
+        "label": "Harakat turi",
+        "options": [
+          { "value": "typing", "label": "Yozmoqda..." },
+          { "value": "upload_photo", "label": "Rasm yuklanmoqda..." },
+          { "value": "upload_video", "label": "Video yuklanmoqda..." },
+          { "value": "upload_voice", "label": "Ovozli xabar yuklanmoqda..." },
+          { "value": "upload_document", "label": "Hujjat yuklanmoqda..." },
+          { "value": "find_location", "label": "Joylashuv aniqlanmoqda..." },
+          { "value": "record_video", "label": "Video yozilmoqda..." },
+          { "value": "record_voice", "label": "Ovoz yozilmoqda..." }
+        ],
+        "helpText": "Bot hozir nimalar bilan band ekanligini ko'rsatadi (5 soniya davom etadi)"
+      }
+    ],
+    "defaults": {
+      "action": "typing"
+    }
+  },
+  {
+    "type": "DownloadFileNode",
+    "status": "runtime",
+    "category": "messageOperations",
+    "titleKey": "constructor.messageOperations.downloadFile.name",
+    "descriptionKey": "constructor.messageOperations.downloadFile.description",
+    "titleFallback": "Fayl yuklab olish",
+    "descriptionFallback": "Faylni yuklab oladi va saqlaydi.",
+    "iconName": "download",
+    "colorToken": "message-op-indigo",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "messageOperations",
+      "sortOrder": 80,
+      "elementType": "file"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [{ "type": "widget", "widgetKey": "downloadFile" }],
+    "footer": [{ "type": "handlersList" }],
+    "defaults": {
+      "messageType": ""
+    }
+  },
+  {
+    "type": "CustomCodeNode",
+    "status": "runtime",
+    "category": "customLogic",
+    "titleKey": "constructor.customLogic.code.name",
+    "descriptionKey": "constructor.customLogic.code.description",
+    "titleFallback": "Maxsus Kod",
+    "descriptionFallback": "Murakkab amallar va shartlar uchun kod yozish imkonini beradi.",
+    "iconName": "code",
+    "colorToken": "custom-yellow",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "customLogic",
+      "sortOrder": 10,
+      "elementType": "code"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [{ "type": "widget", "widgetKey": "customCode" }],
+    "defaults": {
+      "nodeTitle": "Custom Code",
+      "jsCode": "// Your code here",
+      "label": "custom_code_node",
+      "language": "javascript"
+    }
+  },
+  {
+    "type": "StateNode",
+    "status": "runtime",
+    "category": "customLogic",
+    "titleKey": "constructor.customLogic.state.name",
+    "descriptionKey": "constructor.customLogic.state.description",
+    "titleFallback": "Statega ma'lumot qo'shish",
+    "descriptionFallback": "Foydalanuvchidan ma'lumotlarni yig'ib borish uchun.",
+    "iconName": "database",
+    "colorToken": "custom-yellow",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "customLogic",
+      "sortOrder": 20,
+      "elementType": "state"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [{ "type": "widget", "widgetKey": "stateNode" }],
+    "defaults": {
+      "key": "state_key",
+      "type": "user_id"
+    }
+  },
+  {
+    "type": "CollectionNode",
+    "status": "runtime",
+    "category": "customLogic",
+    "titleKey": "constructor.customLogic.collection.name",
+    "descriptionKey": "constructor.customLogic.collection.description",
+    "titleFallback": "Collectionga ma'lumot qo'shish",
+    "descriptionFallback": "Collectionga ma'lumotlar qo'shish.",
+    "iconName": "collection",
+    "colorToken": "custom-yellow",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "customLogic",
+      "sortOrder": 30,
+      "elementType": "collection"
+    }
+  },
+  {
+    "type": "LoadCollectionItemNode",
+    "status": "runtime",
+    "category": "customLogic",
+    "titleKey": "constructor.customLogic.loadCollectionItem.name",
+    "descriptionKey": "constructor.customLogic.loadCollectionItem.description",
+    "titleFallback": "Yuklab olish",
+    "descriptionFallback": "Foydalanuvchidan kelgan ma'lumot yuklab olish.",
+    "iconName": "download",
+    "colorToken": "message-op-indigo",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "customLogic",
+      "sortOrder": 40,
+      "elementType": "load_collection_item"
+    }
+  },
+  {
+    "type": "SubFlowNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.subflow.name",
+    "descriptionKey": "constructor.integrations.subflow.description",
+    "titleFallback": "Subflow",
+    "descriptionFallback": "Boshqa oqim yoki plugin ishga tushiradi.",
+    "iconName": "plugin",
+    "colorToken": "integration-indigo",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": false,
+      "groupId": "integrations",
+      "sortOrder": 1000,
+      "elementType": "subflow"
+    }
+  },
+  {
+    "type": "SubFlowExitNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.subflowExit.name",
+    "descriptionKey": "constructor.integrations.subflowExit.description",
+    "titleFallback": "Chiqish",
+    "descriptionFallback": "Subflow tugagandan keyin chiqish nuqtasi.",
+    "iconName": "door",
+    "colorToken": "integration-indigo",
+    "size": { "width": 288 },
+    "sidebar": {
+      "enabled": false,
+      "groupId": "integrations",
+      "sortOrder": 1001,
+      "elementType": "subflow_exit"
+    },
+    "titleTemplate": "Chiqish: {{exitName}}",
+    "handles": [{ "preset": "target-default" }],
+    "content": [
+      {
+        "type": "text",
+        "key": "exitName",
+        "label": "Chiqish nomi",
+        "placeholder": "success",
+        "helpText": "SubFlow tugagandan keyin qaysi chiqish orqali davom etiladi"
+      }
+    ],
+    "defaults": {
+      "exitName": "success"
+    }
+  },
+  {
+    "type": "IfConditionNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.if.name",
+    "descriptionKey": "constructor.flowControl.if.description",
+    "titleFallback": "If (Agar)",
+    "descriptionFallback": "Shartni tekshiradi va TRUE/FALSE/NEXT yo'nalishlarga ajratadi.",
+    "iconName": "split",
+    "colorToken": "flow-violet",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 10,
+      "elementType": "condition"
+    },
+    "handles": [
+      {
+        "kind": "target",
+        "side": "left",
+        "id": "target-handler",
+        "styleVariant": "accent"
+      },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "next",
+        "offsetClass": "translate-y-[-200%]",
+        "styleVariant": "danger"
+      },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "true",
+        "offsetClass": "translate-y-[200%]",
+        "styleVariant": "success"
+      }
+    ],
+    "content": [{ "type": "widget", "widgetKey": "ifCondition" }],
+    "defaults": {
+      "operator": "AND",
+      "conditions": []
+    }
+  },
+  {
+    "type": "ElseIfNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.elseif.name",
+    "descriptionKey": "constructor.flowControl.elseif.description",
+    "titleFallback": "Else If (Aks holda agar)",
+    "descriptionFallback": "If dan keyin qo'shimcha shart tekshiradi.",
+    "iconName": "repeat",
+    "colorToken": "flow-indigo",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 20,
+      "elementType": "elseif"
+    },
+    "handles": [
+      {
+        "kind": "target",
+        "side": "left",
+        "id": "target-handler",
+        "styleVariant": "accent"
+      },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "next",
+        "offsetClass": "translate-y-[200%]",
+        "styleVariant": "accent"
+      },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "true",
+        "offsetClass": "translate-y-[-200%]",
+        "styleVariant": "danger"
+      }
+    ],
+    "content": [{ "type": "widget", "widgetKey": "elseIf" }],
+    "defaults": {
+      "operator": "AND",
+      "conditions": []
+    }
+  },
+  {
+    "type": "ElseNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.else.name",
+    "descriptionKey": "constructor.flowControl.else.description",
+    "titleFallback": "Else (Aks holda)",
+    "descriptionFallback": "Boshqa shartlar bajarilmasa ishga tushadi.",
+    "iconName": "arrow-right",
+    "colorToken": "flow-purple",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 30,
+      "elementType": "else"
+    },
+    "handles": [
+      {
+        "kind": "target",
+        "side": "left",
+        "id": "target-handler",
+        "styleVariant": "accent"
+      },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "true",
+        "styleVariant": "accent"
+      }
+    ],
+    "content": [{ "type": "widget", "widgetKey": "else" }],
+    "defaults": {}
+  },
+  {
+    "type": "DelayNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.delay.name",
+    "descriptionKey": "constructor.flowControl.delay.description",
+    "titleFallback": "Kutish",
+    "descriptionFallback": "Belgilangan vaqt kutadi.",
+    "iconName": "timer",
+    "colorToken": "flow-amber",
+    "size": { "width": 150, "height": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 40,
+      "elementType": "delay"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "number",
+        "key": "seconds",
+        "label": "Kutish vaqti (soniya)",
+        "placeholder": "5",
+        "min": 1,
+        "max": 300,
+        "helpText": "Maksimal: 300 soniya (5 daqiqa)"
+      }
+    ],
+    "defaults": {
+      "seconds": 1
+    }
+  },
+  {
+    "type": "RandomNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.random.name",
+    "descriptionKey": "constructor.flowControl.random.description",
+    "titleFallback": "Tasodifiy",
+    "descriptionFallback": "Tasodifiy yo'lni tanlaydi.",
+    "iconName": "dice",
+    "colorToken": "flow-yellow",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 50,
+      "elementType": "random"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "buttonGenerator",
+        "textFallback": "Tasodifiy yo'lni tanlaydi."
+      }
+    ],
+    "defaults": {
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": [],
+        "replyOptions": {
+          "remove_after_use": true,
+          "resize_keyboard": true,
+          "one_time_keyboard": false,
+          "is_persistent": false
+        }
+      }
+    }
+  },
+  {
+    "type": "VariableNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.variable.name",
+    "descriptionKey": "constructor.flowControl.variable.description",
+    "titleFallback": "O'zgaruvchi",
+    "descriptionFallback": "O'zgaruvchilarni boshqaradi.",
+    "iconName": "variable",
+    "colorToken": "flow-yellow",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 60,
+      "elementType": "variable"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "select",
+        "key": "operation",
+        "label": "Operatsiya",
+        "options": [
+          { "value": "set", "label": "Set (o'rnatish)" },
+          { "value": "increment", "label": "Increment (+)" },
+          { "value": "decrement", "label": "Decrement (-)" },
+          { "value": "append", "label": "Append (qo'shish)" },
+          { "value": "remove", "label": "Remove (olib tashlash)" },
+          { "value": "delete", "label": "Delete (o'chirish)" },
+          { "value": "toggle", "label": "Toggle (almashtirish)" },
+          { "value": "parse_json", "label": "Parse JSON" }
+        ]
+      },
+      {
+        "type": "text",
+        "key": "variableName",
+        "label": "O'zgaruvchi nomi",
+        "placeholder": "my_variable"
+      },
+      {
+        "type": "text",
+        "key": "value",
+        "label": "Qiymat",
+        "placeholder": "Qiymat kiriting",
+        "visibleWhen": { "key": "operation", "notEquals": "delete" }
+      }
+    ],
+    "defaults": {
+      "operation": "set",
+      "variableName": "",
+      "value": ""
+    }
+  },
+  {
+    "type": "CheckMembershipNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.checkMembership.name",
+    "descriptionKey": "constructor.flowControl.checkMembership.description",
+    "titleFallback": "A'zolikni tekshirish",
+    "descriptionFallback": "Foydalanuvchi kanal/guruh a'zosi ekanligini tekshiradi.",
+    "iconName": "users",
+    "colorToken": "flow-purple",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 70,
+      "elementType": "check_membership"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "is-member",
+        "offsetClass": "translate-y-[-10px]",
+        "styleVariant": "success"
+      },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "not-member",
+        "offsetClass": "translate-y-[10px]",
+        "styleVariant": "danger"
+      }
+    ],
+    "content": [{ "type": "widget", "widgetKey": "checkMembership" }],
+    "defaults": {
+      "channels": [],
+      "inputType": "username"
+    }
+  },
+  {
+    "type": "FormNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.form.name",
+    "descriptionKey": "constructor.flowControl.form.description",
+    "titleFallback": "Forma",
+    "descriptionFallback": "Foydalanuvchi ma'lumotlarini forma orqali yig'adi.",
+    "iconName": "form",
+    "colorToken": "flow-green",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 80,
+      "elementType": "form"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [{ "type": "widget", "widgetKey": "formNode" }],
+    "defaults": {
+      "items": []
+    }
+  },
+  {
+    "type": "ForLoopNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.forLoop.name",
+    "descriptionKey": "constructor.flowControl.forLoop.description",
+    "titleFallback": "For Loop",
+    "descriptionFallback": "Ro'yxat elementlari bo'yicha aylanib chiqadi.",
+    "iconName": "loop",
+    "colorToken": "flow-green",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 90,
+      "elementType": "for_loop"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "loop-body",
+        "offsetClass": "translate-y-[-200%]",
+        "styleVariant": "success"
+      },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "no-items",
+        "offsetClass": "translate-y-[200%]",
+        "styleVariant": "warning"
+      }
+    ],
+    "content": [{ "type": "widget", "widgetKey": "forLoop" }],
+    "defaults": {
+      "dataKey": "",
+      "itemVariable": "item"
+    }
+  },
+  {
+    "type": "ForLoopContinueNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.forLoopContinue.name",
+    "descriptionKey": "constructor.flowControl.forLoopContinue.description",
+    "titleFallback": "Loop Continue",
+    "descriptionFallback": "Loop iteratsiyasini tugatadi va keyingi elementga o'tadi.",
+    "iconName": "corner-up-left",
+    "colorToken": "flow-purple",
+    "size": { "width": 150, "height": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 100,
+      "elementType": "for_loop_continue"
+    },
+    "handles": [{ "preset": "target-default" }],
+    "content": [
+      {
+        "type": "description",
+        "textKey": "constructor.flowControl.forLoopContinue.description",
+        "textFallback": "Loop iteratsiyasini tugatadi va keyingi elementga o'tadi."
+      }
+    ],
+    "defaults": {}
+  },
+  {
+    "type": "HTTPRequestNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.httpRequest.name",
+    "descriptionKey": "constructor.integrations.httpRequest.description",
+    "titleFallback": "HTTP So'rov",
+    "descriptionFallback": "Tashqi API'ga so'rov yuboradi.",
+    "iconName": "globe",
+    "colorToken": "integration-green",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "integrations",
+      "sortOrder": 10,
+      "elementType": "http_request"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [{ "type": "widget", "widgetKey": "httpRequest" }],
+    "defaults": {
+      "method": "GET",
+      "url": "",
+      "headers": {},
+      "body": "",
+      "responseVariable": "",
+      "timeout": 30,
+      "storeHeaders": false
+    }
+  },
+  {
+    "type": "CallbackQueryAnswerNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.callbackAnswer.name",
+    "descriptionKey": "constructor.integrations.callbackAnswer.description",
+    "titleFallback": "Callback Javob",
+    "descriptionFallback": "Inline tugma bosilganda javob beradi.",
+    "iconName": "reply",
+    "colorToken": "integration-sky",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "integrations",
+      "sortOrder": 20,
+      "elementType": "callback_answer"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "buttonGenerator",
+        "textFallback": "Inline tugmaga javob beradi."
+      }
+    ],
+    "defaults": {
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": [],
+        "replyOptions": {
+          "remove_after_use": true,
+          "resize_keyboard": true,
+          "one_time_keyboard": false,
+          "is_persistent": false
+        }
+      }
+    }
+  },
+  {
+    "type": "CallbackQueryTriggerNode",
+    "status": "runtime",
+    "category": "triggers",
+    "titleKey": "constructor.triggers.callbackQuery.name",
+    "descriptionKey": "constructor.triggers.callbackQuery.description",
+    "titleFallback": "Inline tugma bosilganda",
+    "descriptionFallback": "Inline tugmani bosganda.",
+    "iconName": "mouse-pointer",
+    "colorToken": "trigger-blue",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "triggers",
+      "sortOrder": 25,
+      "elementType": "callback_query"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      { "preset": "else-source" },
+      { "preset": "source-default" }
+    ],
+    "content": [{ "type": "widget", "widgetKey": "callbackQueryTrigger" }],
+    "defaults": {
+      "filter": "any",
+      "global": true,
+      "context": {
+        "value": ""
+      }
+    }
+  },
+  {
+    "type": "ReplyButtonTriggerNode",
+    "status": "runtime",
+    "category": "triggers",
+    "titleKey": "constructor.triggers.replyButton.name",
+    "descriptionKey": "constructor.triggers.replyButton.description",
+    "titleFallback": "Javob tugmasi bosilganda",
+    "descriptionFallback": "Tugmani bosganda.",
+    "iconName": "reply",
+    "colorToken": "trigger-blue",
+    "size": { "width": 150 },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "triggers",
+      "sortOrder": 22,
+      "elementType": "reply_button"
+    },
+    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "content": [{ "type": "widget", "widgetKey": "replyButtonTrigger" }],
+    "defaults": {
+      "selectedButtons": [],
+      "global": true,
+      "context": {},
+      "catchNoButton": false
+    }
+  }
+]
