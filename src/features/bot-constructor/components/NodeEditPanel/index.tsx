@@ -7,56 +7,21 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { X, Trash2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry";
+import { SIDEBAR_COLOR_CLASS_REGISTRY } from "@/features/bot-constructor/nodes/registry/colorRegistry";
+import { useTranslations } from "next-intl";
 
-// ── Node category → color mapping (mirrors globals.css) ─────────────────────
-const TRIGGER_NODES = new Set([
-  "CommandTriggerNode", "MessageTriggerNode", "CronTriggerNode",
-]);
-const SEND_MEDIA_NODES = new Set([
-  "SendTextMessageNode", "SendPhotoNode", "SendVideoNode", "SendAudioNode",
-  "SendFileNode", "SendAnimationNode", "SendVoiceNode", "SendVideoNoteNode",
-]);
-const SEND_OTHER_NODES = new Set([
-  "SendLocationNode", "SendContactNode", "SendPollNode",
-  "SendStickerNode", "SendMediaGroupNode", "SendDiceNode",
-]);
-const MSG_OP_NODES = new Set([
-  "EditMessageNode", "EditOrSendMessageNode", "ForwardMessageNode",
-  "CopyMessageNode", "PinMessageNode", "UnpinMessageNode",
-  "DeleteMessageNode", "ChatActionNode", "DownloadFileNode", "SendToAdminNode",
-]);
-const LOGIC_NODES = new Set([
-  "IfConditionNode", "ElseIfNode", "ElseNode", "DelayNode",
-  "RandomNode", "ForLoopNode", "ForLoopContinueNode",
-  "CheckMembershipNode", "FormNode",
-]);
-const DATA_NODES = new Set([
-  "StateNode", "VariableNode", "CollectionNode", "LoadCollectionItemNode",
-]);
-const INTEGRATION_NODES = new Set([
-  "HTTPRequestNode", "SubFlowNode", "SubFlowExitNode", "CallbackQueryAnswerNode",
-]);
-
-function getNodeColor(type: string): string {
-  if (TRIGGER_NODES.has(type)) return "#b45309";
-  if (SEND_MEDIA_NODES.has(type)) return "#1d4ed8";
-  if (SEND_OTHER_NODES.has(type)) return "#0369a1";
-  if (MSG_OP_NODES.has(type)) return "#475569";
-  if (LOGIC_NODES.has(type)) return "#6d28d9";
-  if (DATA_NODES.has(type)) return "#0f766e";
-  if (INTEGRATION_NODES.has(type)) return "#047857";
-  return "#52525b"; // code / default
-}
-
-function formatNodeName(type: string): string {
-  return type
-    .replace(/Node$/, "")
-    .replace(/([A-Z])/g, " $1")
-    .trim();
+function translate(
+  t: ReturnType<typeof useTranslations>,
+  key: string,
+  fallback: string
+) {
+  return typeof t.has === "function" && t.has(key) ? t(key) : fallback;
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
 export function NodeEditPanel() {
+  const t = useTranslations();
   const { editingNodeId, nodes, setEditingNodeId, deleteSelectedElements } =
     useFlowStore();
 
@@ -67,8 +32,13 @@ export function NodeEditPanel() {
     ? CustomNodes[editingNode!.type as keyof typeof CustomNodes]
     : null;
 
-  const color = isOpen ? getNodeColor(editingNode!.type as string) : "#52525b";
-  const label = isOpen ? formatNodeName(editingNode!.type as string) : "";
+  const manifest = isOpen ? getNodeManifestByType(editingNode!.type as string) : null;
+  const colorClass = manifest
+    ? SIDEBAR_COLOR_CLASS_REGISTRY[manifest.colorToken]
+    : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20";
+  const label = manifest
+    ? translate(t, manifest.titleKey, manifest.titleFallback)
+    : "";
 
   return (
     <div
@@ -84,8 +54,10 @@ export function NodeEditPanel() {
           <div className="shrink-0 flex items-center gap-3 px-4 py-3 border-b border-border" style={{ backgroundColor: '#171717' }}>
             {/* Colored node-type icon */}
             <div
-              className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-white text-xs font-bold"
-              style={{ backgroundColor: color }}
+              className={cn(
+                "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-xs font-bold border",
+                colorClass
+              )}
             >
               {label.charAt(0)}
             </div>

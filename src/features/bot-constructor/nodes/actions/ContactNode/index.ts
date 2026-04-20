@@ -1,1 +1,0 @@
-export { SendContactNode } from "./ContactNode";

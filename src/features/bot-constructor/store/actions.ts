@@ -7,23 +7,32 @@ import { SendTextMessageNodeData } from "../nodes/actions/TextMessageNode/types"
 import { SendPhotoNodeData } from "../nodes/actions/PhotoMessageNode/types";
 import { SendAudioNodeData } from "../nodes/actions/AudioMessageNode/types";
 import { SendFileNodeData } from "../nodes/actions/FileMessageNode/types";
-import { EditMessageNodeData } from "../nodes/actions/EditMessageNode";
-import { DeleteMessageNodeData } from "../nodes/actions/DeleteMessageNode/DeleteMessageNode";
-import { ForwardMessageNodeData } from "../nodes/actions/ForwardMessageNode/ForwardMessageNode";
-import { DownloadFileNodeData } from "../nodes/actions/DownloadFileNode/DownloadFileNode";
+import { EditMessageNodeData } from "../nodes/actions/EditMessageNode/types";
 import { CustomCodeNodeData } from "../nodes/custom/CustomCodeNode/types";
 import { StateNodeData } from "../nodes/custom/StateNode/types";
-import { SendLocationNodeData } from "../nodes/actions/LocationNode/types";
 import { CallbackAnswerNodeData } from "../nodes/custom/CallbackAnswerNode/types";
 import { getFormatFlow } from "../lib/format-flow";
 import { generateId } from "@/lib/utils";
 import { FormNodeData } from "../nodes/custom/FormNode/types";
-import { CommandTriggerNodeData } from "../nodes/triggers/CommandTrigger/types";
 import { SubFlowNodeData } from "../nodes/custom/SubFlowNode/types";
-import { SubFlowExitNodeData } from "../nodes/custom/SubFlowExitNode/types";
+import { getNodeManifestByType } from "../nodes/registry";
+
+interface DownloadFileNodeData {
+  messageType?: string;
+}
+
+interface DeleteMessageNodeData {
+  deleteFromContext?: boolean;
+  messageId?: string;
+}
 
 // Node yaratilganda unga to'g'ri default ma'lumot beruvchi funksiya
 const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
+  const manifestDefaults = getNodeManifestByType(nodeType)?.defaults;
+  if (manifestDefaults) {
+    return manifestDefaults;
+  }
+
   const baseMessageData = {
     recipients: { sendToSender: true, additionalIds: [] },
     keyboard: {
@@ -40,14 +49,6 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
   };
 
   switch (nodeType) {
-    // Triggers
-    case "CommandTriggerNode":
-      return {
-        command: "",
-        withArgs: false,
-        global: true,
-      } as CommandTriggerNodeData;
-
     // Actions
     case "SendTextMessageNode":
       return {
@@ -95,12 +96,6 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         deleteFromContext: false,
         messageId: undefined,
       } as DeleteMessageNodeData;
-    case "ForwardMessageNode":
-      return {
-        recipientIds: [""],
-      } as ForwardMessageNodeData;
-    case "SendToAdminNode":
-      return {}; // Maxsus sozlamalar yo'q
     case "DownloadFileNode":
       return {
         messageType: undefined,
@@ -112,10 +107,6 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         label: "custom_code_node",
         language: "javascript",
       } as CustomCodeNodeData; // Custom code uchun alohida sozlamalar
-    case "SendLocationNode":
-      return {
-        ...baseMessageData,
-      } as SendLocationNodeData;
     case "CallbackQueryAnswerNode":
       return {
         ...baseMessageData,
@@ -133,11 +124,6 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         paramsSchema: {},
         outputs: [],
       } as SubFlowNodeData;
-
-    case "SubFlowExitNode":
-      return {
-        exitName: "success",
-      } as SubFlowExitNodeData;
 
     // Custom Nodes
     case "StateNode":

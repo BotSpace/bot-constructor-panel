@@ -1,4 +1,4 @@
-import { CustomNodes } from "@/features/bot-constructor/nodes/";
+import { ReactNode } from "react";
 
 export interface ElementItemType {
   type:
@@ -59,9 +59,9 @@ export interface ElementItemType {
     | "plugin";
   name: string;
   description: string;
-  icon: string;
+  icon: ReactNode | string;
   color: string;
-  triggerId: keyof typeof CustomNodes;
+  triggerId: string;
   defaultData?: Record<string, unknown>;
 }
 
