@@ -1,4 +1,4 @@
-export type NodeRegistryStatus = "runtime" | "non-runtime-audit";
+export type NodeRegistryStatus = "runtime";
 
 export type NodeSidebarGroupId =
   | "triggers"
@@ -15,7 +15,8 @@ export interface NodeHandleManifest {
     | "else-source"
     | "selected-message-target"
     | "edit-message-source"
-    | "delete-message-source";
+    | "delete-message-source"
+    | "subflow-dynamic-sources";
   kind?: "source" | "target";
   id?: string;
   side?: "left" | "right" | "top" | "bottom";

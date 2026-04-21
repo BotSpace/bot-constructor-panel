@@ -1,4 +1,4 @@
-import { MessageTriggerNodeData } from "../../types";
+import { MessageTriggerNodeData } from "@/features/bot-constructor/nodes/types";
 import { RadiusInput } from "./RadiusInput";
 import { SizeInput } from "./SizeInput";
 import { ValueInput } from "./ValueInput";

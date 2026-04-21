@@ -21,7 +21,7 @@ import { EnvManageDialog } from "@/features/bot-constructor/components/EnvManage
 import DebugingButtons from "@/components/layout/components/debug/debug";
 import { SaveStatusBadge } from "@/features/bot-constructor/components/save-status-badge";
 import { Separator } from "@/components/ui/separator";
-import { NodeEditPanel } from "@/features/bot-constructor/components/NodeEditPanel";
+import { NodeEditDialog } from "@/features/bot-constructor/components/NodeEditPanel";
 import { Plus } from "lucide-react";
 
 function PageInner() {
@@ -93,6 +93,7 @@ function PageInner() {
             <Constructor />
             <SearchPanel />
             <DebugConsole />
+            <NodeEditDialog />
             <BottomPanel
               aiPanelOpen={aiOpen}
               onToggleAI={() => setAiOpen((v) => !v)}
@@ -103,9 +104,6 @@ function PageInner() {
 
           {isAiBuilding && <AiBuildingOverlay />}
         </div>
-
-        {/* Node edit panel (right) */}
-        <NodeEditPanel />
       </div>
     </main>
   );

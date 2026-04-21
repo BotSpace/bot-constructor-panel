@@ -8,7 +8,7 @@ import { createHistorySlice } from "./historySlice";
 import { createActions } from "./actions";
 import { Connection, addEdge } from "reactflow";
 import { KeyboardConfig } from "@/features/bot-constructor/components";
-import { DynamicMessage, ParseMode } from "@/features/bot-constructor/nodes/actions/shared/types";
+import { DynamicMessage, ParseMode } from "@/features/bot-constructor/nodes/types";
 
 // EditMessage node uchun ma'lumotlarni nusxalash uchun interface
 interface EditMessageDataUpdate {

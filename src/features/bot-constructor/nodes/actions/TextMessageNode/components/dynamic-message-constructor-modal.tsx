@@ -32,7 +32,7 @@ import { CollectionListItem } from "@/types/http/collection";
 import AccordionItemWrapper from "./accordion-item-wrapper";
 import { Badge } from "@/components/ui/badge";
 import { Database, Trash2 } from "lucide-react";
-import { DynamicMessage } from "../../shared/types";
+import { DynamicMessage } from "@/features/bot-constructor/nodes/types";
 
 export function DynamicMessageConstructor({
   children,

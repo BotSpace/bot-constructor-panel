@@ -1,6 +1,8 @@
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
+import { useFlowStore } from "@/features/bot-constructor/store";
 import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
+import { PlusIcon } from "lucide-react";
+import { ReactNode, useMemo } from "react";
 import { Handle, Position } from "reactflow";
 import { SourceHandles, TargetHandles } from "../components";
 import { DeleteMessageSource } from "../components/shared/ReactFlowHandles/DeleteMessageSource";
@@ -65,6 +67,10 @@ function GenericHandleRenderer({
     return <DeleteMessageSource />;
   }
 
+  if (handle.preset === "subflow-dynamic-sources") {
+    return <SubFlowDynamicSources nodeId={nodeId} />;
+  }
+
   if (!handle.kind || !handle.side) {
     return null;
   }
@@ -80,6 +86,47 @@ function GenericHandleRenderer({
         handle.offsetClass
       )}
     />
+  );
+}
+
+function SubFlowDynamicSources({ nodeId }: { nodeId: string }) {
+  const nodes = useFlowStore((state) => state.nodes);
+  const outputs = useMemo(() => {
+    const node = nodes.find((item) => item.id === nodeId);
+    return Array.isArray(node?.data?.outputs)
+      ? (node.data.outputs as Array<{ name: string }>)
+      : [];
+  }, [nodeId, nodes]);
+
+  if (outputs.length > 0) {
+    return (
+      <>
+        {outputs.map((output, index) => (
+          <Handle
+            key={output.name}
+            type="source"
+            position={Position.Right}
+            id={`output-${output.name}`}
+            className="!w-6 !h-6 !bg-emerald-500 !rounded-full !border-2 !border-background translate-x-[-5px]"
+            style={{ top: `${((index + 1) / (outputs.length + 1)) * 100}%` }}
+            title={output.name}
+          >
+            <PlusIcon className="ml-[7px] mt-[5px] h-2 w-2 pointer-events-none text-white" />
+          </Handle>
+        ))}
+      </>
+    );
+  }
+
+  return (
+    <Handle
+      type="source"
+      position={Position.Right}
+      id="source-handler"
+      className="!w-6 !h-14 !bg-sky-500 !rounded-[10px] !border-gray-800 flex items-center justify-center translate-x-[-5px]"
+    >
+      <PlusIcon className="h-3 w-3 pointer-events-none text-white" />
+    </Handle>
   );
 }
 

@@ -16,7 +16,7 @@ import { Plus } from "lucide-react";
 import { ButtonGenerator } from "@/features/bot-constructor/components";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { FormNodeData } from "../types";
+import { FormNodeData } from "@/features/bot-constructor/nodes/types";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
 import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 import { Input } from "@/components/ui/input";

@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import React from "react";
-import { SendTextMessageNodeData } from "../TextMessageNode/types";
+import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/types";
 
 type Props = {
   notificationDisabled?: boolean;

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/actions/TextMessageNode/types";
+import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/types";
 import { useButtonGeneratorState } from "./hook/useButtonGeneratorState";
 import { KeyboardPreview } from "./components/KeyboardPreview";
 import { EditButtonDialog } from "./components/EditButtonDialog";
