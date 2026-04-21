@@ -3,10 +3,10 @@
 import { createContext, useContext, ReactNode } from "react";
 
 /**
- * Signals that a node component is being rendered inside the
- * NodeEditPanel (not on the ReactFlow canvas).
- * - Handles return null when in panel context
- * - useNodeCollapsed / useNodeExpanded always returns "expanded" in panel
+ * Signals that a node component is being rendered inside an edit surface
+ * (modal/sidebar), not on the ReactFlow canvas.
+ * - Handles return null in edit context
+ * - useNodeCollapsed / useNodeExpanded always returns "expanded" in edit context
  */
 const NodePanelContext = createContext(false);
 

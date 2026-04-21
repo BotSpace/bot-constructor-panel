@@ -1,14 +1,22 @@
 "use client";
 
-import { useFlowStore } from "@/features/bot-constructor/store";
-import { CustomNodes } from "@/features/bot-constructor/nodes";
-import { NodePanelProvider } from "@/features/bot-constructor/contexts/NodePanelContext";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { X, Trash2 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ModalNodeFormRenderer } from "@/features/bot-constructor/components/NodeEditPanel/ModalNodeFormRenderer";
+import { NodeVariablePanel } from "@/features/bot-constructor/components/NodeEditPanel/NodeVariablePanel";
+import { VariableInsertionProvider } from "@/features/bot-constructor/components/NodeEditPanel/variable-insertion";
 import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry";
 import { SIDEBAR_COLOR_CLASS_REGISTRY } from "@/features/bot-constructor/nodes/registry/colorRegistry";
+import { useFlowStore } from "@/features/bot-constructor/store";
+import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
+import { cn } from "@/lib/utils";
+import { Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 function translate(
@@ -19,110 +27,112 @@ function translate(
   return typeof t.has === "function" && t.has(key) ? t(key) : fallback;
 }
 
-// ── Component ────────────────────────────────────────────────────────────────
-export function NodeEditPanel() {
+export function NodeEditDialog() {
   const t = useTranslations();
-  const { editingNodeId, nodes, setEditingNodeId, deleteSelectedElements } =
+  const { editingNodeId, nodes, edges, setEditingNodeId, deleteSelectedElements } =
     useFlowStore();
 
-  const editingNode = nodes.find((n) => n.id === editingNodeId);
-  const isOpen = !!editingNodeId && !!editingNode;
+  const editingNode = nodes.find((node) => node.id === editingNodeId);
+  const isOpen = Boolean(editingNodeId && editingNode);
 
-  const NodeComponent = isOpen
-    ? CustomNodes[editingNode!.type as keyof typeof CustomNodes]
+  const manifest = isOpen
+    ? getNodeManifestByType(editingNode!.type as string)
     : null;
-
-  const manifest = isOpen ? getNodeManifestByType(editingNode!.type as string) : null;
   const colorClass = manifest
     ? SIDEBAR_COLOR_CLASS_REGISTRY[manifest.colorToken]
     : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20";
   const label = manifest
     ? translate(t, manifest.titleKey, manifest.titleFallback)
-    : "";
+    : "Node";
+  const stateKeys =
+    isOpen && editingNodeId
+      ? getAvailableStateKeys(nodes, edges, editingNodeId)
+      : [];
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setEditingNodeId(null);
+    }
+  };
+
+  const handleDelete = () => {
+    deleteSelectedElements();
+    setEditingNodeId(null);
+  };
 
   return (
-    <div
-      className={cn(
-        "h-full shrink-0 flex flex-col border-l border-border bg-background",
-        "transition-all duration-200 overflow-hidden",
-        isOpen ? "w-[380px]" : "w-0 border-0"
-      )}
-    >
-      {isOpen && (
-        <>
-          {/* ── Panel header ─────────────────────────────────────── */}
-          <div className="shrink-0 flex items-center gap-3 px-4 py-3 border-b border-border" style={{ backgroundColor: '#171717' }}>
-            {/* Colored node-type icon */}
-            <div
-              className={cn(
-                "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-xs font-bold border",
-                colorClass
-              )}
-            >
-              {label.charAt(0)}
-            </div>
-
-            {/* Node name */}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate">{label}</p>
-              <p className="text-[11px] text-muted-foreground truncate">
-                ID: {editingNodeId}
-              </p>
-            </div>
-
-            {/* Delete node */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-destructive"
-              title="Node'ni o'chirish"
-              onClick={() => {
-                deleteSelectedElements();
-                setEditingNodeId(null);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-
-            {/* Close panel */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground"
-              title="Yopish"
-              onClick={() => setEditingNodeId(null)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <Separator />
-
-          {/* ── Node configuration content ───────────────────────── */}
-          <div className="flex-1 overflow-y-auto node-edit-panel-body">
-            {NodeComponent ? (
-              <NodePanelProvider>
-                <NodeComponent
-                  key={editingNodeId}
-                  id={editingNodeId!}
-                  data={editingNode!.data}
-                  selected={false}
-                  isConnectable={false}
-                  xPos={0}
-                  yPos={0}
-                  zIndex={0}
-                  dragging={false}
-                  type={editingNode!.type ?? ''}
-                />
-              </NodePanelProvider>
-            ) : (
-              <div className="flex items-center justify-center h-32 text-sm text-muted-foreground">
-                Bu node turi uchun konfiguratsiya topilmadi
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent
+        showCloseButton={false}
+        className={cn(
+          "h-[min(820px,calc(100vh-2rem))] w-[min(1180px,calc(100vw-2rem))]",
+          "!max-w-none gap-0 overflow-hidden border-white/10 bg-[#141414] p-0 text-white shadow-2xl"
+        )}
+      >
+        <VariableInsertionProvider className="flex h-full min-h-0 flex-col">
+          <DialogHeader className="shrink-0 border-b border-white/10 bg-[#171717] px-5 py-4">
+            <div className="flex items-center gap-3">
+              <div
+                className={cn(
+                  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-sm font-bold",
+                  colorClass
+                )}
+              >
+                {label.charAt(0)}
               </div>
-            )}
+
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="truncate text-base font-semibold text-white">
+                  {label}
+                </DialogTitle>
+                <DialogDescription className="truncate text-xs text-zinc-500">
+                  ID: {editingNodeId}
+                </DialogDescription>
+              </div>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 text-zinc-400 hover:bg-red-500/10 hover:text-red-300"
+                title="Node'ni o'chirish"
+                onClick={handleDelete}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 text-zinc-400 hover:bg-white/10 hover:text-white"
+                title="Yopish"
+                onClick={() => setEditingNodeId(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </DialogHeader>
+
+          <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_320px] lg:grid-rows-1">
+            <div className="min-h-0 overflow-y-auto bg-[#101010] node-edit-dialog-body">
+              {manifest && editingNode ? (
+                <ModalNodeFormRenderer
+                  nodeId={editingNodeId!}
+                  data={editingNode.data as Record<string, unknown>}
+                  manifest={manifest}
+                />
+              ) : (
+                <div className="flex h-40 items-center justify-center text-sm text-zinc-500">
+                  Bu node turi uchun konfiguratsiya topilmadi
+                </div>
+              )}
+            </div>
+
+            <NodeVariablePanel stateKeys={stateKeys} />
           </div>
-        </>
-      )}
-    </div>
+        </VariableInsertionProvider>
+      </DialogContent>
+    </Dialog>
   );
 }
+
+export const NodeEditPanel = NodeEditDialog;

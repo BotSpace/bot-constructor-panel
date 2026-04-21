@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,7 @@ import { ConstructorData } from "@/features/bot-constructor/data";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
 import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
 import { Combobox } from "@/components/ui/combobox";
+import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
 import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
 import { useReactQueryAction } from "@/services/react-query/use-react-query-action";
 import { findNearestParentAction } from "@/features/bot-constructor/lib/findNearestParentAction";
@@ -32,20 +34,21 @@ import {
   getStateTypesForReplyButtonTrigger,
 } from "@/features/bot-constructor/nodes/triggers/shared";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { useCollectionStore } from "@/features/collections/store/collection-list";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { uploadFile } from "@/services/requests/file";
 import { cn } from "@/lib/utils";
-import { AlertCircle, CheckCircle2, ListPlus, Loader2, Upload } from "lucide-react";
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { AlertCircle, ArrowRight, CheckCircle2, GripVertical, Key, ListPlus, Loader2, PlusIcon, Trash2, Upload } from "lucide-react";
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { DynamicMessageConstructor } from "../actions/TextMessageNode/components/dynamic-message-constructor-modal";
-import { CodeEditorDialog } from "../custom/CustomCodeNode/components/CodeEditorDialog";
-import AddItemModal from "../custom/FormNode/components/add-item-modal";
-import { FormItem } from "../custom/FormNode/components/form-item";
+import { DynamicMessageConstructor } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/dynamic-message-constructor-modal";
+import { CodeEditorDialog } from "@/features/bot-constructor/nodes/custom/CustomCodeNode/components/CodeEditorDialog";
+import AddItemModal from "@/features/bot-constructor/nodes/custom/FormNode/components/add-item-modal";
+import { FormItem } from "@/features/bot-constructor/nodes/custom/FormNode/components/form-item";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 import { APIDetailCreateResponse, APIListResponse } from "@/types/http/response";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
-import { NodeFieldManifest } from "./types";
+import { NodeFieldManifest } from "@/features/bot-constructor/nodes/registry/types";
 import {
   DndContext,
   PointerSensor,
@@ -1857,6 +1860,596 @@ function FormWidget({ nodeId, data }: WidgetProps) {
   );
 }
 
+function CollectionWidget({ nodeId, data }: WidgetProps) {
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const nodes = useFlowStore((state) => state.nodes);
+  const edges = useFlowStore((state) => state.edges);
+  const fieldMappings =
+    data.fieldMappings && typeof data.fieldMappings === "object"
+      ? (data.fieldMappings as Record<string, string>)
+      : {};
+
+  const { data: collections } = useReactQueryAction<
+    APIListResponse<CollectionListItem[]>
+  >({
+    url: "collection/?project=[id]",
+    enabled: true,
+  });
+
+  const { data: collectionDetail } = useReactQueryAction<
+    APIDetailCreateResponse<CollectionDetail>
+  >({
+    url:
+      typeof data.collection_name === "string" && data.collection_name
+        ? `collection/${data.collection_name}/?project=[id]`
+        : undefined,
+    enabled: Boolean(data.collection_name),
+  });
+
+  const availableStateKeys = useMemo(
+    () => getAvailableStateKeys(nodes, edges, nodeId),
+    [edges, nodeId, nodes]
+  );
+
+  useEffect(() => {
+    const fields = collectionDetail?.data?.fields;
+    if (!data.collection_name || !fields) return;
+
+    const nextMappings: Record<string, string> = {};
+    fields.forEach((field) => {
+      nextMappings[field.name] = fieldMappings[field.name] || field.name;
+    });
+
+    const hasChanges =
+      fields.some((field) => !fieldMappings[field.name]) ||
+      Object.keys(fieldMappings).some(
+        (key) => !fields.find((field) => field.name === key)
+      );
+
+    if (hasChanges) {
+      updateNodeData(nodeId, { fieldMappings: nextMappings });
+    }
+  }, [
+    collectionDetail?.data?.fields,
+    data.collection_name,
+    fieldMappings,
+    nodeId,
+    updateNodeData,
+  ]);
+
+  const handleStateKeyChange = (fieldName: string, stateKey: string) => {
+    updateNodeData(nodeId, {
+      fieldMappings: {
+        ...fieldMappings,
+        [fieldName]: stateKey,
+      },
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1.5">
+        <Label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+          Collection
+        </Label>
+        <Select
+          value={typeof data.collection_name === "string" ? data.collection_name : ""}
+          onValueChange={(collection_name) =>
+            updateNodeData(nodeId, { collection_name, fieldMappings: {} })
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Collection tanlang" />
+          </SelectTrigger>
+          <SelectContent>
+            {collections?.data.results.map((collection) => (
+              <SelectItem key={collection.id} value={collection.name}>
+                {collection.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {collectionDetail?.data?.fields?.length ? (
+        <div className="space-y-3">
+          <Label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Key className="h-3 w-3" />
+            Field Mappings
+          </Label>
+          {collectionDetail.data.fields.map((field) => {
+            const mappedStateKey = fieldMappings[field.name];
+            const usesAvailableKey =
+              mappedStateKey && availableStateKeys.includes(mappedStateKey);
+
+            return (
+              <div key={field.id} className="rounded-lg border bg-muted/30 p-3">
+                <div className="flex items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className="font-mono text-xs">
+                        {field.name}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs text-muted-foreground">
+                        {field.type}
+                      </Badge>
+                      {field.required ? (
+                        <Badge variant="outline" className="text-xs text-red-400">
+                          Required
+                        </Badge>
+                      ) : null}
+                    </div>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Field Key
+                    </p>
+                  </div>
+
+                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+
+                  <div className="min-w-0 flex-1">
+                    <Select
+                      value={usesAvailableKey ? mappedStateKey : mappedStateKey ? "custom" : ""}
+                      onValueChange={(value) =>
+                        handleStateKeyChange(field.name, value === "custom" ? "" : value)
+                      }
+                    >
+                      <SelectTrigger className="h-8 text-sm">
+                        <SelectValue placeholder="State key..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableStateKeys.map((stateKey) => (
+                          <SelectItem key={stateKey} value={stateKey}>
+                            {stateKey}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="custom">Custom...</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {!mappedStateKey || !usesAvailableKey ? (
+                      <Input
+                        className="mt-1.5 h-8 text-sm"
+                        placeholder="Custom state key..."
+                        value={!usesAvailableKey ? mappedStateKey || "" : ""}
+                        onChange={(event) =>
+                          handleStateKeyChange(field.name, event.target.value)
+                        }
+                      />
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function LoadCollectionItemWidget({ nodeId, data }: WidgetProps) {
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const nodes = useFlowStore((state) => state.nodes);
+  const edges = useFlowStore((state) => state.edges);
+  const { data: collections } = useCollectionStore();
+  const selectedCollection =
+    data.collection && typeof data.collection === "object"
+      ? (data.collection as { name?: string })
+      : null;
+
+  const { data: fields } = useReactQueryAction<
+    APIDetailCreateResponse<CollectionDetail>
+  >({
+    url: selectedCollection?.name
+      ? `collection/${selectedCollection.name}/?project=[id]`
+      : undefined,
+    enabled: Boolean(selectedCollection?.name),
+  });
+
+  const availableStateKeys = useMemo(
+    () => getAvailableStateKeys(nodes, edges, nodeId),
+    [edges, nodeId, nodes]
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>Collection</Label>
+        <Select
+          value={selectedCollection?.name ?? ""}
+          onValueChange={(value) => {
+            const collection = collections?.find((item) => item.name === value);
+            updateNodeData(nodeId, {
+              collection: collection || null,
+              filters: [],
+            });
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select collection" />
+          </SelectTrigger>
+          <SelectContent>
+            {collections?.map((collection) => (
+              <SelectItem key={collection.id} value={collection.name}>
+                {collection.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Context Key</Label>
+        <Input
+          placeholder="e.g., selected_film"
+          value={typeof data.contextKey === "string" ? data.contextKey : ""}
+          onChange={(event) =>
+            updateNodeData(nodeId, { contextKey: event.target.value })
+          }
+        />
+        <p className="text-xs text-muted-foreground">
+          Use: {`{{collection.${typeof data.contextKey === "string" && data.contextKey ? data.contextKey : "key"}.fieldname}}`}
+        </p>
+      </div>
+
+      {selectedCollection && fields ? (
+        <div className="space-y-2">
+          <Label>Filters</Label>
+          <FilterBuilder
+            fields={[
+              { id: "_id", label: "id", type: "text" as const },
+              ...fields.data.fields.map((field) => ({
+                id: field.name,
+                label: field.name,
+                type: field.type,
+              })),
+            ]}
+            filters={Array.isArray(data.filters) ? data.filters : []}
+            onChange={(filters) => updateNodeData(nodeId, { filters })}
+            stateKeys={availableStateKeys}
+          />
+        </div>
+      ) : null}
+
+      {selectedCollection && fields ? (
+        <div className="space-y-2">
+          <Label className="text-xs">Available Fields</Label>
+          <div className="flex flex-wrap gap-1">
+            {fields.data.fields.slice(0, 5).map((field) => (
+              <Badge
+                key={field.id}
+                variant="secondary"
+                className="cursor-pointer font-mono text-[10px]"
+                onClick={() =>
+                  navigator.clipboard.writeText(
+                    `{{collection_${typeof data.contextKey === "string" && data.contextKey ? data.contextKey : "key"}_${field.name}}}`
+                  )
+                }
+              >
+                {field.name}
+              </Badge>
+            ))}
+            {fields.data.fields.length > 5 ? (
+              <Badge variant="outline" className="text-[10px]">
+                +{fields.data.fields.length - 5}
+              </Badge>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+interface SchemaField {
+  name: string;
+  title?: string;
+  type: string;
+  description?: string;
+  required: boolean;
+  defaultValue?: unknown;
+  enumValues?: string[];
+  itemFields?: SchemaField[];
+}
+
+function getSchemaFields(schema: Record<string, unknown>): SchemaField[] {
+  const properties = (schema as any)?.properties;
+  const required = (schema as any)?.required || [];
+  if (!properties) return [];
+
+  return Object.entries(properties).map(([name, prop]: [string, any]) => {
+    const field: SchemaField = {
+      name,
+      title: prop.title,
+      type: prop.type || "string",
+      description: prop.description,
+      required: required.includes(name),
+      defaultValue: prop.default,
+      enumValues: prop.enum,
+    };
+
+    if (prop.type === "array" && prop.items?.properties) {
+      const itemRequired = prop.items.required || [];
+      field.itemFields = Object.entries(prop.items.properties).map(
+        ([subName, subProp]: [string, any]) => ({
+          name: subName,
+          title: subProp.title,
+          type: subProp.type || "string",
+          description: subProp.description,
+          required: itemRequired.includes(subName),
+          defaultValue: subProp.default,
+          enumValues: subProp.enum,
+        })
+      );
+    }
+
+    return field;
+  });
+}
+
+function StringParamField({
+  field,
+  value,
+  onChange,
+}: {
+  field: SchemaField;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <>
+      <Label className="text-xs">
+        {field.title || field.name}
+        {field.required ? <span className="ml-1 text-destructive">*</span> : null}
+      </Label>
+      {field.enumValues ? (
+        <Select value={value || (field.defaultValue as string)} onValueChange={onChange}>
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue placeholder={field.title || field.name} />
+          </SelectTrigger>
+          <SelectContent>
+            {field.enumValues.map((option) => (
+              <SelectItem key={option} value={option} className="text-xs">
+                {option}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <Input
+          placeholder={field.description || field.name}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="h-8 text-xs"
+        />
+      )}
+      {field.description ? (
+        <p className="text-[10px] text-muted-foreground">{field.description}</p>
+      ) : null}
+    </>
+  );
+}
+
+function BooleanParamField({
+  field,
+  value,
+  onChange,
+}: {
+  field: SchemaField;
+  value: boolean | undefined;
+  onChange: (value: boolean) => void;
+}) {
+  const checked = value ?? (field.defaultValue as boolean) ?? false;
+  return (
+    <label className="flex cursor-pointer items-center gap-2">
+      <Checkbox checked={checked} onCheckedChange={(nextValue) => onChange(nextValue === true)} />
+      <span className="text-xs">{field.title || field.name}</span>
+    </label>
+  );
+}
+
+function ArrayParamField({
+  field,
+  value,
+  onChange,
+}: {
+  field: SchemaField;
+  value: Record<string, unknown>[];
+  onChange: (value: Record<string, unknown>[]) => void;
+}) {
+  const itemFields = field.itemFields || [];
+  const items = Array.isArray(value) ? value : [];
+
+  const addItem = () => {
+    const newItem: Record<string, unknown> = {};
+    itemFields.forEach((itemField) => {
+      newItem[itemField.name] = itemField.defaultValue ?? "";
+    });
+    onChange([...items, newItem]);
+  };
+
+  return (
+    <>
+      <div className="flex items-center justify-between">
+        <Label className="text-xs">
+          {field.title || field.name}
+          {field.required ? <span className="ml-1 text-destructive">*</span> : null}
+        </Label>
+        <span className="text-[10px] text-muted-foreground">{items.length} ta</span>
+      </div>
+      <div className="flex flex-col gap-2">
+        {items.map((item, index) => (
+          <div key={index} className="flex flex-col gap-1.5 rounded-lg border bg-muted/30 p-2.5">
+            <div className="mb-0.5 flex items-center justify-between">
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <GripVertical className="h-3 w-3" />
+                <span className="text-[10px] font-medium">#{index + 1}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => onChange(items.filter((_, itemIndex) => itemIndex !== index))}
+                className="rounded p-0.5 text-muted-foreground hover:text-destructive"
+              >
+                <Trash2 className="h-3 w-3" />
+              </button>
+            </div>
+            {itemFields.map((itemField) => (
+              <div key={itemField.name} className="flex flex-col gap-0.5">
+                <Label className="text-[10px] text-muted-foreground">
+                  {itemField.title || itemField.name}
+                </Label>
+                {itemField.enumValues ? (
+                  <Select
+                    value={String(item[itemField.name] ?? itemField.defaultValue ?? "")}
+                    onValueChange={(nextValue) =>
+                      onChange(
+                        items.map((currentItem, itemIndex) =>
+                          itemIndex === index
+                            ? { ...currentItem, [itemField.name]: nextValue }
+                            : currentItem
+                        )
+                      )
+                    }
+                  >
+                    <SelectTrigger className="h-7 text-[11px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {itemField.enumValues.map((option) => (
+                        <SelectItem key={option} value={option} className="text-xs">
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : itemField.type === "boolean" ? (
+                  <label className="flex cursor-pointer items-center gap-1.5">
+                    <Checkbox
+                      checked={item[itemField.name] === true}
+                      onCheckedChange={(nextValue) =>
+                        onChange(
+                          items.map((currentItem, itemIndex) =>
+                            itemIndex === index
+                              ? { ...currentItem, [itemField.name]: nextValue === true }
+                              : currentItem
+                          )
+                        )
+                      }
+                      className="h-3.5 w-3.5"
+                    />
+                    <span className="text-[10px]">
+                      {itemField.title || itemField.name}
+                    </span>
+                  </label>
+                ) : (
+                  <Input
+                    placeholder={itemField.title || itemField.name}
+                    value={String(item[itemField.name] ?? "")}
+                    onChange={(event) =>
+                      onChange(
+                        items.map((currentItem, itemIndex) =>
+                          itemIndex === index
+                            ? { ...currentItem, [itemField.name]: event.target.value }
+                            : currentItem
+                        )
+                      )
+                    }
+                    className="h-7 text-[11px]"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={addItem}
+        className="flex w-full items-center justify-center gap-1.5 rounded-md border border-dashed py-1.5 text-xs text-muted-foreground hover:bg-primary/5 hover:text-foreground"
+      >
+        <PlusIcon className="h-3.5 w-3.5" />
+        Qo&apos;shish
+      </button>
+    </>
+  );
+}
+
+function SubFlowWidget({ nodeId, data }: WidgetProps) {
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const params =
+    data.params && typeof data.params === "object"
+      ? (data.params as Record<string, unknown>)
+      : {};
+  const paramFields =
+    data.paramsSchema && typeof data.paramsSchema === "object"
+      ? getSchemaFields(data.paramsSchema as Record<string, unknown>)
+      : [];
+  const outputs = Array.isArray(data.outputs)
+    ? (data.outputs as Array<{ name: string; description?: string }>)
+    : [];
+
+  const handleParamChange = useCallback(
+    (key: string, value: unknown) => {
+      updateNodeData(nodeId, {
+        params: {
+          ...params,
+          [key]: value,
+        },
+      });
+    },
+    [nodeId, params, updateNodeData]
+  );
+
+  return (
+    <div className="flex flex-col gap-3">
+      {typeof data.pluginDescription === "string" && data.pluginDescription ? (
+        <p className="text-xs text-muted-foreground">{data.pluginDescription}</p>
+      ) : null}
+
+      {paramFields.length > 0 ? (
+        <div className="flex flex-col gap-3">
+          <Label className="text-xs font-semibold">Parametrlar</Label>
+          {paramFields.map((field) => (
+            <div key={field.name} className="flex flex-col gap-1">
+              {field.type === "array" ? (
+                <ArrayParamField
+                  field={field}
+                  value={(params[field.name] as Record<string, unknown>[]) || []}
+                  onChange={(value) => handleParamChange(field.name, value)}
+                />
+              ) : field.type === "boolean" ? (
+                <BooleanParamField
+                  field={field}
+                  value={params[field.name] as boolean | undefined}
+                  onChange={(value) => handleParamChange(field.name, value)}
+                />
+              ) : (
+                <StringParamField
+                  field={field}
+                  value={String(params[field.name] ?? "")}
+                  onChange={(value) => handleParamChange(field.name, value)}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {outputs.length > 0 ? (
+        <div className="flex flex-col gap-1">
+          <Label className="text-xs font-semibold">Chiqishlar</Label>
+          <div className="flex flex-wrap gap-1">
+            {outputs.map((output) => (
+              <Badge key={output.name} variant="outline" className="text-[10px]">
+                {output.name}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 const widgetRegistry: Record<string, (props: WidgetProps) => ReactNode> = {
   messageTrigger: MessageTriggerWidget,
   callbackQueryTrigger: CallbackQueryTriggerWidget,
@@ -1883,6 +2476,9 @@ const widgetRegistry: Record<string, (props: WidgetProps) => ReactNode> = {
   stateNode: StateWidget,
   customCode: CustomCodeWidget,
   formNode: FormWidget,
+  collectionNode: CollectionWidget,
+  loadCollectionItem: LoadCollectionItemWidget,
+  subFlow: SubFlowWidget,
 };
 
 export function renderCustomWidget(props: WidgetProps) {

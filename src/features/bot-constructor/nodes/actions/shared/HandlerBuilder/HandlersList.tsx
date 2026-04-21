@@ -17,7 +17,7 @@ import {
 import { MessageCircle, Trash2, Globe, Pencil, PlusIcon } from "lucide-react";
 import { HandlerAdder } from "./handler-adder";
 import { ConstructorData } from "@/features/bot-constructor/data";
-import { MessageTriggerNodeData } from "./types";
+import { MessageTriggerNodeData } from "@/features/bot-constructor/nodes/types";
 import { KeyboardConfig } from "@/features/bot-constructor/components";
 
 interface NodeWithHandlersData {

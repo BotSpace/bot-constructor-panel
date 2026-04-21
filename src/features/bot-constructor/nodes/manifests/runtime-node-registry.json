@@ -1084,6 +1084,17 @@
       "groupId": "customLogic",
       "sortOrder": 30,
       "elementType": "collection"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      { "preset": "source-default" }
+    ],
+    "content": [
+      { "type": "widget", "widgetKey": "collectionNode" }
+    ],
+    "defaults": {
+      "collection_name": "",
+      "fieldMappings": {}
     }
   },
   {
@@ -1102,6 +1113,31 @@
       "groupId": "customLogic",
       "sortOrder": 40,
       "elementType": "load_collection_item"
+    },
+    "handles": [
+      { "preset": "target-default" },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "not_found",
+        "offsetClass": "translate-y-[-75%]",
+        "styleVariant": "danger"
+      },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "found",
+        "offsetClass": "translate-y-[75%]",
+        "styleVariant": "accent"
+      }
+    ],
+    "content": [
+      { "type": "widget", "widgetKey": "loadCollectionItem" }
+    ],
+    "defaults": {
+      "collection": null,
+      "contextKey": "",
+      "filters": []
     }
   },
   {
@@ -1120,6 +1156,22 @@
       "groupId": "integrations",
       "sortOrder": 1000,
       "elementType": "subflow"
+    },
+    "titleTemplate": "{{pluginName}}",
+    "handles": [
+      { "preset": "target-default" },
+      { "preset": "subflow-dynamic-sources" }
+    ],
+    "content": [
+      { "type": "widget", "widgetKey": "subFlow" }
+    ],
+    "defaults": {
+      "slug": "",
+      "pluginName": "",
+      "pluginDescription": "",
+      "params": {},
+      "paramsSchema": {},
+      "outputs": []
     }
   },
   {

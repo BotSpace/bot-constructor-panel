@@ -5,12 +5,12 @@ import { useReactQueryAction } from "@/services/react-query";
 import { APIDetailCreateResponse } from "@/types/http/response";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { SendTextMessageNodeData } from "../types";
+import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/types";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
-import { DynamicMessage } from "../../shared/types";
+import { DynamicMessage } from "@/features/bot-constructor/nodes/types";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 
 type Props = {

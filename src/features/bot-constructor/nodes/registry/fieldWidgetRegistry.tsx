@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { Plus, X } from "lucide-react";
 import { memo } from "react";
 import { NodeFieldManifest } from "./types";
-import { renderCustomWidget } from "./widgetRegistry";
+import { renderCustomWidget } from "@/features/bot-constructor/nodes/widgets/widgetRegistry";
 
 interface FieldWidgetProps {
   nodeId: string;

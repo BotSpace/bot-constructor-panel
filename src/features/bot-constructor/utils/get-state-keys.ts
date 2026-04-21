@@ -5,11 +5,13 @@
  */
 
 import { Node, Edge } from "reactflow";
-import { StateNodeData } from "../nodes/custom/StateNode/types";
-import { MessageTriggerNodeData } from "../nodes/triggers/MessageTrigger/types";
-import { CallbackQueryTriggerData } from "../nodes/triggers/CallbackQueryTrigger/types";
-import { CommandTriggerNodeData } from "../nodes/triggers/CommandTrigger/types";
-import { ReplyButtonTriggerData } from "../nodes/triggers/ReplyButtonTrigger/types";
+import {
+  CallbackQueryTriggerData,
+  CommandTriggerNodeData,
+  MessageTriggerNodeData,
+  ReplyButtonTriggerData,
+  StateNodeData,
+} from "../nodes/types";
 
 type TriggerNodeWithState =
   | MessageTriggerNodeData

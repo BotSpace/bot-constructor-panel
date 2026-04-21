@@ -3,18 +3,20 @@ import { Node } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
 import { ElementItemType } from "@/types/element-types";
 import { instanceAuth } from "@/services/instance";
-import { SendTextMessageNodeData } from "../nodes/actions/TextMessageNode/types";
-import { SendPhotoNodeData } from "../nodes/actions/PhotoMessageNode/types";
-import { SendAudioNodeData } from "../nodes/actions/AudioMessageNode/types";
-import { SendFileNodeData } from "../nodes/actions/FileMessageNode/types";
-import { EditMessageNodeData } from "../nodes/actions/EditMessageNode/types";
-import { CustomCodeNodeData } from "../nodes/custom/CustomCodeNode/types";
-import { StateNodeData } from "../nodes/custom/StateNode/types";
-import { CallbackAnswerNodeData } from "../nodes/custom/CallbackAnswerNode/types";
+import {
+  CallbackAnswerNodeData,
+  CustomCodeNodeData,
+  EditMessageNodeData,
+  FormNodeData,
+  SendAudioNodeData,
+  SendFileNodeData,
+  SendPhotoNodeData,
+  SendTextMessageNodeData,
+  StateNodeData,
+  SubFlowNodeData,
+} from "../nodes/types";
 import { getFormatFlow } from "../lib/format-flow";
 import { generateId } from "@/lib/utils";
-import { FormNodeData } from "../nodes/custom/FormNode/types";
-import { SubFlowNodeData } from "../nodes/custom/SubFlowNode/types";
 import { getNodeManifestByType } from "../nodes/registry";
 
 interface DownloadFileNodeData {

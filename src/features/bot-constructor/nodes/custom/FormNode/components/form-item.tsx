@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GripVertical, Trash2, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { FormNodeData } from "../types";
+import { FormNodeData } from "@/features/bot-constructor/nodes/types";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ConstructorData } from "@/features/bot-constructor/data";
