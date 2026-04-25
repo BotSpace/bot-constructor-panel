@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ModalNodeFormRenderer } from "@/features/bot-constructor/components/NodeEditPanel/ModalNodeFormRenderer";
+import { NodeOverviewPanel } from "@/features/bot-constructor/components/NodeEditPanel/NodeOverviewPanel";
 import { NodeVariablePanel } from "@/features/bot-constructor/components/NodeEditPanel/NodeVariablePanel";
 import { VariableInsertionProvider } from "@/features/bot-constructor/components/NodeEditPanel/variable-insertion";
 import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry";
@@ -112,7 +113,13 @@ export function NodeEditDialog() {
             </div>
           </DialogHeader>
 
-          <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_320px] lg:grid-rows-1">
+          <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] lg:grid-cols-[320px_minmax(0,1fr)_320px] lg:grid-rows-1">
+            {manifest && editingNode ? (
+              <NodeOverviewPanel nodeId={editingNodeId!} manifest={manifest} />
+            ) : (
+              <div className="hidden border-r border-white/10 bg-[#0f0f0f] lg:block" />
+            )}
+
             <div className="min-h-0 overflow-y-auto bg-[#101010] node-edit-dialog-body">
               {manifest && editingNode ? (
                 <ModalNodeFormRenderer

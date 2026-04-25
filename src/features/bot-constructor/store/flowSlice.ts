@@ -17,13 +17,27 @@ export const createFlowSlice: StateCreator<
 > = (set, get) => ({
   nodes: [],
   edges: [],
+  silentFlowUpdateDepth: 0,
+
+  withSilentFlowUpdate: (callback) => {
+    set((state) => ({
+      silentFlowUpdateDepth: state.silentFlowUpdateDepth + 1,
+    }));
+    try {
+      callback();
+    } finally {
+      set((state) => ({
+        silentFlowUpdateDepth: Math.max(0, state.silentFlowUpdateDepth - 1),
+      }));
+    }
+  },
 
   // --- Yaxshilangan onNodesChange ---
   onNodesChange: (changes: NodeChange[]) => {
-    const { initialState, isLoading, saveToHistory } = get();
+    const { initialState, isLoading, saveToHistory, silentFlowUpdateDepth } = get();
 
     // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
-    if (isLoading) {
+    if (isLoading || silentFlowUpdateDepth > 0) {
       set({
         nodes: applyNodeChanges(changes, get().nodes),
         // isLoading bo'lsa, isDirty ni o'zgartirmaymiz
@@ -61,10 +75,10 @@ export const createFlowSlice: StateCreator<
 
   // --- onNodesChange tugadi ---
   onEdgesChange: (changes) => {
-    const { initialState, isLoading, saveToHistory } = get();
+    const { initialState, isLoading, saveToHistory, silentFlowUpdateDepth } = get();
 
     // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
-    if (isLoading) {
+    if (isLoading || silentFlowUpdateDepth > 0) {
       set({
         edges: applyEdgeChanges(changes, get().edges),
         // isLoading bo'lsa, isDirty ni o'zgartirmaymiz
@@ -100,10 +114,10 @@ export const createFlowSlice: StateCreator<
   },
 
   updateNodeData: (nodeId, newData) => {
-    const { initialState, isLoading, saveToHistory } = get();
+    const { initialState, isLoading, saveToHistory, silentFlowUpdateDepth } = get();
 
     // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
-    if (isLoading) {
+    if (isLoading || silentFlowUpdateDepth > 0) {
       set({
         nodes: get().nodes.map((node) => {
           if (node.id === nodeId) {
@@ -137,10 +151,10 @@ export const createFlowSlice: StateCreator<
   },
 
   updateEdgeData: (edgeId, newData) => {
-    const { initialState, isLoading, saveToHistory } = get();
+    const { initialState, isLoading, saveToHistory, silentFlowUpdateDepth } = get();
 
     // Agar yuklanmoqda bo'lsa, isDirty ni o'zgartirmaymiz
-    if (isLoading) {
+    if (isLoading || silentFlowUpdateDepth > 0) {
       set({
         edges: get().edges.map((edge) => {
           if (edge.id === edgeId) {
@@ -216,10 +230,10 @@ export const createFlowSlice: StateCreator<
   },
 
   setNodes: (nodes) => {
-    set({ nodes, isDirty: true });
+    set(get().silentFlowUpdateDepth > 0 ? { nodes } : { nodes, isDirty: true });
   },
 
   setEdges: (edges) => {
-    set({ edges, isDirty: true });
+    set(get().silentFlowUpdateDepth > 0 ? { edges } : { edges, isDirty: true });
   },
 });

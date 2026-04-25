@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from './components/button'
-import { Bot, Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff } from 'lucide-react'
+import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff, Sparkles } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -29,8 +29,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 interface Props {
-    aiPanelOpen?: boolean;
-    onToggleAI?: () => void;
+    agentOpen?: boolean;
+    onToggleAgent?: () => void;
     addNodeOpen?: boolean;
     onAddNodeOpenChange?: (open: boolean) => void;
 }
@@ -42,9 +42,9 @@ interface Props {
 const FIXED_W = 227
 const SLOT = 48
 const MORE_W = 48
-const ALL_COUNT = 7 // Increased from 6 to 7
+const ALL_COUNT = 7
 
-function BottomPanel({ aiPanelOpen, onToggleAI, addNodeOpen, onAddNodeOpenChange }: Props) {
+function BottomPanel({ agentOpen, onToggleAgent, addNodeOpen, onAddNodeOpenChange }: Props) {
     const { isOpen, height, toggle } = debugConsoleStore()
     const { toggleSearchPanel } = useSearchStore()
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false)
@@ -111,26 +111,20 @@ function BottomPanel({ aiPanelOpen, onToggleAI, addNodeOpen, onAddNodeOpenChange
             ),
         },
         {
-            key: 'ai',
+            key: 'agent',
             inline: (
                 <BottomPanelButton
-                    onClick={onToggleAI}
-                    title={aiPanelOpen ? 'AI panelni yopish' : 'AI panelni ochish'}
-                    className={cn(
-                        'relative inline-flex overflow-hidden p-[1px] focus:outline-none',
-                        aiPanelOpen && 'ring-2 ring-primary/50'
-                    )}
+                    onClick={onToggleAgent}
+                    title={agentOpen ? "Agentni yopish" : "Agentni ochish"}
+                    className={cn(agentOpen && 'ring-2 ring-primary/50')}
                 >
-                    <span className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
-                    <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl bg-background/80 px-3 py-1 text-sm font-medium backdrop-blur-3xl">
-                        <Bot size={20} className={aiPanelOpen ? 'text-primary' : ''} />
-                    </span>
+                    <Sparkles size={20} className={agentOpen ? 'text-primary' : ''} />
                 </BottomPanelButton>
             ),
             overflow: (
-                <DropdownMenuItem key="ai" onClick={onToggleAI}>
-                    <Bot size={16} className="mr-2" />
-                    {aiPanelOpen ? 'AI panelni yopish' : 'AI panelni ochish'}
+                <DropdownMenuItem key="agent" onClick={onToggleAgent}>
+                    <Sparkles size={16} className="mr-2" />
+                    {agentOpen ? "Agentni yopish" : "Agentni ochish"}
                 </DropdownMenuItem>
             ),
         },

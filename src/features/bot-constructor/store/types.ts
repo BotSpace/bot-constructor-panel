@@ -6,6 +6,8 @@ import { FlowData } from "@/types/http/flow";
 export interface FlowSlice {
   nodes: Node[];
   edges: Edge[];
+  silentFlowUpdateDepth: number;
+  withSilentFlowUpdate: (callback: () => void) => void;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
