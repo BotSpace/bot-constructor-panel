@@ -10,7 +10,7 @@ type PlanCardProps = {
     isCurrent: boolean;
     isPopular: boolean;
     isProcessing: boolean;
-    onSelectPlan: (plan_id: Plan["id"]) => void;
+    onSelectPlan: (plan_id: Plan["id"], total_price: number) => void;
     buttonText: string;
     unable_free: boolean;
 };
@@ -152,7 +152,7 @@ export function PlanCard({
                 className="w-full rounded-xl font-semibold mt-auto"
                 variant={isCurrent ? "outline" : "default"}
                 disabled={isCurrent || isProcessing}
-                onClick={() => onSelectPlan(plan.id)}
+                onClick={() => onSelectPlan(plan.id, totalPrice)}
             >
                 {isProcessing && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

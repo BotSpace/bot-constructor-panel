@@ -14,6 +14,7 @@ export const useReactQueryAction = <T>({
   enabled = true,
   method = "GET",
   data,
+  refetchInterval,
 }: {
   url?: string;
   query?: Record<string, any>;
@@ -21,6 +22,7 @@ export const useReactQueryAction = <T>({
   enabled?: boolean;
   method?: "GET" | "POST" | "PUT" | "DELETE";
   data?: any;
+  refetchInterval?: number;
 }) => {
   const params = useParams();
 
@@ -66,7 +68,9 @@ export const useReactQueryAction = <T>({
   }
 
   // ✅ Debounce ishlatish (ixtiyoriy)
-  const debouncedUrl = debounceTime ? useDebounces(processedUrl, debounceTime) : processedUrl;
+  const debouncedUrl = debounceTime
+    ? useDebounces(processedUrl, debounceTime)
+    : processedUrl;
 
   return useQuery<T>({
     queryKey: [debouncedUrl],
@@ -108,5 +112,6 @@ export const useReactQueryAction = <T>({
       return failureCount < 3;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    refetchInterval: refetchInterval,
   });
 };
