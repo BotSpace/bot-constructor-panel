@@ -57,7 +57,6 @@ export default function Constructor() {
     countdownRemaining,
   } = useFlowStore();
 
-  const { searchPanelIsOpen } = useSearchStore();
   const { toggleSearchPanel } = useSearchStore();
   const debugToggle = debugConsoleStore.getState().toggle;
 
@@ -93,7 +92,7 @@ export default function Constructor() {
         edges: project.flow.edges,
       });
     }
-  }, [loading]);
+  }, [project]);
 
   useFlowKeyboardShortcuts({
     containerRef: reactFlowWrapper,

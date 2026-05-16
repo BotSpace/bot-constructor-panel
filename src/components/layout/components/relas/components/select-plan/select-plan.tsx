@@ -13,9 +13,10 @@ import SaleForLongTime from "./components/sale-for-long-time";
 type Props = {
     updateForm: (key: string, value: string) => void;
     header: React.ReactNode;
+    handleNextStep: () => void;
 };
 
-function SelectPlan({ updateForm, header }: Props) {
+function SelectPlan({ updateForm, header, handleNextStep }: Props) {
 
     const isUserUseFreePlan = true
 
@@ -71,8 +72,11 @@ function SelectPlan({ updateForm, header }: Props) {
                             isCurrent={false}
                             isPopular={plan.is_top}
                             isProcessing={false}
-                            onSelectPlan={(plan_id) =>
-                                updateForm("plan_id", plan_id.toString())
+                            onSelectPlan={(plan_id, total_price) => {
+                                updateForm("plan_id", plan_id.toString());
+                                updateForm("total_price", total_price.toString());
+                                handleNextStep();
+                            }
                             }
                             buttonText="Sotib olish"
                         />
