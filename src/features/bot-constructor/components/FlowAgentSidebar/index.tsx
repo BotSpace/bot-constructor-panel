@@ -16,6 +16,7 @@ import {
   createAgentEventStream,
   createAgentRun,
   getActiveAgentRuns,
+  getAgentRunStatus,
   getProjectAgentMessages,
 } from "@/services/requests/flow-agent";
 import { cn } from "@/lib/utils";
@@ -102,6 +103,12 @@ async function getAccessToken() {
   return token;
 }
 
+function isRenderableHistoryMessage(
+  message: AgentMessage
+): message is AgentMessage & { role: "user" | "assistant" } {
+  return message.role === "user" || message.role === "assistant";
+}
+
 function getOptionId(option: ClarificationOption) {
   return option.option_id || option.id || option.value || "";
 }
@@ -127,6 +134,10 @@ function markClarificationAnswered(projectId: string, requestId: string) {
 function clearClarificationAnswered(projectId: string, requestId: string) {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(getAnsweredClarificationKey(projectId, requestId));
+}
+
+function shouldRenderActivityDescription(eventType: AgentStreamEvent["type"]) {
+  return eventType === "run_started" || eventType === "tool_call";
 }
 
 function normalizePlanItems(payload: Record<string, unknown>): PlanItem[] {
@@ -311,6 +322,25 @@ export function FlowAgentSidebar({
     };
   }, []);
 
+  const loadClarificationFromStatus = useCallback(
+    async (targetRequestId: string) => {
+      const token = await getAccessToken();
+      const status = await getAgentRunStatus(projectId, targetRequestId, token);
+
+      if (status.status === "waiting_for_clarification") {
+        if (!isClarificationAnswered(projectId, targetRequestId)) {
+          setClarification(status.pending_clarification as ClarificationPayload);
+        }
+        setIsRunning(false);
+        return;
+      }
+
+      setClarification(null);
+      setIsRunning(status.status === "running" || status.status === "queued");
+    },
+    [projectId]
+  );
+
   const applyCanvasEvent = useCallback(
     (event: AgentStreamEvent) => {
       const payload = event.payload as Record<string, unknown>;
@@ -399,7 +429,7 @@ export function FlowAgentSidebar({
         event.description ||
         (typeof payload.description === "string" ? payload.description : "");
 
-      if (description) {
+      if (description && shouldRenderActivityDescription(event.type)) {
         appendActivityMessage(setMessages, event.request_id, {
           id: `${event.request_id}-${event.seq}-activity`,
           content: description,
@@ -464,8 +494,10 @@ export function FlowAgentSidebar({
         if (isClarificationAnswered(projectId, event.request_id)) {
           return;
         }
-        setClarification(event.payload as ClarificationPayload);
-        setIsRunning(false);
+        void loadClarificationFromStatus(event.request_id).catch(() => {
+          setClarification(event.payload as ClarificationPayload);
+          setIsRunning(false);
+        });
         return;
       }
 
@@ -507,7 +539,7 @@ export function FlowAgentSidebar({
         cleanupRef.current = null;
       }
     },
-    [applyCanvasEvent]
+    [applyCanvasEvent, loadClarificationFromStatus, projectId]
   );
 
   const startStream = useCallback(
@@ -522,6 +554,62 @@ export function FlowAgentSidebar({
         onError: (error) => {
           setStreamError(error.message);
           setIsRunning(false);
+        },
+        onClose: () => {
+          if (activeRequestIdRef.current !== nextRequestId) {
+            return;
+          }
+
+          void (async () => {
+            try {
+              const status = await getAgentRunStatus(projectId, nextRequestId, token);
+              if (activeRequestIdRef.current !== nextRequestId) {
+                return;
+              }
+
+              if (status.status === "completed") {
+                if (status.final_response) {
+                  appendMessageUnique(setMessages, {
+                    id: `${nextRequestId}-status-completed`,
+                    role: "assistant",
+                    content: status.final_response,
+                  });
+                }
+                setIsRunning(false);
+                setClarification(null);
+                cleanupRef.current = null;
+                return;
+              }
+
+              if (status.status === "failed") {
+                const content = status.error || "Agent run xatolik bilan tugadi";
+                appendMessageUnique(setMessages, {
+                  id: `${nextRequestId}-status-failed`,
+                  role: "system",
+                  content,
+                });
+                setStreamError(content);
+                setIsRunning(false);
+                cleanupRef.current = null;
+                return;
+              }
+
+              if (status.status === "waiting_for_clarification") {
+                if (!isClarificationAnswered(projectId, nextRequestId)) {
+                  setClarification(status.pending_clarification as ClarificationPayload);
+                }
+                setIsRunning(false);
+                cleanupRef.current = null;
+                return;
+              }
+
+              setIsRunning(status.status === "running" || status.status === "queued");
+            } catch {
+              if (activeRequestIdRef.current === nextRequestId) {
+                setIsRunning(false);
+              }
+            }
+          })();
         },
       });
     },
@@ -601,12 +689,14 @@ export function FlowAgentSidebar({
         if (cancelled) return;
 
         setMessages(
-          history.map((message: AgentMessage) => ({
-            id: String(message.id),
-            role: message.role,
-            content: message.content,
-            createdAt: message.created_at,
-          }))
+          history
+            .filter(isRenderableHistoryMessage)
+            .map((message) => ({
+              id: String(message.id),
+              role: message.role,
+              content: message.content,
+              createdAt: message.created_at,
+            }))
         );
 
         const [activeRun] = sortActiveRuns(activeRuns);

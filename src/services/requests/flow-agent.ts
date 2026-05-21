@@ -10,7 +10,7 @@ export type AgentRunStatus =
 export interface AgentMessage {
   id: number;
   run_id: string;
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "tool_call" | "tool_result";
   content: string;
   payload: Record<string, unknown>;
   created_at: string;

@@ -1,21 +1,28 @@
 import React, { useCallback, useMemo } from "react";
-import { Handle, Position } from "reactflow";
-import { cn } from "@/lib/utils";
+import { Position } from "reactflow";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { PillHandle, PillHandleTone } from "./PillHandle";
 
 interface SourceHandlerProps {
   id?: string;
   position?: Position;
   className?: string;
   nodeId?: string;
+  tone?: PillHandleTone;
 }
+
+// NodeHeader balandligi taxminan 75-80px (icon markazi).
+// Asosiy source handle ni shu darajada anchor qilamiz, shunda
+// tagidagi tugma handlelari bilan to'qnashmaydi.
+const MAIN_SOURCE_TOP_OFFSET = 78;
 
 export function SourceHandles({
   id = "source-handler",
   position,
   className,
   nodeId,
+  tone = "accent",
 }: SourceHandlerProps) {
   const inPanel = useIsInNodePanel();
   const nodes = useFlowStore((state) => state.nodes);
@@ -48,15 +55,13 @@ export function SourceHandles({
   const pos = getHandlePosition(id);
 
   return (
-    <Handle
+    <PillHandle
+      id={id}
       type="source"
       position={pos}
-      id={id}
-      className={cn(
-        "!w-4 !h-4 !rounded-full !bg-zinc-400/60 !border-2 !border-background",
-        "hover:!bg-blue-600 hover:!border-blue-400 hover:!scale-125 !transition-all !duration-150",
-        className
-      )}
+      tone={tone}
+      className={className}
+      style={{ top: MAIN_SOURCE_TOP_OFFSET }}
     />
   );
 }
