@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo, useState } from "react";
-import { Handle, Position } from "reactflow";
+import { Position } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MessageCircle, Trash2, Globe, Pencil, PlusIcon } from "lucide-react";
+import { MessageCircle, Trash2, Globe, Pencil } from "lucide-react";
 import { HandlerAdder } from "./handler-adder";
 import { ConstructorData } from "@/features/bot-constructor/data";
 import { MessageTriggerNodeData } from "@/features/bot-constructor/nodes/types";
 import { KeyboardConfig } from "@/features/bot-constructor/components";
+import { PillHandle } from "../../../components/shared/ReactFlowHandles/PillHandle";
 
 interface NodeWithHandlersData {
   handlers?: MessageTriggerNodeData[];
@@ -161,33 +162,38 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
   return (
     <div className="space-y-2 w-full">
 
-      <div className="space-y-2 overflow-y-auto">
+      <div className="space-y-2">
         {keyboard && keyboard.active && keyboard[keyboard.active] && keyboard[keyboard.active].flat().length > 0 && (
           <div className="flex flex-wrap flex-col gap-2 mb-3 pb-3 border-b">
-            {keyboard[keyboard.active].flat().map((button) => (
-              <Button
-                key={button.id}
-                variant="outline"
-                className="text-xs px-2 py-1 relative"
-              >
-                {button.text}
-                {!inPanel && (() => {
-                  const handleId = `target-handler-${sourceNodeId}-${button.text}`;
-                  const pos = getHandlePosition(handleId);
-                  const isLeft = pos === Position.Left;
-                  return (
-                    <Handle
-                      type="source"
+            {(() => {
+              const seenText = new Set<string>();
+              return keyboard[keyboard.active].flat().map((button) => {
+                const isFirstOccurrence = !seenText.has(button.text);
+                if (isFirstOccurrence) seenText.add(button.text);
+                return { button, isFirstOccurrence };
+              });
+            })().map(({ button, isFirstOccurrence }) => {
+              const handleId = `target-handler-${sourceNodeId}-${button.text}`;
+              const pos = getHandlePosition(handleId);
+              return (
+                <Button
+                  key={button.id}
+                  variant="outline"
+                  className="text-xs px-2 py-1 relative"
+                >
+                  {button.text}
+                  {!inPanel && isFirstOccurrence && (
+                    <PillHandle
                       id={handleId}
+                      type="source"
                       position={pos}
-                      className={`!w-4 !h-full !rounded-[6px] !bg-blue-500 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`}
-                    >
-                      <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
-                    </Handle>
-                  );
-                })()}
-              </Button>
-            ))}
+                      tone="primary"
+                      title={button.text}
+                    />
+                  )}
+                </Button>
+              );
+            })}
           </div>
         )}
 
@@ -234,20 +240,15 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
-                  {!inPanel && (() => {
-                    const pos = getHandlePosition(handleId);
-                    const isLeft = pos === Position.Left;
-                    return (
-                      <Handle
-                        type="source"
-                        id={handleId}
-                        position={pos}
-                        className={`!w-4 !h-full !rounded-[6px] !bg-blue-500 flex items-center justify-center ${isLeft ? 'translate-x-[5px]' : 'translate-x-[-5px]'}`}
-                      >
-                        <PlusIcon size={12} className="w-2 h-2 text-white pointer-events-none" />
-                      </Handle>
-                    );
-                  })()}
+                  {!inPanel && (
+                    <PillHandle
+                      id={handleId}
+                      type="source"
+                      position={getHandlePosition(handleId)}
+                      tone="primary"
+                      title={summary}
+                    />
+                  )}
                 </div>
               </CardContent>
             </Card>
