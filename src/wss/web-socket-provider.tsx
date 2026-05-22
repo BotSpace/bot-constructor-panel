@@ -1,7 +1,7 @@
 "use client";
 
 import useProjectStore from "@/features/bot-constructor/store/project";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/session-client";
 import {
   createContext,
   useCallback,
@@ -34,8 +34,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       socketRef.current = null;
     }
 
+    const access = session.data?.user?.access;
+    if (!access) return;
+
     const ws = new WebSocket(
-      `wss://api.botmother.uz/ws/events?token=${session.data.user.access}`
+      `wss://api.botmother.uz/ws/events?token=${access}`
     );
 
     socketRef.current = ws;

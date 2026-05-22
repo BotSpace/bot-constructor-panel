@@ -20,7 +20,7 @@ import {
   getProjectAgentMessages,
 } from "@/services/requests/flow-agent";
 import { cn } from "@/lib/utils";
-import { getSession } from "next-auth/react";
+import { getSession } from "@/lib/session-client";
 import {
   AlertTriangle,
   Bot,
