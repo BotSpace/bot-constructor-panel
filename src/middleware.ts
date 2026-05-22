@@ -141,10 +141,24 @@ function clearSessionCookie(response: NextResponse) {
   response.cookies.delete(env.SESSION_COOKIE_NAME);
 }
 
+function externalRequestUrl(request: NextRequest): string {
+  // Behind ingress-nginx, request.nextUrl.host can be the upstream pod address
+  // (e.g. localhost:3000). Trust X-Forwarded-* so the dashboard's /login can
+  // redirect the user back to the URL they actually typed.
+  const proto =
+    request.headers.get("x-forwarded-proto") ??
+    request.nextUrl.protocol.replace(/:$/, "");
+  const host =
+    request.headers.get("x-forwarded-host") ??
+    request.headers.get("host") ??
+    request.nextUrl.host;
+  return `${proto}://${host}${request.nextUrl.pathname}${request.nextUrl.search}`;
+}
+
 function dashboardLoginUrl(request: NextRequest): URL {
   const dash = (env.DASHBOARD_URL || "http://localhost:3000").replace(/\/$/, "");
   const url = new URL(dash + "/login");
-  url.searchParams.set("from", request.nextUrl.toString());
+  url.searchParams.set("from", externalRequestUrl(request));
   return url;
 }
 
