@@ -51,9 +51,14 @@ const SessionContext = createContext<Ctx>({
   refresh: async () => {},
 });
 
+// `basePath` is applied by Next.js routing but NOT by raw fetch() URLs, so we
+// prepend it explicitly — otherwise `/api/session` resolves at the origin
+// root (which serves a different app).
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 async function fetchSession(): Promise<Session | null> {
   try {
-    const r = await fetch("/api/session", { cache: "no-store" });
+    const r = await fetch(`${BASE_PATH}/api/session`, { cache: "no-store" });
     if (!r.ok) return null;
     const json = (await r.json()) as { user?: SessionUser | null; access?: string };
     if (!json?.user) return null;
