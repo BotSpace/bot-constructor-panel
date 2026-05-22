@@ -152,7 +152,10 @@ function externalRequestUrl(request: NextRequest): string {
     request.headers.get("x-forwarded-host") ??
     request.headers.get("host") ??
     request.nextUrl.host;
-  return `${proto}://${host}${request.nextUrl.pathname}${request.nextUrl.search}`;
+  // Middleware sees `pathname` with basePath stripped — re-attach it so the
+  // resulting URL is the one the browser actually used.
+  const basePath = request.nextUrl.basePath || "";
+  return `${proto}://${host}${basePath}${request.nextUrl.pathname}${request.nextUrl.search}`;
 }
 
 function dashboardLoginUrl(request: NextRequest): URL {
