@@ -256,16 +256,27 @@ services/
 
 ## Deployment
 
-**Docker (multi-stage, Node 22 Alpine):**
+### CI/CD (Avtomatik deploy)
+
+`main` branchga push qilsang, GitHub Actions ishga tushadi:
+
+1. Docker image build bo'lib `registry.jscorp.uz/botmother-constructor:<commit-sha>` ga push bo'ladi
+2. `helm/values.yaml` dagi `image.tag` avtomatik yangilanadi (commit SHA bilan)
+3. ArgoCD o'zgarishni ko'rib (~3 min) klasterga deploy qiladi
+
+**Tag yaratish shart emas** — `git push origin main` yetarli.
+
+- Workflow: `.github/workflows/deploy.yaml`
+- Helm values: `helm/values.yaml`
+- ArgoCD Application: `k8s` reposida `helm/argocd/apps/constructor.yaml`
+- `helm/` papkasidagi o'zgarishlar workflow ni qayta trigger qilmaydi (`paths-ignore`)
+- Secretlar klasterdagi Kubernetes Secret larda saqlanadi, gitda emas
+
+### Docker (lokal)
 ```bash
 docker build -t bot-constructor-panel .
 docker run -p 3000:3000 --env-file .env bot-constructor-panel
 ```
-
-**Docker Compose (`stack.yaml`):**
-- Service joins the external `botmother` overlay network.
-- Port configurable via `$PORT` env var (default 3000).
-- Rolling update strategy; auto-restart on failure.
 
 ---
 
