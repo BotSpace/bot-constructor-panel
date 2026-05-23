@@ -1,0 +1,82 @@
+fullnameOverride: "constructor"
+
+image:
+  repository: registry.jscorp.uz/botmother-constructor
+  tag: "3.6.3-prod"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: botmother-registry
+
+replicaCount: 1
+
+service:
+  enabled: true
+  type: NodePort
+  port: 3000
+  targetPort: 3000
+  nodePort: 30005
+
+configMaps:
+  config:
+    DEBUG: "false"
+    NEXT_PUBLIC_API: "https://api.botspace.uz/api"
+    CONSTRUCTOR_URL: "http://constructor:3000"
+    ADMIN_PANEL: "https://botspace.uz"
+    DASHBOARD_URL: "https://botspace.uz"
+    NEXT_PUBLIC_AGENT_API: "https://api.botspace.uz/api/agentv2"
+    SESSION_COOKIE_NAME: "bm_session"
+    MONO: "0"
+    PORT: "3000"
+    NODE_ENV: "production"
+
+envFrom:
+  - secretRef:
+      name: constructor-secret
+
+probes:
+  startup:
+    enabled: true
+    type: tcpSocket
+    tcpSocket:
+      port: 3000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 12
+  readiness:
+    enabled: true
+    type: tcpSocket
+    tcpSocket:
+      port: 3000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  liveness:
+    enabled: true
+    type: tcpSocket
+    tcpSocket:
+      port: 3000
+    initialDelaySeconds: 15
+    periodSeconds: 15
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+resources:
+  requests:
+    cpu: "1000m"
+    memory: "1Gi"
+  limits:
+    cpu: "3000m"
+    memory: "3Gi"
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: NotIn
+              values:
+                - base

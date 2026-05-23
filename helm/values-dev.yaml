@@ -1,0 +1,18 @@
+image:
+  tag: "3.6.3-dev"
+
+service:
+  nodePort: 31005
+
+configMaps:
+  config:
+    DEBUG: "true"
+    NEXT_PUBLIC_API: "https://api-dev.botspace.uz/api"
+    CONSTRUCTOR_URL: "http://constructor:3000"
+    ADMIN_PANEL: "https://dev.botspace.uz"
+    DASHBOARD_URL: "https://dev.botspace.uz"
+    NEXT_PUBLIC_AGENT_API: "https://api-dev.botspace.uz/api/agentv2"
+    SESSION_COOKIE_NAME: "bm_session"
+    MONO: "0"
+    PORT: "3000"
+    NODE_ENV: "development"
