@@ -87,13 +87,23 @@ export default function Constructor() {
   // Loyiha yuklanib bo'lsa undagi ma'lumotlarni
   // Constructorga yozib qo'yadi loading status true bo'lganda
   useEffect(() => {
-    if (project) {
-      loadFlow({
-        nodes: project.flow.nodes,
-        edges: project.flow.edges,
+    if (loading) return;
+    if (!project) return;
+
+    loadFlow(project.flow).catch((error) => {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Flow yuklashda noma'lum xatolik yuz berdi";
+
+      console.error("Constructor flow yuklashda xatolik:", {
+        projectId: project.id,
+        projectFlow: project.flow,
+        error,
       });
-    }
-  }, [loading]);
+      toast.error(message);
+    });
+  }, [loading, project, loadFlow]);
 
   useFlowKeyboardShortcuts({
     containerRef: reactFlowWrapper,
