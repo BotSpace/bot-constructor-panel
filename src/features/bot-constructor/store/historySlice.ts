@@ -1,11 +1,23 @@
 import { StateCreator } from "zustand";
 import { FlowStoreState, HistorySlice } from "./types";
-import { Node, Edge } from "reactflow";
+import type { Node, Edge } from "reactflow";
 
 // History state snapshot
 export type HistoryState = {
   nodes: Node[];
   edges: Edge[];
+};
+
+const cloneFlowItems = <T>(items: T[], fieldName: "nodes" | "edges"): T[] => {
+  if (!Array.isArray(items)) {
+    console.error(
+      `History saqlashda ${fieldName} array emas, bo'sh array ishlatildi`,
+      { value: items },
+    );
+    return [];
+  }
+
+  return JSON.parse(JSON.stringify(items));
 };
 
 export const createHistorySlice: StateCreator<
@@ -26,8 +38,8 @@ export const createHistorySlice: StateCreator<
     
     // Yangi state ni qo'shamiz
     newHistory.push({
-      nodes: JSON.parse(JSON.stringify(state.nodes)), // Deep copy
-      edges: JSON.parse(JSON.stringify(state.edges)), // Deep copy
+      nodes: cloneFlowItems(state.nodes, "nodes"), // Deep copy
+      edges: cloneFlowItems(state.edges, "edges"), // Deep copy
     });
 
     // Maksimal hajmdan oshib ketmasligi uchun eski state'larni o'chiramiz
@@ -84,8 +96,8 @@ export const createHistorySlice: StateCreator<
       const previousState = history[previousIndex];
 
       set({
-        nodes: JSON.parse(JSON.stringify(previousState.nodes)),
-        edges: JSON.parse(JSON.stringify(previousState.edges)),
+        nodes: cloneFlowItems(previousState.nodes, "nodes"),
+        edges: cloneFlowItems(previousState.edges, "edges"),
         historyIndex: previousIndex,
         isDirty: true, // Undo qilganda ham o'zgarish bo'lgani uchun
       });
@@ -111,8 +123,8 @@ export const createHistorySlice: StateCreator<
       const nextState = history[nextIndex];
 
       set({
-        nodes: JSON.parse(JSON.stringify(nextState.nodes)),
-        edges: JSON.parse(JSON.stringify(nextState.edges)),
+        nodes: cloneFlowItems(nextState.nodes, "nodes"),
+        edges: cloneFlowItems(nextState.edges, "edges"),
         historyIndex: nextIndex,
         isDirty: true, // Redo qilganda ham o'zgarish bo'lgani uchun
       });
@@ -130,8 +142,8 @@ export const createHistorySlice: StateCreator<
       set({
         history: [
           {
-            nodes: JSON.parse(JSON.stringify(nodes)),
-            edges: JSON.parse(JSON.stringify(edges)),
+            nodes: cloneFlowItems(nodes, "nodes"),
+            edges: cloneFlowItems(edges, "edges"),
           },
         ],
         historyIndex: 0,
@@ -139,4 +151,3 @@ export const createHistorySlice: StateCreator<
     },
   };
 };
-

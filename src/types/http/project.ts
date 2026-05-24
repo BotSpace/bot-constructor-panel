@@ -1,3 +1,5 @@
+import type { Edge, Node } from "reactflow";
+
 export type Status =
   | "pending"
   | "initializing"
@@ -30,7 +32,7 @@ export interface ProjectRetrive {
   debug_bot: boolean;
   release_bot: boolean;
   flow: {
-    edges: [];
-    nodes: [];
+    edges: Edge[];
+    nodes: Node[];
   };
 }
