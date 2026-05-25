@@ -11,7 +11,6 @@ configMaps:
     CONSTRUCTOR_URL: "http://constructor:3000"
     ADMIN_PANEL: "https://dev.botspace.uz"
     DASHBOARD_URL: "https://dev.botspace.uz"
-    NEXT_PUBLIC_AGENT_API: "https://api-dev.botspace.uz/api/agentv2"
     SESSION_COOKIE_NAME: "bm_session"
     MONO: "0"
     PORT: "3000"

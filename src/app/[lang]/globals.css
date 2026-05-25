@@ -19,18 +19,6 @@
   pointer-events: none !important;
 }
 
-/* AI flow highlights — applied via React Flow node className */
-.ai-node-added {
-  box-shadow: 0 0 0 3px #22c55e, 0 0 16px rgba(34, 197, 94, 0.3) !important;
-  border-radius: 0.75rem;
-  transition: box-shadow 1s ease;
-}
-.ai-node-modified {
-  box-shadow: 0 0 0 3px #eab308, 0 0 16px rgba(234, 179, 8, 0.3) !important;
-  border-radius: 0.75rem;
-  transition: box-shadow 1s ease;
-}
-
 /* ── N8n-style node appearance ─────────────────────────────────────────── */
 
 /* Subtle shadow on all node cards (override Tailwind shadow-lg) */
