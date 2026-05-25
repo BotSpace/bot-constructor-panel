@@ -451,6 +451,11 @@ export function FlowAgentSidebar({
       if (event.type === "run_started") {
         setIsRunning(true);
         setStreamError(null);
+        appendActivityMessage(setMessages, event.request_id, {
+          id: `${event.request_id}-${event.seq}-run-started`,
+          content: "Run boshlandi",
+          eventType: event.type,
+        });
         return;
       }
 
@@ -483,10 +488,32 @@ export function FlowAgentSidebar({
       }
 
       if (event.type === "tool_call") {
+        const toolName = String(payload.name || payload.tool_name || "tool");
+        const description =
+          typeof event.description === "string" && event.description.trim()
+            ? event.description.trim()
+            : `${toolName} ishga tushdi`;
+
+        appendActivityMessage(setMessages, event.request_id, {
+          id: `${event.request_id}-${event.seq}-tool-call`,
+          content: description,
+          eventType: event.type,
+        });
         return;
       }
 
       if (event.type === "tool_result") {
+        const toolName = String(payload.name || payload.tool_name || "tool");
+        const rawContent = String(payload.content || payload.message || "");
+        const content =
+          rawContent.trim() ||
+          `${toolName} natijasi tayyor`;
+
+        appendActivityMessage(setMessages, event.request_id, {
+          id: `${event.request_id}-${event.seq}-tool-result`,
+          content,
+          eventType: event.type,
+        });
         return;
       }
 
