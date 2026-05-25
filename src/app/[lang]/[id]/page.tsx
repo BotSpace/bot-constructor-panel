@@ -11,10 +11,8 @@ import { ReactFlowProvider } from "reactflow";
 import SearchPanel from "@/features/bot-constructor/search/search-panel";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import BottomPanel from "@/features/bot-constructor/components/bottom-panel";
-import { FlowAgentSidebar } from "@/features/bot-constructor/components/FlowAgentSidebar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Key, Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ArrowLeft, Key } from "lucide-react";
 import { useLinkToParent } from "@/components/common/link-to-parrent";
 import { ReleasePanel } from "@/components/layout/components/relas/relas";
 import { EnvManageDialog } from "@/features/bot-constructor/components/EnvManageDialog/EnvManageDialog";
@@ -29,7 +27,6 @@ function PageInner() {
   const { loadProject, project } = useProjectStore();
   const { loadCollections } = useCollectionStore();
   const [addNodeOpen, setAddNodeOpen] = useState(false);
-  const [agentOpen, setAgentOpen] = useState(false);
 
   useEffect(() => {
     if (project) {
@@ -58,8 +55,6 @@ function PageInner() {
       <N8nTopBar
         project={project}
         id={id}
-        agentOpen={agentOpen}
-        onToggleAgent={() => setAgentOpen((value) => !value)}
         onAddNode={() => setAddNodeOpen(true)}
       />
 
@@ -73,18 +68,11 @@ function PageInner() {
             <DebugConsole />
             <NodeEditDialog />
             <BottomPanel
-              agentOpen={agentOpen}
-              onToggleAgent={() => setAgentOpen((value) => !value)}
               addNodeOpen={addNodeOpen}
               onAddNodeOpenChange={setAddNodeOpen}
             />
           </ReactFlowProvider>
         </div>
-        <FlowAgentSidebar
-          projectId={id}
-          open={agentOpen}
-          onOpenChange={setAgentOpen}
-        />
       </div>
     </main>
   );
@@ -94,14 +82,10 @@ function PageInner() {
 function N8nTopBar({
   project,
   id,
-  agentOpen,
-  onToggleAgent,
   onAddNode,
 }: {
   project: { name: string };
   id: string;
-  agentOpen: boolean;
-  onToggleAgent: () => void;
   onAddNode: () => void;
 }) {
   const { handleClick: backToHome } = useLinkToParent({ href: `/bot/${id}` });
@@ -144,20 +128,6 @@ function N8nTopBar({
       </Button>
 
       <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20" />
-
-      <Button
-        variant="ghost"
-        size="sm"
-        className={cn(
-          "h-9 gap-1.5 px-4 text-sm text-white/70 hover:bg-white/10 hover:text-white",
-          agentOpen && "bg-white/15 text-white"
-        )}
-        onClick={onToggleAgent}
-        title={agentOpen ? "Agentni yopish" : "Agentni ochish"}
-      >
-        <Sparkles className="h-4 w-4" />
-        Agent
-      </Button>
     </div>
   );
 }
@@ -171,7 +141,6 @@ function MobileView({
   project: { name: string };
 }) {
   const [envOpen, setEnvOpen] = useState(false);
-  const [agentOpen, setAgentOpen] = useState(false);
   const { handleClick: backToHome } = useLinkToParent({ href: `/bot/${id}` });
 
   return (
@@ -188,15 +157,6 @@ function MobileView({
           <p className="text-sm font-semibold truncate">{project.name}</p>
           <p className="text-[10px] text-muted-foreground leading-none">Constructor</p>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 shrink-0"
-          onClick={() => setAgentOpen(true)}
-          title="Agent"
-        >
-          <Sparkles className="h-4 w-4" />
-        </Button>
         <Button
           variant="ghost"
           size="icon"
@@ -222,15 +182,6 @@ function MobileView({
           <SearchPanel />
           <DebugConsole />
           <NodeEditDialog />
-          {agentOpen ? (
-            <div className="absolute inset-0 z-40 bg-background">
-              <FlowAgentSidebar
-                projectId={id}
-                open={agentOpen}
-                onOpenChange={setAgentOpen}
-              />
-            </div>
-          ) : null}
         </ReactFlowProvider>
       </div>
 

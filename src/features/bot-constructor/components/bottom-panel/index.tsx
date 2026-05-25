@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from './components/button'
-import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff, Sparkles } from 'lucide-react'
+import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -29,8 +29,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 interface Props {
-    agentOpen?: boolean;
-    onToggleAgent?: () => void;
     addNodeOpen?: boolean;
     onAddNodeOpenChange?: (open: boolean) => void;
 }
@@ -42,9 +40,9 @@ interface Props {
 const FIXED_W = 227
 const SLOT = 48
 const MORE_W = 48
-const ALL_COUNT = 7
+const ALL_COUNT = 6
 
-function BottomPanel({ agentOpen, onToggleAgent, addNodeOpen, onAddNodeOpenChange }: Props) {
+function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const { isOpen, height, toggle } = debugConsoleStore()
     const { toggleSearchPanel } = useSearchStore()
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false)
@@ -107,24 +105,6 @@ function BottomPanel({ agentOpen, onToggleAgent, addNodeOpen, onAddNodeOpenChang
                 <DropdownMenuItem key="edges" onClick={toggleEdgesVisibility}>
                     {edgesVisible ? <Eye size={16} className="mr-2" /> : <EyeOff size={16} className="mr-2" />}
                     {edgesVisible ? "Edgelarni yashirish" : "Edgelarni ko'rsatish"}
-                </DropdownMenuItem>
-            ),
-        },
-        {
-            key: 'agent',
-            inline: (
-                <BottomPanelButton
-                    onClick={onToggleAgent}
-                    title={agentOpen ? "Agentni yopish" : "Agentni ochish"}
-                    className={cn(agentOpen && 'ring-2 ring-primary/50')}
-                >
-                    <Sparkles size={20} className={agentOpen ? 'text-primary' : ''} />
-                </BottomPanelButton>
-            ),
-            overflow: (
-                <DropdownMenuItem key="agent" onClick={onToggleAgent}>
-                    <Sparkles size={16} className="mr-2" />
-                    {agentOpen ? "Agentni yopish" : "Agentni ochish"}
                 </DropdownMenuItem>
             ),
         },
