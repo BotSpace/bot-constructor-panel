@@ -1772,6 +1772,32 @@ function StateWidget({ nodeId, data }: WidgetProps) {
 
 function CustomCodeWidget({ nodeId, data }: WidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const outputs = Array.isArray(data.outputs)
+    ? (data.outputs as { name: string; description?: string }[])
+    : [];
+  const [newOutput, setNewOutput] = useState("");
+
+  const addOutput = () => {
+    const name = newOutput.trim();
+    if (!name) return;
+    if (outputs.some((o) => o.name === name)) {
+      setNewOutput("");
+      return;
+    }
+    updateNodeData(nodeId, {
+      ...data,
+      outputs: [...outputs, { name }],
+    });
+    setNewOutput("");
+  };
+
+  const removeOutput = (name: string) => {
+    updateNodeData(nodeId, {
+      ...data,
+      outputs: outputs.filter((o) => o.name !== name),
+    });
+  };
+
   return (
     <div className="grid gap-3">
       <div className="rounded-md border border-dashed border-muted-foreground/20 bg-muted/40 p-2">
@@ -1786,6 +1812,61 @@ function CustomCodeWidget({ nodeId, data }: WidgetProps) {
         onChange={(jsCode) => updateNodeData(nodeId, { ...data, jsCode })}
         globals={BOT_GLOBALS}
       />
+
+      <div className="grid gap-2">
+        <Label className="text-xs">
+          Chiqishlar (exit nomlar)
+          <span className="ml-1 text-[10px] text-muted-foreground font-normal">
+            — kod ichida exit("nom") ishlatilganda shu nom orqali yo'naltirish
+          </span>
+        </Label>
+        <div className="flex flex-wrap gap-1">
+          {outputs.map((o) => (
+            <span
+              key={o.name}
+              className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded text-[11px] border border-emerald-500/20 font-mono"
+            >
+              {o.name}
+              <button
+                type="button"
+                onClick={() => removeOutput(o.name)}
+                className="hover:text-red-500"
+                aria-label={`Remove ${o.name}`}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+          {outputs.length === 0 && (
+            <span className="text-[10px] text-muted-foreground italic">
+              Chiqish yo'q — bitta default source handle ishlatiladi
+            </span>
+          )}
+        </div>
+        <div className="flex gap-1">
+          <Input
+            value={newOutput}
+            onChange={(e) => setNewOutput(e.target.value)}
+            placeholder="masalan: ok, invalid, not_found"
+            className="h-8 text-xs"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addOutput();
+              }
+            }}
+          />
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={addOutput}
+            disabled={!newOutput.trim()}
+          >
+            <PlusIcon className="w-3 h-3" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
