@@ -67,8 +67,11 @@ function GenericHandleRenderer({
     return <DeleteMessageSource />;
   }
 
-  if (handle.preset === "subflow-dynamic-sources") {
-    return <SubFlowDynamicSources nodeId={nodeId} />;
+  if (
+    handle.preset === "subflow-dynamic-sources" ||
+    handle.preset === "dynamic-outputs-sources"
+  ) {
+    return <DynamicOutputsSources nodeId={nodeId} />;
   }
 
   if (!handle.kind || !handle.side) {
@@ -90,7 +93,7 @@ function GenericHandleRenderer({
   );
 }
 
-function SubFlowDynamicSources({ nodeId }: { nodeId: string }) {
+function DynamicOutputsSources({ nodeId }: { nodeId: string }) {
   const nodes = useFlowStore((state) => state.nodes);
   const outputs = useMemo(() => {
     const node = nodes.find((item) => item.id === nodeId);

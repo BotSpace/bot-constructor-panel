@@ -1035,13 +1035,14 @@
       "sortOrder": 10,
       "elementType": "code"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [{ "preset": "target-default" }, { "preset": "dynamic-outputs-sources" }],
     "content": [{ "type": "widget", "widgetKey": "customCode" }],
     "defaults": {
       "nodeTitle": "Custom Code",
       "jsCode": "// Your code here",
       "label": "custom_code_node",
-      "language": "javascript"
+      "language": "javascript",
+      "outputs": []
     }
   },
   {

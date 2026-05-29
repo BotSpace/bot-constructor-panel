@@ -61,6 +61,7 @@ export interface CustomCodeNodeData {
   jsCode: string;
   language: "javascript";
   globals?: string[];
+  outputs?: { name: string; description?: string }[];
 }
 
 export interface DelayNodeData {
