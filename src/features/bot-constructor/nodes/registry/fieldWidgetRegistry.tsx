@@ -23,6 +23,10 @@ import { Plus, X } from "lucide-react";
 import { memo } from "react";
 import { NodeFieldManifest } from "./types";
 import { renderCustomWidget } from "@/features/bot-constructor/nodes/widgets/widgetRegistry";
+import {
+  RichTextMessageField,
+  MediaMessageField,
+} from "@/features/bot-constructor/nodes/widgets/shared-message-fields";
 
 interface FieldWidgetProps {
   nodeId: string;
@@ -130,6 +134,25 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
 
   if (field.type === "widget") {
     return renderCustomWidget({ nodeId, data, field });
+  }
+
+  if (field.type === "richTextMessage") {
+    return (
+      <RichTextMessageField
+        nodeId={nodeId}
+        data={data}
+        textKey={field.key || "messageText"}
+        dynamicKey="dynamicMessages"
+        label={field.label || "Xabar matni"}
+        intro={field.intro}
+        showParseMode={false}
+      />
+    );
+  }
+
+  if (field.type === "mediaMessage") {
+    const kind = field.mediaKind || "photo";
+    return <MediaMessageField nodeId={nodeId} data={data} kind={kind} />;
   }
 
   if (field.type === "stateConfig") {
@@ -274,6 +297,10 @@ export function isFieldVisible(
 export function getContentClassName(fieldType: NodeFieldManifest["type"]) {
   if (fieldType === "description") {
     return "pt-0";
+  }
+
+  if (fieldType === "richTextMessage" || fieldType === "mediaMessage") {
+    return "grid gap-3";
   }
 
   return cn("grid gap-3", fieldType === "checkbox" && "pt-1");
