@@ -64,7 +64,9 @@ export interface NodeFieldManifest {
     | "checkbox"
     | "switch"
     | "stringArray"
-    | "stateConfig";
+    | "stateConfig"
+    | "richTextMessage"
+    | "mediaMessage";
   key?: string;
   widgetKey?: string;
   label?: string;
@@ -81,6 +83,10 @@ export interface NodeFieldManifest {
   addButtonLabel?: string;
   visibleWhen?: NodeVisibilityRule;
   variant?: "commandTrigger";
+  /** For richTextMessage: intro text shown above the editor */
+  intro?: string;
+  /** For richTextMessage: label for the text area; for mediaMessage: media kind */
+  mediaKind?: "photo" | "video" | "audio" | "file";
 }
 
 export interface NodeFooterManifest {

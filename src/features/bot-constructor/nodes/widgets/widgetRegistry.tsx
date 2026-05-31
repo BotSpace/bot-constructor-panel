@@ -18,7 +18,6 @@ import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messag
 import { ButtonGenerator } from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
 import { Combobox } from "@/components/ui/combobox";
 import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
-import TelegramRichTextEditor from "@/features/bot-constructor/components/TelegramRichTextEditor/TelegramRichTextEditor";
 import { useReactQueryAction } from "@/services/react-query/use-react-query-action";
 import { findNearestParentAction } from "@/features/bot-constructor/lib/findNearestParentAction";
 import { findNearestTriggerNode, getDynamicFilters } from "@/features/bot-constructor/nodes/custom/StateNode/getDynamicFilters";
@@ -35,13 +34,8 @@ import {
 } from "@/features/bot-constructor/nodes/triggers/shared";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
-import useProjectStore from "@/features/bot-constructor/store/project";
-import { uploadFile } from "@/services/requests/file";
-import { cn } from "@/lib/utils";
-import { AlertCircle, ArrowRight, CheckCircle2, GripVertical, Key, ListPlus, Loader2, PlusIcon, Trash2, Upload } from "lucide-react";
-import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import toast from "react-hot-toast";
-import { DynamicMessageConstructor } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/dynamic-message-constructor-modal";
+import { AlertCircle, ArrowRight, GripVertical, Key, ListPlus, PlusIcon, Trash2 } from "lucide-react";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { CodeEditorDialog } from "@/features/bot-constructor/nodes/custom/CustomCodeNode/components/CodeEditorDialog";
 import AddItemModal from "@/features/bot-constructor/nodes/custom/FormNode/components/add-item-modal";
 import { FormItem } from "@/features/bot-constructor/nodes/custom/FormNode/components/form-item";
@@ -64,6 +58,9 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import {
+  RichTextMessageField,
+} from "@/features/bot-constructor/nodes/widgets/shared-message-fields";
 
 interface WidgetProps {
   nodeId: string;
@@ -71,7 +68,6 @@ interface WidgetProps {
   field: NodeFieldManifest;
 }
 
-type MediaKind = "photo" | "video" | "audio" | "file";
 const BOT_GLOBALS = ["message", "user", "state"];
 
 function MessageTriggerWidget({ nodeId, data }: WidgetProps) {
@@ -684,407 +680,6 @@ function HTTPRequestWidget({ nodeId, data }: WidgetProps) {
   );
 }
 
-function RichTextMessageEditor({
-  nodeId,
-  value,
-  onValueChange,
-  dynamicMessages,
-  intro,
-  label,
-  parseMode,
-  onParseModeChange,
-}: {
-  nodeId: string;
-  value?: string;
-  onValueChange: (nextValue: string) => void;
-  dynamicMessages?: unknown;
-  intro?: string;
-  label: string;
-  parseMode?: string;
-  onParseModeChange?: (nextValue: "None" | "HTML") => void;
-}) {
-  const updateNodeData = useFlowStore((state) => state.updateNodeData);
-
-  return (
-    <div className="grid gap-3">
-      {intro ? (
-        <div className="rounded-md bg-muted/50 px-2 py-1.5 text-xs text-muted-foreground">
-          {intro}
-        </div>
-      ) : null}
-
-      <div className="flex items-center justify-between gap-2">
-        <Label>{label}</Label>
-        <DynamicMessageConstructor
-          handleUpdate={(update) => updateNodeData(nodeId, update)}
-          initialDynamicMessages={dynamicMessages as any}
-          id={nodeId}
-        >
-          <Button size="icon-sm" variant="outline">
-            <ListPlus />
-          </Button>
-        </DynamicMessageConstructor>
-      </div>
-
-      <TelegramRichTextEditor
-        defaultValue={value}
-        onChange={onValueChange}
-      />
-
-      {onParseModeChange ? (
-        <div className="grid gap-2">
-          <Label>Matn formatlash</Label>
-          <Select
-            value={parseMode || "None"}
-            onValueChange={(nextValue) =>
-              onParseModeChange(nextValue as "None" | "HTML")
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Tanlang" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="None">Yo&apos;q</SelectItem>
-              <SelectItem value="HTML">HTML</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function TextMessageWidget({ nodeId, data }: WidgetProps) {
-  const updateNodeData = useFlowStore((state) => state.updateNodeData);
-
-  return (
-    <RichTextMessageEditor
-      nodeId={nodeId}
-      value={typeof data.messageText === "string" ? data.messageText : ""}
-      dynamicMessages={data.dynamicMessages}
-      label="Xabar matni"
-      onValueChange={(messageText) => updateNodeData(nodeId, { messageText })}
-    />
-  );
-}
-
-function EditOrSendMessageWidget({ nodeId, data }: WidgetProps) {
-  const updateNodeData = useFlowStore((state) => state.updateNodeData);
-
-  return (
-    <RichTextMessageEditor
-      nodeId={nodeId}
-      value={typeof data.messageText === "string" ? data.messageText : ""}
-      dynamicMessages={data.dynamicMessages}
-      intro="Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi"
-      label="Xabar matni"
-      onValueChange={(messageText) => updateNodeData(nodeId, { messageText })}
-    />
-  );
-}
-
-function MediaSourceField({
-  nodeId,
-  data,
-  kind,
-}: {
-  nodeId: string;
-  data: Record<string, unknown>;
-  kind: MediaKind;
-}) {
-  const project = useProjectStore((state) => state.project);
-  const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const sourceTypeKey =
-    kind === "photo"
-      ? "photoSourceType"
-      : kind === "video"
-        ? "videoSourceType"
-        : kind === "audio"
-          ? "audioSourceType"
-          : "fileSourceType";
-  const fileIdKey =
-    kind === "photo"
-      ? "photoFileId"
-      : kind === "video"
-        ? "videoFileId"
-        : kind === "audio"
-          ? "audioFileId"
-          : "fileId";
-  const urlKey =
-    kind === "photo"
-      ? "photoUrl"
-      : kind === "video"
-        ? "videoUrl"
-        : kind === "audio"
-          ? "audioUrl"
-          : "fileUrl";
-  const sourceType = typeof data[sourceTypeKey] === "string" ? (data[sourceTypeKey] as string) : "upload";
-
-  const labels = {
-    photo: {
-      title: "Rasm manbasi",
-      fileIdPlaceholder: "rasm_fayl_idsi_bu_yerda...",
-      urlPlaceholder: "https://example.com/image.jpg",
-      accept: "image/*",
-      hint: "Rasm fayllari (JPG, PNG, GIF, WebP)",
-    },
-    video: {
-      title: "Video manbasi",
-      fileIdPlaceholder: "video_fayl_idsi...",
-      urlPlaceholder: "https://example.com/video.mp4",
-      accept: "video/*",
-      hint: "Video fayllari (MP4, MOV, AVI, WebM)",
-    },
-    audio: {
-      title: "Audio manbasi",
-      fileIdPlaceholder: "audio_fayl_idsi...",
-      urlPlaceholder: "https://example.com/audio.mp3",
-      accept: "audio/*",
-      hint: "Audio fayllari (MP3, WAV, OGG, AAC)",
-    },
-    file: {
-      title: "Fayl manbasi",
-      fileIdPlaceholder: "fayl_idsi...",
-      urlPlaceholder: "https://example.com/document.pdf",
-      accept: "*/*",
-      hint: "Har qanday fayl turi",
-    },
-  }[kind];
-
-  const handleFileUpload = async (file: File) => {
-    setIsUploading(true);
-    setUploadedFileName(file.name);
-
-    try {
-      const response = await uploadFile(file, undefined, project?.id);
-      updateNodeData(nodeId, { uploadedFileUuid: response.data.uuid });
-      setUploadedFileName(file.name);
-    } catch {
-      setUploadedFileName(null);
-      toast.error("Fayl yuklashda xatolik yuz berdi");
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  return (
-    <div className="grid gap-2">
-      <Label>{labels.title}</Label>
-      <Select
-        value={sourceType}
-        onValueChange={(value) => updateNodeData(nodeId, { [sourceTypeKey]: value })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Manbani tanlang..." />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="file_id">Mavjud File ID</SelectItem>
-          <SelectItem value="url">Internet (URL)</SelectItem>
-          <SelectItem value="upload">Kompyuterdan yuklash</SelectItem>
-        </SelectContent>
-      </Select>
-
-      {sourceType === "file_id" ? (
-        <Input
-          placeholder={labels.fileIdPlaceholder}
-          value={typeof data[fileIdKey] === "string" ? (data[fileIdKey] as string) : ""}
-          onChange={(e) => updateNodeData(nodeId, { [fileIdKey]: e.target.value })}
-        />
-      ) : null}
-
-      {sourceType === "url" ? (
-        <Input
-          placeholder={labels.urlPlaceholder}
-          value={typeof data[urlKey] === "string" ? (data[urlKey] as string) : ""}
-          onChange={(e) => updateNodeData(nodeId, { [urlKey]: e.target.value })}
-        />
-      ) : null}
-
-      {sourceType === "upload" ? (
-        <div className="space-y-2">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={labels.accept}
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (file) {
-                await handleFileUpload(file);
-              }
-            }}
-            className="hidden"
-          />
-
-          <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            onDragLeave={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            onDrop={async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const file = e.dataTransfer.files?.[0];
-              if (file) {
-                await handleFileUpload(file);
-              }
-            }}
-            onClick={() => !isUploading && fileInputRef.current?.click()}
-            className={cn(
-              "cursor-pointer rounded-lg border-2 border-dashed p-6 transition-colors",
-              "hover:border-primary/50 hover:bg-primary/5",
-              isUploading && "pointer-events-none opacity-50"
-            )}
-          >
-            <div className="flex flex-col items-center justify-center gap-2 text-center">
-              {isUploading ? (
-                <>
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="text-sm font-medium">Yuklanmoqda...</p>
-                </>
-              ) : (
-                <>
-                  <Upload className="h-8 w-8 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">
-                      Fayl tanlash yoki bu yerga sudrab tashlang
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {labels.hint}
-                    </p>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {uploadedFileName && data.uploadedFileUuid && !isUploading ? (
-            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-              <CheckCircle2 className="h-4 w-4" />
-              <span className="truncate">{uploadedFileName}</span>
-            </div>
-          ) : null}
-
-          <div className="grid gap-1">
-            <Label className="text-xs text-muted-foreground">UUID</Label>
-            <Input
-              placeholder="UUID ni kiriting yoki fayl yuklang..."
-              value={
-                typeof data.uploadedFileUuid === "string"
-                  ? (data.uploadedFileUuid as string)
-                  : ""
-              }
-              onChange={(e) =>
-                updateNodeData(nodeId, { uploadedFileUuid: e.target.value })
-              }
-              className="text-xs"
-            />
-          </div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function MediaMessageWidget({
-  nodeId,
-  data,
-  kind,
-}: {
-  nodeId: string;
-  data: Record<string, unknown>;
-  kind: MediaKind;
-}) {
-  const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const captionKey = "caption";
-  const captionValue = typeof data[captionKey] === "string" ? (data[captionKey] as string) : "";
-  const captionLabel =
-    kind === "photo"
-      ? "Rasm matni (Caption)"
-      : kind === "video"
-        ? "Video matni (Caption)"
-        : kind === "audio"
-          ? "Izoh (Caption)"
-          : "Izoh (Caption)";
-
-  return (
-    <div className="grid gap-4">
-      <MediaSourceField nodeId={nodeId} data={data} kind={kind} />
-
-      {kind === "audio" ? (
-        <div className="grid grid-cols-2 gap-3">
-          <div className="grid gap-2">
-            <Label>Ijrochi</Label>
-            <Input
-              placeholder="Masalan, Yulduz U."
-              value={typeof data.performer === "string" ? (data.performer as string) : ""}
-              onChange={(e) => updateNodeData(nodeId, { performer: e.target.value })}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label>Sarlavha</Label>
-            <Input
-              placeholder="Masalan, Xasta bo'lma"
-              value={typeof data.title === "string" ? (data.title as string) : ""}
-              onChange={(e) => updateNodeData(nodeId, { title: e.target.value })}
-            />
-          </div>
-        </div>
-      ) : null}
-
-      <div className="grid gap-2">
-        <Label>{captionLabel}</Label>
-        {kind === "file" ? (
-          <Textarea
-            className="min-h-[90px]"
-            maxLength={1024}
-            placeholder="Fayl uchun izoh..."
-            value={captionValue}
-            onChange={(e) => updateNodeData(nodeId, { caption: e.target.value })}
-          />
-        ) : (
-          <TelegramRichTextEditor
-            defaultValue={captionValue}
-            onChange={(caption) => updateNodeData(nodeId, { caption })}
-          />
-        )}
-        <div
-          className={cn(
-            "text-right text-xs",
-            captionValue.length > 1024
-              ? "text-destructive"
-              : "text-muted-foreground"
-          )}
-        >
-          {captionValue.length}/1024
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SendPhotoWidget(props: WidgetProps) {
-  return <MediaMessageWidget nodeId={props.nodeId} data={props.data} kind="photo" />;
-}
-
-function SendVideoWidget(props: WidgetProps) {
-  return <MediaMessageWidget nodeId={props.nodeId} data={props.data} kind="video" />;
-}
-
-function SendAudioWidget(props: WidgetProps) {
-  return <MediaMessageWidget nodeId={props.nodeId} data={props.data} kind="audio" />;
-}
-
-function SendFileWidget(props: WidgetProps) {
-  return <MediaMessageWidget nodeId={props.nodeId} data={props.data} kind="file" />;
-}
 
 function EditMessageWidget({ nodeId, data }: WidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
@@ -1121,80 +716,24 @@ function EditMessageWidget({ nodeId, data }: WidgetProps) {
           placeholder="Enter message id"
         />
       ) : isTextLike ? (
-        <RichTextMessageEditor
+        <RichTextMessageField
           nodeId={nodeId}
-          value={typeof data.newText === "string" ? data.newText : ""}
-          dynamicMessages={data.dynamicMessages}
+          data={data}
+          textKey="newText"
+          dynamicKey="dynamicMessages"
           label="Yangi matn"
-          parseMode={typeof data.parseMode === "string" ? data.parseMode : "None"}
-          onParseModeChange={(parseMode) => updateNodeData(nodeId, { parseMode })}
-          onValueChange={(newText) => updateNodeData(nodeId, { newText })}
+          showParseMode
         />
       ) : (
-        <RichTextMessageEditor
+        <RichTextMessageField
           nodeId={nodeId}
-          value={typeof data.newCaption === "string" ? data.newCaption : ""}
-          dynamicMessages={data.dynamicMessages}
+          data={data}
+          textKey="newCaption"
+          dynamicKey="dynamicMessages"
           label="Yangi caption"
-          parseMode={typeof data.parseMode === "string" ? data.parseMode : "None"}
-          onParseModeChange={(parseMode) => updateNodeData(nodeId, { parseMode })}
-          onValueChange={(newCaption) => updateNodeData(nodeId, { newCaption })}
+          showParseMode
         />
       )}
-    </div>
-  );
-}
-
-function DeleteMessageWidget({ nodeId, data }: WidgetProps) {
-  const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const nodes = useFlowStore((state) => state.nodes);
-  const edges = useFlowStore((state) => state.edges);
-
-  const connectedMessageNode = useMemo(() => {
-    const deleteHandlerEdge = edges.find(
-      (edge) =>
-        edge.source === nodeId && edge.sourceHandle === "delete-message-source"
-    );
-    if (!deleteHandlerEdge) return null;
-
-    return nodes.find((node) => node.id === deleteHandlerEdge.target) || null;
-  }, [edges, nodeId, nodes]);
-
-  const deleteFromContext = Boolean(data.deleteFromContext);
-  const isConfigured = deleteFromContext || Boolean(connectedMessageNode);
-
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <Label>Contextdan xabarni o&apos;chirish</Label>
-        <Checkbox
-          checked={deleteFromContext}
-          onCheckedChange={(checked) =>
-            updateNodeData(nodeId, { deleteFromContext: Boolean(checked) })
-          }
-        />
-      </div>
-
-      {!deleteFromContext ? (
-        connectedMessageNode ? (
-          <div className="flex items-center gap-2 rounded-md bg-green-50 p-2 text-sm text-green-600">
-            <AlertCircle className="h-4 w-4" />
-            <span>Xabar ulangan: {connectedMessageNode.type}</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 rounded-md bg-muted/50 p-2 text-sm text-muted-foreground">
-            <AlertCircle className="h-4 w-4" />
-            <span>O&apos;chiriladigan xabarni edge orqali ulang</span>
-          </div>
-        )
-      ) : null}
-
-      {!isConfigured ? (
-        <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-2 text-sm text-destructive">
-          <AlertCircle className="h-4 w-4" />
-          <span>Context yoki edge orqali xabar tanlanishi kerak</span>
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -1372,38 +911,6 @@ function ElseIfWidget({ nodeId, data }: WidgetProps) {
         conditions={conditions}
         onChange={(nextConditions) => updateNodeData(nodeId, { conditions: nextConditions })}
       />
-    </div>
-  );
-}
-
-function ElseWidget() {
-  return (
-    <div className="rounded-md border bg-muted/30 p-3 text-center text-sm text-muted-foreground">
-      If yoki Else If shartlari bajarilmasa, bu yo&apos;nalish ishga tushadi.
-    </div>
-  );
-}
-
-function ForLoopWidget({ nodeId, data }: WidgetProps) {
-  const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  return (
-    <div className="grid gap-3">
-      <div className="grid gap-2">
-        <Label>Ro&apos;yxat (dataKey)</Label>
-        <Input
-          placeholder="{{users}} yoki {{items}}"
-          value={typeof data.dataKey === "string" ? (data.dataKey as string) : ""}
-          onChange={(e) => updateNodeData(nodeId, { dataKey: e.target.value })}
-        />
-      </div>
-      <div className="grid gap-2">
-        <Label>Element o&apos;zgaruvchisi</Label>
-        <Input
-          placeholder="item"
-          value={typeof data.itemVariable === "string" ? (data.itemVariable as string) : ""}
-          onChange={(e) => updateNodeData(nodeId, { itemVariable: e.target.value })}
-        />
-      </div>
     </div>
   );
 }
@@ -2539,18 +2046,9 @@ const widgetRegistry: Record<string, (props: WidgetProps) => ReactNode> = {
   buttonGenerator: ButtonGeneratorWidget,
   downloadFile: DownloadFileWidget,
   httpRequest: HTTPRequestWidget,
-  textMessage: TextMessageWidget,
-  photoMessage: SendPhotoWidget,
-  videoMessage: SendVideoWidget,
-  audioMessage: SendAudioWidget,
-  fileMessage: SendFileWidget,
-  editOrSendMessage: EditOrSendMessageWidget,
   editMessage: EditMessageWidget,
-  deleteMessage: DeleteMessageWidget,
   ifCondition: IfConditionWidget,
   elseIf: ElseIfWidget,
-  else: ElseWidget,
-  forLoop: ForLoopWidget,
   checkMembership: CheckMembershipWidget,
   pollMessage: PollWidget,
   mediaGroup: MediaGroupWidget,

@@ -118,7 +118,7 @@
       "elementType": "message"
     },
     "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "widget", "widgetKey": "textMessage" }],
+    "content": [{ "type": "richTextMessage", "key": "messageText", "label": "Xabar matni" }],
     "footer": [
       { "type": "actionPanel", "hideHandlers": true },
       { "type": "handlersList" }
@@ -154,7 +154,7 @@
       { "preset": "selected-message-target" },
       { "preset": "source-default" }
     ],
-    "content": [{ "type": "widget", "widgetKey": "photoMessage" }],
+    "content": [{ "type": "mediaMessage", "mediaKind": "photo" }],
     "footer": [
       { "type": "actionPanel", "hideHandlers": true },
       { "type": "handlersList" }
@@ -190,7 +190,7 @@
       { "preset": "selected-message-target" },
       { "preset": "source-default" }
     ],
-    "content": [{ "type": "widget", "widgetKey": "videoMessage" }],
+    "content": [{ "type": "mediaMessage", "mediaKind": "video" }],
     "footer": [
       { "type": "actionPanel", "hideHandlers": true },
       { "type": "handlersList" }
@@ -226,7 +226,7 @@
       { "preset": "selected-message-target" },
       { "preset": "source-default" }
     ],
-    "content": [{ "type": "widget", "widgetKey": "audioMessage" }],
+    "content": [{ "type": "mediaMessage", "mediaKind": "audio" }],
     "footer": [
       { "type": "actionPanel", "hideHandlers": true },
       { "type": "handlersList" }
@@ -264,7 +264,7 @@
       { "preset": "selected-message-target" },
       { "preset": "source-default" }
     ],
-    "content": [{ "type": "widget", "widgetKey": "fileMessage" }],
+    "content": [{ "type": "mediaMessage", "mediaKind": "file" }],
     "footer": [
       { "type": "actionPanel", "hideHandlers": true },
       { "type": "handlersList" }
@@ -718,7 +718,7 @@
       "elementType": "edit_or_send_message"
     },
     "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "widget", "widgetKey": "editOrSendMessage" }],
+    "content": [{ "type": "richTextMessage", "key": "messageText", "label": "Xabar matni", "intro": "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi" }],
     "footer": [
       { "type": "actionPanel", "hideHandlers": true },
       { "type": "handlersList" }
@@ -928,7 +928,18 @@
       { "preset": "source-default" },
       { "preset": "delete-message-source" }
     ],
-    "content": [{ "type": "widget", "widgetKey": "deleteMessage" }],
+    "content": [
+      {
+        "type": "checkbox",
+        "key": "deleteFromContext",
+        "label": "Contextdan xabarni o'chirish"
+      },
+      {
+        "type": "description",
+        "textFallback": "O'chiriladigan xabarni delete-message-source edge orqali ulang.",
+        "visibleWhen": { "key": "deleteFromContext", "equals": false }
+      }
+    ],
     "defaults": {
       "deleteFromContext": false
     }
@@ -1307,7 +1318,7 @@
         "styleVariant": "accent"
       }
     ],
-    "content": [{ "type": "widget", "widgetKey": "else" }],
+    "content": [{ "type": "description", "textFallback": "If yoki Else If shartlari bajarilmasa, bu yo'nalish ishga tushadi." }],
     "defaults": {}
   },
   {
@@ -1533,7 +1544,20 @@
         "styleVariant": "warning"
       }
     ],
-    "content": [{ "type": "widget", "widgetKey": "forLoop" }],
+    "content": [
+      {
+        "type": "text",
+        "key": "dataKey",
+        "label": "Ro'yxat (dataKey)",
+        "placeholder": "{{users}} yoki {{items}}"
+      },
+      {
+        "type": "text",
+        "key": "itemVariable",
+        "label": "Element o'zgaruvchisi",
+        "placeholder": "item"
+      }
+    ],
     "defaults": {
       "dataKey": "",
       "itemVariable": "item"
