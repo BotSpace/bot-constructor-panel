@@ -90,7 +90,6 @@
     },
     "handles": [
       { "preset": "target-default" },
-      { "preset": "else-source" },
       { "preset": "source-default" }
     ],
     "content": [{ "type": "widget", "widgetKey": "messageTrigger" }],
@@ -155,10 +154,6 @@
       { "preset": "selected-message-target" },
       { "preset": "source-default" }
     ],
-    "preview": {
-      "key": "caption",
-      "placeholder": "Caption yozilmagan..."
-    },
     "content": [{ "type": "widget", "widgetKey": "photoMessage" }],
     "footer": [
       { "type": "actionPanel", "hideHandlers": true },
@@ -195,10 +190,6 @@
       { "preset": "selected-message-target" },
       { "preset": "source-default" }
     ],
-    "preview": {
-      "key": "caption",
-      "placeholder": "Caption yozilmagan..."
-    },
     "content": [{ "type": "widget", "widgetKey": "videoMessage" }],
     "footer": [
       { "type": "actionPanel", "hideHandlers": true },
@@ -235,10 +226,6 @@
       { "preset": "selected-message-target" },
       { "preset": "source-default" }
     ],
-    "preview": {
-      "key": "caption",
-      "placeholder": "Caption yozilmagan..."
-    },
     "content": [{ "type": "widget", "widgetKey": "audioMessage" }],
     "footer": [
       { "type": "actionPanel", "hideHandlers": true },
@@ -277,10 +264,6 @@
       { "preset": "selected-message-target" },
       { "preset": "source-default" }
     ],
-    "preview": {
-      "key": "caption",
-      "placeholder": "Caption yozilmagan..."
-    },
     "content": [{ "type": "widget", "widgetKey": "fileMessage" }],
     "footer": [
       { "type": "actionPanel", "hideHandlers": true },
@@ -735,10 +718,6 @@
       "elementType": "edit_or_send_message"
     },
     "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "preview": {
-      "key": "messageText",
-      "placeholder": "Matn yozilmagan..."
-    },
     "content": [{ "type": "widget", "widgetKey": "editOrSendMessage" }],
     "footer": [
       { "type": "actionPanel", "hideHandlers": true },
@@ -1674,7 +1653,6 @@
     },
     "handles": [
       { "preset": "target-default" },
-      { "preset": "else-source" },
       { "preset": "source-default" }
     ],
     "content": [{ "type": "widget", "widgetKey": "callbackQueryTrigger" }],

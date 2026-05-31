@@ -71,11 +71,6 @@ export interface NodeFooterManifest {
   hideHandlers?: boolean;
 }
 
-export interface NodePreviewManifest {
-  key: string;
-  placeholder?: string;
-}
-
 export interface NodeManifest {
   type: string;
   status: NodeRegistryStatus;
@@ -99,7 +94,6 @@ export interface NodeManifest {
     elementType: string;
   };
   handles?: NodeHandleManifest[];
-  preview?: NodePreviewManifest;
   content?: NodeFieldManifest[];
   footer?: NodeFooterManifest[];
   defaults?: Record<string, unknown>;

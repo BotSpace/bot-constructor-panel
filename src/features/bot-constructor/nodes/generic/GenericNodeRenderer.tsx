@@ -5,7 +5,6 @@ import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollap
 import { ActionPanel } from "@/features/bot-constructor/nodes/components/shared/ActionPanel";
 import { NodeHeader } from "@/features/bot-constructor/nodes/actions/shared/NodeHeader";
 import { HandlersList } from "@/features/bot-constructor/nodes/actions/shared/HandlerBuilder/HandlersList";
-import { NodeTextPreview } from "@/features/bot-constructor/nodes/components/shared/NodeTextPreview";
 import { useTranslations } from "next-intl";
 import { NodeProps } from "reactflow";
 import { cn } from "@/lib/utils";
@@ -85,13 +84,6 @@ export function GenericNodeRenderer({
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
         color={NODE_COLOR_CLASS_REGISTRY[manifest.colorToken] || "bg-zinc-600"}
       />
-
-      {manifest.preview ? (
-        <NodeTextPreview
-          text={typeof data[manifest.preview.key] === "string" ? (data[manifest.preview.key] as string) : ""}
-          placeholder={manifest.preview.placeholder}
-        />
-      ) : null}
 
       {!isCollapsed ? (
         <>
