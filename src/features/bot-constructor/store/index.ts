@@ -7,6 +7,7 @@ import { createClipboardSlice } from "./clipboardSlice";
 import { createHistorySlice } from "./historySlice";
 import { createActions } from "./actions";
 import { Connection, addEdge } from "reactflow";
+import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
 import { KeyboardConfig } from "@/features/bot-constructor/components";
 import { DynamicMessage, ParseMode } from "@/features/bot-constructor/nodes/types";
 
@@ -68,6 +69,52 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 
     onConnect: (connection: Connection) => {
       const { initialState, saveToHistory, nodes, edges, updateNodeData } = get();
+
+      // --- Accessory edge validation (§1.4) ---
+      const targetHandle = connection.targetHandle ?? "";
+      const isAccTarget = targetHandle.startsWith("acc:");
+
+      if (isAccTarget) {
+        // Find the parent node manifest to get accessoryPorts config
+        const parentNode = nodes.find((n) => n.id === connection.target);
+        if (!parentNode) return;
+        const parentManifest = getNodeManifestByType(parentNode.type ?? "");
+        const portType = targetHandle.slice(4); // strip "acc:"
+        const portConfig = parentManifest?.accessoryPorts?.find(
+          (p) => p.portType === portType
+        );
+
+        if (portConfig) {
+          // Validate source node type is accepted by this port
+          const sourceNode = nodes.find((n) => n.id === connection.source);
+          const sourceNodeType = sourceNode?.type ?? "";
+          if (!portConfig.accepts.includes(sourceNodeType)) {
+            return; // Reject: source type not allowed on this port
+          }
+
+          // Enforce maxConnections (e.g. acc:ai_model allows only 1)
+          if (portConfig.maxConnections && portConfig.maxConnections > 0) {
+            const existingCount = edges.filter(
+              (e) => e.target === connection.target && e.targetHandle === targetHandle
+            ).length;
+            if (existingCount >= portConfig.maxConnections) {
+              return; // Reject: port is full
+            }
+          }
+        }
+      }
+
+      // Accessory source handles must only connect to acc: targets
+      // An accessory node has no regular flow target, so if this node is accessory,
+      // only allow connection to acc: targetHandles
+      const sourceNode = nodes.find((n) => n.id === connection.source);
+      if (sourceNode) {
+        const sourceManifest = getNodeManifestByType(sourceNode.type ?? "");
+        if (sourceManifest?.accessory === true && !isAccTarget) {
+          return; // Reject: accessory nodes cannot be wired into normal flow
+        }
+      }
+      // --- End accessory edge validation ---
 
       // History ga saqlash (undo/redo flag tekshiriladi ichida)
       saveToHistory();
