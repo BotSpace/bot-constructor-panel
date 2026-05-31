@@ -6,7 +6,23 @@ export type NodeSidebarGroupId =
   | "messageOperations"
   | "flowControl"
   | "integrations"
-  | "customLogic";
+  | "customLogic"
+  | "ai";
+
+export interface NodeAccessoryPortManifest {
+  /** Port type; the engine targetHandle is `acc:${portType}`. FROZEN values: "ai_model" | "ai_tool". */
+  portType: string;
+  /** i18n key for the port label rendered under the node. */
+  labelKey?: string;
+  /** Fallback label text. */
+  labelFallback: string;
+  /** Node `type` strings this port accepts (drag validation). */
+  accepts: string[];
+  /** 1 = single (ai_model), undefined/0 = unbounded (ai_tool). */
+  maxConnections?: number;
+  /** Pill tone. */
+  styleVariant?: "default" | "success" | "warning" | "danger" | "accent";
+}
 
 export interface NodeHandleManifest {
   preset?:
@@ -16,7 +32,9 @@ export interface NodeHandleManifest {
     | "selected-message-target"
     | "edit-message-source"
     | "delete-message-source"
-    | "subflow-dynamic-sources";
+    | "subflow-dynamic-sources"
+    | "dynamic-outputs-sources"
+    | "accessory-ports";
   kind?: "source" | "target";
   id?: string;
   side?: "left" | "right" | "top" | "bottom";
@@ -97,6 +115,21 @@ export interface NodeManifest {
   content?: NodeFieldManifest[];
   footer?: NodeFooterManifest[];
   defaults?: Record<string, unknown>;
+
+  /** True = this node is a helper sub-node, never traversed as a flow step.
+   *  Drives: no flow target handle, sidebar "ai" styling, drag-validation. */
+  accessory?: boolean;
+
+  /** Accessory ports this node EXPOSES (only on parent flow nodes, e.g. AIAgentNode). */
+  accessoryPorts?: NodeAccessoryPortManifest[];
+
+  /** For accessory nodes: which parent port type(s) this node may attach to.
+   *  e.g. provider nodes => ["ai_model"], tool nodes => ["ai_tool"]. */
+  accessoryAttachesTo?: string[];
+
+  /** Dynamic field groups for provider/tool config rendered in the side panel.
+   *  Reuses NodeFieldManifest. Optional — most nodes use `content`. */
+  configFields?: NodeFieldManifest[];
 }
 
 export interface NodeRegistryEntry extends NodeManifest {
