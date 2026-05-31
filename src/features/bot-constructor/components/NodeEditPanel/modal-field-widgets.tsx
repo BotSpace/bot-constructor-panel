@@ -19,6 +19,10 @@ import {
 } from "@/features/bot-constructor/nodes/triggers/shared";
 import { NodeFieldManifest } from "@/features/bot-constructor/nodes/registry/types";
 import { renderCustomWidget } from "@/features/bot-constructor/nodes/widgets/widgetRegistry";
+import {
+  RichTextMessageField,
+  MediaMessageField,
+} from "@/features/bot-constructor/nodes/widgets/shared-message-fields";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { cn } from "@/lib/utils";
 import { Plus, X } from "lucide-react";
@@ -147,6 +151,31 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
     return (
       <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-4 text-sm leading-6 text-zinc-400">
         {field.textFallback}
+      </div>
+    );
+  }
+
+  if (field.type === "richTextMessage") {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <RichTextMessageField
+          nodeId={nodeId}
+          data={data}
+          textKey={field.key || "messageText"}
+          dynamicKey="dynamicMessages"
+          label={field.label || "Xabar matni"}
+          intro={field.intro}
+          showParseMode={false}
+        />
+      </div>
+    );
+  }
+
+  if (field.type === "mediaMessage") {
+    const kind = field.mediaKind || "photo";
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <MediaMessageField nodeId={nodeId} data={data} kind={kind} />
       </div>
     );
   }
