@@ -11,7 +11,7 @@ import {
   PillHandle,
   PillHandleTone,
 } from "../components/shared/ReactFlowHandles/PillHandle";
-import { NodeHandleManifest } from "./types";
+import { NodeHandleManifest, NodeAccessoryPortManifest } from "./types";
 
 const HANDLE_SIDE_TO_POSITION: Record<string, Position> = {
   left: Position.Left,
@@ -31,11 +31,13 @@ const HANDLE_VARIANT_TONE: Record<string, PillHandleTone> = {
 interface GenericHandleRendererProps {
   handle: NodeHandleManifest;
   nodeId: string;
+  accessoryPorts?: NodeAccessoryPortManifest[];
 }
 
 function GenericHandleRenderer({
   handle,
   nodeId,
+  accessoryPorts,
 }: GenericHandleRendererProps): ReactNode {
   const inPanel = useIsInNodePanel();
 
@@ -74,6 +76,10 @@ function GenericHandleRenderer({
     return <DynamicOutputsSources nodeId={nodeId} />;
   }
 
+  if (handle.preset === "accessory-ports") {
+    return <AccessoryPortHandles ports={accessoryPorts ?? []} />;
+  }
+
   if (!handle.kind || !handle.side) {
     return null;
   }
@@ -90,6 +96,57 @@ function GenericHandleRenderer({
       showPlus={handle.kind === "source"}
       className={handle.offsetClass}
     />
+  );
+}
+
+const ACC_PORT_LEFT_POSITIONS: Record<number, string[]> = {
+  1: ["50%"],
+  2: ["30%", "70%"],
+  3: ["20%", "50%", "80%"],
+};
+
+function AccessoryPortHandles({ ports }: { ports: NodeAccessoryPortManifest[] }) {
+  const positions = ACC_PORT_LEFT_POSITIONS[ports.length] ?? ports.map((_, i) => `${((i + 1) / (ports.length + 1)) * 100}%`);
+
+  return (
+    <>
+      {ports.map((port, index) => {
+        const tone = HANDLE_VARIANT_TONE[port.styleVariant ?? "accent"] as PillHandleTone;
+        const left = positions[index] ?? "50%";
+        return (
+          <div key={port.portType} style={{ position: "absolute", bottom: 0, left }}>
+            <PillHandle
+              id={`acc:${port.portType}`}
+              type="target"
+              position={Position.Bottom}
+              tone={tone}
+              title={port.labelFallback}
+              isConnectableStart={false}
+              showPlus={false}
+              style={{
+                transform: `translate(-50%, calc(100% + 8px))`,
+              }}
+            />
+            <span
+              style={{
+                position: "absolute",
+                bottom: -28,
+                left: "50%",
+                transform: "translateX(-50%)",
+                whiteSpace: "nowrap",
+                fontSize: 9,
+                lineHeight: "12px",
+                pointerEvents: "none",
+                userSelect: "none",
+              }}
+              className="text-muted-foreground font-medium"
+            >
+              {port.labelFallback}
+            </span>
+          </div>
+        );
+      })}
+    </>
   );
 }
 
@@ -133,7 +190,15 @@ function DynamicOutputsSources({ nodeId }: { nodeId: string }) {
 export function renderHandleFromManifest(
   handle: NodeHandleManifest,
   nodeId: string,
-  key: string
+  key: string,
+  accessoryPorts?: NodeAccessoryPortManifest[]
 ) {
-  return <GenericHandleRenderer key={key} handle={handle} nodeId={nodeId} />;
+  return (
+    <GenericHandleRenderer
+      key={key}
+      handle={handle}
+      nodeId={nodeId}
+      accessoryPorts={accessoryPorts}
+    />
+  );
 }

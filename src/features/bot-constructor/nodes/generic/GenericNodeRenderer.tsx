@@ -74,7 +74,7 @@ export function GenericNodeRenderer({
       style={sizeStyle}
     >
       {manifest.handles?.map((handle, index) =>
-        renderHandleFromManifest(handle, id, `${manifest.type}-${index}`)
+        renderHandleFromManifest(handle, id, `${manifest.type}-${index}`, manifest.accessoryPorts)
       )}
 
       <NodeHeader
