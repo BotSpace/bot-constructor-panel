@@ -202,6 +202,41 @@
         "description": "Отвечает при нажатии inline кнопки."
       }
     },
+    "ai": {
+      "title": "🤖 ИИ",
+      "agent": {
+        "name": "ИИ Агент",
+        "description": "Запускает LLM агент с вызовом инструментов."
+      },
+      "openai": {
+        "name": "OpenAI",
+        "description": "Провайдер OpenAI (GPT-4o и др.)."
+      },
+      "ollama": {
+        "name": "Ollama",
+        "description": "Локальный провайдер Ollama."
+      },
+      "gemini": {
+        "name": "Gemini",
+        "description": "Провайдер Google Gemini."
+      },
+      "anthropic": {
+        "name": "Anthropic",
+        "description": "Провайдер Anthropic Claude."
+      },
+      "httpTool": {
+        "name": "HTTP Инструмент",
+        "description": "Позволяет агенту делать HTTP запросы."
+      },
+      "mongoTool": {
+        "name": "MongoDB Инструмент",
+        "description": "Позволяет агенту читать данные из MongoDB."
+      },
+      "customCodeTool": {
+        "name": "Пользовательский код",
+        "description": "Позволяет агенту выполнять произвольный JavaScript."
+      }
+    },
     "customLogic": {
       "title": "🧩 Пользовательская логика",
       "code": {

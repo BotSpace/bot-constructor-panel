@@ -210,6 +210,41 @@
         "description": "Answers inline button is pressed."
       }
     },
+    "ai": {
+      "title": "🤖 AI",
+      "agent": {
+        "name": "AI Agent",
+        "description": "Runs a tool-calling LLM agent loop."
+      },
+      "openai": {
+        "name": "OpenAI",
+        "description": "OpenAI LLM provider (GPT-4o, etc.)."
+      },
+      "ollama": {
+        "name": "Ollama",
+        "description": "Local Ollama LLM provider."
+      },
+      "gemini": {
+        "name": "Gemini",
+        "description": "Google Gemini LLM provider."
+      },
+      "anthropic": {
+        "name": "Anthropic",
+        "description": "Anthropic Claude LLM provider."
+      },
+      "httpTool": {
+        "name": "HTTP Tool",
+        "description": "Lets the agent make HTTP requests."
+      },
+      "mongoTool": {
+        "name": "MongoDB Tool",
+        "description": "Lets the agent query MongoDB (read-only)."
+      },
+      "customCodeTool": {
+        "name": "Custom Code Tool",
+        "description": "Lets the agent run custom JavaScript code."
+      }
+    },
     "customLogic": {
       "title": "🧩 Custom Logic",
       "code": {

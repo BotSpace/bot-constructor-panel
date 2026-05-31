@@ -1,6 +1,8 @@
 import {
+  BrainCircuit,
   Clapperboard,
   Clock3,
+  Code2,
   Copy,
   Database,
   DoorOpen,
@@ -15,12 +17,15 @@ import {
   Music,
   Route,
   Send,
+  Settings2,
   Split,
   Timer,
   Users,
   Variable,
   Video,
   WandSparkles,
+  Wrench,
+  Zap,
 } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -40,6 +45,11 @@ const EMOJI_ICONS: Record<string, string> = {
 };
 
 const LUCIDE_ICONS: Record<string, ReactNode> = {
+  "brain-circuit": <BrainCircuit className="text-primary" />,
+  "settings-2": <Settings2 className="text-primary" />,
+  wrench: <Wrench className="text-primary" />,
+  zap: <Zap className="text-primary" />,
+  "code-2": <Code2 className="text-primary" />,
   message: <MessageSquare className="text-primary" />,
   photo: <Image className="text-primary" />,
   video: <Video className="text-primary" />,

@@ -25,6 +25,12 @@ export const NODE_COLOR_CLASS_REGISTRY: Record<string, string> = {
   "flow-amber": "bg-amber-400",
   "flow-yellow": "bg-yellow-500",
   "flow-green": "bg-green-500",
+  "ai-violet": "bg-violet-600",
+  "ai-indigo": "bg-indigo-500",
+  "ai-sky": "bg-sky-500",
+  "ai-teal": "bg-teal-500",
+  "ai-emerald": "bg-emerald-500",
+  "ai-rose": "bg-rose-500",
 };
 
 export const SIDEBAR_COLOR_CLASS_REGISTRY: Record<string, string> = {
@@ -54,4 +60,10 @@ export const SIDEBAR_COLOR_CLASS_REGISTRY: Record<string, string> = {
   "flow-amber": "bg-pink-500/10 text-pink-400 border-pink-500/20",
   "flow-yellow": "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
   "flow-green": "bg-green-500/10 text-green-400 border-green-500/20",
+  "ai-violet": "bg-violet-500/10 text-violet-400 border-violet-500/20",
+  "ai-indigo": "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+  "ai-sky": "bg-sky-500/10 text-sky-400 border-sky-500/20",
+  "ai-teal": "bg-teal-500/10 text-teal-400 border-teal-500/20",
+  "ai-emerald": "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  "ai-rose": "bg-rose-500/10 text-rose-400 border-rose-500/20",
 };

@@ -202,6 +202,41 @@
         "description": "インラインボタンが押されたときに応答します。"
       }
     },
+    "ai": {
+      "title": "🤖 AI",
+      "agent": {
+        "name": "AIエージェント",
+        "description": "ツール呼び出しLLMエージェントループを実行します。"
+      },
+      "openai": {
+        "name": "OpenAI",
+        "description": "OpenAI LLMプロバイダー（GPT-4oなど）。"
+      },
+      "ollama": {
+        "name": "Ollama",
+        "description": "ローカルOllama LLMプロバイダー。"
+      },
+      "gemini": {
+        "name": "Gemini",
+        "description": "Google Gemini LLMプロバイダー。"
+      },
+      "anthropic": {
+        "name": "Anthropic",
+        "description": "Anthropic Claude LLMプロバイダー。"
+      },
+      "httpTool": {
+        "name": "HTTPツール",
+        "description": "エージェントがHTTPリクエストを行えるようにします。"
+      },
+      "mongoTool": {
+        "name": "MongoDBツール",
+        "description": "エージェントがMongoDBを読み取れるようにします。"
+      },
+      "customCodeTool": {
+        "name": "カスタムコードツール",
+        "description": "エージェントがJavaScriptコードを実行できるようにします。"
+      }
+    },
     "customLogic": {
       "title": "🧩 カスタムロジック",
       "code": {
