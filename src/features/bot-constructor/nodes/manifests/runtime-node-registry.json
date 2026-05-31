@@ -1929,7 +1929,7 @@
         "type": "text",
         "key": "baseURL",
         "label": "Base URL",
-        "placeholder": "http://localhost:11434"
+        "placeholder": "https://ollama.com/v1"
       },
       {
         "type": "number",
@@ -1951,7 +1951,7 @@
       "provider": "ollama",
       "apiKey": "",
       "model": "llama3.1",
-      "baseURL": "http://localhost:11434",
+      "baseURL": "https://ollama.com/v1",
       "temperature": 0.7,
       "maxTokens": null,
       "extraHeaders": {},
