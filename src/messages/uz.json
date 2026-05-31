@@ -210,6 +210,41 @@
         "description": "Inline tugma bosilganda javob beradi."
       }
     },
+    "ai": {
+      "title": "🤖 Sun'iy Intellekt",
+      "agent": {
+        "name": "AI Agent",
+        "description": "LLM agentni asboblar bilan ishga tushiradi."
+      },
+      "openai": {
+        "name": "OpenAI",
+        "description": "OpenAI LLM provayderi (GPT-4o va boshqalar)."
+      },
+      "ollama": {
+        "name": "Ollama",
+        "description": "Mahalliy Ollama LLM provayderi."
+      },
+      "gemini": {
+        "name": "Gemini",
+        "description": "Google Gemini LLM provayderi."
+      },
+      "anthropic": {
+        "name": "Anthropic",
+        "description": "Anthropic Claude LLM provayderi."
+      },
+      "httpTool": {
+        "name": "HTTP Asbob",
+        "description": "Agentga HTTP so'rovlar yuborishga imkon beradi."
+      },
+      "mongoTool": {
+        "name": "MongoDB Asbob",
+        "description": "Agentga MongoDB dan o'qishga imkon beradi."
+      },
+      "customCodeTool": {
+        "name": "Maxsus Kod Asbob",
+        "description": "Agentga JavaScript kodi bajarishga imkon beradi."
+      }
+    },
     "customLogic": {
       "title": "🧩 Maxsus Mantiq",
       "code": {
