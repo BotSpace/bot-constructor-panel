@@ -21,7 +21,11 @@ export function useLinkToParent(options: UseLinkToParentOptions = {}) {
     }
 
     if (window) {
-      const targetUrl = options.href || env.ADMIN_PANEL + `/${lang}`;
+      const rawHref = options.href || `/${lang}`;
+      // Relative path bo'lsa, ADMIN_PANEL bazasiga biriktir
+      const targetUrl = rawHref.startsWith("http")
+        ? rawHref
+        : (env.ADMIN_PANEL ?? "").replace(/\/$/, "") + rawHref;
       window.location.href = targetUrl;
     }
   }

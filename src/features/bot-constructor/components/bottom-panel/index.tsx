@@ -59,7 +59,8 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const { getViewport } = useReactFlow()
     const { id } = useParams()
 
-    const { handleClick: backToHome } = useLinkToParent({ href: `/bot/${id}` })
+    const { lang } = useParams<{ lang: string }>()
+    const { handleClick: backToHome } = useLinkToParent({ href: `/${lang}/app/bots/${id}` })
 
     const handleAddNode = useCallback((element: ElementItemType) => {
         const { x, y, zoom } = getViewport()
