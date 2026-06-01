@@ -144,11 +144,6 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
       const isDeleteMessageEdge =
         connection.sourceHandle === "delete-message-source";
 
-      // Handler handle'dan chiqqan edge'ni aniqlash (keyboard tugmalari)
-      const isHandlerEdge =
-        connection.sourceHandle?.startsWith("target-handler-") ||
-        connection.sourceHandle?.startsWith("source-handler-");
-
       // Edge rangini aniqlash
       let edgeColor = "#495057"; // Default kulrang
       if (isEditMessageEdge) {
@@ -159,16 +154,9 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
 
       const newEdge = {
         ...connection,
-        // type: isHandlerEdge ? "step" : "floating",
         type: "floating",
-        markerEnd: {
-          type: "arrow",
-          width: 30,
-          height: 30,
-          color: edgeColor,
-        },
-        // React Flow'ning default edge'ini ishlatamiz
-        // Rasmga mos stil
+        // markerEnd intentionally omitted — AI-generated edges have no arrow,
+        // so manually-created edges must match (no arrow) for visual parity.
         style: {
           strokeWidth: 4,
           stroke: edgeColor,

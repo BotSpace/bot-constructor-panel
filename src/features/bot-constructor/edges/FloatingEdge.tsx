@@ -69,29 +69,15 @@ function FloatingEdge({
     const isAccessoryEdge = typeof targetHandleId === "string" && targetHandleId.startsWith("acc:");
 
     if (!isAccessoryEdge && targetNode) {
-        const targetWidth = targetNode.width || 150;
         const targetHeight = targetNode.height || 100;
-        const targetCenterX = targetNode.position.x + targetWidth / 2;
         const targetCenterY = targetNode.position.y + targetHeight / 2;
 
-        // 4 candidate entry points on the target node
-        const candidates: { pos: Position; x: number; y: number }[] = [
-            { pos: Position.Left,   x: targetNode.position.x,               y: targetCenterY },
-            { pos: Position.Right,  x: targetNode.position.x + targetWidth,  y: targetCenterY },
-            { pos: Position.Top,    x: targetCenterX,                        y: targetNode.position.y },
-            { pos: Position.Bottom, x: targetCenterX,                        y: targetNode.position.y + targetHeight },
-        ];
-
-        let minDist = Infinity;
-        for (const c of candidates) {
-            const dist = Math.hypot(c.x - sourceX, c.y - sourceY);
-            if (dist < minDist) {
-                minDist = dist;
-                dynTargetPos = c.pos;
-                dynTargetX = c.x;
-                dynTargetY = c.y;
-            }
-        }
+        // TargetHandles always renders on Position.Left (id="target-handler").
+        // Fix the entry side to Left so all edges — AI-generated and manually
+        // drawn — arrive from the same side, matching the actual handle position.
+        dynTargetPos = Position.Left;
+        dynTargetX = targetNode.position.x;
+        dynTargetY = targetCenterY;
     }
 
     // Use Bezier path with dynamic positions
