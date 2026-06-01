@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { StateCreator } from "zustand";
 import type { Edge, Node } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
@@ -160,6 +161,46 @@ const parseFlowInput = (flow: unknown) => {
   }
 };
 
+/**
+ * Normalize a single edge to the canonical "smart-edge" format used by the
+ * constructor.  This ensures legacy flows saved with type:"floating" or
+ * targetHandle:null render identically to AI-generated edges.
+ *
+ * Rules:
+ *  - type "floating" → "smart-edge"  (FloatingEdge is registered for both)
+ *  - targetHandle null → "target-handler"  (left-side entry handle)
+ *  - strokeWidth > 2 in style → reduced to 2  (match AI edge weight)
+ *
+ * Accessory edges (targetHandle starts with "acc:") are intentionally left
+ * untouched because they route to specific sub-node ports, not the main
+ * target-handler.
+ */
+const normalizeEdge = (edge: Edge): Edge => {
+  const isAccessory =
+    typeof edge.targetHandle === "string" && edge.targetHandle.startsWith("acc:");
+
+  if (isAccessory) return edge;
+
+  const type =
+    edge.type === "floating" || edge.type === "smart-edge" || !edge.type
+      ? "smart-edge"
+      : edge.type;
+
+  const targetHandle = edge.targetHandle ?? "target-handler";
+
+  // Thin down any legacy strokeWidth > 2 that was stored in style.
+  // Cast through CSSProperties so the spread keeps the correct type.
+  const existingStyle = (edge.style ?? {}) as CSSProperties;
+  const needsThinner =
+    typeof existingStyle.strokeWidth === "number" &&
+    (existingStyle.strokeWidth as number) > 2;
+  const style: CSSProperties = needsThinner
+    ? { ...existingStyle, strokeWidth: 2 }
+    : existingStyle;
+
+  return { ...edge, type, targetHandle, style };
+};
+
 const normalizeFlow = (flow: unknown) => {
   const parsedFlow = parseFlowInput(flow);
   const issues: string[] = [];
@@ -181,9 +222,14 @@ const normalizeFlow = (flow: unknown) => {
     issues.push(`flow.edges array emas, hozir: ${describeValue(flowObject.edges)}`);
   }
 
+  const rawEdges = Array.isArray(flowObject.edges)
+    ? (flowObject.edges as Edge[])
+    : [];
+
   return {
     nodes: Array.isArray(flowObject.nodes) ? (flowObject.nodes as Node[]) : [],
-    edges: Array.isArray(flowObject.edges) ? (flowObject.edges as Edge[]) : [],
+    // Normalize every edge on load so legacy flows look identical to new flows
+    edges: rawEdges.map(normalizeEdge),
     issues,
   };
 };
