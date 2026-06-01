@@ -265,6 +265,24 @@
       "customCodeTool": {
         "name": "Custom Code Tool",
         "description": "Lets the agent run custom JavaScript code."
+      },
+      "knowledgeTool": {
+        "name": "Knowledge",
+        "description": "RAG over a bot collection — embeds and searches docs via vector DB.",
+        "fields": {
+          "toolName": "Tool Name",
+          "collection": "Collection",
+          "textFields": "Text Fields to Embed",
+          "textFieldsHelp": "Which collection fields to embed. Leave empty to embed the whole document.",
+          "embeddingProvider": "Embedding Provider",
+          "embeddingModel": "Embedding Model",
+          "embeddingApiKey": "Embedding API Key",
+          "embeddingBaseURL": "Embedding Base URL",
+          "vectorDbUrl": "Qdrant URL",
+          "vectorDbApiKey": "Qdrant API Key",
+          "topK": "Top-K Results",
+          "topKHelp": "Number of most-similar chunks returned to the agent."
+        }
       }
     },
     "customLogic": {

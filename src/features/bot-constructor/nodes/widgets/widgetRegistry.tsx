@@ -2175,6 +2175,236 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
   );
 }
 
+function AIKnowledgeToolConfigWidget({ nodeId, data }: WidgetProps) {
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const { data: collections } = useCollectionStore();
+
+  const collection = typeof data.collection === "string" ? data.collection : "";
+  const textFields = Array.isArray(data.textFields)
+    ? (data.textFields as string[])
+    : [];
+  const embeddingProvider =
+    typeof data.embeddingProvider === "string" ? data.embeddingProvider : "openai";
+  const embeddingModel =
+    typeof data.embeddingModel === "string" ? data.embeddingModel : "text-embedding-3-small";
+  const embeddingApiKey =
+    typeof data.embeddingApiKey === "string" ? data.embeddingApiKey : "";
+  const embeddingBaseURL =
+    typeof data.embeddingBaseURL === "string" ? data.embeddingBaseURL : "";
+  const vectorDbUrl =
+    typeof data.vectorDbUrl === "string" ? data.vectorDbUrl : "";
+  const vectorDbApiKey =
+    typeof data.vectorDbApiKey === "string" ? data.vectorDbApiKey : "";
+  const topK =
+    typeof data.topK === "number" ? data.topK : 5;
+  const toolName =
+    typeof data.toolName === "string" ? data.toolName : "knowledge";
+
+  const [newTextField, setNewTextField] = useState("");
+
+  const addTextField = () => {
+    const field = newTextField.trim();
+    if (!field || textFields.includes(field)) {
+      setNewTextField("");
+      return;
+    }
+    updateNodeData(nodeId, { textFields: [...textFields, field] });
+    setNewTextField("");
+  };
+
+  const removeTextField = (index: number) => {
+    updateNodeData(nodeId, {
+      textFields: textFields.filter((_, i) => i !== index),
+    });
+  };
+
+  return (
+    <div className="grid gap-3">
+      <div className="grid gap-1.5">
+        <Label className="text-xs text-muted-foreground">Tool Name</Label>
+        <Input
+          className="h-8 text-xs"
+          placeholder="knowledge"
+          value={toolName}
+          onChange={(e) => updateNodeData(nodeId, { toolName: e.target.value })}
+        />
+      </div>
+
+      <div className="grid gap-1.5">
+        <Label className="text-xs text-muted-foreground">Collection</Label>
+        <Select value={collection} onValueChange={(val) => updateNodeData(nodeId, { collection: val })}>
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue placeholder="Select collection" />
+          </SelectTrigger>
+          <SelectContent>
+            {collections?.map((col) => (
+              <SelectItem key={col.id} value={col.name} className="text-xs">
+                {col.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid gap-1.5">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs text-muted-foreground">Text Fields to Embed</Label>
+          <span className="text-[10px] text-muted-foreground">
+            {textFields.length === 0 ? "whole doc" : `${textFields.length} field(s)`}
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {textFields.map((field, index) => (
+            <span
+              key={index}
+              className="inline-flex items-center gap-1 rounded border border-violet-500/20 bg-violet-500/10 px-1.5 py-0.5 font-mono text-[11px] text-violet-400"
+            >
+              {field}
+              <button
+                type="button"
+                onClick={() => removeTextField(index)}
+                className="hover:text-destructive"
+                aria-label={`Remove ${field}`}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+          {textFields.length === 0 ? (
+            <span className="text-[10px] text-muted-foreground italic">
+              Empty = embed whole document
+            </span>
+          ) : null}
+        </div>
+        <div className="flex gap-1">
+          <Input
+            className="h-7 text-[11px] font-mono"
+            placeholder="field name (e.g. content)"
+            value={newTextField}
+            onChange={(e) => setNewTextField(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addTextField();
+              }
+            }}
+          />
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={addTextField}
+            disabled={!newTextField.trim()}
+            className="h-7 px-2"
+          >
+            <PlusIcon className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid gap-1.5">
+        <Label className="text-xs text-muted-foreground">Embedding Provider</Label>
+        <Select
+          value={embeddingProvider}
+          onValueChange={(val) => {
+            const modelDefaults: Record<string, string> = {
+              openai: "text-embedding-3-small",
+              ollama: "nomic-embed-text",
+              gemini: "text-embedding-004",
+            };
+            updateNodeData(nodeId, {
+              embeddingProvider: val,
+              embeddingModel: modelDefaults[val] ?? "",
+            });
+          }}
+        >
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="openai">OpenAI</SelectItem>
+            <SelectItem value="ollama">Ollama</SelectItem>
+            <SelectItem value="gemini">Gemini</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid gap-1.5">
+        <Label className="text-xs text-muted-foreground">Embedding Model</Label>
+        <Input
+          className="h-8 text-xs font-mono"
+          placeholder={
+            embeddingProvider === "openai"
+              ? "text-embedding-3-small"
+              : embeddingProvider === "ollama"
+              ? "nomic-embed-text"
+              : "text-embedding-004"
+          }
+          value={embeddingModel}
+          onChange={(e) => updateNodeData(nodeId, { embeddingModel: e.target.value })}
+        />
+      </div>
+
+      <div className="grid gap-1.5">
+        <Label className="text-xs text-muted-foreground">Embedding API Key</Label>
+        <Input
+          className="h-8 text-xs"
+          placeholder="sk-... or {{env.EMBEDDING_KEY}}"
+          value={embeddingApiKey}
+          onChange={(e) => updateNodeData(nodeId, { embeddingApiKey: e.target.value })}
+        />
+      </div>
+
+      <div className="grid gap-1.5">
+        <Label className="text-xs text-muted-foreground">Embedding Base URL</Label>
+        <Input
+          className="h-8 text-xs"
+          placeholder="https://api.openai.com/v1 (optional)"
+          value={embeddingBaseURL}
+          onChange={(e) => updateNodeData(nodeId, { embeddingBaseURL: e.target.value })}
+        />
+      </div>
+
+      <div className="grid gap-1.5">
+        <Label className="text-xs text-muted-foreground">Qdrant URL</Label>
+        <Input
+          className="h-8 text-xs"
+          placeholder="http://localhost:6333"
+          value={vectorDbUrl}
+          onChange={(e) => updateNodeData(nodeId, { vectorDbUrl: e.target.value })}
+        />
+      </div>
+
+      <div className="grid gap-1.5">
+        <Label className="text-xs text-muted-foreground">Qdrant API Key</Label>
+        <Input
+          className="h-8 text-xs"
+          placeholder="qdrant-api-key (optional)"
+          value={vectorDbApiKey}
+          onChange={(e) => updateNodeData(nodeId, { vectorDbApiKey: e.target.value })}
+        />
+      </div>
+
+      <div className="grid gap-1.5">
+        <Label className="text-xs text-muted-foreground">Top-K Results</Label>
+        <Input
+          type="number"
+          className="h-8 text-xs"
+          min={1}
+          max={50}
+          value={String(topK)}
+          onChange={(e) =>
+            updateNodeData(nodeId, { topK: e.target.value === "" ? 5 : Number(e.target.value) })
+          }
+        />
+        <p className="text-[10px] text-muted-foreground">
+          Number of most-similar chunks returned to the agent.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function buildParametersSchema(
   searchFields: { field: string; description: string }[]
 ): Record<string, unknown> {
@@ -2290,6 +2520,7 @@ const widgetRegistry: Record<string, (props: WidgetProps) => ReactNode> = {
   subFlow: SubFlowWidget,
   aiAgentAdvanced: AIAgentAdvancedWidget,
   aiCollectionToolConfig: AICollectionToolConfigWidget,
+  aiKnowledgeToolConfig: AIKnowledgeToolConfigWidget,
 };
 
 export function renderCustomWidget(props: WidgetProps) {

@@ -265,6 +265,24 @@
       "customCodeTool": {
         "name": "Maxsus Kod Asbob",
         "description": "Agentga JavaScript kodi bajarishga imkon beradi."
+      },
+      "knowledgeTool": {
+        "name": "Bilim Bazasi",
+        "description": "Bot kolleksiyasi ustida RAG — hujjatlarni vektor MB orqali indekslaydi va qidiradi.",
+        "fields": {
+          "toolName": "Asbob nomi",
+          "collection": "Kolleksiya",
+          "textFields": "Embed qilinadigan matn maydonlari",
+          "textFieldsHelp": "Qaysi kolleksiya maydonlarini embed qilish. Bo'sh qoldirilsa — butun hujjat embed qilinadi.",
+          "embeddingProvider": "Embedding provayderi",
+          "embeddingModel": "Embedding modeli",
+          "embeddingApiKey": "Embedding API kaliti",
+          "embeddingBaseURL": "Embedding Base URL",
+          "vectorDbUrl": "Qdrant URL",
+          "vectorDbApiKey": "Qdrant API kaliti",
+          "topK": "Top-K natijalar",
+          "topKHelp": "Agentga qaytariladigan eng o'xshash parchalar soni."
+        }
       }
     },
     "customLogic": {
