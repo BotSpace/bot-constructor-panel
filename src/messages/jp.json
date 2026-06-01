@@ -260,6 +260,24 @@
       "customCodeTool": {
         "name": "カスタムコードツール",
         "description": "エージェントがJavaScriptコードを実行できるようにします。"
+      },
+      "knowledgeTool": {
+        "name": "ナレッジ",
+        "description": "ボットコレクションに対するRAG — ベクターDBを通じてドキュメントを埋め込み・検索します。",
+        "fields": {
+          "toolName": "ツール名",
+          "collection": "コレクション",
+          "textFields": "埋め込むテキストフィールド",
+          "textFieldsHelp": "埋め込むコレクションのフィールド。空の場合はドキュメント全体を埋め込みます。",
+          "embeddingProvider": "埋め込みプロバイダー",
+          "embeddingModel": "埋め込みモデル",
+          "embeddingApiKey": "埋め込みAPIキー",
+          "embeddingBaseURL": "埋め込みBase URL",
+          "vectorDbUrl": "Qdrant URL",
+          "vectorDbApiKey": "Qdrant APIキー",
+          "topK": "Top-K結果数",
+          "topKHelp": "エージェントに返される最も類似したチャンクの数。"
+        }
       }
     },
     "customLogic": {
