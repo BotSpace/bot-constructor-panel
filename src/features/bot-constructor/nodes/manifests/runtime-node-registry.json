@@ -2468,7 +2468,8 @@
         "accepts": [
           "AIHTTPToolNode",
           "AIMongoToolNode",
-          "AICustomCodeToolNode"
+          "AICustomCodeToolNode",
+          "AIKnowledgeToolNode"
         ],
         "styleVariant": "success"
       }
@@ -3086,6 +3087,54 @@
         "properties": {},
         "required": []
       }
+    }
+  },
+  {
+    "type": "AIKnowledgeToolNode",
+    "status": "runtime",
+    "category": "ai",
+    "accessory": true,
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
+    "titleKey": "constructor.ai.knowledgeTool.name",
+    "descriptionKey": "constructor.ai.knowledgeTool.description",
+    "titleFallback": "Knowledge",
+    "descriptionFallback": "RAG over a bot collection — embeds and searches docs via vector DB.",
+    "iconName": "brain-circuit",
+    "colorToken": "ai-violet",
+    "size": {
+      "width": 180
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "ai",
+      "sortOrder": 33,
+      "elementType": "ai_tool_knowledge"
+    },
+    "handles": [
+      {
+        "preset": "source-top"
+      }
+    ],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "aiKnowledgeToolConfig"
+      }
+    ],
+    "defaults": {
+      "tool": "knowledge",
+      "toolName": "knowledge",
+      "collection": "",
+      "textFields": [],
+      "embeddingProvider": "openai",
+      "embeddingModel": "text-embedding-3-small",
+      "embeddingApiKey": "",
+      "embeddingBaseURL": "",
+      "vectorDbUrl": "",
+      "vectorDbApiKey": "",
+      "topK": 5
     }
   }
 ]
