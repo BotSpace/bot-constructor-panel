@@ -241,19 +241,16 @@
         "name": "HTTP",
         "description": "Позволяет агенту делать HTTP запросы."
       },
-      "mongoTool": {
-        "name": "MongoDB",
-        "description": "Позволяет агенту читать данные из MongoDB.",
+      "collectionTool": {
+        "name": "Collection",
+        "description": "Позволяет агенту выполнять CRUD-операции над коллекцией бота.",
         "fields": {
-          "toolName": "Название инструмента",
-          "description": "Описание (для LLM)",
           "collection": "Коллекция",
+          "operations": "Операции",
           "searchFields": "Поля поиска",
-          "searchFieldsHelp": "Поля, по которым агент может искать. Добавьте описание, чтобы LLM понимал каждое поле.",
+          "searchFieldsHelp": "Поля, по которым агент может фильтровать записи. Добавьте описание, чтобы LLM понимал каждое поле.",
           "fieldName": "Название поля",
           "fieldDescription": "Описание",
-          "operation": "Операция",
-          "limit": "Лимит",
           "addField": "Добавить поле"
         }
       },
