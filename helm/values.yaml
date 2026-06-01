@@ -2,7 +2,7 @@ fullnameOverride: "constructor"
 
 image:
   repository: registry.jscorp.uz/botmother-constructor
-  tag: "b169213"
+  tag: "7c94bd5"
   pullPolicy: IfNotPresent
 
 imagePullSecrets:
