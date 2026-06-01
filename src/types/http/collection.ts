@@ -1,5 +1,5 @@
 export interface CollectionListItem {
-  id: number;
+  id: string | number;
   name: string;
 }
 
