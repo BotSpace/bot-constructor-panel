@@ -2655,6 +2655,12 @@
         "placeholder": "https://ollama.com/v1"
       },
       {
+        "type": "text",
+        "key": "apiKey",
+        "label": "API Key (ollama.com uchun)",
+        "placeholder": "ollama.com dan olingan API kalit"
+      },
+      {
         "type": "number",
         "key": "temperature",
         "label": "Temperature",
