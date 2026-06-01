@@ -164,7 +164,7 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
 
       <div className="space-y-2">
         {keyboard && keyboard.active && keyboard[keyboard.active] && keyboard[keyboard.active].flat().length > 0 && (
-          <div className="flex flex-wrap flex-col gap-2 mb-3 pb-3 border-b">
+          <div className="flex flex-col gap-2 mb-3 pb-3 border-b">
             {(() => {
               const seenText = new Set<string>();
               return keyboard[keyboard.active].flat().map((button: any) => {
@@ -184,7 +184,7 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                 <Button
                   key={button.id}
                   variant="outline"
-                  className="text-xs px-2 py-1 relative"
+                  className="w-full text-xs px-2 py-1 relative truncate"
                 >
                   {label}
                   {!inPanel && isFirstOccurrence && (
