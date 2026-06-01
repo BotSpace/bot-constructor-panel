@@ -1225,7 +1225,7 @@ function StateWidget({ nodeId, data }: WidgetProps) {
   const comboboxOptions = useMemo(
     () => [
       ...dynamicFilterOptions,
-      { value: "__custom__", label: "Custom (o'zingiz kiriting)", group: "Boshqa" },
+      { value: "Custom", label: "Custom (o'zingiz kiriting)", group: "Boshqa" },
     ],
     [dynamicFilterOptions]
   );
@@ -1254,8 +1254,8 @@ function StateWidget({ nodeId, data }: WidgetProps) {
           options={comboboxOptions}
           value={typeof data.type === "string" ? (data.type as string) : ""}
           onValueChange={(value) =>
-            value === "__custom__"
-              ? updateNodeData(nodeId, { type: "__custom__", customType: data.customType || "" })
+            value === "Custom"
+              ? updateNodeData(nodeId, { type: "Custom", customType: data.customType || "" })
               : updateNodeData(nodeId, { type: value, customType: undefined })
           }
           placeholder="Ma'lumot turini tanlang..."
@@ -1264,7 +1264,7 @@ function StateWidget({ nodeId, data }: WidgetProps) {
           triggerClassName="h-9 text-sm"
         />
       </div>
-      {data.type === "__custom__" ? (
+      {data.type === "Custom" ? (
         <div className="grid gap-2">
           <Label>Custom Type</Label>
           <Input
