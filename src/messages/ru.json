@@ -257,6 +257,24 @@
       "customCodeTool": {
         "name": "Пользовательский код",
         "description": "Позволяет агенту выполнять произвольный JavaScript."
+      },
+      "knowledgeTool": {
+        "name": "База знаний",
+        "description": "RAG по коллекции бота — индексирует и ищет документы через векторную БД.",
+        "fields": {
+          "toolName": "Название инструмента",
+          "collection": "Коллекция",
+          "textFields": "Поля для embed",
+          "textFieldsHelp": "Какие поля коллекции встраивать. Оставьте пустым, чтобы встраивать весь документ.",
+          "embeddingProvider": "Провайдер эмбеддинга",
+          "embeddingModel": "Модель эмбеддинга",
+          "embeddingApiKey": "API-ключ эмбеддинга",
+          "embeddingBaseURL": "Base URL эмбеддинга",
+          "vectorDbUrl": "URL Qdrant",
+          "vectorDbApiKey": "API-ключ Qdrant",
+          "topK": "Top-K результатов",
+          "topKHelp": "Количество наиболее похожих фрагментов, возвращаемых агенту."
+        }
       }
     },
     "customLogic": {
