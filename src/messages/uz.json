@@ -214,7 +214,20 @@
       "title": "🤖 Sun'iy Intellekt",
       "agent": {
         "name": "AI Agent",
-        "description": "LLM agentni asboblar bilan ishga tushiradi."
+        "description": "LLM agentni asboblar bilan ishga tushiradi.",
+        "fields": {
+          "systemPrompt": "System Prompt",
+          "userInput": "Foydalanuvchi xabari",
+          "outputKey": "Natija o'zgaruvchisi",
+          "structuredOutput": "Tuzilgan chiqish (JSON Schema)",
+          "jsonSchema": "JSON Schema",
+          "advanced": "Qo'shimcha sozlamalar",
+          "userInputSource": "Kirish manbai",
+          "maxIterations": "Maksimal iteratsiyalar",
+          "returnMode": "Qaytarish rejimi",
+          "historyKey": "Tarix kaliti",
+          "errorOutputKey": "Xato natija kaliti"
+        }
       },
       "openai": {
         "name": "OpenAI",
@@ -233,12 +246,24 @@
         "description": "Anthropic Claude LLM provayderi."
       },
       "httpTool": {
-        "name": "HTTP Asbob",
+        "name": "HTTP",
         "description": "Agentga HTTP so'rovlar yuborishga imkon beradi."
       },
       "mongoTool": {
-        "name": "MongoDB Asbob",
-        "description": "Agentga MongoDB dan o'qishga imkon beradi."
+        "name": "MongoDB",
+        "description": "Agentga MongoDB dan o'qishga imkon beradi.",
+        "fields": {
+          "toolName": "Asbob nomi",
+          "description": "Tavsif (LLM uchun)",
+          "collection": "Kolleksiya",
+          "searchFields": "Qidiruv maydonlari",
+          "searchFieldsHelp": "Agent qidirishi mumkin bo'lgan maydonlar. Har bir maydon uchun tavsif yozing.",
+          "fieldName": "Maydon nomi",
+          "fieldDescription": "Tavsif",
+          "operation": "Operatsiya",
+          "limit": "Limit",
+          "addField": "Maydon qo'shish"
+        }
       },
       "customCodeTool": {
         "name": "Maxsus Kod Asbob",
