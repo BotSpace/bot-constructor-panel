@@ -83,12 +83,21 @@ export default function Constructor() {
   const connectionSuccessfulRef = useRef(false);
 
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  // Tracks whether loadFlow has already been called for the current project.
+  // Without this guard, every changeDebug/changeRelease call mutates the
+  // project object reference, re-triggering the effect and overwriting
+  // unsaved editor state with the server-saved flow (Bug 2 root cause).
+  const hasLoadedFlowRef = useRef(false);
 
   // Loyiha yuklanib bo'lsa undagi ma'lumotlarni
   // Constructorga yozib qo'yadi loading status true bo'lganda
   useEffect(() => {
     if (loading) return;
     if (!project) return;
+    // Only load once per project session — do not re-load when project metadata
+    // (e.g. debug.status) changes after the initial fetch.
+    if (hasLoadedFlowRef.current) return;
+    hasLoadedFlowRef.current = true;
 
     loadFlow(project.flow).catch((error) => {
       const message =
