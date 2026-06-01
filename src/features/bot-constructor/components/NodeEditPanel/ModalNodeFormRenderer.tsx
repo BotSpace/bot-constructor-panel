@@ -6,6 +6,7 @@ import {
   ModalActionPanel,
   ModalHandlersList,
 } from "@/features/bot-constructor/components/NodeEditPanel/modal-footer-widgets";
+import { NodePanelProvider } from "@/features/bot-constructor/contexts/NodePanelContext";
 import { useTranslations } from "next-intl";
 
 interface ModalNodeFormRendererProps {
@@ -66,52 +67,54 @@ export function ModalNodeFormRenderer({
     }));
 
   return (
-    <div className="mx-auto w-full max-w-[820px] space-y-4 p-4 lg:p-6">
-      {fields.length ? (
-        <div className="space-y-3">
-          {fields.map((field, index) => (
-            <ModalFieldWidget
-              key={`${manifest.type}-${field.key || field.widgetKey || field.type}-${index}`}
-              nodeId={nodeId}
-              data={data}
-              field={field}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-6 text-center text-sm text-zinc-500">
-          Bu node uchun alohida sozlama maydonlari yo'q.
-        </div>
-      )}
+    <NodePanelProvider>
+      <div className="mx-auto w-full max-w-[820px] space-y-4 p-4 lg:p-6">
+        {fields.length ? (
+          <div className="space-y-3">
+            {fields.map((field, index) => (
+              <ModalFieldWidget
+                key={`${manifest.type}-${field.key || field.widgetKey || field.type}-${index}`}
+                nodeId={nodeId}
+                data={data}
+                field={field}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-6 text-center text-sm text-zinc-500">
+            Bu node uchun alohida sozlama maydonlari yo'q.
+          </div>
+        )}
 
-      {manifest.footer?.length ? (
-        <div className="space-y-3 border-t border-white/10 pt-4">
-          {manifest.footer.map((footer, index) => {
-            if (footer.type === "actionPanel") {
-              return (
-                <ModalActionPanel
-                  key={`${manifest.type}-action-panel-${index}`}
-                  nodeId={nodeId}
-                  data={data}
-                  hideHandlers={footer.hideHandlers}
-                />
-              );
-            }
+        {manifest.footer?.length ? (
+          <div className="space-y-3 border-t border-white/10 pt-4">
+            {manifest.footer.map((footer, index) => {
+              if (footer.type === "actionPanel") {
+                return (
+                  <ModalActionPanel
+                    key={`${manifest.type}-action-panel-${index}`}
+                    nodeId={nodeId}
+                    data={data}
+                    hideHandlers={footer.hideHandlers}
+                  />
+                );
+              }
 
-            if (footer.type === "handlersList") {
-              return (
-                <ModalHandlersList
-                  key={`${manifest.type}-handlers-${index}`}
-                  nodeId={nodeId}
-                  data={data}
-                />
-              );
-            }
+              if (footer.type === "handlersList") {
+                return (
+                  <ModalHandlersList
+                    key={`${manifest.type}-handlers-${index}`}
+                    nodeId={nodeId}
+                    data={data}
+                  />
+                );
+              }
 
-            return null;
-          })}
-        </div>
-      ) : null}
-    </div>
+              return null;
+            })}
+          </div>
+        ) : null}
+      </div>
+    </NodePanelProvider>
   );
 }
