@@ -24,7 +24,7 @@ import { useEdgeColor } from "./useEdgeColor";
  */
 function FloatingEdge({
     id,
-    source,
+    source: _source,
     target,
     sourceX,
     sourceY,
@@ -41,75 +41,42 @@ function FloatingEdge({
     const nodes = useNodes();
     const { stroke: edgeColor, selectedStroke } = useEdgeColor(sourceHandleId);
 
-    // Find source and target nodes for dynamic direction and label
-    const sourceNode = nodes.find((node) => node.id === source);
+    // Find target node for entry-side selection and label
     const targetNode = nodes.find((node) => node.id === target);
     
     // Get target node name for label
     const targetNodeTitle = (targetNode?.data as any)?.title || targetNode?.type?.replace('Node', '') || 'Node';
 
-    // Dynamically determine direction based on node positions
+    // Use the exact handle coordinates that React Flow provides.
+    // sourceX/sourceY already point to the actual handle (the "+" pill) because
+    // React Flow computes them from the DOM-measured handle centre.  Do not
+    // override them with the node-body edge – that caused edges to detach from
+    // the "+" marker visually.
+    //
+    // We still pick the best entry side for the TARGET so that the bezier curve
+    // enters the target node from the closest face.
     let dynSourcePos = sourcePosition;
     let dynTargetPos = targetPosition;
-    let dynSourceX = sourceX;
     let dynTargetX = targetX;
     let dynTargetY = targetY;
 
-    if (sourceNode && targetNode) {
-        const sourceWidth = sourceNode.width || 150;
+    if (targetNode) {
         const targetWidth = targetNode.width || 150;
         const targetHeight = targetNode.height || 100;
-
-        const sourceCenterX = sourceNode.position.x + sourceWidth / 2;
         const targetCenterX = targetNode.position.x + targetWidth / 2;
-
-        // Source chiqish faqat o'ng yoki chap
-        if (targetCenterX >= sourceCenterX) {
-            dynSourcePos = Position.Right;
-            dynSourceX = sourceNode.position.x + sourceWidth;
-        } else {
-            dynSourcePos = Position.Left;
-            dynSourceX = sourceNode.position.x;
-        }
-
-        // Target kirish - 4 tomondan eng yaqinini tanlash
-        const sourceExitX = dynSourceX;
-        const sourceExitY = sourceY;
-
         const targetCenterY = targetNode.position.y + targetHeight / 2;
 
-        // 4 ta kirish nuqtasi
-        const candidates: {
-            pos: Position;
-            x: number;
-            y: number;
-        }[] = [
-                {
-                    pos: Position.Left,
-                    x: targetNode.position.x,
-                    y: targetCenterY,
-                },
-                {
-                    pos: Position.Right,
-                    x: targetNode.position.x + targetWidth,
-                    y: targetCenterY,
-                },
-                {
-                    pos: Position.Top,
-                    x: targetCenterX,
-                    y: targetNode.position.y,
-                },
-                {
-                    pos: Position.Bottom,
-                    x: targetCenterX,
-                    y: targetNode.position.y + targetHeight,
-                },
-            ];
+        // 4 candidate entry points on the target node
+        const candidates: { pos: Position; x: number; y: number }[] = [
+            { pos: Position.Left,   x: targetNode.position.x,               y: targetCenterY },
+            { pos: Position.Right,  x: targetNode.position.x + targetWidth,  y: targetCenterY },
+            { pos: Position.Top,    x: targetCenterX,                        y: targetNode.position.y },
+            { pos: Position.Bottom, x: targetCenterX,                        y: targetNode.position.y + targetHeight },
+        ];
 
-        // Eng yaqin kirish nuqtasini topish
         let minDist = Infinity;
         for (const c of candidates) {
-            const dist = Math.hypot(c.x - sourceExitX, c.y - sourceExitY);
+            const dist = Math.hypot(c.x - sourceX, c.y - sourceY);
             if (dist < minDist) {
                 minDist = dist;
                 dynTargetPos = c.pos;
@@ -121,7 +88,7 @@ function FloatingEdge({
 
     // Use Bezier path with dynamic positions
     const [edgePath, labelX, labelY] = getBezierPath({
-        sourceX: dynSourceX,
+        sourceX,
         sourceY,
         targetX: dynTargetX,
         targetY: dynTargetY,
