@@ -206,7 +206,20 @@
       "title": "🤖 AI",
       "agent": {
         "name": "AIエージェント",
-        "description": "ツール呼び出しLLMエージェントループを実行します。"
+        "description": "ツール呼び出しLLMエージェントループを実行します。",
+        "fields": {
+          "systemPrompt": "システムプロンプト",
+          "userInput": "ユーザー入力",
+          "outputKey": "出力変数",
+          "structuredOutput": "構造化出力（JSON Schema）",
+          "jsonSchema": "JSON Schema",
+          "advanced": "詳細設定",
+          "userInputSource": "入力ソース",
+          "maxIterations": "最大イテレーション数",
+          "returnMode": "返却モード",
+          "historyKey": "履歴キー",
+          "errorOutputKey": "エラー出力キー"
+        }
       },
       "openai": {
         "name": "OpenAI",
@@ -225,12 +238,24 @@
         "description": "Anthropic Claude LLMプロバイダー。"
       },
       "httpTool": {
-        "name": "HTTPツール",
+        "name": "HTTP",
         "description": "エージェントがHTTPリクエストを行えるようにします。"
       },
       "mongoTool": {
-        "name": "MongoDBツール",
-        "description": "エージェントがMongoDBを読み取れるようにします。"
+        "name": "MongoDB",
+        "description": "エージェントがMongoDBを読み取れるようにします。",
+        "fields": {
+          "toolName": "ツール名",
+          "description": "説明（LLM向け）",
+          "collection": "コレクション",
+          "searchFields": "検索フィールド",
+          "searchFieldsHelp": "エージェントが検索できるフィールド。LLMが理解できるよう説明を追加してください。",
+          "fieldName": "フィールド名",
+          "fieldDescription": "説明",
+          "operation": "操作",
+          "limit": "上限",
+          "addField": "フィールドを追加"
+        }
       },
       "customCodeTool": {
         "name": "カスタムコードツール",

@@ -118,23 +118,32 @@ function AccessoryPortHandles({ ports }: { ports: NodeAccessoryPortManifest[] })
         const tone = HANDLE_VARIANT_TONE[port.styleVariant ?? "accent"] as PillHandleTone;
         const left = positions[index] ?? "50%";
         return (
-          <div key={port.portType} style={{ position: "absolute", bottom: 0, left }}>
+          // pointer-events: none on the wrapper so it never intercepts handle drag events.
+          // The Handle element itself manages its own pointer interactions via React Flow.
+          <div key={port.portType} style={{ position: "absolute", bottom: 0, left, pointerEvents: "none" }}>
             <PillHandle
               id={`acc:${port.portType}`}
               type="target"
               position={Position.Bottom}
               tone={tone}
               title={port.labelFallback}
-              isConnectableStart={false}
+              // In ConnectionMode.Loose the target handle can also initiate a connection drag.
+              // Keeping isConnectableStart undefined (defaults to true in ReactFlow) so users
+              // can drag from either side of the accessory edge.
+              isConnectableStart={true}
               showPlus={false}
               style={{
+                // Re-apply the standard bottom-handle offset so the pill sits just outside the card edge.
                 transform: `translate(-50%, calc(100% + 8px))`,
+                // Restore pointer events for the handle dot itself.
+                pointerEvents: "all",
               }}
             />
             <span
               style={{
                 position: "absolute",
-                bottom: -28,
+                // 44px below the card bottom: handle dot is ~8+16=24px below edge, label adds 20px gap.
+                bottom: -44,
                 left: "50%",
                 transform: "translateX(-50%)",
                 whiteSpace: "nowrap",

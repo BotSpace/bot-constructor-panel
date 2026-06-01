@@ -206,7 +206,20 @@
       "title": "🤖 ИИ",
       "agent": {
         "name": "ИИ Агент",
-        "description": "Запускает LLM агент с вызовом инструментов."
+        "description": "Запускает LLM агент с вызовом инструментов.",
+        "fields": {
+          "systemPrompt": "Системный промпт",
+          "userInput": "Сообщение пользователя",
+          "outputKey": "Переменная результата",
+          "structuredOutput": "Структурированный вывод (JSON Schema)",
+          "jsonSchema": "JSON Schema",
+          "advanced": "Дополнительные параметры",
+          "userInputSource": "Источник ввода",
+          "maxIterations": "Максимум итераций",
+          "returnMode": "Режим возврата",
+          "historyKey": "Ключ истории",
+          "errorOutputKey": "Ключ ошибки"
+        }
       },
       "openai": {
         "name": "OpenAI",
@@ -225,12 +238,24 @@
         "description": "Провайдер Anthropic Claude."
       },
       "httpTool": {
-        "name": "HTTP Инструмент",
+        "name": "HTTP",
         "description": "Позволяет агенту делать HTTP запросы."
       },
       "mongoTool": {
-        "name": "MongoDB Инструмент",
-        "description": "Позволяет агенту читать данные из MongoDB."
+        "name": "MongoDB",
+        "description": "Позволяет агенту читать данные из MongoDB.",
+        "fields": {
+          "toolName": "Название инструмента",
+          "description": "Описание (для LLM)",
+          "collection": "Коллекция",
+          "searchFields": "Поля поиска",
+          "searchFieldsHelp": "Поля, по которым агент может искать. Добавьте описание, чтобы LLM понимал каждое поле.",
+          "fieldName": "Название поля",
+          "fieldDescription": "Описание",
+          "operation": "Операция",
+          "limit": "Лимит",
+          "addField": "Добавить поле"
+        }
       },
       "customCodeTool": {
         "name": "Пользовательский код",

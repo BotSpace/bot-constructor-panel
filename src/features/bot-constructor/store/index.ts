@@ -70,6 +70,23 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     onConnect: (connection: Connection) => {
       const { initialState, saveToHistory, nodes, edges, updateNodeData } = get();
 
+      // --- Accessory edge normalisation (ConnectionMode.Loose) ---
+      // In Loose mode the user may drag FROM an acc: handle (which is typed "target").
+      // When that happens ReactFlow sets source=agentNode, sourceHandle="acc:...",
+      // target=providerNode, targetHandle=<provider-source-handle>.
+      // We flip the connection so acc: is always on the target side for consistent
+      // storage and downstream engine parsing.
+      const sourceHandleRaw = connection.sourceHandle ?? "";
+      const targetHandleRaw = connection.targetHandle ?? "";
+      if (sourceHandleRaw.startsWith("acc:") && !targetHandleRaw.startsWith("acc:")) {
+        connection = {
+          source: connection.target,
+          sourceHandle: connection.targetHandle,
+          target: connection.source,
+          targetHandle: connection.sourceHandle,
+        };
+      }
+
       // --- Accessory edge validation (§1.4) ---
       const targetHandle = connection.targetHandle ?? "";
       const isAccTarget = targetHandle.startsWith("acc:");
