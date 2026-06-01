@@ -11,10 +11,14 @@ interface SourceHandlerProps {
   tone?: PillHandleTone;
 }
 
-// NodeHeader balandligi taxminan 75-80px (icon markazi).
-// Asosiy source handle ni shu darajada anchor qilamiz, shunda
-// tagidagi tugma handlelari bilan to'qnashmaydi.
-const MAIN_SOURCE_TOP_OFFSET = 78;
+/** Returns the inline style needed to centre a handle along its edge. */
+function centerStyleForPosition(pos: Position): React.CSSProperties {
+  if (pos === Position.Top || pos === Position.Bottom) {
+    return { left: "50%" };
+  }
+  // Left or Right — centre vertically
+  return { top: "50%" };
+}
 
 export function SourceHandles({
   id = "source-handler",
@@ -26,14 +30,16 @@ export function SourceHandles({
 
   if (inPanel) return null;
 
+  const resolvedPosition = position ?? Position.Right;
+
   return (
     <PillHandle
       id={id}
       type="source"
-      position={position ?? Position.Right}
+      position={resolvedPosition}
       tone={tone}
       className={className}
-      style={{ top: MAIN_SOURCE_TOP_OFFSET }}
+      style={centerStyleForPosition(resolvedPosition)}
     />
   );
 }

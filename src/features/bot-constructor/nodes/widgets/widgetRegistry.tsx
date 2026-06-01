@@ -167,13 +167,13 @@ function CallbackQueryTriggerWidget({ nodeId, data }: WidgetProps) {
 
     const parentNode = nodes.find((node) => node.id === incomingEdge.source);
     const keyboard = parentNode?.data?.keyboard;
-    if (!keyboard?.inline) return [];
+    if (!Array.isArray((keyboard as any)?.inline)) return [];
 
-    return keyboard.inline.flat().flatMap((button: any) => {
+    return (keyboard as any).inline.flat().flatMap((button: any) => {
       if (button.type === "callback" && button.value && !button.collectionData) {
         return [{
           id: button.id,
-          text: button.text,
+          text: button.text ?? "",
           value: button.value,
           isCollection: false,
         }];
@@ -183,7 +183,7 @@ function CallbackQueryTriggerWidget({ nodeId, data }: WidgetProps) {
         const { collection, text } = button.collectionData;
         return [{
           id: button.id,
-          text: button.text.replace("📦 ", ""),
+          text: button.text?.replace("📦 ", "") ?? collection ?? "",
           value: `collection:${collection}:${text}`,
           isCollection: true,
           collectionName: collection,
