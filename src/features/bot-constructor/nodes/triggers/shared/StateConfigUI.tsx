@@ -38,7 +38,17 @@ const StateConfigComponent = ({
 
   const handleTypeChange = (type: string) => {
     if (state) {
-      onStateChange({ ...state, type: type as StateType });
+      if (type === "Custom") {
+        onStateChange({ ...state, type: "Custom", customType: state.customType ?? "" });
+      } else {
+        onStateChange({ ...state, type: type as StateType, customType: undefined });
+      }
+    }
+  };
+
+  const handleCustomTypeChange = (customType: string) => {
+    if (state) {
+      onStateChange({ ...state, customType });
     }
   };
 
@@ -116,6 +126,26 @@ const StateConfigComponent = ({
               </SelectContent>
             </Select>
           </div>
+
+          {state.type === "Custom" && (
+            <div className="space-y-1.5">
+              <Label
+                htmlFor={`state-customtype-${nodeId}`}
+                className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium"
+              >
+                <Type className="h-3 w-3" />
+                Custom type
+              </Label>
+              <Input
+                id={`state-customtype-${nodeId}`}
+                type="text"
+                placeholder="Masalan: my_custom_state"
+                value={state.customType ?? ""}
+                onChange={(e) => handleCustomTypeChange(e.target.value)}
+                className="w-full h-9 bg-muted/50 border-border focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm"
+              />
+            </div>
+          )}
         </div>
       )}
     </div>
