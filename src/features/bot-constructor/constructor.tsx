@@ -243,7 +243,9 @@ export default function Constructor() {
   // Store'dan kerakli qismlarni olamiz
   const { formatFlow, collapseAllNodes, expandAllNodes, setEditingNodeId } = useFlowStore();
 
-  const handleNodeClick = useCallback(
+  // Single click only selects the node (React Flow handles selection itself);
+  // the edit modal opens on double click.
+  const handleNodeDoubleClick = useCallback(
     (_event: React.MouseEvent, node: Node) => {
       setEditingNodeId(node.id);
     },
@@ -505,7 +507,7 @@ export default function Constructor() {
               onConnectEnd={handleConnectEnd}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
-              onNodeClick={handleNodeClick}
+              onNodeDoubleClick={handleNodeDoubleClick}
               onNodeDrag={handleNodeDrag}
               onNodeDragStop={handleNodeDragStop}
               panOnScroll
