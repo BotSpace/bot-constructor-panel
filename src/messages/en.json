@@ -214,7 +214,20 @@
       "title": "🤖 AI",
       "agent": {
         "name": "AI Agent",
-        "description": "Runs a tool-calling LLM agent loop."
+        "description": "Runs a tool-calling LLM agent loop.",
+        "fields": {
+          "systemPrompt": "System Prompt",
+          "userInput": "User Input",
+          "outputKey": "Output Variable",
+          "structuredOutput": "Structured Output (JSON Schema)",
+          "jsonSchema": "JSON Schema",
+          "advanced": "Advanced",
+          "userInputSource": "User Input Source",
+          "maxIterations": "Max Iterations",
+          "returnMode": "Return Mode",
+          "historyKey": "History Key",
+          "errorOutputKey": "Error Output Key"
+        }
       },
       "openai": {
         "name": "OpenAI",
@@ -233,12 +246,24 @@
         "description": "Anthropic Claude LLM provider."
       },
       "httpTool": {
-        "name": "HTTP Tool",
+        "name": "HTTP",
         "description": "Lets the agent make HTTP requests."
       },
       "mongoTool": {
-        "name": "MongoDB Tool",
-        "description": "Lets the agent query MongoDB (read-only)."
+        "name": "MongoDB",
+        "description": "Lets the agent query MongoDB (read-only).",
+        "fields": {
+          "toolName": "Tool Name",
+          "description": "Description (shown to LLM)",
+          "collection": "Collection",
+          "searchFields": "Search Fields",
+          "searchFieldsHelp": "Fields the agent can use to search. Add a description so the LLM understands each field.",
+          "fieldName": "Field name",
+          "fieldDescription": "Description",
+          "operation": "Operation",
+          "limit": "Limit",
+          "addField": "Add field"
+        }
       },
       "customCodeTool": {
         "name": "Custom Code Tool",

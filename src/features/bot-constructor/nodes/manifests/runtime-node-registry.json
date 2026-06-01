@@ -2477,62 +2477,50 @@
       {
         "type": "textarea",
         "key": "systemPrompt",
+        "labelKey": "constructor.ai.agent.fields.systemPrompt",
         "label": "System Prompt",
         "placeholder": "You are a helpful assistant...",
-        "rows": 3
-      },
-      {
-        "type": "text",
-        "key": "userInputSource",
-        "label": "User Input Source",
-        "placeholder": "message.text"
+        "rows": 3,
+        "helpText": "Instructions that define the agent's behavior and persona."
       },
       {
         "type": "text",
         "key": "userInputText",
-        "label": "User Input (override)",
-        "placeholder": "{{var}} or literal text"
+        "labelKey": "constructor.ai.agent.fields.userInput",
+        "label": "User Input",
+        "placeholder": "{{message.text}} or literal text",
+        "helpText": "The user message sent to the agent. Use {{message.text}} to pass the incoming message."
       },
       {
         "type": "text",
         "key": "outputKey",
-        "label": "Output Context Key",
-        "placeholder": "agent_output"
+        "labelKey": "constructor.ai.agent.fields.outputKey",
+        "label": "Output Variable",
+        "placeholder": "agent_output",
+        "helpText": "Context key where the agent's reply will be stored."
       },
       {
-        "type": "number",
-        "key": "maxIterations",
-        "label": "Max Iterations",
-        "min": 1,
-        "max": 10,
-        "step": 1
+        "type": "checkbox",
+        "key": "structuredOutput",
+        "labelKey": "constructor.ai.agent.fields.structuredOutput",
+        "label": "Structured Output (JSON Schema)"
       },
       {
-        "type": "select",
-        "key": "returnMode",
-        "label": "Return Mode",
-        "options": [
-          {
-            "value": "text",
-            "label": "Text"
-          },
-          {
-            "value": "json",
-            "label": "JSON"
-          }
-        ]
+        "type": "textarea",
+        "key": "jsonSchema",
+        "labelKey": "constructor.ai.agent.fields.jsonSchema",
+        "label": "JSON Schema",
+        "placeholder": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"answer\": { \"type\": \"string\" }\n  }\n}",
+        "rows": 5,
+        "helpText": "JSON Schema the agent must conform to when structuredOutput is enabled.",
+        "visibleWhen": {
+          "key": "structuredOutput",
+          "equals": true
+        }
       },
       {
-        "type": "text",
-        "key": "historyKey",
-        "label": "History Context Key",
-        "placeholder": "Leave empty to disable"
-      },
-      {
-        "type": "text",
-        "key": "errorOutputKey",
-        "label": "Error Output Key",
-        "placeholder": "agent_error"
+        "type": "widget",
+        "widgetKey": "aiAgentAdvanced"
       }
     ],
     "defaults": {
@@ -2545,7 +2533,9 @@
       "maxTokens": null,
       "returnMode": "text",
       "historyKey": "",
-      "errorOutputKey": "agent_error"
+      "errorOutputKey": "agent_error",
+      "structuredOutput": false,
+      "jsonSchema": ""
     }
   },
   {
@@ -2848,7 +2838,7 @@
     ],
     "titleKey": "constructor.ai.httpTool.name",
     "descriptionKey": "constructor.ai.httpTool.description",
-    "titleFallback": "HTTP Tool",
+    "titleFallback": "HTTP",
     "descriptionFallback": "Lets the agent make HTTP requests.",
     "iconName": "globe",
     "colorToken": "integration-indigo",
@@ -2952,7 +2942,7 @@
     ],
     "titleKey": "constructor.ai.mongoTool.name",
     "descriptionKey": "constructor.ai.mongoTool.description",
-    "titleFallback": "MongoDB Tool",
+    "titleFallback": "MongoDB",
     "descriptionFallback": "Lets the agent query MongoDB (read-only).",
     "iconName": "database",
     "colorToken": "ai-emerald",
@@ -2974,25 +2964,26 @@
       {
         "type": "text",
         "key": "toolName",
+        "labelKey": "constructor.ai.mongoTool.fields.toolName",
         "label": "Tool Name",
         "placeholder": "mongo_query"
       },
       {
         "type": "textarea",
         "key": "description",
+        "labelKey": "constructor.ai.mongoTool.fields.description",
         "label": "Description (shown to LLM)",
         "placeholder": "Query the database for records.",
         "rows": 2
       },
       {
-        "type": "text",
-        "key": "collection",
-        "label": "Collection",
-        "placeholder": "users"
+        "type": "widget",
+        "widgetKey": "aiMongoToolConfig"
       },
       {
         "type": "select",
         "key": "operation",
+        "labelKey": "constructor.ai.mongoTool.fields.operation",
         "label": "Operation",
         "options": [
           {
@@ -3012,6 +3003,7 @@
       {
         "type": "number",
         "key": "limit",
+        "labelKey": "constructor.ai.mongoTool.fields.limit",
         "label": "Limit",
         "min": 1,
         "max": 100,
@@ -3023,6 +3015,7 @@
       "toolName": "mongo_query",
       "description": "Query a MongoDB collection.",
       "collection": "",
+      "searchFields": [],
       "operation": "find",
       "filterTemplate": {},
       "limit": 10,

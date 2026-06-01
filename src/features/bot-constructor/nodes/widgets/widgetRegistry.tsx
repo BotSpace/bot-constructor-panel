@@ -34,7 +34,7 @@ import {
 } from "@/features/bot-constructor/nodes/triggers/shared";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
-import { AlertCircle, ArrowRight, GripVertical, Key, ListPlus, PlusIcon, Trash2 } from "lucide-react";
+import { AlertCircle, ArrowRight, GripVertical, Key, ListPlus, PlusIcon, Trash2, X } from "lucide-react";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { CodeEditorDialog } from "@/features/bot-constructor/nodes/custom/CustomCodeNode/components/CodeEditorDialog";
 import AddItemModal from "@/features/bot-constructor/nodes/custom/FormNode/components/add-item-modal";
@@ -1961,6 +1961,205 @@ function ArrayParamField({
   );
 }
 
+function AIAgentAdvancedWidget({ nodeId, data }: WidgetProps) {
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="rounded-md border border-muted/50">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <span>Advanced</span>
+        <span className="opacity-60">{open ? "▲" : "▼"}</span>
+      </button>
+      {open ? (
+        <div className="grid gap-3 border-t border-muted/40 px-3 pb-3 pt-2">
+          <div className="grid gap-1.5">
+            <Label className="text-xs text-muted-foreground">User Input Source</Label>
+            <Input
+              className="h-8 text-xs"
+              placeholder="message.text"
+              value={typeof data.userInputSource === "string" ? data.userInputSource : "message.text"}
+              onChange={(e) => updateNodeData(nodeId, { userInputSource: e.target.value })}
+            />
+            <p className="text-[10px] text-muted-foreground">Context path used when User Input is empty.</p>
+          </div>
+          <div className="grid gap-1.5">
+            <Label className="text-xs text-muted-foreground">Max Iterations</Label>
+            <Input
+              type="number"
+              className="h-8 text-xs"
+              min={1}
+              max={10}
+              value={typeof data.maxIterations === "number" ? String(data.maxIterations) : "5"}
+              onChange={(e) =>
+                updateNodeData(nodeId, { maxIterations: e.target.value === "" ? 5 : Number(e.target.value) })
+              }
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label className="text-xs text-muted-foreground">Return Mode</Label>
+            <Select
+              value={typeof data.returnMode === "string" ? data.returnMode : "text"}
+              onValueChange={(val) => updateNodeData(nodeId, { returnMode: val })}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="text">Text</SelectItem>
+                <SelectItem value="json">JSON</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid gap-1.5">
+            <Label className="text-xs text-muted-foreground">History Key</Label>
+            <Input
+              className="h-8 text-xs"
+              placeholder="Leave empty to disable"
+              value={typeof data.historyKey === "string" ? data.historyKey : ""}
+              onChange={(e) => updateNodeData(nodeId, { historyKey: e.target.value })}
+            />
+            <p className="text-[10px] text-muted-foreground">Context key for conversation history.</p>
+          </div>
+          <div className="grid gap-1.5">
+            <Label className="text-xs text-muted-foreground">Error Output Key</Label>
+            <Input
+              className="h-8 text-xs"
+              placeholder="agent_error"
+              value={typeof data.errorOutputKey === "string" ? data.errorOutputKey : "agent_error"}
+              onChange={(e) => updateNodeData(nodeId, { errorOutputKey: e.target.value })}
+            />
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function AIMongoToolConfigWidget({ nodeId, data }: WidgetProps) {
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const { data: collections } = useCollectionStore();
+
+  const collection = typeof data.collection === "string" ? data.collection : "";
+  const searchFields = Array.isArray(data.searchFields)
+    ? (data.searchFields as { field: string; description: string }[])
+    : [];
+
+  const handleCollectionChange = (value: string) => {
+    updateNodeData(nodeId, { collection: value });
+  };
+
+  const updateSearchField = (index: number, key: "field" | "description", value: string) => {
+    const next = searchFields.map((item, i) =>
+      i === index ? { ...item, [key]: value } : item
+    );
+    updateNodeData(nodeId, {
+      searchFields: next,
+      parametersSchema: buildParametersSchema(next),
+    });
+  };
+
+  const addSearchField = () => {
+    const next = [...searchFields, { field: "", description: "" }];
+    updateNodeData(nodeId, {
+      searchFields: next,
+      parametersSchema: buildParametersSchema(next),
+    });
+  };
+
+  const removeSearchField = (index: number) => {
+    const next = searchFields.filter((_, i) => i !== index);
+    updateNodeData(nodeId, {
+      searchFields: next,
+      parametersSchema: buildParametersSchema(next),
+    });
+  };
+
+  return (
+    <div className="grid gap-3">
+      <div className="grid gap-1.5">
+        <Label className="text-xs text-muted-foreground">Collection</Label>
+        <Select value={collection} onValueChange={handleCollectionChange}>
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue placeholder="Select collection" />
+          </SelectTrigger>
+          <SelectContent>
+            {collections?.map((col) => (
+              <SelectItem key={col.id} value={col.name} className="text-xs">
+                {col.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid gap-2">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs text-muted-foreground">Search Fields</Label>
+          <button
+            type="button"
+            className="flex items-center gap-1 rounded px-2 py-0.5 text-[10px] text-muted-foreground hover:bg-primary/5 hover:text-foreground border border-dashed"
+            onClick={addSearchField}
+          >
+            <PlusIcon className="h-3 w-3" />
+            Add field
+          </button>
+        </div>
+        {searchFields.length === 0 ? (
+          <p className="text-[10px] text-muted-foreground italic">
+            No search fields defined. The LLM will not know what to query.
+          </p>
+        ) : null}
+        {searchFields.map((item, index) => (
+          <div key={index} className="flex items-start gap-2 rounded-md border bg-muted/20 p-2">
+            <div className="flex-1 grid gap-1.5">
+              <Input
+                className="h-7 text-[11px] font-mono"
+                placeholder="field name (e.g. username)"
+                value={item.field}
+                onChange={(e) => updateSearchField(index, "field", e.target.value)}
+              />
+              <Input
+                className="h-7 text-[11px]"
+                placeholder="description for the LLM"
+                value={item.description}
+                onChange={(e) => updateSearchField(index, "description", e.target.value)}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => removeSearchField(index)}
+              className="mt-1 rounded p-0.5 text-muted-foreground hover:text-destructive"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function buildParametersSchema(
+  searchFields: { field: string; description: string }[]
+): Record<string, unknown> {
+  const properties: Record<string, unknown> = {};
+  searchFields.forEach(({ field, description }) => {
+    if (field) {
+      properties[field] = { type: "string", description };
+    }
+  });
+  return {
+    type: "object",
+    properties,
+    required: [],
+  };
+}
+
 function SubFlowWidget({ nodeId, data }: WidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const params =
@@ -2058,6 +2257,8 @@ const widgetRegistry: Record<string, (props: WidgetProps) => ReactNode> = {
   collectionNode: CollectionWidget,
   loadCollectionItem: LoadCollectionItemWidget,
   subFlow: SubFlowWidget,
+  aiAgentAdvanced: AIAgentAdvancedWidget,
+  aiMongoToolConfig: AIMongoToolConfigWidget,
 };
 
 export function renderCustomWidget(props: WidgetProps) {
