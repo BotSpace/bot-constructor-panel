@@ -31,6 +31,10 @@ const SIDEBAR_GROUP_META = {
     titleKey: "constructor.customLogic.title",
     titleFallback: "🧩 Maxsus Mantiq",
   },
+  ai: {
+    titleKey: "constructor.ai.title",
+    titleFallback: "🤖 AI",
+  },
 } as const;
 
 function translate(

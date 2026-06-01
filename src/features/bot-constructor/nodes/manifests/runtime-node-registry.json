@@ -9,14 +9,23 @@
     "descriptionFallback": "/start yoki /help kabi buyruq yuborganda.",
     "iconName": "keyboard",
     "colorToken": "trigger-blue",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "triggers",
       "sortOrder": 10,
       "elementType": "command"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "text",
@@ -56,15 +65,29 @@
     "descriptionFallback": "Belgilangan vaqtda bajariladigan ishlar.",
     "iconName": "clock",
     "colorToken": "trigger-blue",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "triggers",
       "sortOrder": 30,
       "elementType": "cron"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "widget", "widgetKey": "cronTrigger" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "cronTrigger"
+      }
+    ],
     "defaults": {
       "schedule": "0 9 * * *",
       "enabled": true,
@@ -81,7 +104,9 @@
     "descriptionFallback": "Foydalanuvchidan xabar kelganda.",
     "iconName": "message",
     "colorToken": "trigger-blue",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "triggers",
@@ -89,10 +114,19 @@
       "elementType": "message"
     },
     "handles": [
-      { "preset": "target-default" },
-      { "preset": "source-default" }
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
     ],
-    "content": [{ "type": "widget", "widgetKey": "messageTrigger" }],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "messageTrigger"
+      }
+    ],
     "defaults": {
       "type": "any",
       "filter": "any",
@@ -110,26 +144,53 @@
     "descriptionFallback": "Foydalanuvchiga matnli xabar yuboradi.",
     "iconName": "message",
     "colorToken": "action-amber",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
       "sortOrder": 10,
       "elementType": "message"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "richTextMessage", "key": "messageText", "label": "Xabar matni" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "richTextMessage",
+        "key": "messageText",
+        "label": "Xabar matni"
+      }
+    ],
     "footer": [
-      { "type": "actionPanel", "hideHandlers": true },
-      { "type": "handlersList" }
+      {
+        "type": "actionPanel",
+        "hideHandlers": true
+      },
+      {
+        "type": "handlersList"
+      }
     ],
     "defaults": {
       "messageText": "",
       "parseMode": "None",
       "disableNotification": false,
       "protectContent": false,
-      "recipients": { "sendToSender": true, "additionalIds": [] },
-      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      },
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": []
+      }
     }
   },
   {
@@ -142,7 +203,9 @@
     "descriptionFallback": "Foydalanuvchiga rasm yuboradi.",
     "iconName": "photo",
     "colorToken": "action-purple",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
@@ -150,22 +213,42 @@
       "elementType": "photo"
     },
     "handles": [
-      { "preset": "target-default" },
-      { "preset": "selected-message-target" },
-      { "preset": "source-default" }
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
     ],
-    "content": [{ "type": "mediaMessage", "mediaKind": "photo" }],
+    "content": [
+      {
+        "type": "mediaMessage",
+        "mediaKind": "photo"
+      }
+    ],
     "footer": [
-      { "type": "actionPanel", "hideHandlers": true },
-      { "type": "handlersList" }
+      {
+        "type": "actionPanel",
+        "hideHandlers": true
+      },
+      {
+        "type": "handlersList"
+      }
     ],
     "defaults": {
       "photoSourceType": "upload",
       "caption": "",
       "disableNotification": false,
       "protectContent": false,
-      "recipients": { "sendToSender": true, "additionalIds": [] },
-      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      },
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": []
+      }
     }
   },
   {
@@ -178,7 +261,9 @@
     "descriptionFallback": "Foydalanuvchiga video yuboradi.",
     "iconName": "video",
     "colorToken": "action-red",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
@@ -186,22 +271,42 @@
       "elementType": "video"
     },
     "handles": [
-      { "preset": "target-default" },
-      { "preset": "selected-message-target" },
-      { "preset": "source-default" }
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
     ],
-    "content": [{ "type": "mediaMessage", "mediaKind": "video" }],
+    "content": [
+      {
+        "type": "mediaMessage",
+        "mediaKind": "video"
+      }
+    ],
     "footer": [
-      { "type": "actionPanel", "hideHandlers": true },
-      { "type": "handlersList" }
+      {
+        "type": "actionPanel",
+        "hideHandlers": true
+      },
+      {
+        "type": "handlersList"
+      }
     ],
     "defaults": {
       "videoSourceType": "upload",
       "caption": "",
       "disableNotification": false,
       "protectContent": false,
-      "recipients": { "sendToSender": true, "additionalIds": [] },
-      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      },
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": []
+      }
     }
   },
   {
@@ -214,7 +319,9 @@
     "descriptionFallback": "Foydalanuvchiga audio fayl yuboradi.",
     "iconName": "music",
     "colorToken": "action-pink",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
@@ -222,14 +329,27 @@
       "elementType": "audio"
     },
     "handles": [
-      { "preset": "target-default" },
-      { "preset": "selected-message-target" },
-      { "preset": "source-default" }
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
     ],
-    "content": [{ "type": "mediaMessage", "mediaKind": "audio" }],
+    "content": [
+      {
+        "type": "mediaMessage",
+        "mediaKind": "audio"
+      }
+    ],
     "footer": [
-      { "type": "actionPanel", "hideHandlers": true },
-      { "type": "handlersList" }
+      {
+        "type": "actionPanel",
+        "hideHandlers": true
+      },
+      {
+        "type": "handlersList"
+      }
     ],
     "defaults": {
       "audioSourceType": "upload",
@@ -238,8 +358,15 @@
       "title": "",
       "disableNotification": false,
       "protectContent": false,
-      "recipients": { "sendToSender": true, "additionalIds": [] },
-      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      },
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": []
+      }
     }
   },
   {
@@ -252,7 +379,9 @@
     "descriptionFallback": "Foydalanuvchiga hujjat yoki boshqa turdagi fayl yuboradi.",
     "iconName": "file",
     "colorToken": "action-gray",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
@@ -260,22 +389,42 @@
       "elementType": "file"
     },
     "handles": [
-      { "preset": "target-default" },
-      { "preset": "selected-message-target" },
-      { "preset": "source-default" }
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
     ],
-    "content": [{ "type": "mediaMessage", "mediaKind": "file" }],
+    "content": [
+      {
+        "type": "mediaMessage",
+        "mediaKind": "file"
+      }
+    ],
     "footer": [
-      { "type": "actionPanel", "hideHandlers": true },
-      { "type": "handlersList" }
+      {
+        "type": "actionPanel",
+        "hideHandlers": true
+      },
+      {
+        "type": "handlersList"
+      }
     ],
     "defaults": {
       "fileSourceType": "upload",
       "caption": "",
       "disableNotification": false,
       "protectContent": false,
-      "recipients": { "sendToSender": true, "additionalIds": [] },
-      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      },
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": []
+      }
     }
   },
   {
@@ -288,14 +437,24 @@
     "descriptionFallback": "GIF yoki MP4 animation yuboradi.",
     "iconName": "clapperboard",
     "colorToken": "action-fuchsia",
-    "size": { "width": 150, "height": 150 },
+    "size": {
+      "width": 150,
+      "height": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
       "sortOrder": 60,
       "elementType": "animation"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "description",
@@ -315,14 +474,24 @@
     "descriptionFallback": "Voice message yuboradi.",
     "iconName": "microphone",
     "colorToken": "action-violet",
-    "size": { "width": 150, "height": 150 },
+    "size": {
+      "width": 150,
+      "height": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
       "sortOrder": 70,
       "elementType": "voice"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "description",
@@ -330,7 +499,11 @@
         "textFallback": "Voice message yuboradi."
       }
     ],
-    "footer": [{ "type": "handlersList" }],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "keyboard": {
         "active": "inline",
@@ -359,14 +532,24 @@
     "descriptionFallback": "Dumaloq video xabar yuboradi.",
     "iconName": "video",
     "colorToken": "action-purple",
-    "size": { "width": 150, "height": 150 },
+    "size": {
+      "width": 150,
+      "height": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
       "sortOrder": 80,
       "elementType": "video_note"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "description",
@@ -374,7 +557,11 @@
         "textFallback": "Dumaloq video xabar yuboradi."
       }
     ],
-    "footer": [{ "type": "handlersList" }],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "keyboard": {
         "active": "inline",
@@ -403,33 +590,47 @@
     "descriptionFallback": "Geografik joylashuvni yuboradi.",
     "iconName": "location",
     "colorToken": "action-emerald",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
       "sortOrder": 90,
       "elementType": "location"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "number",
         "key": "latitude",
         "label": "Latitude",
         "placeholder": "41.311151",
-        "step": 0.000001
+        "step": 1e-06
       },
       {
         "type": "number",
         "key": "longitude",
         "label": "Longitude",
         "placeholder": "69.279737",
-        "step": 0.000001
+        "step": 1e-06
       }
     ],
     "footer": [
-      { "type": "actionPanel", "variant": "messageBasic" },
-      { "type": "handlersList" }
+      {
+        "type": "actionPanel",
+        "variant": "messageBasic"
+      },
+      {
+        "type": "handlersList"
+      }
     ],
     "defaults": {
       "keyboard": {
@@ -459,14 +660,23 @@
     "descriptionFallback": "Kontakt ma'lumotlarini yuboradi.",
     "iconName": "contact",
     "colorToken": "action-teal",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
       "sortOrder": 100,
       "elementType": "contact"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "text",
@@ -496,8 +706,13 @@
       }
     ],
     "footer": [
-      { "type": "actionPanel", "variant": "messageBasic" },
-      { "type": "handlersList" }
+      {
+        "type": "actionPanel",
+        "variant": "messageBasic"
+      },
+      {
+        "type": "handlersList"
+      }
     ],
     "defaults": {
       "keyboard": {
@@ -527,18 +742,37 @@
     "descriptionFallback": "So'rovnoma yoki test yaratadi.",
     "iconName": "poll",
     "colorToken": "action-fuchsia",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
       "sortOrder": 110,
       "elementType": "poll"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "widget", "widgetKey": "pollMessage" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "pollMessage"
+      }
+    ],
     "footer": [
-      { "type": "actionPanel", "hideHandlers": true },
-      { "type": "handlersList" }
+      {
+        "type": "actionPanel",
+        "hideHandlers": true
+      },
+      {
+        "type": "handlersList"
+      }
     ],
     "defaults": {
       "question": "",
@@ -546,8 +780,15 @@
       "isAnonymous": true,
       "type": "regular",
       "allowsMultipleAnswers": false,
-      "keyboard": { "active": "inline", "inline": [], "reply": [] },
-      "recipients": { "sendToSender": true, "additionalIds": [] }
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": []
+      },
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      }
     }
   },
   {
@@ -560,22 +801,37 @@
     "descriptionFallback": "Sticker yuboradi.",
     "iconName": "sticker",
     "colorToken": "action-pink",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
       "sortOrder": 120,
       "elementType": "sticker"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "select",
         "key": "stickerSourceType",
         "label": "Sticker manbai",
         "options": [
-          { "value": "file_id", "label": "File ID" },
-          { "value": "url", "label": "URL" }
+          {
+            "value": "file_id",
+            "label": "File ID"
+          },
+          {
+            "value": "url",
+            "label": "URL"
+          }
         ]
       },
       {
@@ -583,14 +839,20 @@
         "key": "stickerFileId",
         "label": "Sticker File ID",
         "placeholder": "CAACAgIAAxkBAAIC...",
-        "visibleWhen": { "key": "stickerSourceType", "equals": "file_id" }
+        "visibleWhen": {
+          "key": "stickerSourceType",
+          "equals": "file_id"
+        }
       },
       {
         "type": "text",
         "key": "stickerUrl",
         "label": "Sticker URL",
         "placeholder": "https://example.com/sticker.webp",
-        "visibleWhen": { "key": "stickerSourceType", "equals": "url" }
+        "visibleWhen": {
+          "key": "stickerSourceType",
+          "equals": "url"
+        }
       }
     ],
     "defaults": {
@@ -607,23 +869,46 @@
     "descriptionFallback": "Bir nechta rasm/video birgalikda yuboradi (2-10 ta).",
     "iconName": "gallery",
     "colorToken": "action-indigo",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
       "sortOrder": 130,
       "elementType": "media_group"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "widget", "widgetKey": "mediaGroup" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "mediaGroup"
+      }
+    ],
     "footer": [
-      { "type": "actionPanel", "hideHandlers": true },
-      { "type": "handlersList" }
+      {
+        "type": "actionPanel",
+        "hideHandlers": true
+      },
+      {
+        "type": "handlersList"
+      }
     ],
     "defaults": {
       "mediaItems": [],
       "disableNotification": false,
-      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": []
+      }
     }
   },
   {
@@ -636,26 +921,54 @@
     "descriptionFallback": "Tasodifiy o'yin (kub, darts, basketbol va h.k.).",
     "iconName": "dice",
     "colorToken": "action-amber",
-    "size": { "width": 150, "height": 150 },
+    "size": {
+      "width": 150,
+      "height": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
       "sortOrder": 140,
       "elementType": "dice"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "select",
         "key": "emoji",
         "label": "O'yin turi",
         "options": [
-          { "value": "🎲", "label": "🎲 Kub (1-6)" },
-          { "value": "🎯", "label": "🎯 Darts (1-6)" },
-          { "value": "🏀", "label": "🏀 Basketbol (1-5)" },
-          { "value": "⚽", "label": "⚽ Futbol (1-5)" },
-          { "value": "🎳", "label": "🎳 Bouling (1-6)" },
-          { "value": "🎰", "label": "🎰 Slot mashina (1-64)" }
+          {
+            "value": "🎲",
+            "label": "🎲 Kub (1-6)"
+          },
+          {
+            "value": "🎯",
+            "label": "🎯 Darts (1-6)"
+          },
+          {
+            "value": "🏀",
+            "label": "🏀 Basketbol (1-5)"
+          },
+          {
+            "value": "⚽",
+            "label": "⚽ Futbol (1-5)"
+          },
+          {
+            "value": "🎳",
+            "label": "🎳 Bouling (1-6)"
+          },
+          {
+            "value": "🎰",
+            "label": "🎰 Slot mashina (1-64)"
+          }
         ],
         "helpText": "Animatsiyali o'yin yuboradi. Natija tasodifiy bo'ladi."
       }
@@ -674,7 +987,9 @@
     "descriptionFallback": "Yuborilgan xabarni tahrirlash.",
     "iconName": "edit",
     "colorToken": "message-op-slate",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
@@ -682,14 +997,30 @@
       "elementType": "edit_message"
     },
     "handles": [
-      { "preset": "target-default" },
-      { "preset": "source-default" },
-      { "preset": "edit-message-source" }
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      },
+      {
+        "preset": "edit-message-source"
+      }
     ],
-    "content": [{ "type": "widget", "widgetKey": "editMessage" }],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "editMessage"
+      }
+    ],
     "footer": [
-      { "type": "actionPanel", "hideHandlers": true },
-      { "type": "handlersList" }
+      {
+        "type": "actionPanel",
+        "hideHandlers": true
+      },
+      {
+        "type": "handlersList"
+      }
     ],
     "defaults": {
       "messageIdSource": "this_message",
@@ -697,7 +1028,11 @@
       "newText": "",
       "newCaption": "",
       "parseMode": "None",
-      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": []
+      }
     }
   },
   {
@@ -710,25 +1045,53 @@
     "descriptionFallback": "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi.",
     "iconName": "edit",
     "colorToken": "message-op-teal",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "actions",
       "sortOrder": 160,
       "elementType": "edit_or_send_message"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "richTextMessage", "key": "messageText", "label": "Xabar matni", "intro": "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "richTextMessage",
+        "key": "messageText",
+        "label": "Xabar matni",
+        "intro": "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi"
+      }
+    ],
     "footer": [
-      { "type": "actionPanel", "hideHandlers": true },
-      { "type": "handlersList" }
+      {
+        "type": "actionPanel",
+        "hideHandlers": true
+      },
+      {
+        "type": "handlersList"
+      }
     ],
     "defaults": {
       "messageText": "",
       "parseMode": "None",
       "disableNotification": false,
-      "recipients": { "sendToSender": true, "additionalIds": [] },
-      "keyboard": { "active": "inline", "inline": [], "reply": [] }
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      },
+      "keyboard": {
+        "active": "inline",
+        "inline": [],
+        "reply": []
+      }
     }
   },
   {
@@ -741,14 +1104,24 @@
     "descriptionFallback": "Xabarni boshqa chatga yoki guruhga uzatadi.",
     "iconName": "forward",
     "colorToken": "message-op-slate-light",
-    "size": { "width": 150, "height": 150 },
+    "size": {
+      "width": 150,
+      "height": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "messageOperations",
       "sortOrder": 10,
       "elementType": "forward_message"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "stringArray",
@@ -759,7 +1132,9 @@
       }
     ],
     "defaults": {
-      "recipientIds": [""]
+      "recipientIds": [
+        ""
+      ]
     }
   },
   {
@@ -772,14 +1147,24 @@
     "descriptionFallback": "Xabarni admin'ga yuboradi.",
     "iconName": "admin",
     "colorToken": "message-op-red",
-    "size": { "width": 150, "height": 150 },
+    "size": {
+      "width": 150,
+      "height": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "messageOperations",
       "sortOrder": 20,
       "elementType": "send_to_admin"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "description",
@@ -799,14 +1184,24 @@
     "descriptionFallback": "Xabarni nusxalab yuboradi.",
     "iconName": "copy",
     "colorToken": "message-op-slate",
-    "size": { "width": 150, "height": 150 },
+    "size": {
+      "width": 150,
+      "height": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "messageOperations",
       "sortOrder": 30,
       "elementType": "copy_message"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "description",
@@ -814,7 +1209,11 @@
         "textFallback": "Xabarni nusxalab yuboradi."
       }
     ],
-    "footer": [{ "type": "handlersList" }],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "keyboard": {
         "active": "inline",
@@ -839,14 +1238,24 @@
     "descriptionFallback": "Xabarni guruhda qadab qo'yadi.",
     "iconName": "pin",
     "colorToken": "message-op-slate",
-    "size": { "width": 150, "height": 150 },
+    "size": {
+      "width": 150,
+      "height": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "messageOperations",
       "sortOrder": 40,
       "elementType": "pin_message"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "description",
@@ -854,7 +1263,11 @@
         "textFallback": "Xabarni guruhda qadab qo'yadi."
       }
     ],
-    "footer": [{ "type": "handlersList" }],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "keyboard": {
         "active": "inline",
@@ -879,14 +1292,23 @@
     "descriptionFallback": "Qadangan xabarni olib tashlaydi.",
     "iconName": "unpin",
     "colorToken": "message-op-slate",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "messageOperations",
       "sortOrder": 50,
       "elementType": "unpin_message"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "switch",
@@ -898,7 +1320,10 @@
         "key": "messageId",
         "label": "Xabar ID (ixtiyoriy)",
         "placeholder": "Oxirgi qadalgan xabar",
-        "visibleWhen": { "key": "unpinAll", "notEquals": true },
+        "visibleWhen": {
+          "key": "unpinAll",
+          "notEquals": true
+        },
         "helpText": "Bo'sh qoldirilsa, oxirgi qadalgan xabar olib tashlanadi"
       }
     ],
@@ -916,7 +1341,9 @@
     "descriptionFallback": "Xabarni o'chiradi.",
     "iconName": "trash",
     "colorToken": "message-op-red",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "messageOperations",
@@ -924,9 +1351,15 @@
       "elementType": "delete_message"
     },
     "handles": [
-      { "preset": "target-default" },
-      { "preset": "source-default" },
-      { "preset": "delete-message-source" }
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      },
+      {
+        "preset": "delete-message-source"
+      }
     ],
     "content": [
       {
@@ -937,7 +1370,10 @@
       {
         "type": "description",
         "textFallback": "O'chiriladigan xabarni delete-message-source edge orqali ulang.",
-        "visibleWhen": { "key": "deleteFromContext", "equals": false }
+        "visibleWhen": {
+          "key": "deleteFromContext",
+          "equals": false
+        }
       }
     ],
     "defaults": {
@@ -954,28 +1390,62 @@
     "descriptionFallback": "Typing yoki upload ko'rsatkichini ko'rsatadi.",
     "iconName": "typing",
     "colorToken": "message-op-gray",
-    "size": { "width": 150, "height": 150 },
+    "size": {
+      "width": 150,
+      "height": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "messageOperations",
       "sortOrder": 70,
       "elementType": "chat_action"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "select",
         "key": "action",
         "label": "Harakat turi",
         "options": [
-          { "value": "typing", "label": "Yozmoqda..." },
-          { "value": "upload_photo", "label": "Rasm yuklanmoqda..." },
-          { "value": "upload_video", "label": "Video yuklanmoqda..." },
-          { "value": "upload_voice", "label": "Ovozli xabar yuklanmoqda..." },
-          { "value": "upload_document", "label": "Hujjat yuklanmoqda..." },
-          { "value": "find_location", "label": "Joylashuv aniqlanmoqda..." },
-          { "value": "record_video", "label": "Video yozilmoqda..." },
-          { "value": "record_voice", "label": "Ovoz yozilmoqda..." }
+          {
+            "value": "typing",
+            "label": "Yozmoqda..."
+          },
+          {
+            "value": "upload_photo",
+            "label": "Rasm yuklanmoqda..."
+          },
+          {
+            "value": "upload_video",
+            "label": "Video yuklanmoqda..."
+          },
+          {
+            "value": "upload_voice",
+            "label": "Ovozli xabar yuklanmoqda..."
+          },
+          {
+            "value": "upload_document",
+            "label": "Hujjat yuklanmoqda..."
+          },
+          {
+            "value": "find_location",
+            "label": "Joylashuv aniqlanmoqda..."
+          },
+          {
+            "value": "record_video",
+            "label": "Video yozilmoqda..."
+          },
+          {
+            "value": "record_voice",
+            "label": "Ovoz yozilmoqda..."
+          }
         ],
         "helpText": "Bot hozir nimalar bilan band ekanligini ko'rsatadi (5 soniya davom etadi)"
       }
@@ -994,16 +1464,34 @@
     "descriptionFallback": "Faylni yuklab oladi va saqlaydi.",
     "iconName": "download",
     "colorToken": "message-op-indigo",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "messageOperations",
       "sortOrder": 80,
       "elementType": "file"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "widget", "widgetKey": "downloadFile" }],
-    "footer": [{ "type": "handlersList" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "downloadFile"
+      }
+    ],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "messageType": ""
     }
@@ -1018,15 +1506,29 @@
     "descriptionFallback": "Murakkab amallar va shartlar uchun kod yozish imkonini beradi.",
     "iconName": "code",
     "colorToken": "custom-yellow",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "customLogic",
       "sortOrder": 10,
       "elementType": "code"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "dynamic-outputs-sources" }],
-    "content": [{ "type": "widget", "widgetKey": "customCode" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "dynamic-outputs-sources"
+      }
+    ],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "customCode"
+      }
+    ],
     "defaults": {
       "nodeTitle": "Custom Code",
       "jsCode": "// Your code here",
@@ -1045,15 +1547,29 @@
     "descriptionFallback": "Foydalanuvchidan ma'lumotlarni yig'ib borish uchun.",
     "iconName": "database",
     "colorToken": "custom-yellow",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "customLogic",
       "sortOrder": 20,
       "elementType": "state"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "widget", "widgetKey": "stateNode" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "stateNode"
+      }
+    ],
     "defaults": {
       "key": "state_key",
       "type": "user_id"
@@ -1069,7 +1585,9 @@
     "descriptionFallback": "Collectionga ma'lumotlar qo'shish.",
     "iconName": "collection",
     "colorToken": "custom-yellow",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "customLogic",
@@ -1077,11 +1595,18 @@
       "elementType": "collection"
     },
     "handles": [
-      { "preset": "target-default" },
-      { "preset": "source-default" }
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
     ],
     "content": [
-      { "type": "widget", "widgetKey": "collectionNode" }
+      {
+        "type": "widget",
+        "widgetKey": "collectionNode"
+      }
     ],
     "defaults": {
       "collection_name": "",
@@ -1098,7 +1623,9 @@
     "descriptionFallback": "Foydalanuvchidan kelgan ma'lumot yuklab olish.",
     "iconName": "download",
     "colorToken": "message-op-indigo",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "customLogic",
@@ -1106,24 +1633,29 @@
       "elementType": "load_collection_item"
     },
     "handles": [
-      { "preset": "target-default" },
+      {
+        "preset": "target-default"
+      },
       {
         "kind": "source",
         "side": "right",
         "id": "not_found",
-        "offsetClass": "translate-y-[-75%]",
+        "offsetClass": "translate-y-[-200%]",
         "styleVariant": "danger"
       },
       {
         "kind": "source",
         "side": "right",
         "id": "found",
-        "offsetClass": "translate-y-[75%]",
+        "offsetClass": "translate-y-[200%]",
         "styleVariant": "accent"
       }
     ],
     "content": [
-      { "type": "widget", "widgetKey": "loadCollectionItem" }
+      {
+        "type": "widget",
+        "widgetKey": "loadCollectionItem"
+      }
     ],
     "defaults": {
       "collection": null,
@@ -1141,7 +1673,9 @@
     "descriptionFallback": "Boshqa oqim yoki plugin ishga tushiradi.",
     "iconName": "plugin",
     "colorToken": "integration-indigo",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": false,
       "groupId": "integrations",
@@ -1150,11 +1684,18 @@
     },
     "titleTemplate": "{{pluginName}}",
     "handles": [
-      { "preset": "target-default" },
-      { "preset": "subflow-dynamic-sources" }
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "subflow-dynamic-sources"
+      }
     ],
     "content": [
-      { "type": "widget", "widgetKey": "subFlow" }
+      {
+        "type": "widget",
+        "widgetKey": "subFlow"
+      }
     ],
     "defaults": {
       "slug": "",
@@ -1175,7 +1716,9 @@
     "descriptionFallback": "Subflow tugagandan keyin chiqish nuqtasi.",
     "iconName": "door",
     "colorToken": "integration-indigo",
-    "size": { "width": 288 },
+    "size": {
+      "width": 288
+    },
     "sidebar": {
       "enabled": false,
       "groupId": "integrations",
@@ -1183,7 +1726,11 @@
       "elementType": "subflow_exit"
     },
     "titleTemplate": "Chiqish: {{exitName}}",
-    "handles": [{ "preset": "target-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      }
+    ],
     "content": [
       {
         "type": "text",
@@ -1207,7 +1754,9 @@
     "descriptionFallback": "Shartni tekshiradi va TRUE/FALSE/NEXT yo'nalishlarga ajratadi.",
     "iconName": "split",
     "colorToken": "flow-violet",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "flowControl",
@@ -1236,7 +1785,12 @@
         "styleVariant": "success"
       }
     ],
-    "content": [{ "type": "widget", "widgetKey": "ifCondition" }],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "ifCondition"
+      }
+    ],
     "defaults": {
       "operator": "AND",
       "conditions": []
@@ -1252,7 +1806,9 @@
     "descriptionFallback": "If dan keyin qo'shimcha shart tekshiradi.",
     "iconName": "repeat",
     "colorToken": "flow-indigo",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "flowControl",
@@ -1281,7 +1837,12 @@
         "styleVariant": "danger"
       }
     ],
-    "content": [{ "type": "widget", "widgetKey": "elseIf" }],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "elseIf"
+      }
+    ],
     "defaults": {
       "operator": "AND",
       "conditions": []
@@ -1297,7 +1858,9 @@
     "descriptionFallback": "Boshqa shartlar bajarilmasa ishga tushadi.",
     "iconName": "arrow-right",
     "colorToken": "flow-purple",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "flowControl",
@@ -1318,7 +1881,12 @@
         "styleVariant": "accent"
       }
     ],
-    "content": [{ "type": "description", "textFallback": "If yoki Else If shartlari bajarilmasa, bu yo'nalish ishga tushadi." }],
+    "content": [
+      {
+        "type": "description",
+        "textFallback": "If yoki Else If shartlari bajarilmasa, bu yo'nalish ishga tushadi."
+      }
+    ],
     "defaults": {}
   },
   {
@@ -1331,14 +1899,24 @@
     "descriptionFallback": "Belgilangan vaqt kutadi.",
     "iconName": "timer",
     "colorToken": "flow-amber",
-    "size": { "width": 150, "height": 150 },
+    "size": {
+      "width": 150,
+      "height": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "flowControl",
       "sortOrder": 40,
       "elementType": "delay"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "number",
@@ -1364,14 +1942,23 @@
     "descriptionFallback": "Tasodifiy yo'lni tanlaydi.",
     "iconName": "dice",
     "colorToken": "flow-yellow",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "flowControl",
       "sortOrder": 50,
       "elementType": "random"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "widget",
@@ -1403,28 +1990,61 @@
     "descriptionFallback": "O'zgaruvchilarni boshqaradi.",
     "iconName": "variable",
     "colorToken": "flow-yellow",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "flowControl",
       "sortOrder": 60,
       "elementType": "variable"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "select",
         "key": "operation",
         "label": "Operatsiya",
         "options": [
-          { "value": "set", "label": "Set (o'rnatish)" },
-          { "value": "increment", "label": "Increment (+)" },
-          { "value": "decrement", "label": "Decrement (-)" },
-          { "value": "append", "label": "Append (qo'shish)" },
-          { "value": "remove", "label": "Remove (olib tashlash)" },
-          { "value": "delete", "label": "Delete (o'chirish)" },
-          { "value": "toggle", "label": "Toggle (almashtirish)" },
-          { "value": "parse_json", "label": "Parse JSON" }
+          {
+            "value": "set",
+            "label": "Set (o'rnatish)"
+          },
+          {
+            "value": "increment",
+            "label": "Increment (+)"
+          },
+          {
+            "value": "decrement",
+            "label": "Decrement (-)"
+          },
+          {
+            "value": "append",
+            "label": "Append (qo'shish)"
+          },
+          {
+            "value": "remove",
+            "label": "Remove (olib tashlash)"
+          },
+          {
+            "value": "delete",
+            "label": "Delete (o'chirish)"
+          },
+          {
+            "value": "toggle",
+            "label": "Toggle (almashtirish)"
+          },
+          {
+            "value": "parse_json",
+            "label": "Parse JSON"
+          }
         ]
       },
       {
@@ -1438,7 +2058,10 @@
         "key": "value",
         "label": "Qiymat",
         "placeholder": "Qiymat kiriting",
-        "visibleWhen": { "key": "operation", "notEquals": "delete" }
+        "visibleWhen": {
+          "key": "operation",
+          "notEquals": "delete"
+        }
       }
     ],
     "defaults": {
@@ -1457,7 +2080,9 @@
     "descriptionFallback": "Foydalanuvchi kanal/guruh a'zosi ekanligini tekshiradi.",
     "iconName": "users",
     "colorToken": "flow-purple",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "flowControl",
@@ -1465,7 +2090,9 @@
       "elementType": "check_membership"
     },
     "handles": [
-      { "preset": "target-default" },
+      {
+        "preset": "target-default"
+      },
       {
         "kind": "source",
         "side": "right",
@@ -1481,7 +2108,12 @@
         "styleVariant": "danger"
       }
     ],
-    "content": [{ "type": "widget", "widgetKey": "checkMembership" }],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "checkMembership"
+      }
+    ],
     "defaults": {
       "channels": [],
       "inputType": "username"
@@ -1497,15 +2129,29 @@
     "descriptionFallback": "Foydalanuvchi ma'lumotlarini forma orqali yig'adi.",
     "iconName": "form",
     "colorToken": "flow-green",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "flowControl",
       "sortOrder": 80,
       "elementType": "form"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "widget", "widgetKey": "formNode" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "formNode"
+      }
+    ],
     "defaults": {
       "items": []
     }
@@ -1520,7 +2166,9 @@
     "descriptionFallback": "Ro'yxat elementlari bo'yicha aylanib chiqadi.",
     "iconName": "loop",
     "colorToken": "flow-green",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "flowControl",
@@ -1528,7 +2176,9 @@
       "elementType": "for_loop"
     },
     "handles": [
-      { "preset": "target-default" },
+      {
+        "preset": "target-default"
+      },
       {
         "kind": "source",
         "side": "right",
@@ -1573,14 +2223,21 @@
     "descriptionFallback": "Loop iteratsiyasini tugatadi va keyingi elementga o'tadi.",
     "iconName": "corner-up-left",
     "colorToken": "flow-purple",
-    "size": { "width": 150, "height": 150 },
+    "size": {
+      "width": 150,
+      "height": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "flowControl",
       "sortOrder": 100,
       "elementType": "for_loop_continue"
     },
-    "handles": [{ "preset": "target-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      }
+    ],
     "content": [
       {
         "type": "description",
@@ -1600,15 +2257,29 @@
     "descriptionFallback": "Tashqi API'ga so'rov yuboradi.",
     "iconName": "globe",
     "colorToken": "integration-green",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "integrations",
       "sortOrder": 10,
       "elementType": "http_request"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "widget", "widgetKey": "httpRequest" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "httpRequest"
+      }
+    ],
     "defaults": {
       "method": "GET",
       "url": "",
@@ -1629,14 +2300,23 @@
     "descriptionFallback": "Inline tugma bosilganda javob beradi.",
     "iconName": "reply",
     "colorToken": "integration-sky",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "integrations",
       "sortOrder": 20,
       "elementType": "callback_answer"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
     "content": [
       {
         "type": "widget",
@@ -1668,7 +2348,9 @@
     "descriptionFallback": "Inline tugmani bosganda.",
     "iconName": "mouse-pointer",
     "colorToken": "trigger-blue",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "triggers",
@@ -1676,10 +2358,19 @@
       "elementType": "callback_query"
     },
     "handles": [
-      { "preset": "target-default" },
-      { "preset": "source-default" }
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
     ],
-    "content": [{ "type": "widget", "widgetKey": "callbackQueryTrigger" }],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "callbackQueryTrigger"
+      }
+    ],
     "defaults": {
       "filter": "any",
       "global": true,
@@ -1698,15 +2389,29 @@
     "descriptionFallback": "Tugmani bosganda.",
     "iconName": "reply",
     "colorToken": "trigger-blue",
-    "size": { "width": 150 },
+    "size": {
+      "width": 150
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "triggers",
       "sortOrder": 22,
       "elementType": "reply_button"
     },
-    "handles": [{ "preset": "target-default" }, { "preset": "source-default" }],
-    "content": [{ "type": "widget", "widgetKey": "replyButtonTrigger" }],
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "widget",
+        "widgetKey": "replyButtonTrigger"
+      }
+    ],
     "defaults": {
       "selectedButtons": [],
       "global": true,
@@ -1714,7 +2419,6 @@
       "catchNoButton": false
     }
   },
-
   {
     "type": "AIAgentNode",
     "status": "runtime",
@@ -1725,7 +2429,9 @@
     "descriptionFallback": "Runs a tool-calling LLM agent loop.",
     "iconName": "brain-circuit",
     "colorToken": "ai-violet",
-    "size": { "width": 200 },
+    "size": {
+      "width": 200
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "ai",
@@ -1733,9 +2439,15 @@
       "elementType": "ai_agent"
     },
     "handles": [
-      { "preset": "target-default" },
-      { "preset": "source-default" },
-      { "preset": "accessory-ports" }
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      },
+      {
+        "preset": "accessory-ports"
+      }
     ],
     "accessoryPorts": [
       {
@@ -1800,8 +2512,14 @@
         "key": "returnMode",
         "label": "Return Mode",
         "options": [
-          { "value": "text", "label": "Text" },
-          { "value": "json", "label": "JSON" }
+          {
+            "value": "text",
+            "label": "Text"
+          },
+          {
+            "value": "json",
+            "label": "JSON"
+          }
         ]
       },
       {
@@ -1830,27 +2548,34 @@
       "errorOutputKey": "agent_error"
     }
   },
-
   {
     "type": "AIOpenAIProviderNode",
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_model"],
+    "accessoryAttachesTo": [
+      "ai_model"
+    ],
     "titleKey": "constructor.ai.openai.name",
     "descriptionKey": "constructor.ai.openai.description",
     "titleFallback": "OpenAI",
     "descriptionFallback": "OpenAI LLM provider (GPT-4o, etc.).",
     "iconName": "settings-2",
     "colorToken": "ai-indigo",
-    "size": { "width": 180 },
+    "size": {
+      "width": 180
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "ai",
       "sortOrder": 20,
       "elementType": "ai_provider_openai"
     },
-    "handles": [{ "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "source-bottom"
+      }
+    ],
     "content": [
       {
         "type": "text",
@@ -1897,27 +2622,34 @@
       "extraParams": {}
     }
   },
-
   {
     "type": "AIOllamaProviderNode",
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_model"],
+    "accessoryAttachesTo": [
+      "ai_model"
+    ],
     "titleKey": "constructor.ai.ollama.name",
     "descriptionKey": "constructor.ai.ollama.description",
     "titleFallback": "Ollama",
     "descriptionFallback": "Local Ollama LLM provider.",
     "iconName": "settings-2",
     "colorToken": "ai-teal",
-    "size": { "width": 180 },
+    "size": {
+      "width": 180
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "ai",
       "sortOrder": 21,
       "elementType": "ai_provider_ollama"
     },
-    "handles": [{ "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "source-bottom"
+      }
+    ],
     "content": [
       {
         "type": "text",
@@ -1958,27 +2690,34 @@
       "extraParams": {}
     }
   },
-
   {
     "type": "AIGeminiProviderNode",
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_model"],
+    "accessoryAttachesTo": [
+      "ai_model"
+    ],
     "titleKey": "constructor.ai.gemini.name",
     "descriptionKey": "constructor.ai.gemini.description",
     "titleFallback": "Gemini",
     "descriptionFallback": "Google Gemini LLM provider.",
     "iconName": "settings-2",
     "colorToken": "ai-sky",
-    "size": { "width": 180 },
+    "size": {
+      "width": 180
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "ai",
       "sortOrder": 22,
       "elementType": "ai_provider_gemini"
     },
-    "handles": [{ "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "source-bottom"
+      }
+    ],
     "content": [
       {
         "type": "text",
@@ -2025,27 +2764,34 @@
       "extraParams": {}
     }
   },
-
   {
     "type": "AIAnthropicProviderNode",
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_model"],
+    "accessoryAttachesTo": [
+      "ai_model"
+    ],
     "titleKey": "constructor.ai.anthropic.name",
     "descriptionKey": "constructor.ai.anthropic.description",
     "titleFallback": "Anthropic",
     "descriptionFallback": "Anthropic Claude LLM provider.",
     "iconName": "settings-2",
     "colorToken": "ai-rose",
-    "size": { "width": 180 },
+    "size": {
+      "width": 180
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "ai",
       "sortOrder": 23,
       "elementType": "ai_provider_anthropic"
     },
-    "handles": [{ "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "source-bottom"
+      }
+    ],
     "content": [
       {
         "type": "text",
@@ -2092,27 +2838,34 @@
       "extraParams": {}
     }
   },
-
   {
     "type": "AIHTTPToolNode",
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_tool"],
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
     "titleKey": "constructor.ai.httpTool.name",
     "descriptionKey": "constructor.ai.httpTool.description",
     "titleFallback": "HTTP Tool",
     "descriptionFallback": "Lets the agent make HTTP requests.",
     "iconName": "globe",
     "colorToken": "integration-indigo",
-    "size": { "width": 180 },
+    "size": {
+      "width": 180
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "ai",
       "sortOrder": 30,
       "elementType": "ai_tool_http"
     },
-    "handles": [{ "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "source-bottom"
+      }
+    ],
     "content": [
       {
         "type": "text",
@@ -2132,12 +2885,30 @@
         "key": "method",
         "label": "Method",
         "options": [
-          { "value": "GET", "label": "GET" },
-          { "value": "POST", "label": "POST" },
-          { "value": "PUT", "label": "PUT" },
-          { "value": "PATCH", "label": "PATCH" },
-          { "value": "DELETE", "label": "DELETE" },
-          { "value": "{{from_args}}", "label": "From LLM args" }
+          {
+            "value": "GET",
+            "label": "GET"
+          },
+          {
+            "value": "POST",
+            "label": "POST"
+          },
+          {
+            "value": "PUT",
+            "label": "PUT"
+          },
+          {
+            "value": "PATCH",
+            "label": "PATCH"
+          },
+          {
+            "value": "DELETE",
+            "label": "DELETE"
+          },
+          {
+            "value": "{{from_args}}",
+            "label": "From LLM args"
+          }
         ]
       },
       {
@@ -2164,30 +2935,41 @@
       "headers": {},
       "bodyTemplate": "",
       "timeout": 30,
-      "parametersSchema": { "type": "object", "properties": {}, "required": [] }
+      "parametersSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
     }
   },
-
   {
     "type": "AIMongoToolNode",
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_tool"],
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
     "titleKey": "constructor.ai.mongoTool.name",
     "descriptionKey": "constructor.ai.mongoTool.description",
     "titleFallback": "MongoDB Tool",
     "descriptionFallback": "Lets the agent query MongoDB (read-only).",
     "iconName": "database",
     "colorToken": "ai-emerald",
-    "size": { "width": 180 },
+    "size": {
+      "width": 180
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "ai",
       "sortOrder": 31,
       "elementType": "ai_tool_mongo"
     },
-    "handles": [{ "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "source-bottom"
+      }
+    ],
     "content": [
       {
         "type": "text",
@@ -2213,9 +2995,18 @@
         "key": "operation",
         "label": "Operation",
         "options": [
-          { "value": "find", "label": "find" },
-          { "value": "find_one", "label": "find_one" },
-          { "value": "count", "label": "count" }
+          {
+            "value": "find",
+            "label": "find"
+          },
+          {
+            "value": "find_one",
+            "label": "find_one"
+          },
+          {
+            "value": "count",
+            "label": "count"
+          }
         ]
       },
       {
@@ -2235,30 +3026,41 @@
       "operation": "find",
       "filterTemplate": {},
       "limit": 10,
-      "parametersSchema": { "type": "object", "properties": {}, "required": [] }
+      "parametersSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
     }
   },
-
   {
     "type": "AICustomCodeToolNode",
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_tool"],
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
     "titleKey": "constructor.ai.customCodeTool.name",
     "descriptionKey": "constructor.ai.customCodeTool.description",
     "titleFallback": "Custom Code Tool",
     "descriptionFallback": "Lets the agent run custom JavaScript code.",
     "iconName": "code-2",
     "colorToken": "custom-yellow",
-    "size": { "width": 180 },
+    "size": {
+      "width": 180
+    },
     "sidebar": {
       "enabled": true,
       "groupId": "ai",
       "sortOrder": 32,
       "elementType": "ai_tool_custom_code"
     },
-    "handles": [{ "preset": "source-default" }],
+    "handles": [
+      {
+        "preset": "source-bottom"
+      }
+    ],
     "content": [
       {
         "type": "text",
@@ -2286,7 +3088,11 @@
       "toolName": "custom_code",
       "description": "Execute custom JavaScript code and return a result.",
       "jsCode": "// return value becomes the tool result\nreturn args.input;",
-      "parametersSchema": { "type": "object", "properties": {}, "required": [] }
+      "parametersSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
     }
   }
 ]

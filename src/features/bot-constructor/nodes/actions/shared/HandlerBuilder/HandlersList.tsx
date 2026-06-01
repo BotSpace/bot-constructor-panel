@@ -167,13 +167,18 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
           <div className="flex flex-wrap flex-col gap-2 mb-3 pb-3 border-b">
             {(() => {
               const seenText = new Set<string>();
-              return keyboard[keyboard.active].flat().map((button) => {
-                const isFirstOccurrence = !seenText.has(button.text);
-                if (isFirstOccurrence) seenText.add(button.text);
-                return { button, isFirstOccurrence };
+              return keyboard[keyboard.active].flat().map((button: any) => {
+                const label: string =
+                  button.text ||
+                  (button.collectionData?.collection
+                    ? button.collectionData.collection
+                    : "");
+                const isFirstOccurrence = !seenText.has(label);
+                if (isFirstOccurrence) seenText.add(label);
+                return { button, label, isFirstOccurrence };
               });
-            })().map(({ button, isFirstOccurrence }) => {
-              const handleId = `target-handler-${sourceNodeId}-${button.text}`;
+            })().map(({ button, label, isFirstOccurrence }: { button: any; label: string; isFirstOccurrence: boolean }) => {
+              const handleId = `target-handler-${sourceNodeId}-${label}`;
               const pos = getHandlePosition(handleId);
               return (
                 <Button
@@ -181,14 +186,14 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                   variant="outline"
                   className="text-xs px-2 py-1 relative"
                 >
-                  {button.text}
+                  {label}
                   {!inPanel && isFirstOccurrence && (
                     <PillHandle
                       id={handleId}
                       type="source"
                       position={pos}
                       tone="primary"
-                      title={button.text}
+                      title={label}
                     />
                   )}
                 </Button>
