@@ -33,6 +33,7 @@ function FloatingEdge({
     sourcePosition,
     targetPosition,
     sourceHandleId,
+    targetHandleId,
     markerEnd,
     style = {},
     selected,
@@ -117,13 +118,16 @@ function FloatingEdge({
     // Marker color also changes when selected
     const markerColor = selected ? selectedStroke : edgeColor;
 
+    // Accessory edges (sub-node → AI Agent acc: port) must not render an arrowhead
+    const isAccessoryEdge = typeof targetHandleId === "string" && targetHandleId.startsWith("acc:");
+
     // Get label from handle ID
     const handleLabel = sourceHandleId?.replace(/[-_]/g, " ").toUpperCase();
 
     return (
         <>
-            {/* Arrow marker */}
-            {markerEnd && (
+            {/* Arrow marker — suppressed for accessory edges (acc: targetHandle) */}
+            {markerEnd && !isAccessoryEdge && (
                 <marker
                     id={`arrowhead-${id}`}
                     viewBox="0 0 10 10"
@@ -155,7 +159,7 @@ function FloatingEdge({
             <BaseEdge
                 id={id}
                 path={edgePath}
-                markerEnd={markerEnd ? `url(#arrowhead-${id})` : undefined}
+                markerEnd={markerEnd && !isAccessoryEdge ? `url(#arrowhead-${id})` : undefined}
                 style={{
                     ...style,
                     ...dynamicStyle,
