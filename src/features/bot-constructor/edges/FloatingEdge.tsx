@@ -33,6 +33,7 @@ function FloatingEdge({
     sourcePosition,
     targetPosition,
     sourceHandleId,
+    targetHandleId,
     markerEnd,
     style = {},
     selected,
@@ -43,7 +44,7 @@ function FloatingEdge({
 
     // Find target node for entry-side selection and label
     const targetNode = nodes.find((node) => node.id === target);
-    
+
     // Get target node name for label
     const targetNodeTitle = (targetNode?.data as any)?.title || targetNode?.type?.replace('Node', '') || 'Node';
 
@@ -53,14 +54,21 @@ function FloatingEdge({
     // override them with the node-body edge – that caused edges to detach from
     // the "+" marker visually.
     //
-    // We still pick the best entry side for the TARGET so that the bezier curve
-    // enters the target node from the closest face.
+    // For accessory edges (targetHandleId starts with "acc:"), React Flow already
+    // measured the exact port handle position — use targetX/targetY directly so
+    // the edge terminates at the specific Model/Tools port rather than a
+    // floating face-centre on the AI Agent node.
+    //
+    // For all other edges we still pick the best entry side (closest face) for a
+    // clean floating connection.
     let dynSourcePos = sourcePosition;
     let dynTargetPos = targetPosition;
     let dynTargetX = targetX;
     let dynTargetY = targetY;
 
-    if (targetNode) {
+    const isAccessoryEdge = typeof targetHandleId === "string" && targetHandleId.startsWith("acc:");
+
+    if (!isAccessoryEdge && targetNode) {
         const targetWidth = targetNode.width || 150;
         const targetHeight = targetNode.height || 100;
         const targetCenterX = targetNode.position.x + targetWidth / 2;
