@@ -12,6 +12,7 @@ import { ModalNodeFormRenderer } from "@/features/bot-constructor/components/Nod
 import { NodeOverviewPanel } from "@/features/bot-constructor/components/NodeEditPanel/NodeOverviewPanel";
 import { NodeVariablePanel } from "@/features/bot-constructor/components/NodeEditPanel/NodeVariablePanel";
 import { VariableInsertionProvider } from "@/features/bot-constructor/components/NodeEditPanel/variable-insertion";
+import { NodePanelProvider } from "@/features/bot-constructor/contexts/NodePanelContext";
 import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry";
 import { SIDEBAR_COLOR_CLASS_REGISTRY } from "@/features/bot-constructor/nodes/registry/colorRegistry";
 import { useFlowStore } from "@/features/bot-constructor/store";
@@ -70,6 +71,7 @@ export function NodeEditDialog() {
           "!max-w-none gap-0 overflow-hidden border-white/10 bg-[#141414] p-0 text-white shadow-2xl"
         )}
       >
+        <NodePanelProvider>
         <VariableInsertionProvider className="flex h-full min-h-0 flex-col">
           <DialogHeader className="shrink-0 border-b border-white/10 bg-[#171717] px-5 py-4">
             <div className="flex items-center gap-3">
@@ -137,6 +139,7 @@ export function NodeEditDialog() {
             <NodeVariablePanel stateKeys={stateKeys} />
           </div>
         </VariableInsertionProvider>
+        </NodePanelProvider>
       </DialogContent>
     </Dialog>
   );
