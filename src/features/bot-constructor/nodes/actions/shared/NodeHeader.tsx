@@ -12,6 +12,13 @@ interface NodeHeaderProps {
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
   color?: string;
+  /**
+   * Optional handle slot rendered inside the header container.
+   * Use this to anchor the main source handle to the header's vertical
+   * midpoint so it does not drift toward the card centre when the card
+   * is taller than the header (e.g. nodes with handler-button rows below).
+   */
+  handleSlot?: ReactNode;
 }
 
 export const NodeHeader = ({
@@ -21,6 +28,7 @@ export const NodeHeader = ({
   isCollapsed = false,
   onToggleCollapse,
   color = "bg-zinc-600",
+  handleSlot,
 }: NodeHeaderProps) => {
   const inPanel = useIsInNodePanel();
   if (inPanel) return null;
@@ -31,6 +39,9 @@ export const NodeHeader = ({
       className="relative flex flex-col items-center justify-center gap-3 px-4 py-6 cursor-pointer select-none hover:bg-muted/40 transition-colors rounded-t-[inherit]"
       role="button"
     >
+      {/* Handle anchored to this header container so React Flow measures
+          it relative to the header midpoint, not the full card centre. */}
+      {handleSlot}
       {/* Katta Markazlashgan Icon */}
       <div
         className={cn(
