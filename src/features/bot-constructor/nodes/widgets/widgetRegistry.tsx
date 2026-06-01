@@ -40,7 +40,6 @@ import { CodeEditorDialog } from "@/features/bot-constructor/nodes/custom/Custom
 import AddItemModal from "@/features/bot-constructor/nodes/custom/FormNode/components/add-item-modal";
 import { FormItem } from "@/features/bot-constructor/nodes/custom/FormNode/components/form-item";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
-import { APIDetailCreateResponse, APIListResponse } from "@/types/http/response";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
 import { NodeFieldManifest } from "@/features/bot-constructor/nodes/registry/types";
 import {
@@ -1460,19 +1459,12 @@ function CollectionWidget({ nodeId, data }: WidgetProps) {
       ? (data.fieldMappings as Record<string, string>)
       : {};
 
-  const { data: collections } = useReactQueryAction<
-    APIListResponse<CollectionListItem[]>
-  >({
-    url: "collection/?project=[id]",
-    enabled: true,
-  });
+  const { data: collections } = useCollectionStore();
 
-  const { data: collectionDetail } = useReactQueryAction<
-    APIDetailCreateResponse<CollectionDetail>
-  >({
+  const { data: collectionDetail } = useReactQueryAction<CollectionDetail>({
     url:
       typeof data.collection_name === "string" && data.collection_name
-        ? `collection/${data.collection_name}/?project=[id]`
+        ? `cms/projects/[id]/collections/${data.collection_name}/`
         : undefined,
     enabled: Boolean(data.collection_name),
   });
@@ -1483,7 +1475,7 @@ function CollectionWidget({ nodeId, data }: WidgetProps) {
   );
 
   useEffect(() => {
-    const fields = collectionDetail?.data?.fields;
+    const fields = collectionDetail?.fields;
     if (!data.collection_name || !fields) return;
 
     const nextMappings: Record<string, string> = {};
@@ -1501,7 +1493,7 @@ function CollectionWidget({ nodeId, data }: WidgetProps) {
       updateNodeData(nodeId, { fieldMappings: nextMappings });
     }
   }, [
-    collectionDetail?.data?.fields,
+    collectionDetail?.fields,
     data.collection_name,
     fieldMappings,
     nodeId,
@@ -1533,7 +1525,7 @@ function CollectionWidget({ nodeId, data }: WidgetProps) {
             <SelectValue placeholder="Collection tanlang" />
           </SelectTrigger>
           <SelectContent>
-            {collections?.data.results.map((collection) => (
+            {collections?.map((collection) => (
               <SelectItem key={collection.id} value={collection.name}>
                 {collection.name}
               </SelectItem>
@@ -1542,13 +1534,13 @@ function CollectionWidget({ nodeId, data }: WidgetProps) {
         </Select>
       </div>
 
-      {collectionDetail?.data?.fields?.length ? (
+      {collectionDetail?.fields?.length ? (
         <div className="space-y-3">
           <Label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
             <Key className="h-3 w-3" />
             Field Mappings
           </Label>
-          {collectionDetail.data.fields.map((field) => {
+          {collectionDetail.fields.map((field) => {
             const mappedStateKey = fieldMappings[field.name];
             const usesAvailableKey =
               mappedStateKey && availableStateKeys.includes(mappedStateKey);
@@ -1562,7 +1554,7 @@ function CollectionWidget({ nodeId, data }: WidgetProps) {
                         {field.name}
                       </Badge>
                       <Badge variant="outline" className="text-xs text-muted-foreground">
-                        {field.type}
+                        {field.kind}
                       </Badge>
                       {field.required ? (
                         <Badge variant="outline" className="text-xs text-red-400">
@@ -1627,11 +1619,9 @@ function LoadCollectionItemWidget({ nodeId, data }: WidgetProps) {
       ? (data.collection as { name?: string })
       : null;
 
-  const { data: fields } = useReactQueryAction<
-    APIDetailCreateResponse<CollectionDetail>
-  >({
+  const { data: fields } = useReactQueryAction<CollectionDetail>({
     url: selectedCollection?.name
-      ? `collection/${selectedCollection.name}/?project=[id]`
+      ? `cms/projects/[id]/collections/${selectedCollection.name}/`
       : undefined,
     enabled: Boolean(selectedCollection?.name),
   });
@@ -1682,16 +1672,16 @@ function LoadCollectionItemWidget({ nodeId, data }: WidgetProps) {
         </p>
       </div>
 
-      {selectedCollection && fields ? (
+      {selectedCollection && fields?.fields ? (
         <div className="space-y-2">
           <Label>Filters</Label>
           <FilterBuilder
             fields={[
               { id: "_id", label: "id", type: "text" as const },
-              ...fields.data.fields.map((field) => ({
+              ...fields.fields.map((field) => ({
                 id: field.name,
-                label: field.name,
-                type: field.type,
+                label: field.label || field.name,
+                type: field.kind as any,
               })),
             ]}
             filters={Array.isArray(data.filters) ? data.filters : []}
@@ -1701,11 +1691,11 @@ function LoadCollectionItemWidget({ nodeId, data }: WidgetProps) {
         </div>
       ) : null}
 
-      {selectedCollection && fields ? (
+      {selectedCollection && fields?.fields ? (
         <div className="space-y-2">
           <Label className="text-xs">Available Fields</Label>
           <div className="flex flex-wrap gap-1">
-            {fields.data.fields.slice(0, 5).map((field) => (
+            {fields.fields.slice(0, 5).map((field) => (
               <Badge
                 key={field.id}
                 variant="secondary"
@@ -1719,9 +1709,9 @@ function LoadCollectionItemWidget({ nodeId, data }: WidgetProps) {
                 {field.name}
               </Badge>
             ))}
-            {fields.data.fields.length > 5 ? (
+            {fields.fields.length > 5 ? (
               <Badge variant="outline" className="text-[10px]">
-                +{fields.data.fields.length - 5}
+                +{fields.fields.length - 5}
               </Badge>
             ) : null}
           </div>
