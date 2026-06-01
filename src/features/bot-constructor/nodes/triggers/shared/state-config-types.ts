@@ -21,9 +21,13 @@ export type StateType =
   | "latitude"
   | "longitude"
   | "location_latitude"
-  | "location_longitude";
+  | "location_longitude"
+  // Custom — engine reads data.customType when type === "Custom"
+  | "Custom";
 
 export interface StateConfig {
   key: string;
   type: StateType;
+  /** Only used when type === "Custom". Engine reads this as the actual state type. */
+  customType?: string;
 }
