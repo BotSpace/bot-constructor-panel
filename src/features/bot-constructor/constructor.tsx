@@ -513,7 +513,7 @@ export default function Constructor() {
                 stroke: edgeColor,
               }}
               connectionLineComponent={FloatingConnectionLine}
-              connectionMode={ConnectionMode.Strict}
+              connectionMode={ConnectionMode.Loose}
             >
               <Background
                 variant={BackgroundVariant.Dots}
