@@ -125,8 +125,8 @@ function FloatingEdge({
     // Marker color also changes when selected
     const markerColor = selected ? selectedStroke : edgeColor;
 
-    // Accessory edges (sub-node → AI Agent acc: port) must not render an arrowhead
-    const isAccessoryEdge = typeof targetHandleId === "string" && targetHandleId.startsWith("acc:");
+    // isAccessoryEdge is already declared above (acc: target) — reused here to
+    // suppress the arrowhead for accessory edges.
 
     // Get label from handle ID
     const handleLabel = sourceHandleId?.replace(/[-_]/g, " ").toUpperCase();
