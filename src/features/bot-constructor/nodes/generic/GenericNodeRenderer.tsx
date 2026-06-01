@@ -152,12 +152,39 @@ export function GenericNodeRenderer({
     );
   }
 
+  // Nodes that render handler-button rows (handlersList footer) grow the card
+  // vertically below the header.  If the main source handle stays at "top: 50%"
+  // of the card it drifts down into / on-top-of the button handles.  Fix: move
+  // the source-default handle into the NodeHeader slot so React Flow measures it
+  // against the header element (whose own top:50% is the correct midpoint).
+  const hasHandlersList = manifest.footer?.some((f) => f.type === "handlersList") ?? false;
+
+  // Handles that should be lifted into the NodeHeader slot.
+  const headerHandles = hasHandlersList
+    ? manifest.handles?.filter((h) => h.preset === "source-default") ?? []
+    : [];
+
+  // All other handles rendered at the Card level as usual.
+  const cardHandles = hasHandlersList
+    ? manifest.handles?.filter((h) => h.preset !== "source-default") ?? []
+    : (manifest.handles ?? []);
+
+  // Build the JSX for the header slot (null when not needed).
+  const headerHandleSlot =
+    headerHandles.length > 0 ? (
+      <>
+        {headerHandles.map((handle, index) =>
+          renderHandleFromManifest(handle, id, `${manifest.type}-header-${index}`, manifest.accessoryPorts)
+        )}
+      </>
+    ) : undefined;
+
   return (
     <Card
       className={cn("shadow-lg", selected && "ring-2 ring-primary")}
       style={sizeStyle}
     >
-      {manifest.handles?.map((handle, index) =>
+      {cardHandles.map((handle, index) =>
         renderHandleFromManifest(handle, id, `${manifest.type}-${index}`, manifest.accessoryPorts)
       )}
 
@@ -167,6 +194,7 @@ export function GenericNodeRenderer({
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
         color={NODE_COLOR_CLASS_REGISTRY[manifest.colorToken] || "bg-zinc-600"}
+        handleSlot={headerHandleSlot}
       />
 
       {!isCollapsed ? (
