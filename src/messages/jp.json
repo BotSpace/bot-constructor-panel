@@ -448,5 +448,28 @@
     "selectModel": "モデルを選択",
     "yourPrompt": "プロンプト",
     "enterPrompt": "プロンプトをここに入力...（送信は Cmd/Ctrl + Enter）"
+  },
+  "variablePanel": {
+    "title": "利用可能な変数",
+    "subtitle": "クリックまたはドラッグして使用",
+    "emptyTitle": "状態が見つかりません",
+    "emptyDesc": "StateNode を接続するか、トリガーで状態を有効にしてください。",
+    "sectionState": "フロー状態",
+    "sectionGlobal": "グローバル / 自動コンテキスト",
+    "globalVars": {
+      "groupUser": "ユーザー",
+      "groupMessage": "メッセージ",
+      "groupCallback": "コールバック",
+      "user_id": "Telegram ユーザーID",
+      "user_first_name": "ユーザーの名前",
+      "user_username": "ユーザー名 (@handle)",
+      "chat_id": "チャットID",
+      "message_text": "メッセージのテキスト",
+      "message_from_first_name": "名前（メッセージより）",
+      "message_contact_phone": "連絡先の電話番号",
+      "message_location_lat": "位置情報（緯度）",
+      "message_location_lon": "位置情報（経度）",
+      "callback_query_data": "インラインボタンのコールバックデータ"
+    }
   }
 }

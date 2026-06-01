@@ -448,5 +448,28 @@
     "selectModel": "Выбрать модель",
     "yourPrompt": "Ваш запрос",
     "enterPrompt": "Введите ваш запрос здесь... (Cmd/Ctrl + Enter для отправки)"
+  },
+  "variablePanel": {
+    "title": "Доступные переменные",
+    "subtitle": "Нажмите или перетащите для использования",
+    "emptyTitle": "Состояние не найдено",
+    "emptyDesc": "Подключите StateNode или включите состояние в триггере — ключи появятся здесь.",
+    "sectionState": "Состояние потока",
+    "sectionGlobal": "Глобальный / авто контекст",
+    "globalVars": {
+      "groupUser": "Пользователь",
+      "groupMessage": "Сообщение",
+      "groupCallback": "Callback",
+      "user_id": "Telegram ID пользователя",
+      "user_first_name": "Имя пользователя",
+      "user_username": "Username (@handle)",
+      "chat_id": "ID чата",
+      "message_text": "Текст сообщения",
+      "message_from_first_name": "Имя (из сообщения)",
+      "message_contact_phone": "Номер телефона контакта",
+      "message_location_lat": "Широта геолокации",
+      "message_location_lon": "Долгота геолокации",
+      "callback_query_data": "Данные inline-кнопки"
+    }
   }
 }
