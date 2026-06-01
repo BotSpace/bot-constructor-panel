@@ -31,6 +31,7 @@ export const ActionsMessageOperations = pickNodesByCategory("messageOperations")
 export const CustomNodesCodeAndData = pickNodesByCategory("customLogic");
 export const CustomNodesFlowControl = pickNodesByCategory("flowControl");
 export const CustomIntegration = pickNodesByCategory("integrations");
+export const CustomAI = pickNodesByCategory("ai");
 
 export const CustomNodes = {
   ...Triggers,
@@ -39,4 +40,5 @@ export const CustomNodes = {
   ...CustomNodesCodeAndData,
   ...CustomNodesFlowControl,
   ...CustomIntegration,
+  ...CustomAI,
 };
