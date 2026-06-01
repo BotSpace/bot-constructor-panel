@@ -10,7 +10,7 @@ const DEFAULT_NODE_HEIGHT = 150;
 /** Horizontal gap between sibling accessory nodes placed below their parent. */
 const ACCESSORY_HORIZONTAL_GAP = 20;
 /** Vertical distance from the bottom edge of the parent to the top of the accessory node. */
-const ACCESSORY_VERTICAL_OFFSET = 40;
+const ACCESSORY_VERTICAL_OFFSET = 130;
 
 /**
  * Cycle-safe dagre layout.
