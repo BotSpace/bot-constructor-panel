@@ -29,6 +29,7 @@ export interface NodeHandleManifest {
     | "target-default"
     | "source-default"
     | "source-bottom"
+    | "source-top"
     | "else-source"
     | "selected-message-target"
     | "edit-message-source"
