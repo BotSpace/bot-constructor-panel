@@ -249,19 +249,16 @@
         "name": "HTTP",
         "description": "Agentga HTTP so'rovlar yuborishga imkon beradi."
       },
-      "mongoTool": {
-        "name": "MongoDB",
-        "description": "Agentga MongoDB dan o'qishga imkon beradi.",
+      "collectionTool": {
+        "name": "Collection",
+        "description": "Agentga bot kolleksiyasida CRUD amallarini bajarishga imkon beradi.",
         "fields": {
-          "toolName": "Asbob nomi",
-          "description": "Tavsif (LLM uchun)",
           "collection": "Kolleksiya",
+          "operations": "Amallar",
           "searchFields": "Qidiruv maydonlari",
-          "searchFieldsHelp": "Agent qidirishi mumkin bo'lgan maydonlar. Har bir maydon uchun tavsif yozing.",
+          "searchFieldsHelp": "Agent filtrlashi mumkin bo'lgan maydonlar. Har bir maydon uchun tavsif yozing.",
           "fieldName": "Maydon nomi",
           "fieldDescription": "Tavsif",
-          "operation": "Operatsiya",
-          "limit": "Limit",
           "addField": "Maydon qo'shish"
         }
       },
