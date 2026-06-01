@@ -34,11 +34,10 @@ function FloatingEdge({
     targetPosition,
     sourceHandleId,
     targetHandleId,
-    markerEnd,
     style = {},
     selected,
     label,
-}: EdgeProps) {
+}: Omit<EdgeProps, "markerEnd">) {
     const nodes = useNodes();
     const { stroke: edgeColor, selectedStroke } = useEdgeColor(sourceHandleId);
 
@@ -108,33 +107,11 @@ function FloatingEdge({
     // Apply selected style if edge is selected
     const dynamicStyle = selected ? selectedStyle : defaultStyle;
 
-    // Marker color also changes when selected
-    const markerColor = selected ? selectedStroke : edgeColor;
-
-    // isAccessoryEdge is already declared above (acc: target) — reused here to
-    // suppress the arrowhead for accessory edges.
-
     // Get label from handle ID
     const handleLabel = sourceHandleId?.replace(/[-_]/g, " ").toUpperCase();
 
     return (
         <>
-            {/* Arrow marker — suppressed for accessory edges (acc: targetHandle) */}
-            {markerEnd && !isAccessoryEdge && (
-                <marker
-                    id={`arrowhead-${id}`}
-                    viewBox="0 0 10 10"
-                    refX="9"
-                    refY="5"
-                    markerUnits="strokeWidth"
-                    markerWidth="10"
-                    markerHeight="8"
-                    orient="auto-start-reverse"
-                >
-                    <path d="M 0 0 L 10 5 L 0 10 z" fill={markerColor} stroke="none" />
-                </marker>
-            )}
-
             {/* Animated dashed line underneath for flow indication */}
             <path
                 d={edgePath}
@@ -148,11 +125,11 @@ function FloatingEdge({
                 }}
             />
 
-            {/* Main Edge path */}
+            {/* Main Edge path — no arrowhead on any edge type */}
             <BaseEdge
                 id={id}
                 path={edgePath}
-                markerEnd={markerEnd && !isAccessoryEdge ? `url(#arrowhead-${id})` : undefined}
+                markerEnd={undefined}
                 style={{
                     ...style,
                     ...dynamicStyle,
