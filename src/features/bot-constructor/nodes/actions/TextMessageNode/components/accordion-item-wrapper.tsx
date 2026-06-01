@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
 import { FilterBuilder } from "../../shared/filter/filter";
 import { useReactQueryAction } from "@/services/react-query";
-import { APIDetailCreateResponse } from "@/types/http/response";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/types";
@@ -26,10 +25,8 @@ function AccordionItemWrapper({ collection, id, dynamicMessages }: Props) {
     updateNodeData(id, update);
   };
 
-  const { data: fields } = useReactQueryAction<
-    APIDetailCreateResponse<CollectionDetail>
-  >({
-    url: `collection/${collection.name}/?project=[id]`,
+  const { data: fields } = useReactQueryAction<CollectionDetail>({
+    url: `cms/projects/[id]/collections/${collection.name}/`,
   });
 
   // State keys'larni olish (faqat zanjiriga ulangan StateNode va Trigger'lardan)
@@ -39,7 +36,7 @@ function AccordionItemWrapper({ collection, id, dynamicMessages }: Props) {
     return getAvailableStateKeys(nodes, edges, id);
   }, [nodes, edges, id]);
 
-  if (!fields) return <Skeleton className="w-full h-10" />;
+  if (!fields?.fields) return <Skeleton className="w-full h-10" />;
 
   // Collection'ga tegishli dynamic message'ni topish
   const currentMessage = dynamicMessages?.find(
@@ -50,10 +47,10 @@ function AccordionItemWrapper({ collection, id, dynamicMessages }: Props) {
     <>
       <FilterBuilder
         key={`filter-builder-${collection.id}`}
-        fields={fields.data.fields.map((field) => ({
-          id: field.name, // Field nomini id sifatida ishlatish
-          label: field.name,
-          type: field.type,
+        fields={fields.fields.map((field) => ({
+          id: field.name,
+          label: field.label || field.name,
+          type: field.kind as any,
         }))}
         filters={currentMessage?.filters ?? []}
         onChange={(filters) =>
@@ -166,7 +163,7 @@ function AccordionItemWrapper({ collection, id, dynamicMessages }: Props) {
           Available Variables
         </Label>
         <div className="flex flex-wrap gap-2">
-          {fields.data.fields.map((field) => (
+          {fields.fields.map((field) => (
             <Badge
               key={`badge-${field.id}`}
               variant="outline"
