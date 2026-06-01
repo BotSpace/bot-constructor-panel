@@ -88,7 +88,8 @@ function N8nTopBar({
   id: string;
   onAddNode: () => void;
 }) {
-  const { handleClick: backToHome } = useLinkToParent({ href: `/bot/${id}` });
+  const { lang } = useParams<{ lang: string }>();
+  const { handleClick: backToHome } = useLinkToParent({ href: `/${lang}/app/bots/${id}` });
 
   return (
     <div className="h-[62px] shrink-0 flex items-center gap-2 px-3 border-b border-border z-10" style={{ backgroundColor: "#212121" }}>
@@ -141,7 +142,8 @@ function MobileView({
   project: { name: string };
 }) {
   const [envOpen, setEnvOpen] = useState(false);
-  const { handleClick: backToHome } = useLinkToParent({ href: `/bot/${id}` });
+  const { lang } = useParams<{ lang: string }>();
+  const { handleClick: backToHome } = useLinkToParent({ href: `/${lang}/app/bots/${id}` });
 
   return (
     <div
