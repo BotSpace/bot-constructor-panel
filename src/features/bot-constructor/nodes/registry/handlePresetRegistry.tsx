@@ -57,6 +57,10 @@ function GenericHandleRenderer({
     return <SourceHandles nodeId={nodeId} position={Position.Bottom} />;
   }
 
+  if (handle.preset === "source-top") {
+    return <SourceHandles nodeId={nodeId} position={Position.Top} />;
+  }
+
   if (handle.preset === "else-source") {
     return <ElseMessageSource />;
   }
