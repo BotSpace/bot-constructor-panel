@@ -241,19 +241,16 @@
         "name": "HTTP",
         "description": "エージェントがHTTPリクエストを行えるようにします。"
       },
-      "mongoTool": {
-        "name": "MongoDB",
-        "description": "エージェントがMongoDBを読み取れるようにします。",
+      "collectionTool": {
+        "name": "Collection",
+        "description": "エージェントがボットコレクションでCRUD操作を実行できるようにします。",
         "fields": {
-          "toolName": "ツール名",
-          "description": "説明（LLM向け）",
           "collection": "コレクション",
+          "operations": "操作",
           "searchFields": "検索フィールド",
-          "searchFieldsHelp": "エージェントが検索できるフィールド。LLMが理解できるよう説明を追加してください。",
+          "searchFieldsHelp": "エージェントがフィルタリングできるフィールド。LLMが理解できるよう説明を追加してください。",
           "fieldName": "フィールド名",
           "fieldDescription": "説明",
-          "operation": "操作",
-          "limit": "上限",
           "addField": "フィールドを追加"
         }
       },
