@@ -9,7 +9,7 @@ on:
       - '*.md'
 
 env:
-  PROJECT_NAME: botmother-constructor
+  PROJECT_NAME: botspace/botmother-constructor
 
 permissions:
   contents: write
