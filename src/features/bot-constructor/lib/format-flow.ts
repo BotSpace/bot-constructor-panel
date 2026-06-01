@@ -52,6 +52,38 @@ export const getFormatFlow = (
     (e) => accessoryIds.has(e.source) && !accessoryIds.has(e.target)
   );
 
+  // ── Pre-compute accessory footprint per parent ───────────────────────────
+  // Group accessory nodes by their parent id so we can inflate the parent's
+  // effective height fed to dagre.  This prevents following nodes from being
+  // placed inside the space already reserved for accessory children.
+
+  /** Extra vertical space (below the parent's own bottom edge) that its
+   *  accessory subtree will occupy after layout. */
+  const accessoryFootprintByParent = new Map<string, number>();
+  {
+    const byParent = new Map<string, Node[]>();
+    accessoryNodes.forEach((accNode) => {
+      const parentEdge = accessoryEdges.find((e) => e.source === accNode.id);
+      const parentId = parentEdge?.target;
+      if (!parentId) return;
+      if (!byParent.has(parentId)) byParent.set(parentId, []);
+      byParent.get(parentId)!.push(accNode);
+    });
+
+    byParent.forEach((accGroup, parentId) => {
+      // Height of the tallest accessory node in the group (one row of accessories)
+      const maxAccHeight = accGroup.reduce(
+        (m, n) => Math.max(m, n.height ?? DEFAULT_NODE_HEIGHT),
+        0
+      );
+      // Total extra space = gap from parent bottom + one row of accessories
+      accessoryFootprintByParent.set(
+        parentId,
+        ACCESSORY_VERTICAL_OFFSET + maxAccHeight
+      );
+    });
+  }
+
   // ── Dagre layout on normal nodes only ────────────────────────────────────
   const nodeIds = new Set(normalNodes.map((n) => n.id));
 
@@ -103,7 +135,11 @@ export const getFormatFlow = (
 
   normalNodes.forEach((node) => {
     const width = node.width ?? DEFAULT_NODE_WIDTH;
-    const height = node.height ?? DEFAULT_NODE_HEIGHT;
+    const ownHeight = node.height ?? DEFAULT_NODE_HEIGHT;
+    // If this node has accessory children, inflate its effective height so dagre
+    // reserves the vertical space they will occupy below the parent.
+    const footprint = accessoryFootprintByParent.get(node.id) ?? 0;
+    const height = ownHeight + footprint;
     dagreGraph.setNode(node.id, { width, height });
   });
 
@@ -121,7 +157,11 @@ export const getFormatFlow = (
   const layoutedNormalNodes = normalNodes.map((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
     const width = node.width ?? DEFAULT_NODE_WIDTH;
-    const height = node.height ?? DEFAULT_NODE_HEIGHT;
+    const ownHeight = node.height ?? DEFAULT_NODE_HEIGHT;
+    // dagre stored the *inflated* height for this node; its center Y is based on
+    // that inflated bounding box.  We want the visual node to sit at the TOP of
+    // that bounding box so the accessory area is always BELOW the node itself.
+    const inflatedHeight = ownHeight + (accessoryFootprintByParent.get(node.id) ?? 0);
 
     return {
       ...node,
@@ -129,7 +169,9 @@ export const getFormatFlow = (
       sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
       position: {
         x: nodeWithPosition.x - width / 2,
-        y: nodeWithPosition.y - height / 2,
+        // nodeWithPosition.y is the center of the inflated box; shift back to
+        // get the top-left of the VISUAL node (not the inflated box).
+        y: nodeWithPosition.y - inflatedHeight / 2,
       },
     };
   });
