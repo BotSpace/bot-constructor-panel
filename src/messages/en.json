@@ -249,19 +249,16 @@
         "name": "HTTP",
         "description": "Lets the agent make HTTP requests."
       },
-      "mongoTool": {
-        "name": "MongoDB",
-        "description": "Lets the agent query MongoDB (read-only).",
+      "collectionTool": {
+        "name": "Collection",
+        "description": "Lets the agent perform CRUD operations on a bot collection.",
         "fields": {
-          "toolName": "Tool Name",
-          "description": "Description (shown to LLM)",
           "collection": "Collection",
+          "operations": "Operations",
           "searchFields": "Search Fields",
-          "searchFieldsHelp": "Fields the agent can use to search. Add a description so the LLM understands each field.",
+          "searchFieldsHelp": "Fields the agent can use to filter records. Add a description so the LLM understands each field.",
           "fieldName": "Field name",
           "fieldDescription": "Description",
-          "operation": "Operation",
-          "limit": "Limit",
           "addField": "Add field"
         }
       },

@@ -2040,17 +2040,32 @@ function AIAgentAdvancedWidget({ nodeId, data }: WidgetProps) {
   );
 }
 
-function AIMongoToolConfigWidget({ nodeId, data }: WidgetProps) {
+const ALL_CRUD_OPS = ["create", "read", "update", "delete"] as const;
+type CrudOp = (typeof ALL_CRUD_OPS)[number];
+
+function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const { data: collections } = useCollectionStore();
 
   const collection = typeof data.collection === "string" ? data.collection : "";
+  const operations: CrudOp[] = Array.isArray(data.operations)
+    ? (data.operations as CrudOp[])
+    : ["create", "read", "update", "delete"];
   const searchFields = Array.isArray(data.searchFields)
     ? (data.searchFields as { field: string; description: string }[])
     : [];
 
   const handleCollectionChange = (value: string) => {
     updateNodeData(nodeId, { collection: value });
+  };
+
+  const toggleOperation = (op: CrudOp, checked: boolean) => {
+    const next = checked
+      ? [...operations.filter((o) => o !== op), op].sort(
+          (a, b) => ALL_CRUD_OPS.indexOf(a) - ALL_CRUD_OPS.indexOf(b)
+        )
+      : operations.filter((o) => o !== op);
+    updateNodeData(nodeId, { operations: next });
   };
 
   const updateSearchField = (index: number, key: "field" | "description", value: string) => {
@@ -2097,6 +2112,22 @@ function AIMongoToolConfigWidget({ nodeId, data }: WidgetProps) {
         </Select>
       </div>
 
+      <div className="grid gap-1.5">
+        <Label className="text-xs text-muted-foreground">Operations</Label>
+        <div className="flex flex-wrap gap-2">
+          {ALL_CRUD_OPS.map((op) => (
+            <label key={op} className="flex cursor-pointer items-center gap-1.5">
+              <Checkbox
+                checked={operations.includes(op)}
+                onCheckedChange={(checked) => toggleOperation(op, checked === true)}
+                className="h-3.5 w-3.5"
+              />
+              <span className="text-[11px] font-mono">{op}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
       <div className="grid gap-2">
         <div className="flex items-center justify-between">
           <Label className="text-xs text-muted-foreground">Search Fields</Label>
@@ -2111,7 +2142,7 @@ function AIMongoToolConfigWidget({ nodeId, data }: WidgetProps) {
         </div>
         {searchFields.length === 0 ? (
           <p className="text-[10px] text-muted-foreground italic">
-            No search fields defined. The LLM will not know what to query.
+            No search fields defined. The LLM will not know what to filter by.
           </p>
         ) : null}
         {searchFields.map((item, index) => (
@@ -2488,7 +2519,7 @@ const widgetRegistry: Record<string, (props: WidgetProps) => ReactNode> = {
   loadCollectionItem: LoadCollectionItemWidget,
   subFlow: SubFlowWidget,
   aiAgentAdvanced: AIAgentAdvancedWidget,
-  aiMongoToolConfig: AIMongoToolConfigWidget,
+  aiCollectionToolConfig: AICollectionToolConfigWidget,
   aiKnowledgeToolConfig: AIKnowledgeToolConfigWidget,
 };
 

@@ -2467,7 +2467,7 @@
         "labelFallback": "Tools",
         "accepts": [
           "AIHTTPToolNode",
-          "AIMongoToolNode",
+          "AICollectionToolNode",
           "AICustomCodeToolNode",
           "AIKnowledgeToolNode"
         ],
@@ -2934,17 +2934,17 @@
     }
   },
   {
-    "type": "AIMongoToolNode",
+    "type": "AICollectionToolNode",
     "status": "runtime",
     "category": "ai",
     "accessory": true,
     "accessoryAttachesTo": [
       "ai_tool"
     ],
-    "titleKey": "constructor.ai.mongoTool.name",
-    "descriptionKey": "constructor.ai.mongoTool.description",
-    "titleFallback": "MongoDB",
-    "descriptionFallback": "Lets the agent query MongoDB (read-only).",
+    "titleKey": "constructor.ai.collectionTool.name",
+    "descriptionKey": "constructor.ai.collectionTool.description",
+    "titleFallback": "Collection",
+    "descriptionFallback": "Lets the agent perform CRUD operations on a bot collection.",
     "iconName": "database",
     "colorToken": "ai-emerald",
     "size": {
@@ -2954,7 +2954,7 @@
       "enabled": true,
       "groupId": "ai",
       "sortOrder": 31,
-      "elementType": "ai_tool_mongo"
+      "elementType": "ai_tool_collection"
     },
     "handles": [
       {
@@ -2963,63 +2963,16 @@
     ],
     "content": [
       {
-        "type": "text",
-        "key": "toolName",
-        "labelKey": "constructor.ai.mongoTool.fields.toolName",
-        "label": "Tool Name",
-        "placeholder": "mongo_query"
-      },
-      {
-        "type": "textarea",
-        "key": "description",
-        "labelKey": "constructor.ai.mongoTool.fields.description",
-        "label": "Description (shown to LLM)",
-        "placeholder": "Query the database for records.",
-        "rows": 2
-      },
-      {
         "type": "widget",
-        "widgetKey": "aiMongoToolConfig"
-      },
-      {
-        "type": "select",
-        "key": "operation",
-        "labelKey": "constructor.ai.mongoTool.fields.operation",
-        "label": "Operation",
-        "options": [
-          {
-            "value": "find",
-            "label": "find"
-          },
-          {
-            "value": "find_one",
-            "label": "find_one"
-          },
-          {
-            "value": "count",
-            "label": "count"
-          }
-        ]
-      },
-      {
-        "type": "number",
-        "key": "limit",
-        "labelKey": "constructor.ai.mongoTool.fields.limit",
-        "label": "Limit",
-        "min": 1,
-        "max": 100,
-        "step": 1
+        "widgetKey": "aiCollectionToolConfig"
       }
     ],
     "defaults": {
-      "tool": "mongo_query",
-      "toolName": "mongo_query",
-      "description": "Query a MongoDB collection.",
+      "tool": "collection",
+      "toolName": "collection",
       "collection": "",
+      "operations": ["create", "read", "update", "delete"],
       "searchFields": [],
-      "operation": "find",
-      "filterTemplate": {},
-      "limit": 10,
       "parametersSchema": {
         "type": "object",
         "properties": {},
