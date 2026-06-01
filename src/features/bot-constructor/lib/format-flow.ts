@@ -185,14 +185,39 @@ export const getFormatFlow = (
       return;
     }
 
+    // Sort accessory nodes by their connected port order so they are placed
+    // left-to-right matching the port positions rendered on the parent node.
+    // ACC_PORT_LEFT_POSITIONS[2] = ["30%", "70%"], meaning index 0 → left (ai_model),
+    // index 1 → right (ai_tool).  Without this sort, the layout spreads nodes in
+    // insertion order, which causes edges to cross when nodes arrive in the wrong order.
+    const parentManifest = getNodeManifestByType(
+      normalNodes.find((n) => n.id === parentId)?.type ?? ""
+    );
+    const portOrder: string[] = (parentManifest?.accessoryPorts ?? []).map(
+      (p) => `acc:${p.portType}`
+    );
+
+    const sorted = [...accGroup].sort((a, b) => {
+      const edgeA = accessoryEdges.find((e) => e.source === a.id);
+      const edgeB = accessoryEdges.find((e) => e.source === b.id);
+      const handleA = edgeA?.targetHandle ?? "";
+      const handleB = edgeB?.targetHandle ?? "";
+      const idxA = portOrder.indexOf(handleA);
+      const idxB = portOrder.indexOf(handleB);
+      // Unknown handles go to the end
+      const rankA = idxA === -1 ? portOrder.length : idxA;
+      const rankB = idxB === -1 ? portOrder.length : idxB;
+      return rankA - rankB;
+    });
+
     // Total width occupied by the group
-    const totalGroupWidth = accGroup.reduce((sum, n) => sum + (n.width ?? DEFAULT_NODE_WIDTH) + ACCESSORY_HORIZONTAL_GAP, 0) - ACCESSORY_HORIZONTAL_GAP;
+    const totalGroupWidth = sorted.reduce((sum, n) => sum + (n.width ?? DEFAULT_NODE_WIDTH) + ACCESSORY_HORIZONTAL_GAP, 0) - ACCESSORY_HORIZONTAL_GAP;
     const parentCenterX = parent.x + parent.width / 2;
     const startX = parentCenterX - totalGroupWidth / 2;
     const baseY = parent.y + parent.height + ACCESSORY_VERTICAL_OFFSET;
 
     let cursor = startX;
-    accGroup.forEach((accNode) => {
+    sorted.forEach((accNode) => {
       const w = accNode.width ?? DEFAULT_NODE_WIDTH;
       layoutedAccessoryNodes.push({
         ...accNode,
