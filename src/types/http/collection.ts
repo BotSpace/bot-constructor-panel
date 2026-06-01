@@ -9,17 +9,10 @@ export interface CollectionDetail {
   fields: {
     id: number;
     name: string;
-    type:
-      | "text"
-      | "number"
-      | "bool"
-      | "datetime"
-      | "file"
-      | "audio"
-      | "video"
-      | "photo";
-
+    label?: string;
+    kind: string;
     required: boolean;
     default: any;
+    relation_collection?: number | null;
   }[];
 }

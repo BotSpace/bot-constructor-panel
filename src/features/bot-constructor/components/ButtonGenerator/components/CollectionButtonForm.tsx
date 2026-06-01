@@ -30,7 +30,6 @@ import { Switch } from "@/components/ui/switch";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
 import { useReactQueryAction } from "@/services/react-query";
 import { ButtonConfig } from "../types";
-import { APIDetailCreateResponse } from "@/types/http/response";
 import { CollectionDetail } from "@/types/http/collection";
 import { generateId } from "@/lib/utils";
 import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
@@ -63,11 +62,9 @@ export const CollectionButtonForm = ({
   const [enablePagination, setEnablePagination] = useState(true);
 
   // --- DATA FETCHING ---
-  const { data: collectionFields } = useReactQueryAction<
-    APIDetailCreateResponse<CollectionDetail>
-  >({
+  const { data: collectionFields } = useReactQueryAction<CollectionDetail>({
     url: selectedCollection
-      ? `collection/${selectedCollection}/?project=[id]`
+      ? `cms/projects/[id]/collections/${selectedCollection}/`
       : "",
     enabled: !!selectedCollection,
   });
@@ -148,7 +145,7 @@ export const CollectionButtonForm = ({
           </Select>
         </div>
 
-        {selectedCollection && collectionFields?.data && (
+        {selectedCollection && collectionFields?.fields && (
           <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
             {/* 2. Shablon va Maydonlar */}
             <div className="space-y-3">
@@ -160,7 +157,7 @@ export const CollectionButtonForm = ({
                   Maydonni qo'shish:
                 </p>
                 <div className="flex flex-wrap gap-1.5">
-                  {collectionFields.data.fields.map((f) => (
+                  {collectionFields.fields.map((f) => (
                     <Badge
                       key={f.id}
                       variant="outline"
@@ -203,10 +200,10 @@ export const CollectionButtonForm = ({
                   <FilterBuilder
                     fields={[
                       { id: "_id", label: "ID", type: "text" },
-                      ...collectionFields.data.fields.map((f) => ({
+                      ...collectionFields.fields.map((f) => ({
                         id: f.name,
-                        label: f.name,
-                        type: f.type as any,
+                        label: f.label || f.name,
+                        type: f.kind as any,
                       })),
                     ]}
                     filters={filters}
@@ -292,7 +289,7 @@ export const CollectionButtonForm = ({
           </div>
         )}
 
-        {selectedCollection && !collectionFields && (
+        {selectedCollection && !collectionFields?.fields && (
           <div className="flex items-center justify-center py-10">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
           </div>
