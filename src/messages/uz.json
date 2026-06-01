@@ -457,5 +457,28 @@
     "selectModel": "Model tanlash",
     "yourPrompt": "Sizning so'rovingiz",
     "enterPrompt": "So'rovingizni bu yerga kiriting... (Yuborish uchun Cmd/Ctrl + Enter)"
+  },
+  "variablePanel": {
+    "title": "Mavjud o'zgaruvchilar",
+    "subtitle": "Ishlatish uchun bosing yoki sudrab olib boring",
+    "emptyTitle": "State topilmadi",
+    "emptyDesc": "StateNode ulang yoki triggerda state yoqing — kalitlar shu yerda chiqadi.",
+    "sectionState": "Flow state",
+    "sectionGlobal": "Global / avtomatik kontekst",
+    "globalVars": {
+      "groupUser": "Foydalanuvchi",
+      "groupMessage": "Xabar",
+      "groupCallback": "Callback",
+      "user_id": "Telegram foydalanuvchi ID",
+      "user_first_name": "Foydalanuvchi ismi",
+      "user_username": "Username (@handle)",
+      "chat_id": "Chat ID",
+      "message_text": "Xabar matni",
+      "message_from_first_name": "Ism (xabardan)",
+      "message_contact_phone": "Kontakt telefon raqami",
+      "message_location_lat": "Joylashuv kengligi (lat)",
+      "message_location_lon": "Joylashuv uzunligi (lon)",
+      "callback_query_data": "Inline tugma callback data"
+    }
   }
 }
