@@ -1224,8 +1224,11 @@ function StateWidget({ nodeId, data }: WidgetProps) {
   const dynamicFilterOptions = useMemo(() => getDynamicFilters(triggerNode), [triggerNode]);
   const comboboxOptions = useMemo(
     () => [
-      ...dynamicFilterOptions,
+      // Custom first so it's always visible at the top of the dropdown — it was
+      // appended last (group "Boshqa") and fell below the fold, so users thought
+      // it was missing.
       { value: "Custom", label: "Custom (o'zingiz kiriting)", group: "Boshqa" },
+      ...dynamicFilterOptions,
     ],
     [dynamicFilterOptions]
   );
