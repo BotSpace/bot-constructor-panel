@@ -457,5 +457,28 @@
     "selectModel": "Select Model",
     "yourPrompt": "Your Prompt",
     "enterPrompt": "Enter your prompt here... (Cmd/Ctrl + Enter to submit)"
+  },
+  "variablePanel": {
+    "title": "Available variables",
+    "subtitle": "Click or drag to use",
+    "emptyTitle": "No state found",
+    "emptyDesc": "Connect a StateNode or enable state on a trigger — keys will appear here.",
+    "sectionState": "Flow state",
+    "sectionGlobal": "Global / auto context",
+    "globalVars": {
+      "groupUser": "User",
+      "groupMessage": "Message",
+      "groupCallback": "Callback",
+      "user_id": "Telegram user ID",
+      "user_first_name": "User first name",
+      "user_username": "Username (@handle)",
+      "chat_id": "Chat ID",
+      "message_text": "Text of the message",
+      "message_from_first_name": "First name (from message)",
+      "message_contact_phone": "Contact phone number",
+      "message_location_lat": "Location latitude",
+      "message_location_lon": "Location longitude",
+      "callback_query_data": "Inline button callback data"
+    }
   }
 }
