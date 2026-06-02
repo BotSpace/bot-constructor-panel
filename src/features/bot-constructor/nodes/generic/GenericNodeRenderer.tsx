@@ -13,6 +13,24 @@ import { renderHandleFromManifest } from "../registry/handlePresetRegistry";
 import { FieldWidget, getContentClassName, isFieldVisible } from "../registry/fieldWidgetRegistry";
 import { NodeManifest } from "../registry/types";
 import { NODE_COLOR_CLASS_REGISTRY } from "../registry/colorRegistry";
+import {
+  useDebugStatusStore,
+  type DebugNodeStatus,
+} from "@/features/bot-constructor/store/debug-status";
+
+/** Ring + glow class applied to a node based on its live debug execution status. */
+function debugStatusClass(status: DebugNodeStatus | undefined): string {
+  switch (status) {
+    case "running":
+      return "ring-2 ring-amber-400 shadow-[0_0_0_4px_rgba(251,191,36,0.15)] animate-pulse";
+    case "success":
+      return "ring-2 ring-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.15)]";
+    case "error":
+      return "ring-2 ring-red-500 shadow-[0_0_0_4px_rgba(239,68,68,0.18)]";
+    default:
+      return "";
+  }
+}
 
 // ---------------------------------------------------------------------------
 // AccessoryNodeCard — compact n8n-style pill card for AI provider / tool nodes
@@ -29,6 +47,7 @@ interface AccessoryNodeCardProps {
 function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardProps) {
   const colorClass = NODE_COLOR_CLASS_REGISTRY[manifest.colorToken] || "bg-zinc-600";
   const icon = resolveNodeIcon(manifest.iconName);
+  const debugStatus = useDebugStatusStore((s) => s.statuses[id]);
 
   return (
     <div
@@ -40,6 +59,7 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
         "border border-border/60 bg-card shadow-md",
         "transition-shadow duration-150",
         selected && "ring-2 ring-primary shadow-lg",
+        debugStatusClass(debugStatus),
       )}
       style={{
         width: Math.min(manifest.size.width, 140),
@@ -121,6 +141,7 @@ export function GenericNodeRenderer({
 }: GenericNodeRendererProps) {
   const t = useTranslations();
   const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
+  const debugStatus = useDebugStatusStore((s) => s.statuses[id]);
   const translatedTitle = resolveTranslation(
     t,
     manifest.titleKey,
@@ -181,7 +202,11 @@ export function GenericNodeRenderer({
 
   return (
     <Card
-      className={cn("shadow-lg", selected && "ring-2 ring-primary")}
+      className={cn(
+        "shadow-lg transition-shadow",
+        selected && "ring-2 ring-primary",
+        debugStatusClass(debugStatus)
+      )}
       style={sizeStyle}
     >
       {cardHandles.map((handle, index) =>

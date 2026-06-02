@@ -1,6 +1,7 @@
 "use client";
 
 import useProjectStore from "@/features/bot-constructor/store/project";
+import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
 import { useSession } from "@/lib/session-client";
 import {
   createContext,
@@ -69,6 +70,16 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
           if (project.id === message["data"]["project"])
             changeDebug(message["data"]);
           break;
+        case "node_execution": {
+          const d = message["data"] ?? {};
+          // project may be int (backend) — compare loosely against current project
+          if (String(d.project) === String(project.id) && d.node_id) {
+            useDebugStatusStore
+              .getState()
+              .setNodeStatus(d.node_id, d.status, d.error);
+          }
+          break;
+        }
         default:
           break;
       }
