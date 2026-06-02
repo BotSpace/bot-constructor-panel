@@ -144,23 +144,21 @@ export function ModalNodeFormRenderer({
               field.optional ? (
                 <div
                   key={`${manifest.type}-${fieldKey(field)}-${index}`}
-                  className="flex items-stretch gap-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-200"
+                  className="flex items-center gap-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-200"
                 >
                   {/* Persistent remove control on the left, separated by a divider */}
-                  <div className="flex items-start border-r border-white/10 pr-3 pt-1">
-                    <button
-                      type="button"
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-red-500/10 hover:text-red-400"
-                      title="Maydonni olib tashlash"
-                      onClick={() =>
-                        setAddedOptionalKeys((prev) =>
-                          prev.filter((k) => k !== fieldKey(field))
-                        )
-                      }
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center self-center rounded-md border-r border-white/10 pr-3 text-zinc-500 hover:text-red-400"
+                    title="Maydonni olib tashlash"
+                    onClick={() =>
+                      setAddedOptionalKeys((prev) =>
+                        prev.filter((k) => k !== fieldKey(field))
+                      )
+                    }
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                   <div className="min-w-0 flex-1">
                     <ModalFieldWidget nodeId={nodeId} data={data} field={field} />
                   </div>
