@@ -169,9 +169,11 @@ export const getFormatFlow = (
       sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
       position: {
         x: nodeWithPosition.x - width / 2,
-        // nodeWithPosition.y is the center of the inflated box; shift back to
-        // get the top-left of the VISUAL node (not the inflated box).
-        y: nodeWithPosition.y - inflatedHeight / 2,
+        // Use ownHeight (not inflatedHeight) so the visual node is vertically
+        // centred at the same Y as its dagre peers.  inflatedHeight was only
+        // needed to reserve vertical space for accessory children in the dagre
+        // rank graph — it must not shift the node itself upward.
+        y: nodeWithPosition.y - ownHeight / 2,
       },
     };
   });
