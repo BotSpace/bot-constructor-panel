@@ -47,7 +47,8 @@
         "type": "stateConfig",
         "key": "state",
         "variant": "commandTrigger",
-        "optional": true
+        "optional": true,
+        "label": "Ma'lumotni saqlash"
       }
     ],
     "defaults": {
