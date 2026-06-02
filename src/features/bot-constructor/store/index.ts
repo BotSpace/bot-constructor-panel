@@ -17,6 +17,8 @@ interface EditMessageDataUpdate {
   newCaption?: string;
   parseMode?: ParseMode;
   keyboard?: KeyboardConfig;
+  rows?: unknown;
+  keyboard_kind?: string;
   dynamicMessages?: DynamicMessage[];
 }
 
@@ -227,6 +229,10 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
             }
             if (messageData.keyboard) {
               dataUpdate.keyboard = structuredClone(messageData.keyboard);
+            }
+            if (messageData.rows) {
+              dataUpdate.rows = structuredClone(messageData.rows);
+              dataUpdate.keyboard_kind = messageData.keyboard_kind ?? "inline";
             }
             if (messageData.dynamicMessages) {
               dataUpdate.dynamicMessages = structuredClone(messageData.dynamicMessages);

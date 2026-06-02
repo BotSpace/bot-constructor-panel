@@ -26,6 +26,7 @@ import { ConditionListField } from "@/features/bot-constructor/nodes/widgets/gen
 import { CronEditorField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CronEditorField";
 import { TriggerConfigField } from "@/features/bot-constructor/nodes/widgets/generic-fields/TriggerConfigField";
 import { DynamicParamsField } from "@/features/bot-constructor/nodes/widgets/generic-fields/DynamicParamsField";
+import { NestedRowsField } from "@/features/bot-constructor/nodes/widgets/generic-fields/NestedRowsField";
 import {
   RichTextMessageField,
   MediaMessageField,
@@ -271,6 +272,16 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
 
   if (field.type === "action-handlers") {
     return <HandlerAdder sourceNodeId={nodeId} />;
+  }
+
+  if (field.type === "nested-rows" && field.key && field.columnFields) {
+    return (
+      <NestedRowsField
+        nodeId={nodeId}
+        data={data}
+        field={field as Parameters<typeof NestedRowsField>[0]["field"]}
+      />
+    );
   }
 
   if (field.type === "action-keyboard") {

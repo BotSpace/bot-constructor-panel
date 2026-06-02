@@ -177,9 +177,80 @@
         "optional": true
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -230,11 +301,8 @@
         "sendToSender": true,
         "additionalIds": []
       },
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": []
-      }
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -275,9 +343,80 @@
         "optional": true
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -307,11 +446,8 @@
         "sendToSender": true,
         "additionalIds": []
       },
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": []
-      }
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -352,9 +488,80 @@
         "optional": true
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -384,11 +591,8 @@
         "sendToSender": true,
         "additionalIds": []
       },
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": []
-      }
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -429,9 +633,80 @@
         "optional": true
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -463,11 +738,8 @@
         "sendToSender": true,
         "additionalIds": []
       },
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": []
-      }
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -508,9 +780,80 @@
         "optional": true
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -540,11 +883,8 @@
         "sendToSender": true,
         "additionalIds": []
       },
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": []
-      }
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -750,9 +1090,80 @@
         "optional": true
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -774,21 +1185,12 @@
     ],
     "footer": [],
     "defaults": {
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": [],
-        "replyOptions": {
-          "remove_after_use": true,
-          "resize_keyboard": true,
-          "one_time_keyboard": false,
-          "is_persistent": false
-        }
-      },
       "recipients": {
         "sendToSender": true,
         "additionalIds": []
-      }
+      },
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -851,9 +1253,80 @@
         "optional": true
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -875,21 +1348,12 @@
     ],
     "footer": [],
     "defaults": {
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": [],
-        "replyOptions": {
-          "remove_after_use": true,
-          "resize_keyboard": true,
-          "one_time_keyboard": false,
-          "is_persistent": false
-        }
-      },
       "recipients": {
         "sendToSender": true,
         "additionalIds": []
-      }
+      },
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -1010,9 +1474,80 @@
         "optional": true
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -1039,15 +1574,12 @@
       "isAnonymous": true,
       "type": "regular",
       "allowsMultipleAnswers": false,
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": []
-      },
       "recipients": {
         "sendToSender": true,
         "additionalIds": []
-      }
+      },
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -1225,9 +1757,80 @@
         ]
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -1251,11 +1854,8 @@
     "defaults": {
       "mediaItems": [],
       "disableNotification": false,
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": []
-      }
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -1390,9 +1990,80 @@
         "label": "Yangi matn"
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -1440,11 +2111,8 @@
       "newText": "",
       "newCaption": "",
       "parseMode": "None",
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": []
-      }
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -1487,9 +2155,80 @@
         "optional": true
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -1539,11 +2278,8 @@
         "sendToSender": true,
         "additionalIds": []
       },
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": []
-      }
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -2426,9 +3162,80 @@
         "textFallback": "Keyboard tugmalari tasodifiy yo'l tanlash uchun ishlatiladi. Har bir tugma alohida chiqish handle'ga ega bo'ladi."
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -2445,17 +3252,8 @@
     ],
     "footer": [],
     "defaults": {
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": [],
-        "replyOptions": {
-          "remove_after_use": true,
-          "resize_keyboard": true,
-          "one_time_keyboard": false,
-          "is_persistent": false
-        }
-      }
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {
@@ -2957,9 +3755,80 @@
         "textFallback": "Inline tugma bosilganda javob xabar yuboradi. Keyboard orqali yangi tugmalar qo'shish mumkin."
       },
       {
-        "type": "action-keyboard",
+        "type": "select",
+        "key": "keyboard_kind",
+        "label": "Klaviatura turi",
+        "variant": "tabs",
+        "optional": true,
+        "options": [
+          {
+            "value": "inline",
+            "label": "Inline"
+          },
+          {
+            "value": "reply",
+            "label": "Reply"
+          }
+        ]
+      },
+      {
+        "type": "nested-rows",
+        "key": "rows",
         "label": "Tugmalar",
-        "optional": true
+        "addRowLabel": "Qator qo'shish",
+        "addColumnLabel": "Tugma qo'shish",
+        "maxColumns": 8,
+        "optional": true,
+        "defaultColumn": {
+          "text": "",
+          "type": "callback",
+          "value": ""
+        },
+        "columnFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Matn",
+            "placeholder": "Tugma matni"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "callback",
+                "label": "Callback"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              },
+              {
+                "value": "reply",
+                "label": "Oddiy (reply)"
+              },
+              {
+                "value": "request_contact",
+                "label": "Kontakt so'rash"
+              },
+              {
+                "value": "request_location",
+                "label": "Lokatsiya so'rash"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Qiymat",
+            "placeholder": "callback data / URL",
+            "visibleWhen": {
+              "key": "type",
+              "notEquals": "request_contact"
+            }
+          }
+        ]
       },
       {
         "type": "checkbox",
@@ -2976,17 +3845,8 @@
     ],
     "footer": [],
     "defaults": {
-      "keyboard": {
-        "active": "inline",
-        "inline": [],
-        "reply": [],
-        "replyOptions": {
-          "remove_after_use": true,
-          "resize_keyboard": true,
-          "one_time_keyboard": false,
-          "is_persistent": false
-        }
-      }
+      "keyboard_kind": "inline",
+      "rows": []
     }
   },
   {

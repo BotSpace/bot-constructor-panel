@@ -91,7 +91,9 @@ export interface NodeFieldManifest {
     // Action panel sub-sections (optional-capable)
     | "action-recipients"
     | "action-keyboard"
-    | "action-handlers";
+    | "action-handlers"
+    // Nested row/column editor (generic; used for keyboards)
+    | "nested-rows";
   key?: string;
   widgetKey?: string;
   label?: string;
@@ -143,6 +145,19 @@ export interface NodeFieldManifest {
   schemaKey?: string;
   paramsKey?: string;
   descriptionKey?: string;
+  // nested-rows
+  addRowLabel?: string;
+  addColumnLabel?: string;
+  maxColumns?: number;
+  defaultColumn?: Record<string, unknown>;
+  columnFields?: {
+    key: string;
+    type: "text" | "select";
+    label?: string;
+    placeholder?: string;
+    options?: NodeFieldOptionManifest[];
+    visibleWhen?: NodeVisibilityRule;
+  }[];
 }
 
 export interface NodeFooterManifest {

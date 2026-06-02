@@ -201,6 +201,41 @@ const normalizeEdge = (edge: Edge): Edge => {
   return { ...edge, type, targetHandle, style };
 };
 
+/**
+ * Migrate a node's legacy keyboard ({active, inline, reply}) to the new
+ * {keyboard_kind, rows:[{columns:[btn]}]} shape consumed by NestedRowsField
+ * and the engine loader shim.  Button objects (incl. collectionData) are
+ * preserved verbatim inside columns.  The legacy `keyboard` key is removed so
+ * the engine doesn't prefer it over `rows`.
+ */
+const migrateNodeKeyboard = (node: Node): Node => {
+  const data = node.data as Record<string, unknown> | undefined;
+  if (!data || typeof data !== "object") return node;
+
+  // Already migrated
+  if (Array.isArray(data.rows) && typeof data.keyboard_kind === "string") {
+    return node;
+  }
+
+  const kb = data.keyboard as
+    | { active?: string; inline?: unknown[]; reply?: unknown[] }
+    | undefined;
+  if (!kb || typeof kb !== "object") return node;
+
+  const kind = kb.active === "reply" ? "reply" : "inline";
+  const arr = Array.isArray(kb[kind]) ? (kb[kind] as unknown[]) : [];
+  const rows = arr.map((row) => ({
+    columns: Array.isArray(row) ? row : [],
+  }));
+
+  const nextData = { ...data };
+  delete nextData.keyboard;
+  nextData.keyboard_kind = kind;
+  nextData.rows = rows;
+
+  return { ...node, data: nextData };
+};
+
 const normalizeFlow = (flow: unknown) => {
   const parsedFlow = parseFlowInput(flow);
   const issues: string[] = [];
@@ -227,7 +262,9 @@ const normalizeFlow = (flow: unknown) => {
     : [];
 
   return {
-    nodes: Array.isArray(flowObject.nodes) ? (flowObject.nodes as Node[]) : [],
+    nodes: Array.isArray(flowObject.nodes)
+      ? (flowObject.nodes as Node[]).map(migrateNodeKeyboard)
+      : [],
     // Normalize every edge on load so legacy flows look identical to new flows
     edges: rawEdges.map(normalizeEdge),
     issues,

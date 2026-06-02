@@ -119,10 +119,31 @@ function StateConfigField({ nodeId, data, field }: FieldWidgetProps) {
   );
 }
 
+// Field types that are only meaningful in the side panel — never rendered on
+// the compact canvas node body.
+const PANEL_ONLY_FIELD_TYPES = new Set([
+  "nested-rows",
+  "action-keyboard",
+  "action-recipients",
+  "action-handlers",
+  "code-editor",
+  "collection-select",
+  "condition-list",
+  "cron-editor",
+  "trigger-config",
+  "dynamic-params",
+  "array-editor",
+  "state-type-select",
+]);
+
 function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const fieldKey = field.key || "";
   const value = data[fieldKey];
+
+  if (PANEL_ONLY_FIELD_TYPES.has(field.type)) {
+    return null;
+  }
 
   if (field.type === "description") {
     return (

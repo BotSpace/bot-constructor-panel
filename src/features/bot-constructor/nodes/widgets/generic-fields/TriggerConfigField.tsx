@@ -26,6 +26,7 @@ import {
 } from "@/features/bot-constructor/nodes/triggers/shared";
 import { StateConfig } from "@/features/bot-constructor/nodes/triggers/shared/state-config-types";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { getNodeKeyboard } from "@/features/bot-constructor/utils/keyboard-compat";
 
 // ---------------------------------------------------------------------------
 // Public interface
@@ -196,12 +197,10 @@ function CallbackQueryTriggerConfig({
     if (!incomingEdge) return [];
 
     const parentNode = nodes.find((node) => node.id === incomingEdge.source);
-    const keyboard = parentNode?.data?.keyboard as
-      | { inline?: unknown[][] }
-      | undefined;
-    if (!Array.isArray(keyboard?.inline)) return [];
+    const inline = getNodeKeyboard(parentNode?.data).inline;
+    if (inline.length === 0) return [];
 
-    return (keyboard.inline as unknown[][]).flat().flatMap<AvailableCallback>((button: unknown) => {
+    return inline.flat().flatMap<AvailableCallback>((button: unknown) => {
       const btn = button as Record<string, unknown>;
 
       if (btn.type === "callback" && btn.value && !btn.collectionData) {
@@ -396,10 +395,8 @@ function ReplyButtonTriggerConfig({
     if (!incomingEdge) return [];
 
     const parentNode = nodes.find((node) => node.id === incomingEdge.source);
-    const reply = (
-      parentNode?.data?.keyboard as { reply?: unknown[][] } | undefined
-    )?.reply;
-    if (!Array.isArray(reply)) return [];
+    const reply = getNodeKeyboard(parentNode?.data).reply;
+    if (reply.length === 0) return [];
 
     return reply
       .flat()
