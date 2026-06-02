@@ -193,6 +193,11 @@ export interface NodeManifest {
   footer?: NodeFooterManifest[];
   defaults?: Record<string, unknown>;
 
+  /** State keys this node ALWAYS produces just by being used (no field needed).
+   *  They appear in the variable panel for the node and its descendants.
+   *  e.g. HTTPRequestNode → ["http_response"]. */
+  producesState?: string[];
+
   /** True = this node is a helper sub-node, never traversed as a flow step.
    *  Drives: no flow target handle, sidebar "ai" styling, drag-validation. */
   accessory?: boolean;

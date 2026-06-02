@@ -21,11 +21,22 @@ import { getNodeManifestByType } from "../nodes/registry/manifestStore";
 function getManifestStateKeys(node: Node): string[] {
   if (!node.type) return [];
   const manifest = getNodeManifestByType(node.type);
-  if (!manifest?.content) return [];
+  if (!manifest) return [];
 
-  const data = (node.data ?? {}) as Record<string, unknown>;
   const keys: string[] = [];
-  for (const field of manifest.content) {
+
+  // Node-level auto state keys: produced just by using the node (no field).
+  if (Array.isArray(manifest.producesState)) {
+    for (const key of manifest.producesState) {
+      if (typeof key === "string" && key.trim() !== "") {
+        keys.push(key);
+      }
+    }
+  }
+
+  // Field-level is_state: the field's current value becomes a state key.
+  const data = (node.data ?? {}) as Record<string, unknown>;
+  for (const field of manifest.content ?? []) {
     if (field.is_state && field.key) {
       const value = data[field.key];
       if (typeof value === "string" && value.trim() !== "") {
@@ -33,6 +44,7 @@ function getManifestStateKeys(node: Node): string[] {
       }
     }
   }
+
   return keys;
 }
 
