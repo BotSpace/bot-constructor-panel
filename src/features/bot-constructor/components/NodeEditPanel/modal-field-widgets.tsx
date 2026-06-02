@@ -32,7 +32,8 @@ import {
   MediaMessageField,
 } from "@/features/bot-constructor/nodes/widgets/shared-message-fields";
 import { RecipientsManager } from "@/features/bot-constructor/nodes/actions/shared/RecipientSelector";
-import { ButtonGenerator, KeyboardConfig } from "@/features/bot-constructor/components";
+import { KeyboardConfig } from "@/features/bot-constructor/components";
+import { InlineKeyboardEditor } from "@/features/bot-constructor/components/ButtonGenerator/InlineKeyboardEditor";
 import { HandlerAdder } from "@/features/bot-constructor/nodes/actions/shared/HandlerBuilder";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { cn } from "@/lib/utils";
@@ -275,7 +276,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
   if (field.type === "action-keyboard") {
     const keyboard = data.keyboard as KeyboardConfig | undefined;
     if (!keyboard) return null;
-    return <ButtonGenerator initialKeyboard={keyboard} node_id={nodeId} />;
+    return <InlineKeyboardEditor initialKeyboard={keyboard} node_id={nodeId} />;
   }
 
   if (field.type === "widget") {
