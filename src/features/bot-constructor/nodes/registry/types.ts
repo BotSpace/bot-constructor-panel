@@ -131,6 +131,7 @@ export interface NodeFieldManifest {
   // cron-editor (key reused)
   // trigger-config
   kind?: "message" | "callback" | "reply";
+  stateOptional?: boolean;
   // dynamic-params
   schemaKey?: string;
   paramsKey?: string;
