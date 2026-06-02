@@ -4537,6 +4537,21 @@
     ],
     "content": [
       {
+        "type": "text",
+        "key": "toolName",
+        "label": "Tool nomi",
+        "placeholder": "masalan: search_products",
+        "helpText": "LLM shu nom bilan tool'ni chaqiradi (snake_case)."
+      },
+      {
+        "type": "textarea",
+        "key": "description",
+        "label": "Tavsif (LLM uchun)",
+        "rows": 3,
+        "placeholder": "Bu tool nima qilishini LLM tushunadigan qilib yozing",
+        "helpText": "LLM qachon va nima uchun bu tool'ni ishlatishni shu tavsifdan biladi."
+      },
+      {
         "type": "widget",
         "widgetKey": "aiCollectionToolConfig"
       }
@@ -4556,7 +4571,8 @@
         "type": "object",
         "properties": {},
         "required": []
-      }
+      },
+      "description": ""
     }
   },
   {
@@ -4651,6 +4667,21 @@
     ],
     "content": [
       {
+        "type": "text",
+        "key": "toolName",
+        "label": "Tool nomi",
+        "placeholder": "masalan: search_products",
+        "helpText": "LLM shu nom bilan tool'ni chaqiradi (snake_case)."
+      },
+      {
+        "type": "textarea",
+        "key": "description",
+        "label": "Tavsif (LLM uchun)",
+        "rows": 3,
+        "placeholder": "Bu tool nima qilishini LLM tushunadigan qilib yozing",
+        "helpText": "LLM qachon va nima uchun bu tool'ni ishlatishni shu tavsifdan biladi."
+      },
+      {
         "type": "widget",
         "widgetKey": "aiKnowledgeToolConfig"
       }
@@ -4666,7 +4697,8 @@
       "embeddingBaseURL": "",
       "vectorDbUrl": "",
       "vectorDbApiKey": "",
-      "topK": 5
+      "topK": 5,
+      "description": ""
     }
   }
 ]
