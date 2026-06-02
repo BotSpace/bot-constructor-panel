@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
-import { AlertCircle } from "lucide-react";
+import { useMemo, useState } from "react";
+import { AlertCircle, Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
@@ -38,6 +38,7 @@ export interface TriggerConfigFieldProps {
     type: "trigger-config";
     kind: "message" | "callback" | "reply";
     label?: string;
+    stateOptional?: boolean;
   };
 }
 
@@ -60,11 +61,14 @@ interface MessageData {
 function MessageTriggerConfig({
   nodeId,
   data,
+  stateOptional,
 }: {
   nodeId: string;
   data: Record<string, unknown>;
+  stateOptional?: boolean;
 }) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const [showState, setShowState] = useState(false);
 
   const typedData = data as MessageData;
 
@@ -129,12 +133,23 @@ function MessageTriggerConfig({
       </Label>
 
       {typedData.type ? (
-        <StateConfigUI
-          state={typedData.state}
-          onStateChange={(state) => updateNodeData(nodeId, { state })}
-          availableTypes={availableStateTypes}
-          nodeId={nodeId}
-        />
+        stateOptional && !showState ? (
+          <button
+            type="button"
+            onClick={() => setShowState(true)}
+            className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+          >
+            <Plus className="h-3 w-3" />
+            Ma&apos;lumotni saqlash
+          </button>
+        ) : (stateOptional && showState) || !stateOptional ? (
+          <StateConfigUI
+            state={typedData.state}
+            onStateChange={(state) => updateNodeData(nodeId, { state })}
+            availableTypes={availableStateTypes}
+            nodeId={nodeId}
+          />
+        ) : null
       ) : null}
     </div>
   );
@@ -163,11 +178,14 @@ interface CallbackData {
 function CallbackQueryTriggerConfig({
   nodeId,
   data,
+  stateOptional,
 }: {
   nodeId: string;
   data: Record<string, unknown>;
+  stateOptional?: boolean;
 }) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const [showState, setShowState] = useState(false);
   const nodes = useFlowStore((state) => state.nodes);
   const edges = useFlowStore((state) => state.edges);
 
@@ -319,12 +337,23 @@ function CallbackQueryTriggerConfig({
         </Label>
       </div>
 
-      <StateConfigUI
-        state={typedData.state}
-        onStateChange={(state) => updateNodeData(nodeId, { state })}
-        availableTypes={availableStateTypes}
-        nodeId={nodeId}
-      />
+      {stateOptional && !showState ? (
+        <button
+          type="button"
+          onClick={() => setShowState(true)}
+          className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+        >
+          <Plus className="h-3 w-3" />
+          Ma&apos;lumotni saqlash
+        </button>
+      ) : (
+        <StateConfigUI
+          state={typedData.state}
+          onStateChange={(state) => updateNodeData(nodeId, { state })}
+          availableTypes={availableStateTypes}
+          nodeId={nodeId}
+        />
+      )}
     </div>
   );
 }
@@ -349,11 +378,14 @@ interface ReplyData {
 function ReplyButtonTriggerConfig({
   nodeId,
   data,
+  stateOptional,
 }: {
   nodeId: string;
   data: Record<string, unknown>;
+  stateOptional?: boolean;
 }) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const [showState, setShowState] = useState(false);
   const nodes = useFlowStore((state) => state.nodes);
   const edges = useFlowStore((state) => state.edges);
 
@@ -457,12 +489,23 @@ function ReplyButtonTriggerConfig({
         </Label>
       </div>
 
-      <StateConfigUI
-        state={typedData.state}
-        onStateChange={(state) => updateNodeData(nodeId, { state })}
-        availableTypes={getStateTypesForReplyButtonTrigger()}
-        nodeId={nodeId}
-      />
+      {stateOptional && !showState ? (
+        <button
+          type="button"
+          onClick={() => setShowState(true)}
+          className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+        >
+          <Plus className="h-3 w-3" />
+          Ma&apos;lumotni saqlash
+        </button>
+      ) : (
+        <StateConfigUI
+          state={typedData.state}
+          onStateChange={(state) => updateNodeData(nodeId, { state })}
+          availableTypes={getStateTypesForReplyButtonTrigger()}
+          nodeId={nodeId}
+        />
+      )}
     </div>
   );
 }
@@ -483,11 +526,11 @@ export function TriggerConfigField({
       ) : null}
 
       {field.kind === "message" ? (
-        <MessageTriggerConfig nodeId={nodeId} data={data} />
+        <MessageTriggerConfig nodeId={nodeId} data={data} stateOptional={field.stateOptional} />
       ) : field.kind === "callback" ? (
-        <CallbackQueryTriggerConfig nodeId={nodeId} data={data} />
+        <CallbackQueryTriggerConfig nodeId={nodeId} data={data} stateOptional={field.stateOptional} />
       ) : (
-        <ReplyButtonTriggerConfig nodeId={nodeId} data={data} />
+        <ReplyButtonTriggerConfig nodeId={nodeId} data={data} stateOptional={field.stateOptional} />
       )}
     </div>
   );

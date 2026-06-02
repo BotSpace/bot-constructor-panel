@@ -46,7 +46,8 @@
       {
         "type": "stateConfig",
         "key": "state",
-        "variant": "commandTrigger"
+        "variant": "commandTrigger",
+        "optional": true
       }
     ],
     "defaults": {
@@ -125,7 +126,8 @@
     "content": [
       {
         "type": "trigger-config",
-        "kind": "message"
+        "kind": "message",
+        "stateOptional": true
       }
     ],
     "defaults": {
@@ -2714,7 +2716,8 @@
     "content": [
       {
         "type": "trigger-config",
-        "kind": "callback"
+        "kind": "callback",
+        "stateOptional": true
       }
     ],
     "defaults": {
@@ -2755,7 +2758,8 @@
     "content": [
       {
         "type": "trigger-config",
-        "kind": "reply"
+        "kind": "reply",
+        "stateOptional": true
       }
     ],
     "defaults": {
