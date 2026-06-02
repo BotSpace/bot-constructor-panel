@@ -20,6 +20,7 @@ import { ConstructorData } from "@/features/bot-constructor/data";
 import { MessageTriggerNodeData } from "@/features/bot-constructor/nodes/types";
 import { KeyboardConfig } from "@/features/bot-constructor/components";
 import { PillHandle } from "../../../components/shared/ReactFlowHandles/PillHandle";
+import { getNodeKeyboard } from "@/features/bot-constructor/utils/keyboard-compat";
 
 interface NodeWithHandlersData {
   handlers?: MessageTriggerNodeData[];
@@ -163,11 +164,15 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
     <div className="space-y-2 w-full">
 
       <div className="space-y-2">
-        {keyboard && keyboard.active && keyboard[keyboard.active] && keyboard[keyboard.active].flat().length > 0 && (
+        {(() => {
+          const normalized = getNodeKeyboard(sourceNode?.data ?? { keyboard });
+          return normalized[normalized.active] as any[][];
+        })().flat().length > 0 && (
           <div className="flex flex-col gap-2 mb-3 pb-3 border-b">
             {(() => {
               const seenText = new Set<string>();
-              return keyboard[keyboard.active].flat().map((button: any) => {
+              const normalized = getNodeKeyboard(sourceNode?.data ?? { keyboard });
+              return (normalized[normalized.active] as any[][]).flat().map((button: any) => {
                 const label: string =
                   button.text ||
                   (button.collectionData?.collection
