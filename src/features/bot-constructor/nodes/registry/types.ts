@@ -83,7 +83,11 @@ export interface NodeFieldManifest {
     | "array-editor"
     | "code-editor"
     | "collection-select"
-    | "state-type-select";
+    | "state-type-select"
+    | "condition-list"
+    | "cron-editor"
+    | "trigger-config"
+    | "dynamic-params";
   key?: string;
   widgetKey?: string;
   label?: string;
@@ -119,6 +123,16 @@ export interface NodeFieldManifest {
   // state-type-select
   keyField?: string;
   typeField?: string;
+  // condition-list
+  operatorKey?: string;
+  conditionsKey?: string;
+  // cron-editor (key reused)
+  // trigger-config
+  kind?: "message" | "callback" | "reply";
+  // dynamic-params
+  schemaKey?: string;
+  paramsKey?: string;
+  descriptionKey?: string;
 }
 
 export interface NodeFooterManifest {
