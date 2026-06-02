@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -322,26 +321,10 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
     );
   }
 
-  if (field.type === "checkbox") {
+  if (field.type === "checkbox" || field.type === "switch") {
     return (
       <FieldShell compact>
-        <Label className="flex cursor-pointer items-center gap-3 text-sm text-zinc-200">
-          <Checkbox
-            checked={Boolean(value)}
-            onCheckedChange={(checked) =>
-              updateNodeData(nodeId, { [fieldKey]: Boolean(checked) })
-            }
-          />
-          <span>{field.label}</span>
-        </Label>
-      </FieldShell>
-    );
-  }
-
-  if (field.type === "switch") {
-    return (
-      <FieldShell compact>
-        {field.label ? <Label className="text-sm text-zinc-200">{field.label}</Label> : null}
+        {field.label ? <Label className="cursor-pointer text-sm text-zinc-200">{field.label}</Label> : null}
         <Switch
           checked={Boolean(value)}
           onCheckedChange={(checked) => updateNodeData(nodeId, { [fieldKey]: checked })}
