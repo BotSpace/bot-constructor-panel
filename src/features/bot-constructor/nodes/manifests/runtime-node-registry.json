@@ -2880,6 +2880,13 @@
         "optional": true
       },
       {
+        "type": "textarea",
+        "key": "data",
+        "label": "Data",
+        "helpText": "JSON yoki matn — body bilan bir xil, lekin alohida key sifatida",
+        "optional": true
+      },
+      {
         "type": "text",
         "key": "responseVariable",
         "label": "Javob o'zgaruvchisi",
