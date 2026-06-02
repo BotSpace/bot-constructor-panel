@@ -41,14 +41,6 @@ interface ModalFieldWidgetProps {
   field: NodeFieldManifest;
 }
 
-function HelpText({ text }: { text?: string }) {
-  if (!text) {
-    return null;
-  }
-
-  return <p className="text-xs leading-5 text-zinc-500">{text}</p>;
-}
-
 function FieldShell({
   label,
   helpText,
@@ -63,17 +55,17 @@ function FieldShell({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-white/10 bg-white/[0.03] p-4",
-        compact ? "space-y-2" : "space-y-3"
+        "space-y-1.5",
+        compact && "flex items-center justify-between gap-3 space-y-0"
       )}
     >
       {label ? (
-        <Label className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
+        <Label className="text-xs font-medium uppercase tracking-wide text-zinc-400">
           {label}
         </Label>
       ) : null}
       {children}
-      <HelpText text={helpText} />
+      {helpText ? <p className="text-xs leading-relaxed text-zinc-500">{helpText}</p> : null}
     </div>
   );
 }
@@ -331,13 +323,11 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
   if (field.type === "switch") {
     return (
       <FieldShell compact>
-        <div className="flex items-center justify-between gap-3">
-          {field.label ? <Label className="text-sm text-zinc-200">{field.label}</Label> : null}
-          <Switch
-            checked={Boolean(value)}
-            onCheckedChange={(checked) => updateNodeData(nodeId, { [fieldKey]: checked })}
-          />
-        </div>
+        {field.label ? <Label className="text-sm text-zinc-200">{field.label}</Label> : null}
+        <Switch
+          checked={Boolean(value)}
+          onCheckedChange={(checked) => updateNodeData(nodeId, { [fieldKey]: checked })}
+        />
       </FieldShell>
     );
   }

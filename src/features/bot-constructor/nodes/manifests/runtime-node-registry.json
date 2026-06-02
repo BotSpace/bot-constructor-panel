@@ -807,7 +807,8 @@
         "visibleWhen": {
           "key": "type",
           "equals": "quiz"
-        }
+        },
+        "optional": true
       },
       {
         "type": "textarea",
@@ -817,7 +818,8 @@
         "visibleWhen": {
           "key": "type",
           "equals": "quiz"
-        }
+        },
+        "optional": true
       },
       {
         "type": "checkbox",
@@ -831,14 +833,16 @@
         "visibleWhen": {
           "key": "type",
           "notEquals": "quiz"
-        }
+        },
+        "optional": true
       },
       {
         "type": "number",
         "key": "openPeriod",
         "label": "Avtomatik yopish (soniya)",
         "min": 5,
-        "max": 600
+        "max": 600,
+        "optional": true
       }
     ],
     "footer": [
@@ -2583,7 +2587,8 @@
         "type": "textarea",
         "key": "headers",
         "label": "Headers (JSON)",
-        "helpText": "{\"Authorization\": \"Bearer token\"}"
+        "helpText": "{\"Authorization\": \"Bearer token\"}",
+        "optional": true
       },
       {
         "type": "textarea",
@@ -2592,7 +2597,8 @@
         "visibleWhen": {
           "key": "method",
           "notEquals": "GET"
-        }
+        },
+        "optional": true
       },
       {
         "type": "text",
@@ -2605,12 +2611,14 @@
         "key": "timeout",
         "label": "Timeout (soniya)",
         "min": 1,
-        "max": 300
+        "max": 300,
+        "optional": true
       },
       {
         "type": "checkbox",
         "key": "storeHeaders",
-        "label": "Response headerlarni saqlash"
+        "label": "Response headerlarni saqlash",
+        "optional": true
       }
     ],
     "defaults": {
@@ -2842,7 +2850,8 @@
         "type": "checkbox",
         "key": "structuredOutput",
         "labelKey": "constructor.ai.agent.fields.structuredOutput",
-        "label": "Structured Output (JSON Schema)"
+        "label": "Structured Output (JSON Schema)",
+        "optional": true
       },
       {
         "type": "textarea",
@@ -2855,21 +2864,24 @@
         "visibleWhen": {
           "key": "structuredOutput",
           "equals": true
-        }
+        },
+        "optional": true
       },
       {
         "type": "text",
         "key": "userInputSource",
         "label": "User Input Source",
         "placeholder": "message.text",
-        "helpText": "Context path used when User Input is empty."
+        "helpText": "Context path used when User Input is empty.",
+        "optional": true
       },
       {
         "type": "number",
         "key": "maxIterations",
         "label": "Max Iterations",
         "min": 1,
-        "max": 10
+        "max": 10,
+        "optional": true
       },
       {
         "type": "select",
@@ -2884,20 +2896,23 @@
             "value": "json",
             "label": "JSON"
           }
-        ]
+        ],
+        "optional": true
       },
       {
         "type": "text",
         "key": "historyKey",
         "label": "History Key",
         "placeholder": "Leave empty to disable",
-        "helpText": "Context key for conversation history."
+        "helpText": "Context key for conversation history.",
+        "optional": true
       },
       {
         "type": "text",
         "key": "errorOutputKey",
         "label": "Error Output Key",
-        "placeholder": "agent_error"
+        "placeholder": "agent_error",
+        "optional": true
       }
     ],
     "defaults": {
