@@ -274,5 +274,46 @@ export const getFormatFlow = (
     });
   });
 
-  return { nodes: [...layoutedNormalNodes, ...layoutedAccessoryNodes], edges };
+  // ── Post-process: push normal nodes that overlap the accessory area downward ─
+  // Disconnected/global normal nodes can land inside the space reserved for
+  // accessories because dagre doesn't know where accessories will be placed.
+  // Find the bottom edge of all accessories then nudge overlapping normals below.
+
+  const accessoryBottom =
+    layoutedAccessoryNodes.length > 0
+      ? Math.max(
+          ...layoutedAccessoryNodes.map(
+            (n) => n.position.y + (n.height ?? DEFAULT_NODE_HEIGHT)
+          )
+        )
+      : -Infinity;
+
+  const resolvedNormalNodes = layoutedNormalNodes.map((node) => {
+    const nodeBottom = node.position.y + (node.height ?? DEFAULT_NODE_HEIGHT);
+    const nodeRight = node.position.x + (node.width ?? DEFAULT_NODE_WIDTH);
+
+    // Check if this node overlaps any accessory node
+    const overlaps = layoutedAccessoryNodes.some((acc) => {
+      const accRight = acc.position.x + (acc.width ?? DEFAULT_NODE_WIDTH);
+      const accBottom = acc.position.y + (acc.height ?? DEFAULT_NODE_HEIGHT);
+      return (
+        node.position.x < accRight &&
+        nodeRight > acc.position.x &&
+        node.position.y < accBottom &&
+        nodeBottom > acc.position.y
+      );
+    });
+
+    if (!overlaps) return node;
+
+    return {
+      ...node,
+      position: {
+        ...node.position,
+        y: accessoryBottom + ACCESSORY_VERTICAL_OFFSET,
+      },
+    };
+  });
+
+  return { nodes: [...resolvedNormalNodes, ...layoutedAccessoryNodes], edges };
 };

@@ -162,20 +162,11 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
       const newEdge = {
         ...connection,
         targetHandle: normalizedTargetHandle,
-        // "smart-edge" matches AI-generated edges and is registered in CustomEdge
-        // → both old ("floating") and new edges resolve to FloatingEdge renderer.
         type: "smart-edge",
-        // markerEnd intentionally omitted — AI-generated edges have no arrow,
-        // so manually-created edges must match (no arrow) for visual parity.
         style: {
-          // strokeWidth 2 matches AI edge visual weight (AI edges carry no style
-          // override so FloatingEdge falls back to 2.5; 2 is close enough and
-          // slightly lighter than the previous 4).
           strokeWidth: 2,
           stroke: edgeColor,
         },
-        // EditMessageHandler va DeleteMessageHandler'dan chiqqan edge'lar uchun animated true
-        animated: isEditMessageEdge || isDeleteMessageEdge ? true : false,
       };
 
       const newEdges = addEdge(newEdge, get().edges);

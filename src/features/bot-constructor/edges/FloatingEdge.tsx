@@ -39,7 +39,9 @@ function FloatingEdge({
     label,
 }: Omit<EdgeProps, "markerEnd">) {
     const nodes = useNodes();
-    const { stroke: edgeColor, selectedStroke } = useEdgeColor(sourceHandleId);
+    const { stroke: defaultColor, selectedStroke } = useEdgeColor(sourceHandleId);
+    // Prefer edge's own style.stroke (e.g. orange for edit-message) over computed color
+    const edgeColor = (style as any)?.stroke || defaultColor;
 
     // Find target node for entry-side selection and label
     const targetNode = nodes.find((node) => node.id === target);
