@@ -149,35 +149,27 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
 
   if (field.type === "description") {
     return (
-      <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-4 text-sm leading-6 text-zinc-400">
-        {field.textFallback}
-      </div>
+      <p className="text-sm leading-6 text-zinc-500">{field.textFallback}</p>
     );
   }
 
   if (field.type === "richTextMessage") {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <RichTextMessageField
-          nodeId={nodeId}
-          data={data}
-          textKey={field.key || "messageText"}
-          dynamicKey="dynamicMessages"
-          label={field.label || "Xabar matni"}
-          intro={field.intro}
-          showParseMode={false}
-        />
-      </div>
+      <RichTextMessageField
+        nodeId={nodeId}
+        data={data}
+        textKey={field.key || "messageText"}
+        dynamicKey="dynamicMessages"
+        label={field.label || "Xabar matni"}
+        intro={field.intro}
+        showParseMode={false}
+      />
     );
   }
 
   if (field.type === "mediaMessage") {
     const kind = field.mediaKind || "photo";
-    return (
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <MediaMessageField nodeId={nodeId} data={data} kind={kind} />
-      </div>
-    );
+    return <MediaMessageField nodeId={nodeId} data={data} kind={kind} />;
   }
 
   if (field.type === "array-editor" && field.key && field.itemFields) {
@@ -262,15 +254,10 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
 
   if (field.type === "widget") {
     const widget = renderCustomWidget({ nodeId, data, field });
-
-    return (
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        {widget ?? (
-          <p className="text-sm text-red-300">
-            Modal widget topilmadi: {field.widgetKey || "unknown"}
-          </p>
-        )}
-      </div>
+    return widget ?? (
+      <p className="text-sm text-red-300">
+        Modal widget topilmadi: {field.widgetKey || "unknown"}
+      </p>
     );
   }
 

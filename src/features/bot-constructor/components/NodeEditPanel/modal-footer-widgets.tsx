@@ -6,7 +6,7 @@ import ActionNodeSettings from "@/features/bot-constructor/nodes/actions/shared/
 import { RecipientsManager } from "@/features/bot-constructor/nodes/actions/shared/RecipientSelector";
 import { ParseMode } from "@/features/bot-constructor/nodes/types";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { Keyboard, SlidersHorizontal, Users, Workflow } from "lucide-react";
+import { Workflow } from "lucide-react";
 
 interface ModalActionPanelProps {
   nodeId: string;
@@ -15,27 +15,17 @@ interface ModalActionPanelProps {
 }
 
 function Section({
-  icon: Icon,
   title,
-  description,
   children,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
+  icon?: React.ComponentType<{ className?: string }>;
   title: string;
   description?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-      <div className="mb-3 flex items-center gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-200">
-          <Icon className="h-4 w-4" />
-        </span>
-        <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-zinc-100">{title}</h3>
-          {description ? <p className="text-xs text-zinc-500">{description}</p> : null}
-        </div>
-      </div>
+    <section className="space-y-3">
+      <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">{title}</p>
       {children}
     </section>
   );
@@ -62,32 +52,24 @@ export function ModalActionPanel({
   return (
     <div className="space-y-3">
       {recipients !== undefined ? (
-        <Section
-          icon={Users}
-          title="Qabul qiluvchilar"
-          description="Xabar kimga yuborilishini tanlang"
-        >
+        <Section title="Qabul qiluvchilar">
           <RecipientsManager recipients={recipients} onUpdate={handleUpdate} />
         </Section>
       ) : null}
 
       {keyboard !== undefined ? (
-        <Section icon={Keyboard} title="Tugmalar" description="Inline va reply tugmalar">
+        <Section title="Tugmalar">
           <ButtonGenerator initialKeyboard={keyboard} node_id={nodeId} />
         </Section>
       ) : null}
 
       {!hideHandlers ? (
-        <Section icon={Workflow} title="Handlerlar" description="Javob qoidalari">
+        <Section title="Handlerlar">
           <HandlerAdder sourceNodeId={nodeId} />
         </Section>
       ) : null}
 
-      <Section
-        icon={SlidersHorizontal}
-        title="Qo'shimcha sozlamalar"
-        description="Xabar yuborish parametrlari"
-      >
+      <Section title="Qo'shimcha sozlamalar">
         <ActionNodeSettings
           notificationDisabled={
             typeof data.disableNotification === "boolean"
@@ -112,16 +94,8 @@ export function ModalHandlersList({
   data: Record<string, unknown>;
 }) {
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-      <div className="mb-3 flex items-center gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-200">
-          <Workflow className="h-4 w-4" />
-        </span>
-        <div>
-          <h3 className="text-sm font-semibold text-zinc-100">Handlerlar</h3>
-          <p className="text-xs text-zinc-500">React Flow handle chizmasdan boshqariladi</p>
-        </div>
-      </div>
+    <section className="space-y-3">
+      <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">Handlerlar</p>
       <HandlerAdder sourceNodeId={nodeId} />
     </section>
   );
