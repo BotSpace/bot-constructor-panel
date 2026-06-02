@@ -45,7 +45,7 @@ export function NodeVariablePanel({ stateKeys }: NodeVariablePanelProps) {
   const sectionGlobal = t_safe(t, "sectionGlobal", "Global / auto context");
 
   return (
-    <aside className="flex min-h-0 flex-col border-t border-white/10 bg-zinc-950/80 lg:w-[320px] lg:border-l lg:border-t-0">
+    <aside className="hidden min-h-0 flex-col border-t border-white/10 bg-zinc-950/80 lg:flex lg:w-[320px] lg:border-l lg:border-t-0">
       {/* Header */}
       <div className="shrink-0 border-b border-white/10 p-4">
         <div className="flex items-center gap-2">
