@@ -84,8 +84,9 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "cronTrigger"
+        "type": "cron-editor",
+        "key": "schedule",
+        "label": "Jadval"
       }
     ],
     "defaults": {
@@ -123,8 +124,8 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "messageTrigger"
+        "type": "trigger-config",
+        "kind": "message"
       }
     ],
     "defaults": {
@@ -761,8 +762,83 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "pollMessage"
+        "type": "text",
+        "key": "question",
+        "label": "Savol",
+        "placeholder": "Sevimli rangingiz qaysi?"
+      },
+      {
+        "type": "array-editor",
+        "key": "options",
+        "label": "Variantlar",
+        "addLabel": "Variant qo'shish",
+        "defaultItem": {
+          "text": ""
+        },
+        "itemFields": [
+          {
+            "key": "text",
+            "type": "text",
+            "label": "Variant matni",
+            "placeholder": "Variant..."
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "key": "type",
+        "label": "Turi",
+        "options": [
+          {
+            "value": "regular",
+            "label": "Oddiy so'rovnoma"
+          },
+          {
+            "value": "quiz",
+            "label": "Test/Quiz"
+          }
+        ]
+      },
+      {
+        "type": "number",
+        "key": "correctOptionId",
+        "label": "To'g'ri javob indeksi (0 dan)",
+        "min": 0,
+        "visibleWhen": {
+          "key": "type",
+          "equals": "quiz"
+        }
+      },
+      {
+        "type": "textarea",
+        "key": "explanation",
+        "label": "Tushuntirish",
+        "rows": 2,
+        "visibleWhen": {
+          "key": "type",
+          "equals": "quiz"
+        }
+      },
+      {
+        "type": "checkbox",
+        "key": "isAnonymous",
+        "label": "Anonim"
+      },
+      {
+        "type": "checkbox",
+        "key": "allowsMultipleAnswers",
+        "label": "Bir nechta javob",
+        "visibleWhen": {
+          "key": "type",
+          "notEquals": "quiz"
+        }
+      },
+      {
+        "type": "number",
+        "key": "openPeriod",
+        "label": "Avtomatik yopish (soniya)",
+        "min": 5,
+        "max": 600
       }
     ],
     "footer": [
@@ -1082,8 +1158,37 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "editMessage"
+        "type": "select",
+        "key": "messageIdSource",
+        "label": "Qaysi xabar",
+        "options": [
+          {
+            "value": "this_message",
+            "label": "Yuqoridagi xabar"
+          },
+          {
+            "value": "connected_node",
+            "label": "Ko'rsatilgan xabar"
+          },
+          {
+            "value": "message_id",
+            "label": "Message ID"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "key": "messageId",
+        "label": "Message ID",
+        "visibleWhen": {
+          "key": "messageIdSource",
+          "equals": "message_id"
+        }
+      },
+      {
+        "type": "richTextMessage",
+        "key": "newText",
+        "label": "Yangi matn"
       }
     ],
     "footer": [
@@ -1556,8 +1661,8 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "downloadFile"
+        "type": "description",
+        "textFallback": "Bu node file turidagi MessageTrigger'dan keyin kelishi kerak. Fayl ID trigger'dan avtomatik olinadi."
       }
     ],
     "footer": [
@@ -1771,8 +1876,7 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "subFlow"
+        "type": "dynamic-params"
       }
     ],
     "defaults": {
@@ -1865,8 +1969,9 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "ifCondition"
+        "type": "condition-list",
+        "operatorKey": "operator",
+        "conditionsKey": "conditions"
       }
     ],
     "defaults": {
@@ -1917,8 +2022,9 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "elseIf"
+        "type": "condition-list",
+        "operatorKey": "operator",
+        "conditionsKey": "conditions"
       }
     ],
     "defaults": {
@@ -2039,9 +2145,14 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "buttonGenerator",
-        "textFallback": "Tasodifiy yo'lni tanlaydi."
+        "type": "description",
+        "textFallback": "Keyboard tugmalari tasodifiy yo'l tanlash uchun ishlatiladi. Har bir tugma alohida chiqish handle'ga ega bo'ladi."
+      }
+    ],
+    "footer": [
+      {
+        "type": "actionPanel",
+        "hideHandlers": true
       }
     ],
     "defaults": {
@@ -2188,8 +2299,36 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "checkMembership"
+        "type": "select",
+        "key": "inputType",
+        "label": "Kirish turi",
+        "options": [
+          {
+            "value": "username",
+            "label": "Username (@kanal)"
+          },
+          {
+            "value": "id",
+            "label": "Chat ID"
+          }
+        ]
+      },
+      {
+        "type": "array-editor",
+        "key": "channels",
+        "label": "Kanal/Guruhlar",
+        "addLabel": "Kanal qo'shish",
+        "defaultItem": {
+          "value": ""
+        },
+        "itemFields": [
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Kanal",
+            "placeholder": "@username yoki -100123456789"
+          }
+        ]
       }
     ],
     "defaults": {
@@ -2226,8 +2365,62 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "formNode"
+        "type": "array-editor",
+        "key": "items",
+        "label": "Forma maydonlari",
+        "addLabel": "Maydon qo'shish",
+        "defaultItem": {
+          "label": "",
+          "variable": "",
+          "type": "text",
+          "required": false
+        },
+        "itemFields": [
+          {
+            "key": "label",
+            "type": "text",
+            "label": "Maydon nomi",
+            "placeholder": "Telefon raqam"
+          },
+          {
+            "key": "variable",
+            "type": "text",
+            "label": "O'zgaruvchi",
+            "placeholder": "phone"
+          },
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "text",
+                "label": "Matn"
+              },
+              {
+                "value": "number",
+                "label": "Raqam"
+              },
+              {
+                "value": "phone",
+                "label": "Telefon"
+              },
+              {
+                "value": "select",
+                "label": "Tanlash"
+              },
+              {
+                "value": "checkbox",
+                "label": "Belgilash"
+              }
+            ]
+          },
+          {
+            "key": "required",
+            "type": "checkbox",
+            "label": "Majburiy"
+          }
+        ]
       }
     ],
     "defaults": {
@@ -2354,8 +2547,70 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "httpRequest"
+        "type": "select",
+        "key": "method",
+        "label": "HTTP Metod",
+        "options": [
+          {
+            "value": "GET",
+            "label": "GET"
+          },
+          {
+            "value": "POST",
+            "label": "POST"
+          },
+          {
+            "value": "PUT",
+            "label": "PUT"
+          },
+          {
+            "value": "DELETE",
+            "label": "DELETE"
+          },
+          {
+            "value": "PATCH",
+            "label": "PATCH"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "key": "url",
+        "label": "URL",
+        "placeholder": "https://api.example.com/endpoint"
+      },
+      {
+        "type": "textarea",
+        "key": "headers",
+        "label": "Headers (JSON)",
+        "helpText": "{\"Authorization\": \"Bearer token\"}"
+      },
+      {
+        "type": "textarea",
+        "key": "body",
+        "label": "Body (JSON)",
+        "visibleWhen": {
+          "key": "method",
+          "notEquals": "GET"
+        }
+      },
+      {
+        "type": "text",
+        "key": "responseVariable",
+        "label": "Javob o'zgaruvchisi",
+        "placeholder": "response"
+      },
+      {
+        "type": "number",
+        "key": "timeout",
+        "label": "Timeout (soniya)",
+        "min": 1,
+        "max": 300
+      },
+      {
+        "type": "checkbox",
+        "key": "storeHeaders",
+        "label": "Response headerlarni saqlash"
       }
     ],
     "defaults": {
@@ -2397,9 +2652,14 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "buttonGenerator",
-        "textFallback": "Inline tugmaga javob beradi."
+        "type": "description",
+        "textFallback": "Inline tugma bosilganda javob xabar yuboradi. Keyboard orqali yangi tugmalar qo'shish mumkin."
+      }
+    ],
+    "footer": [
+      {
+        "type": "actionPanel",
+        "hideHandlers": true
       }
     ],
     "defaults": {
@@ -2445,8 +2705,8 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "callbackQueryTrigger"
+        "type": "trigger-config",
+        "kind": "callback"
       }
     ],
     "defaults": {
@@ -2486,8 +2746,8 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "replyButtonTrigger"
+        "type": "trigger-config",
+        "kind": "reply"
       }
     ],
     "defaults": {
@@ -2598,8 +2858,46 @@
         }
       },
       {
-        "type": "widget",
-        "widgetKey": "aiAgentAdvanced"
+        "type": "text",
+        "key": "userInputSource",
+        "label": "User Input Source",
+        "placeholder": "message.text",
+        "helpText": "Context path used when User Input is empty."
+      },
+      {
+        "type": "number",
+        "key": "maxIterations",
+        "label": "Max Iterations",
+        "min": 1,
+        "max": 10
+      },
+      {
+        "type": "select",
+        "key": "returnMode",
+        "label": "Return Mode",
+        "options": [
+          {
+            "value": "text",
+            "label": "Text"
+          },
+          {
+            "value": "json",
+            "label": "JSON"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "key": "historyKey",
+        "label": "History Key",
+        "placeholder": "Leave empty to disable",
+        "helpText": "Context key for conversation history."
+      },
+      {
+        "type": "text",
+        "key": "errorOutputKey",
+        "label": "Error Output Key",
+        "placeholder": "agent_error"
       }
     ],
     "defaults": {

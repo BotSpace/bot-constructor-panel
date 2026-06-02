@@ -23,6 +23,10 @@ import { ArrayEditorField } from "@/features/bot-constructor/nodes/widgets/gener
 import { CodeEditorField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CodeEditorField";
 import { CollectionSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CollectionSelectField";
 import { StateTypeSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/StateTypeSelectField";
+import { ConditionListField } from "@/features/bot-constructor/nodes/widgets/generic-fields/ConditionListField";
+import { CronEditorField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CronEditorField";
+import { TriggerConfigField } from "@/features/bot-constructor/nodes/widgets/generic-fields/TriggerConfigField";
+import { DynamicParamsField } from "@/features/bot-constructor/nodes/widgets/generic-fields/DynamicParamsField";
 import {
   RichTextMessageField,
   MediaMessageField,
@@ -220,6 +224,46 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         nodeId={nodeId}
         data={data}
         field={field as Parameters<typeof StateTypeSelectField>[0]["field"]}
+      />
+    );
+  }
+
+  if (field.type === "condition-list") {
+    return (
+      <ConditionListField
+        nodeId={nodeId}
+        data={data}
+        field={field as Parameters<typeof ConditionListField>[0]["field"]}
+      />
+    );
+  }
+
+  if (field.type === "cron-editor") {
+    return (
+      <CronEditorField
+        nodeId={nodeId}
+        data={data}
+        field={field as Parameters<typeof CronEditorField>[0]["field"]}
+      />
+    );
+  }
+
+  if (field.type === "trigger-config" && field.kind) {
+    return (
+      <TriggerConfigField
+        nodeId={nodeId}
+        data={data}
+        field={field as Parameters<typeof TriggerConfigField>[0]["field"]}
+      />
+    );
+  }
+
+  if (field.type === "dynamic-params") {
+    return (
+      <DynamicParamsField
+        nodeId={nodeId}
+        data={data}
+        field={field as Parameters<typeof DynamicParamsField>[0]["field"]}
       />
     );
   }
