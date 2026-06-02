@@ -55,6 +55,16 @@ export interface NodeFieldOptionManifest {
   label: string;
 }
 
+/** Item field spec for array-editor type */
+export interface ArrayEditorItemFieldSpec {
+  key: string;
+  type: "text" | "number" | "select" | "checkbox" | "switch" | "textarea";
+  label?: string;
+  placeholder?: string;
+  options?: NodeFieldOptionManifest[];
+  visibleWhen?: NodeVisibilityRule;
+}
+
 export interface NodeFieldManifest {
   type:
     | "description"
@@ -68,7 +78,12 @@ export interface NodeFieldManifest {
     | "stringArray"
     | "stateConfig"
     | "richTextMessage"
-    | "mediaMessage";
+    | "mediaMessage"
+    // Generic manifest-driven field types
+    | "array-editor"
+    | "code-editor"
+    | "collection-select"
+    | "state-type-select";
   key?: string;
   widgetKey?: string;
   label?: string;
@@ -89,6 +104,21 @@ export interface NodeFieldManifest {
   intro?: string;
   /** For richTextMessage: label for the text area; for mediaMessage: media kind */
   mediaKind?: "photo" | "video" | "audio" | "file";
+  // array-editor
+  addLabel?: string;
+  maxItems?: number;
+  defaultItem?: Record<string, unknown>;
+  itemFields?: ArrayEditorItemFieldSpec[];
+  // code-editor
+  outputsKey?: string;
+  language?: "javascript" | "python";
+  // collection-select
+  withFieldMapping?: boolean;
+  withFilters?: boolean;
+  contextKeyField?: string;
+  // state-type-select
+  keyField?: string;
+  typeField?: string;
 }
 
 export interface NodeFooterManifest {
