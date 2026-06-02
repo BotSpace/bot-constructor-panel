@@ -12,6 +12,29 @@ import {
   ReplyButtonTriggerData,
   StateNodeData,
 } from "../nodes/types";
+import { getNodeManifestByType } from "../nodes/registry/manifestStore";
+
+/**
+ * Collect state keys produced by manifest fields flagged `is_state: true`.
+ * The field's current value (e.g. outputKey="agent_output") becomes a state key.
+ */
+function getManifestStateKeys(node: Node): string[] {
+  if (!node.type) return [];
+  const manifest = getNodeManifestByType(node.type);
+  if (!manifest?.content) return [];
+
+  const data = (node.data ?? {}) as Record<string, unknown>;
+  const keys: string[] = [];
+  for (const field of manifest.content) {
+    if (field.is_state && field.key) {
+      const value = data[field.key];
+      if (typeof value === "string" && value.trim() !== "") {
+        keys.push(value);
+      }
+    }
+  }
+  return keys;
+}
 
 type TriggerNodeWithState =
   | MessageTriggerNodeData
@@ -105,6 +128,12 @@ export function getAvailableStateKeys(
 
   nodes.forEach((node) => {
     if (!node.type) return;
+    // Manifest is_state fields are collected for ancestors AND the current node
+    // so a node's own output (e.g. AIAgentNode outputKey) is visible in its panel.
+    if (ancestorIds.has(node.id) || node.id === currentNodeId) {
+      getManifestStateKeys(node).forEach((key) => stateKeys.add(key));
+    }
+
     if (!ancestorIds.has(node.id)) return;
 
     if (node.type === "StateNode") {

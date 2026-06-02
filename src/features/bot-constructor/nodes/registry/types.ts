@@ -109,7 +109,10 @@ export interface NodeFieldManifest {
   visibleWhen?: NodeVisibilityRule;
   /** true = hidden by default; user explicitly adds via "Add option" dropdown */
   optional?: boolean;
-  variant?: "commandTrigger";
+  /** For select: "tabs" renders a segmented control instead of a dropdown (use for ≤4 options) */
+  variant?: "commandTrigger" | "tabs";
+  /** true = field value is auto-saved to flow context as state_<key>; shown read-only in the variable panel */
+  is_state?: boolean;
   /** For richTextMessage: intro text shown above the editor */
   intro?: string;
   /** For richTextMessage: label for the text area; for mediaMessage: media kind */
