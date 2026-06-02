@@ -888,8 +888,81 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "mediaGroup"
+        "type": "array-editor",
+        "key": "mediaItems",
+        "label": "Media elementlar",
+        "addLabel": "Media qo'shish",
+        "maxItems": 10,
+        "defaultItem": {
+          "type": "photo",
+          "sourceType": "file_id"
+        },
+        "itemFields": [
+          {
+            "key": "type",
+            "type": "select",
+            "label": "Tur",
+            "options": [
+              {
+                "value": "photo",
+                "label": "Rasm"
+              },
+              {
+                "value": "video",
+                "label": "Video"
+              },
+              {
+                "value": "audio",
+                "label": "Audio"
+              },
+              {
+                "value": "document",
+                "label": "Fayl"
+              }
+            ]
+          },
+          {
+            "key": "sourceType",
+            "type": "select",
+            "label": "Manba",
+            "options": [
+              {
+                "value": "file_id",
+                "label": "File ID"
+              },
+              {
+                "value": "url",
+                "label": "URL"
+              }
+            ]
+          },
+          {
+            "key": "fileId",
+            "type": "text",
+            "label": "File ID",
+            "placeholder": "AgACAgIAAxk...",
+            "visibleWhen": {
+              "key": "sourceType",
+              "equals": "file_id"
+            }
+          },
+          {
+            "key": "url",
+            "type": "text",
+            "label": "URL",
+            "placeholder": "https://example.com/file.jpg",
+            "visibleWhen": {
+              "key": "sourceType",
+              "equals": "url"
+            }
+          },
+          {
+            "key": "caption",
+            "type": "text",
+            "label": "Caption",
+            "placeholder": "Sarlavha..."
+          }
+        ]
       }
     ],
     "footer": [
@@ -1525,8 +1598,11 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "customCode"
+        "type": "code-editor",
+        "key": "jsCode",
+        "outputsKey": "outputs",
+        "language": "javascript",
+        "label": "JavaScript kodi"
       }
     ],
     "defaults": {
@@ -1566,8 +1642,7 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "stateNode"
+        "type": "state-type-select"
       }
     ],
     "defaults": {
@@ -1604,8 +1679,9 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "collectionNode"
+        "type": "collection-select",
+        "key": "collection_name",
+        "withFieldMapping": true
       }
     ],
     "defaults": {
@@ -1653,8 +1729,10 @@
     ],
     "content": [
       {
-        "type": "widget",
-        "widgetKey": "loadCollectionItem"
+        "type": "collection-select",
+        "key": "collection",
+        "withFilters": true,
+        "contextKeyField": "contextKey"
       }
     ],
     "defaults": {
@@ -2977,7 +3055,12 @@
       "tool": "collection",
       "toolName": "collection",
       "collection": "",
-      "operations": ["create", "read", "update", "delete"],
+      "operations": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ],
       "searchFields": [],
       "parametersSchema": {
         "type": "object",
