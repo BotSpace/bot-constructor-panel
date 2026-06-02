@@ -90,8 +90,7 @@ export interface NodeFieldManifest {
     | "dynamic-params"
     // Action panel sub-sections (optional-capable)
     | "action-recipients"
-    | "action-keyboard"
-    | "action-settings";
+    | "action-keyboard";
   key?: string;
   widgetKey?: string;
   label?: string;

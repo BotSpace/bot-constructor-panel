@@ -182,9 +182,36 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
         "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
+        "optional": true
+      },
+      {
+        "type": "select",
+        "key": "parseMode",
+        "label": "Parse Mode",
+        "optional": true,
+        "options": [
+          {
+            "value": "None",
+            "label": "Yo'q"
+          },
+          {
+            "value": "Markdown",
+            "label": "Markdown"
+          },
+          {
+            "value": "HTML",
+            "label": "HTML"
+          }
+        ]
       }
     ],
     "footer": [
@@ -251,8 +278,15 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
         "optional": true
       }
     ],
@@ -320,8 +354,15 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
         "optional": true
       }
     ],
@@ -389,8 +430,15 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
         "optional": true
       }
     ],
@@ -460,8 +508,15 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
         "optional": true
       }
     ],
@@ -692,8 +747,15 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
         "optional": true
       }
     ],
@@ -785,8 +847,15 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
         "optional": true
       }
     ],
@@ -935,8 +1004,15 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
         "optional": true
       }
     ],
@@ -1141,8 +1217,15 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
         "optional": true
       }
     ],
@@ -1297,9 +1380,36 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
         "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
+        "optional": true
+      },
+      {
+        "type": "select",
+        "key": "parseMode",
+        "label": "Parse Mode",
+        "optional": true,
+        "options": [
+          {
+            "value": "None",
+            "label": "Yo'q"
+          },
+          {
+            "value": "Markdown",
+            "label": "Markdown"
+          },
+          {
+            "value": "HTML",
+            "label": "HTML"
+          }
+        ]
       }
     ],
     "footer": [
@@ -1365,9 +1475,36 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
         "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
+        "optional": true
+      },
+      {
+        "type": "select",
+        "key": "parseMode",
+        "label": "Parse Mode",
+        "optional": true,
+        "options": [
+          {
+            "value": "None",
+            "label": "Yo'q"
+          },
+          {
+            "value": "Markdown",
+            "label": "Markdown"
+          },
+          {
+            "value": "HTML",
+            "label": "HTML"
+          }
+        ]
       }
     ],
     "footer": [
@@ -2272,8 +2409,15 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
         "optional": true
       }
     ],
@@ -2788,8 +2932,15 @@
         "optional": true
       },
       {
-        "type": "action-settings",
-        "label": "Qo'shimcha sozlamalar",
+        "type": "checkbox",
+        "key": "disableNotification",
+        "label": "Ovozsiz yuborish",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "protectContent",
+        "label": "Yuklab olishni taqiqlash",
         "optional": true
       }
     ],
