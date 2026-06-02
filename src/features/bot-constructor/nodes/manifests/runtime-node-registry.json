@@ -2873,14 +2873,6 @@
         "optional": true
       },
       {
-        "type": "text",
-        "key": "userInputSource",
-        "label": "User Input Source",
-        "placeholder": "message.text",
-        "helpText": "Context path used when User Input is empty.",
-        "optional": true
-      },
-      {
         "type": "number",
         "key": "maxIterations",
         "label": "Max Iterations",
