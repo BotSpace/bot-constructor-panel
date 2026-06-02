@@ -170,13 +170,24 @@
         "type": "richTextMessage",
         "key": "messageText",
         "label": "Xabar matni"
+      },
+      {
+        "type": "action-recipients",
+        "label": "Qabul qiluvchilar",
+        "optional": true
+      },
+      {
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
     "footer": [
-      {
-        "type": "actionPanel",
-        "hideHandlers": true
-      },
       {
         "type": "handlersList"
       }
@@ -228,13 +239,24 @@
       {
         "type": "mediaMessage",
         "mediaKind": "photo"
+      },
+      {
+        "type": "action-recipients",
+        "label": "Qabul qiluvchilar",
+        "optional": true
+      },
+      {
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
     "footer": [
-      {
-        "type": "actionPanel",
-        "hideHandlers": true
-      },
       {
         "type": "handlersList"
       }
@@ -286,13 +308,24 @@
       {
         "type": "mediaMessage",
         "mediaKind": "video"
+      },
+      {
+        "type": "action-recipients",
+        "label": "Qabul qiluvchilar",
+        "optional": true
+      },
+      {
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
     "footer": [
-      {
-        "type": "actionPanel",
-        "hideHandlers": true
-      },
       {
         "type": "handlersList"
       }
@@ -344,13 +377,24 @@
       {
         "type": "mediaMessage",
         "mediaKind": "audio"
+      },
+      {
+        "type": "action-recipients",
+        "label": "Qabul qiluvchilar",
+        "optional": true
+      },
+      {
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
     "footer": [
-      {
-        "type": "actionPanel",
-        "hideHandlers": true
-      },
       {
         "type": "handlersList"
       }
@@ -404,13 +448,24 @@
       {
         "type": "mediaMessage",
         "mediaKind": "file"
+      },
+      {
+        "type": "action-recipients",
+        "label": "Qabul qiluvchilar",
+        "optional": true
+      },
+      {
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
     "footer": [
-      {
-        "type": "actionPanel",
-        "hideHandlers": true
-      },
       {
         "type": "handlersList"
       }
@@ -625,13 +680,24 @@
         "label": "Longitude",
         "placeholder": "69.279737",
         "step": 1e-06
+      },
+      {
+        "type": "action-recipients",
+        "label": "Qabul qiluvchilar",
+        "optional": true
+      },
+      {
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
     "footer": [
-      {
-        "type": "actionPanel",
-        "variant": "messageBasic"
-      },
       {
         "type": "handlersList"
       }
@@ -707,13 +773,24 @@
         "placeholder": "BEGIN:VCARD\nVERSION:3.0\n...",
         "rows": 4,
         "helpText": "Qo'shimcha kontakt ma'lumotlari uchun VCard format"
+      },
+      {
+        "type": "action-recipients",
+        "label": "Qabul qiluvchilar",
+        "optional": true
+      },
+      {
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
     "footer": [
-      {
-        "type": "actionPanel",
-        "variant": "messageBasic"
-      },
       {
         "type": "handlersList"
       }
@@ -846,13 +923,24 @@
         "min": 5,
         "max": 600,
         "optional": true
+      },
+      {
+        "type": "action-recipients",
+        "label": "Qabul qiluvchilar",
+        "optional": true
+      },
+      {
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
     "footer": [
-      {
-        "type": "actionPanel",
-        "hideHandlers": true
-      },
       {
         "type": "handlersList"
       }
@@ -1046,13 +1134,19 @@
             "placeholder": "Sarlavha..."
           }
         ]
+      },
+      {
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
     "footer": [
-      {
-        "type": "actionPanel",
-        "hideHandlers": true
-      },
       {
         "type": "handlersList"
       }
@@ -1196,13 +1290,19 @@
         "type": "richTextMessage",
         "key": "newText",
         "label": "Yangi matn"
+      },
+      {
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
     "footer": [
-      {
-        "type": "actionPanel",
-        "hideHandlers": true
-      },
       {
         "type": "handlersList"
       }
@@ -1253,13 +1353,24 @@
         "key": "messageText",
         "label": "Xabar matni",
         "intro": "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi"
+      },
+      {
+        "type": "action-recipients",
+        "label": "Qabul qiluvchilar",
+        "optional": true
+      },
+      {
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
     "footer": [
-      {
-        "type": "actionPanel",
-        "hideHandlers": true
-      },
       {
         "type": "handlersList"
       }
@@ -2154,14 +2265,19 @@
       {
         "type": "description",
         "textFallback": "Keyboard tugmalari tasodifiy yo'l tanlash uchun ishlatiladi. Har bir tugma alohida chiqish handle'ga ega bo'ladi."
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "actionPanel",
-        "hideHandlers": true
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "keyboard": {
         "active": "inline",
@@ -2665,14 +2781,19 @@
       {
         "type": "description",
         "textFallback": "Inline tugma bosilganda javob xabar yuboradi. Keyboard orqali yangi tugmalar qo'shish mumkin."
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "actionPanel",
-        "hideHandlers": true
+        "type": "action-keyboard",
+        "label": "Tugmalar",
+        "optional": true
+      },
+      {
+        "type": "action-settings",
+        "label": "Qo'shimcha sozlamalar",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "keyboard": {
         "active": "inline",

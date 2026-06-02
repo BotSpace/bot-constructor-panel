@@ -87,7 +87,11 @@ export interface NodeFieldManifest {
     | "condition-list"
     | "cron-editor"
     | "trigger-config"
-    | "dynamic-params";
+    | "dynamic-params"
+    // Action panel sub-sections (optional-capable)
+    | "action-recipients"
+    | "action-keyboard"
+    | "action-settings";
   key?: string;
   widgetKey?: string;
   label?: string;

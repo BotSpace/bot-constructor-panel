@@ -31,6 +31,10 @@ import {
   RichTextMessageField,
   MediaMessageField,
 } from "@/features/bot-constructor/nodes/widgets/shared-message-fields";
+import { RecipientsManager } from "@/features/bot-constructor/nodes/actions/shared/RecipientSelector";
+import { ButtonGenerator, KeyboardConfig } from "@/features/bot-constructor/components";
+import ActionNodeSettings from "@/features/bot-constructor/nodes/actions/shared/ActionNodeSettings";
+import { ParseMode } from "@/features/bot-constructor/nodes/types";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { cn } from "@/lib/utils";
 import { Plus, X } from "lucide-react";
@@ -248,6 +252,36 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         nodeId={nodeId}
         data={data}
         field={field as Parameters<typeof DynamicParamsField>[0]["field"]}
+      />
+    );
+  }
+
+  if (field.type === "action-recipients") {
+    const recipients = (data.recipients as { sendToSender: boolean; additionalIds: string[] }) ?? {
+      sendToSender: true,
+      additionalIds: [],
+    };
+    return (
+      <RecipientsManager
+        recipients={recipients}
+        onUpdate={(update) => updateNodeData(nodeId, update)}
+      />
+    );
+  }
+
+  if (field.type === "action-keyboard") {
+    const keyboard = data.keyboard as KeyboardConfig | undefined;
+    if (!keyboard) return null;
+    return <ButtonGenerator initialKeyboard={keyboard} node_id={nodeId} />;
+  }
+
+  if (field.type === "action-settings") {
+    return (
+      <ActionNodeSettings
+        notificationDisabled={typeof data.disableNotification === "boolean" ? data.disableNotification : undefined}
+        contentProtected={typeof data.protectContent === "boolean" ? data.protectContent : undefined}
+        parseMode={typeof data.parseMode === "string" ? (data.parseMode as ParseMode) : undefined}
+        handleUpdate={(update) => updateNodeData(nodeId, update)}
       />
     );
   }
