@@ -19,6 +19,10 @@ import {
 } from "@/features/bot-constructor/nodes/triggers/shared";
 import { NodeFieldManifest } from "@/features/bot-constructor/nodes/registry/types";
 import { renderCustomWidget } from "@/features/bot-constructor/nodes/widgets/widgetRegistry";
+import { ArrayEditorField } from "@/features/bot-constructor/nodes/widgets/generic-fields/ArrayEditorField";
+import { CodeEditorField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CodeEditorField";
+import { CollectionSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CollectionSelectField";
+import { StateTypeSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/StateTypeSelectField";
 import {
   RichTextMessageField,
   MediaMessageField,
@@ -177,6 +181,46 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <MediaMessageField nodeId={nodeId} data={data} kind={kind} />
       </div>
+    );
+  }
+
+  if (field.type === "array-editor" && field.key && field.itemFields) {
+    return (
+      <ArrayEditorField
+        nodeId={nodeId}
+        data={data}
+        field={field as Parameters<typeof ArrayEditorField>[0]["field"]}
+      />
+    );
+  }
+
+  if (field.type === "code-editor" && field.key) {
+    return (
+      <CodeEditorField
+        nodeId={nodeId}
+        data={data}
+        field={field as Parameters<typeof CodeEditorField>[0]["field"]}
+      />
+    );
+  }
+
+  if (field.type === "collection-select" && field.key) {
+    return (
+      <CollectionSelectField
+        nodeId={nodeId}
+        data={data}
+        field={field as Parameters<typeof CollectionSelectField>[0]["field"]}
+      />
+    );
+  }
+
+  if (field.type === "state-type-select") {
+    return (
+      <StateTypeSelectField
+        nodeId={nodeId}
+        data={data}
+        field={field as Parameters<typeof StateTypeSelectField>[0]["field"]}
+      />
     );
   }
 
