@@ -9,7 +9,7 @@ import {
 } from "@/features/bot-constructor/components/NodeEditPanel/modal-footer-widgets";
 import { NodePanelProvider } from "@/features/bot-constructor/contexts/NodePanelContext";
 import { useTranslations } from "next-intl";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ModalNodeFormRendererProps {
@@ -140,27 +140,37 @@ export function ModalNodeFormRenderer({
       <div className="mx-auto w-full max-w-[820px] space-y-4 p-4 lg:p-6">
         {shownFields.length ? (
           <div className="space-y-5">
-            {shownFields.map((field, index) => (
-              <div
-                key={`${manifest.type}-${fieldKey(field)}-${index}`}
-                className="group relative animate-in fade-in-0 slide-in-from-bottom-2 duration-200"
-              >
-                <ModalFieldWidget nodeId={nodeId} data={data} field={field} />
-                {field.optional ? (
-                  <button
-                    type="button"
-                    className="absolute -left-2 -top-2 hidden h-5 w-5 items-center justify-center rounded-full bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white group-hover:flex"
-                    onClick={() =>
-                      setAddedOptionalKeys((prev) =>
-                        prev.filter((k) => k !== fieldKey(field))
-                      )
-                    }
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                ) : null}
-              </div>
-            ))}
+            {shownFields.map((field, index) =>
+              field.optional ? (
+                <div
+                  key={`${manifest.type}-${fieldKey(field)}-${index}`}
+                  className="flex items-stretch gap-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-200"
+                >
+                  {/* Persistent remove control on the left, separated by a divider */}
+                  <div className="flex items-start border-r border-white/10 pr-3 pt-1">
+                    <button
+                      type="button"
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-red-500/10 hover:text-red-400"
+                      title="Maydonni olib tashlash"
+                      onClick={() =>
+                        setAddedOptionalKeys((prev) =>
+                          prev.filter((k) => k !== fieldKey(field))
+                        )
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <ModalFieldWidget nodeId={nodeId} data={data} field={field} />
+                  </div>
+                </div>
+              ) : (
+                <div key={`${manifest.type}-${fieldKey(field)}-${index}`}>
+                  <ModalFieldWidget nodeId={nodeId} data={data} field={field} />
+                </div>
+              )
+            )}
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-6 text-center text-sm text-zinc-500">
