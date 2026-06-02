@@ -127,7 +127,7 @@ export function VariableInsertionProvider({
 
   const handleDropCapture = useCallback((event: DragEvent<HTMLDivElement>) => {
     const token =
-      event.dataTransfer.getData("application/x-botmother-variable") ||
+      event.dataTransfer.getData("application/x-botspace-variable") ||
       event.dataTransfer.getData("text/plain");
 
     if (!token.startsWith("{{") || !token.endsWith("}}")) {

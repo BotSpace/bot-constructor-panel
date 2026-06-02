@@ -2,7 +2,7 @@ import axios from "axios";
 import { SubFlowListResponse, SubFlowPlugin, PluginCategoryListResponse } from "@/types/http/plugin";
 
 const PLUGIN_API_URL =
-  process.env.NEXT_PUBLIC_PLUGIN_API || "https://api.botmother.uz/api/engine-plugin";
+  process.env.NEXT_PUBLIC_PLUGIN_API || "https://api.botspace.uz/api/engine-plugin";
 
 const pluginInstance = axios.create({
   baseURL: PLUGIN_API_URL,

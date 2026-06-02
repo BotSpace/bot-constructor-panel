@@ -33,7 +33,7 @@ export function NodeVariablePanel({ stateKeys }: NodeVariablePanelProps) {
     const token = `{{${key}}}`;
 
     event.dataTransfer.setData("text/plain", token);
-    event.dataTransfer.setData("application/x-botmother-variable", token);
+    event.dataTransfer.setData("application/x-botspace-variable", token);
     event.dataTransfer.effectAllowed = "copy";
   };
 
