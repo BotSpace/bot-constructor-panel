@@ -212,13 +212,14 @@
             "label": "HTML"
           }
         ]
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "messageText": "",
       "parseMode": "None",
@@ -288,13 +289,14 @@
         "key": "protectContent",
         "label": "Yuklab olishni taqiqlash",
         "optional": true
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "photoSourceType": "upload",
       "caption": "",
@@ -364,13 +366,14 @@
         "key": "protectContent",
         "label": "Yuklab olishni taqiqlash",
         "optional": true
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "videoSourceType": "upload",
       "caption": "",
@@ -440,13 +443,14 @@
         "key": "protectContent",
         "label": "Yuklab olishni taqiqlash",
         "optional": true
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "audioSourceType": "upload",
       "caption": "",
@@ -518,13 +522,14 @@
         "key": "protectContent",
         "label": "Yuklab olishni taqiqlash",
         "optional": true
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "fileSourceType": "upload",
       "caption": "",
@@ -611,13 +616,14 @@
         "type": "description",
         "textKey": "constructor.actions.voice.description",
         "textFallback": "Voice message yuboradi."
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "keyboard": {
         "active": "inline",
@@ -669,13 +675,14 @@
         "type": "description",
         "textKey": "constructor.actions.videoNote.description",
         "textFallback": "Dumaloq video xabar yuboradi."
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "keyboard": {
         "active": "inline",
@@ -757,13 +764,14 @@
         "key": "protectContent",
         "label": "Yuklab olishni taqiqlash",
         "optional": true
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "keyboard": {
         "active": "inline",
@@ -857,13 +865,14 @@
         "key": "protectContent",
         "label": "Yuklab olishni taqiqlash",
         "optional": true
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "keyboard": {
         "active": "inline",
@@ -1014,13 +1023,14 @@
         "key": "protectContent",
         "label": "Yuklab olishni taqiqlash",
         "optional": true
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "question": "",
       "options": [],
@@ -1227,13 +1237,14 @@
         "key": "protectContent",
         "label": "Yuklab olishni taqiqlash",
         "optional": true
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "mediaItems": [],
       "disableNotification": false,
@@ -1410,13 +1421,14 @@
             "label": "HTML"
           }
         ]
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "messageIdSource": "this_message",
       "messageId": null,
@@ -1505,13 +1517,14 @@
             "label": "HTML"
           }
         ]
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "messageText": "",
       "parseMode": "None",
@@ -1640,13 +1653,14 @@
         "type": "description",
         "textKey": "constructor.messageOperations.copy.description",
         "textFallback": "Xabarni nusxalab yuboradi."
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "keyboard": {
         "active": "inline",
@@ -1694,13 +1708,14 @@
         "type": "description",
         "textKey": "constructor.messageOperations.pin.description",
         "textFallback": "Xabarni guruhda qadab qo'yadi."
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "keyboard": {
         "active": "inline",
@@ -1918,13 +1933,14 @@
       {
         "type": "description",
         "textFallback": "Bu node file turidagi MessageTrigger'dan keyin kelishi kerak. Fayl ID trigger'dan avtomatik olinadi."
-      }
-    ],
-    "footer": [
+      },
       {
-        "type": "handlersList"
+        "type": "action-handlers",
+        "label": "Handler qo'shish",
+        "optional": true
       }
     ],
+    "footer": [],
     "defaults": {
       "messageType": ""
     }

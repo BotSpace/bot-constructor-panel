@@ -33,6 +33,7 @@ import {
 } from "@/features/bot-constructor/nodes/widgets/shared-message-fields";
 import { RecipientsManager } from "@/features/bot-constructor/nodes/actions/shared/RecipientSelector";
 import { ButtonGenerator, KeyboardConfig } from "@/features/bot-constructor/components";
+import { HandlerAdder } from "@/features/bot-constructor/nodes/actions/shared/HandlerBuilder";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { cn } from "@/lib/utils";
 import { Plus, X } from "lucide-react";
@@ -265,6 +266,10 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         onUpdate={(update) => updateNodeData(nodeId, update)}
       />
     );
+  }
+
+  if (field.type === "action-handlers") {
+    return <HandlerAdder sourceNodeId={nodeId} />;
   }
 
   if (field.type === "action-keyboard") {
