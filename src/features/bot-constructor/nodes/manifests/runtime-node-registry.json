@@ -4471,6 +4471,18 @@
         "placeholder": "https://api.example.com/{{id}}"
       },
       {
+        "type": "textarea",
+        "key": "bodyTemplate",
+        "label": "Payload (Body)",
+        "placeholder": "{\"key\": \"{{args.value}}\"}",
+        "rows": 4,
+        "helpText": "JSON yoki matn. {{args.x}} va {{context}} o'zgaruvchilar ishlatiladi. GET uchun bo'sh qoldiring.",
+        "visibleWhen": {
+          "key": "method",
+          "notEquals": "GET"
+        }
+      },
+      {
         "type": "number",
         "key": "timeout",
         "label": "Timeout (s)",
