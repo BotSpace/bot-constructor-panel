@@ -300,6 +300,32 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
   }
 
   if (field.type === "select") {
+    // Tab-style variant: render options as a segmented control (good for ≤4 options)
+    if (field.variant === "tabs") {
+      const current = typeof value === "string" ? value : "";
+      return (
+        <FieldShell label={field.label} helpText={field.helpText}>
+          <div className="flex gap-1 rounded-lg border border-white/10 bg-white/[0.03] p-1">
+            {field.options?.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => updateNodeData(nodeId, { [fieldKey]: option.value })}
+                className={cn(
+                  "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
+                  current === option.value
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </FieldShell>
+      );
+    }
+
     return (
       <FieldShell label={field.label} helpText={field.helpText}>
         <Select

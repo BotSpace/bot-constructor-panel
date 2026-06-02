@@ -211,7 +211,8 @@
             "value": "HTML",
             "label": "HTML"
           }
-        ]
+        ],
+        "variant": "tabs"
       },
       {
         "type": "action-handlers",
@@ -955,7 +956,8 @@
             "value": "quiz",
             "label": "Test/Quiz"
           }
-        ]
+        ],
+        "variant": "tabs"
       },
       {
         "type": "number",
@@ -1089,7 +1091,8 @@
             "value": "url",
             "label": "URL"
           }
-        ]
+        ],
+        "variant": "tabs"
       },
       {
         "type": "text",
@@ -1369,7 +1372,8 @@
             "value": "message_id",
             "label": "Message ID"
           }
-        ]
+        ],
+        "variant": "tabs"
       },
       {
         "type": "text",
@@ -1420,7 +1424,8 @@
             "value": "HTML",
             "label": "HTML"
           }
-        ]
+        ],
+        "variant": "tabs"
       },
       {
         "type": "action-handlers",
@@ -1516,7 +1521,8 @@
             "value": "HTML",
             "label": "HTML"
           }
-        ]
+        ],
+        "variant": "tabs"
       },
       {
         "type": "action-handlers",
@@ -2594,7 +2600,8 @@
             "value": "id",
             "label": "Chat ID"
           }
-        ]
+        ],
+        "variant": "tabs"
       },
       {
         "type": "array-editor",
@@ -3144,7 +3151,8 @@
         "labelKey": "constructor.ai.agent.fields.outputKey",
         "label": "Output Variable",
         "placeholder": "agent_output",
-        "helpText": "Context key where the agent's reply will be stored."
+        "helpText": "Context key where the agent's reply will be stored.",
+        "is_state": true
       },
       {
         "type": "checkbox",
@@ -3189,7 +3197,8 @@
             "label": "JSON"
           }
         ],
-        "optional": true
+        "optional": true,
+        "variant": "tabs"
       },
       {
         "type": "text",
