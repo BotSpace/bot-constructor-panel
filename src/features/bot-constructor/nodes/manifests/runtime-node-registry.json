@@ -3720,7 +3720,11 @@
       "responseVariable": "",
       "timeout": 30,
       "storeHeaders": false
-    }
+    },
+    "producesState": [
+      "http_response",
+      "http_success"
+    ]
   },
   {
     "type": "CallbackQueryAnswerNode",
