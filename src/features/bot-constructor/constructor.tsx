@@ -434,11 +434,38 @@ export default function Constructor() {
       if (pendingConnectionRef.current) {
         const { source, sourceHandle, position } = pendingConnectionRef.current;
 
-        // Place the new node at the same Y as the source so it lands on the same row
-        const sourceNode = useFlowStore.getState().nodes.find((n) => n.id === source);
-        const adjustedPosition = sourceNode
-          ? { x: position.x, y: sourceNode.position.y }
-          : position;
+        // Place the new node at the same Y as the source so it lands on the same
+        // row. If that spot is already occupied by another node (e.g. a sibling
+        // branch), push the new node downward until the row is free.
+        const allNodes = useFlowStore.getState().nodes;
+        const sourceNode = allNodes.find((n) => n.id === source);
+        let adjustedPosition = position;
+        if (sourceNode) {
+          const NODE_W = 280;
+          const NODE_H = 160;
+          const V_GAP = 40;
+          let candidateY = sourceNode.position.y;
+          const overlapsAt = (y: number) =>
+            allNodes.some((n) => {
+              if (n.id === source) return false;
+              const nx = n.position.x;
+              const ny = n.position.y;
+              const nw = n.width ?? NODE_W;
+              const nh = n.height ?? NODE_H;
+              return (
+                position.x < nx + nw &&
+                position.x + NODE_W > nx &&
+                y < ny + nh &&
+                y + NODE_H > ny
+              );
+            });
+          let guard = 0;
+          while (overlapsAt(candidateY) && guard < 50) {
+            candidateY += NODE_H + V_GAP;
+            guard += 1;
+          }
+          adjustedPosition = { x: position.x, y: candidateY };
+        }
 
         // Yangi node yaratish
         addNode(element, adjustedPosition);
