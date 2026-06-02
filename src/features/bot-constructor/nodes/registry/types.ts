@@ -103,6 +103,8 @@ export interface NodeFieldManifest {
   itemPlaceholder?: string;
   addButtonLabel?: string;
   visibleWhen?: NodeVisibilityRule;
+  /** true = hidden by default; user explicitly adds via "Add option" dropdown */
+  optional?: boolean;
   variant?: "commandTrigger";
   /** For richTextMessage: intro text shown above the editor */
   intro?: string;
