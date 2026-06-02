@@ -9,7 +9,7 @@ export default {
   // Shared with dashboard — must be the exact same value as dashboard's SESSION_SECRET.
   SESSION_SECRET: process.env.SESSION_SECRET ?? "dev-secret-change-me-please-32chars",
   SESSION_COOKIE_NAME: process.env.SESSION_COOKIE_NAME ?? "bm_session",
-  // Set in production to share the cookie across subdomains, e.g. ".botmother.uz".
+  // Set in production to share the cookie across subdomains, e.g. ".botspace.uz".
   SESSION_COOKIE_DOMAIN: process.env.SESSION_COOKIE_DOMAIN,
   // Where to send the user when no session exists — dashboard handles auth.
   DASHBOARD_URL: process.env.DASHBOARD_URL ?? process.env.ADMIN_PANEL ?? "http://localhost:3000",

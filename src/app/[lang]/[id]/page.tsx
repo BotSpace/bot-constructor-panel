@@ -30,7 +30,7 @@ function PageInner() {
 
   useEffect(() => {
     if (project) {
-      document.title = `${project.name} | BotMother.uz`;
+      document.title = `${project.name} | BotSpace.uz`;
     }
   }, [project?.id]);
 

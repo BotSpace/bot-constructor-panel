@@ -135,7 +135,7 @@ export function PlanCard({
                     <li className="flex items-start gap-2">
                         <Check className="mt-[2px] h-3 w-3 text-primary" />
                         <span>
-                            Botda &quot;Powered by BotMother&quot; yozuvisiz
+                            Botda &quot;Powered by BotSpace&quot; yozuvisiz
                         </span>
                     </li>
                 )}

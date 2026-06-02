@@ -44,7 +44,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const ws = new WebSocket(`wss://api.botmother.uz/ws/events?token=${access}`);
+    const ws = new WebSocket(`wss://api.botspace.uz/ws/events?token=${access}`);
     socketRef.current = ws;
 
     ws.onopen = () => {
