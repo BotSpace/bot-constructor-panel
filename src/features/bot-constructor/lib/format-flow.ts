@@ -129,8 +129,8 @@ export const getFormatFlow = (
 
   dagreGraph.setGraph({
     rankdir: direction,
-    nodesep: 60,
-    ranksep: 120,
+    nodesep: 100,
+    ranksep: 180,
   });
 
   normalNodes.forEach((node) => {

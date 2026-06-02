@@ -143,13 +143,13 @@ export function ModalNodeFormRenderer({
             {shownFields.map((field, index) => (
               <div
                 key={`${manifest.type}-${fieldKey(field)}-${index}`}
-                className="group relative"
+                className="group relative animate-in fade-in-0 slide-in-from-bottom-2 duration-200"
               >
                 <ModalFieldWidget nodeId={nodeId} data={data} field={field} />
                 {field.optional ? (
                   <button
                     type="button"
-                    className="absolute -right-2 -top-2 hidden h-5 w-5 items-center justify-center rounded-full bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white group-hover:flex"
+                    className="absolute -left-2 -top-2 hidden h-5 w-5 items-center justify-center rounded-full bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white group-hover:flex"
                     onClick={() =>
                       setAddedOptionalKeys((prev) =>
                         prev.filter((k) => k !== fieldKey(field))

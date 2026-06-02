@@ -434,8 +434,14 @@ export default function Constructor() {
       if (pendingConnectionRef.current) {
         const { source, sourceHandle, position } = pendingConnectionRef.current;
 
+        // Place the new node at the same Y as the source so it lands on the same row
+        const sourceNode = useFlowStore.getState().nodes.find((n) => n.id === source);
+        const adjustedPosition = sourceNode
+          ? { x: position.x, y: sourceNode.position.y }
+          : position;
+
         // Yangi node yaratish
-        addNode(element, position);
+        addNode(element, adjustedPosition);
 
         // Yangi yaratilgan node'ni topish va edge yaratish
         setTimeout(() => {
@@ -516,7 +522,7 @@ export default function Constructor() {
               deleteKeyCode={null} // O'zimizning handler'imizni ishlatamiz
               minZoom={0.1}
               maxZoom={2.5}
-              connectionRadius={210}
+              connectionRadius={60}
               snapToGrid={snapToGrid}
               snapGrid={snapToGrid ? [20, 20] : undefined}
               connectionLineStyle={{
