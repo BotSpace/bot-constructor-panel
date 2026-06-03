@@ -46,9 +46,8 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
     autoClearTimer = setTimeout(() => get().clearStatuses(), AUTO_CLEAR_MS);
 
     set((state) => {
-      const base = isNewRun
-        ? { statuses: {}, errors: {}, timestamps: {} }
-        : state;
+      const base: Pick<DebugStatusState, "statuses" | "errors" | "timestamps"> =
+        isNewRun ? { statuses: {}, errors: {}, timestamps: {} } : state;
 
       const incomingTs = typeof ts === "number" ? ts : now;
       const prevTs = base.timestamps[nodeId];
