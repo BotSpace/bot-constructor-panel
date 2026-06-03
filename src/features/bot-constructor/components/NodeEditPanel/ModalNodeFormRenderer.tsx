@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { NodeManifest, NodeFieldManifest } from "@/features/bot-constructor/nodes/registry/types";
 import { ModalFieldWidget } from "@/features/bot-constructor/components/NodeEditPanel/modal-field-widgets";
 import {
@@ -108,10 +109,38 @@ function AddOptionButton({
   onAdd: (key: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open || !buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    const estimatedHeight = Math.min(options.length * 36 + 8, 240);
+    const spaceBelow = window.innerHeight - rect.bottom;
+
+    if (spaceBelow < estimatedHeight) {
+      setDropdownStyle({
+        position: "fixed",
+        left: rect.left,
+        width: rect.width,
+        bottom: window.innerHeight - rect.top + 4,
+        zIndex: 9999,
+      });
+    } else {
+      setDropdownStyle({
+        position: "fixed",
+        left: rect.left,
+        width: rect.width,
+        top: rect.bottom + 4,
+        zIndex: 9999,
+      });
+    }
+  }, [open, options.length]);
 
   return (
-    <div className="relative">
+    <div>
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2.5 text-sm text-zinc-400 transition-colors hover:border-white/20 hover:text-zinc-200"
@@ -120,30 +149,32 @@ function AddOptionButton({
         <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
       </button>
 
-      {open ? (
-        <>
-          {/* Outside click overlay */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setOpen(false)}
-          />
-          <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-white/10 bg-zinc-900 py-1 shadow-xl">
-            {options.map((field) => (
-              <button
-                key={fieldKey(field)}
-                type="button"
-                className="flex w-full items-center px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white"
-                onClick={() => {
-                  onAdd(fieldKey(field));
-                  setOpen(false);
-                }}
+      {open
+        ? createPortal(
+            <>
+              <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
+              <div
+                style={dropdownStyle}
+                className="rounded-lg border border-white/10 bg-zinc-900 py-1 shadow-xl"
               >
-                {field.label ?? field.key ?? field.type}
-              </button>
-            ))}
-          </div>
-        </>
-      ) : null}
+                {options.map((field) => (
+                  <button
+                    key={fieldKey(field)}
+                    type="button"
+                    className="flex w-full items-center px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white"
+                    onClick={() => {
+                      onAdd(fieldKey(field));
+                      setOpen(false);
+                    }}
+                  >
+                    {field.label ?? field.key ?? field.type}
+                  </button>
+                ))}
+              </div>
+            </>,
+            document.body
+          )
+        : null}
     </div>
   );
 }
@@ -178,16 +209,27 @@ export function ModalNodeFormRenderer({
 
   const requiredFields = allFields.filter((f) => !f.optional);
 
-  // An optional field is shown if the user added it this session OR it already
-  // carries a configured value (so it survives a page refresh).
-  const isShownOptional = (f: NodeFieldManifest) =>
-    f.optional &&
-    (addedOptionalKeys.includes(fieldKey(f)) || optionalFieldConfigured(f, data));
+  // Pre-configured optional fields (have a value from a previous session) —
+  // shown in manifest order so they feel stable on page refresh.
+  const configuredOptionalFields = allFields.filter(
+    (f) =>
+      f.optional &&
+      !addedOptionalKeys.includes(fieldKey(f)) &&
+      optionalFieldConfigured(f, data)
+  );
 
-  const addedOptionalFields = allFields.filter(isShownOptional);
+  // Manually added this session — in the ORDER the user added them so each
+  // new field always appears at the very bottom of the list.
+  const manuallyAddedFields = addedOptionalKeys
+    .map((key) => allFields.find((f) => fieldKey(f) === key))
+    .filter((f): f is NodeFieldManifest => Boolean(f));
+
+  const addedOptionalFields = [...configuredOptionalFields, ...manuallyAddedFields];
+
+  const shownOptionalKeys = new Set(addedOptionalFields.map(fieldKey));
 
   const availableOptionalFields = allFields.filter(
-    (f) => f.optional && !isShownOptional(f)
+    (f) => f.optional && !shownOptionalKeys.has(fieldKey(f))
   );
 
   const shownFields = [...requiredFields, ...addedOptionalFields];

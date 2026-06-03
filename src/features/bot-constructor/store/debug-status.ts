@@ -22,6 +22,12 @@ interface DebugStatusState {
     ts?: number,
     error?: string
   ) => void;
+  /**
+   * Call when a new trigger fires. Clears all previous execution state,
+   * then marks every trigger node in the flow as "waiting" (yellow glow).
+   * Subsequent setNodeStatus calls will override these with real events.
+   */
+  startNewRun: (triggerNodeIds: string[]) => void;
   clearStatuses: () => void;
 }
 
@@ -29,6 +35,20 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
   statuses: {},
   errors: {},
   timestamps: {},
+
+  startNewRun: (triggerNodeIds) => {
+    if (autoClearTimer) clearTimeout(autoClearTimer);
+    autoClearTimer = setTimeout(() => get().clearStatuses(), AUTO_CLEAR_MS);
+
+    // ts=0 so any real setNodeStatus event (ts > 0) always wins
+    const newStatuses: Record<string, DebugNodeStatus> = {};
+    const newTimestamps: Record<string, number> = {};
+    for (const id of triggerNodeIds) {
+      newStatuses[id] = "waiting";
+      newTimestamps[id] = 0;
+    }
+    set({ statuses: newStatuses, errors: {}, timestamps: newTimestamps });
+  },
 
   setNodeStatus: (nodeId, status, ts, error) => {
     const now = Date.now();

@@ -2,6 +2,8 @@
 
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
+import { useFlowStore } from "@/features/bot-constructor/store";
+import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
 import { useSession } from "@/lib/session-client";
 import {
   createContext,
@@ -80,19 +82,52 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         case "debug_status":
           if (project.id === data.project) store.changeDebug(data as never);
           break;
-        case "node_execution":
+        case "node_execution": {
           // project may be int (backend) — compare loosely against current project
           if (String(data.project) === String(project.id) && data.node_id) {
-            useDebugStatusStore
-              .getState()
-              .setNodeStatus(
-                data.node_id as string,
-                data.status as never,
-                typeof data.ts === "number" ? (data.ts as number) : undefined,
-                data.error as string | undefined
-              );
+            const nodeId = data.node_id as string;
+            const status = data.status as "waiting" | "running" | "success" | "error";
+            const ts = typeof data.ts === "number" ? (data.ts as number) : undefined;
+            const error = data.error as string | undefined;
+
+            const debugStore = useDebugStatusStore.getState();
+            const { nodes, edges } = useFlowStore.getState();
+
+            // When a trigger fires, reset all nodes and mark all triggers as waiting
+            if (status === "running") {
+              const flowNode = nodes.find((n) => n.id === nodeId);
+              const manifest = flowNode?.type
+                ? getNodeManifestByType(flowNode.type)
+                : undefined;
+              if (manifest?.sidebar?.groupId === "triggers") {
+                const triggerIds = nodes
+                  .filter(
+                    (n) =>
+                      n.type &&
+                      getNodeManifestByType(n.type)?.sidebar?.groupId === "triggers"
+                  )
+                  .map((n) => n.id);
+                debugStore.startNewRun(triggerIds);
+              }
+            }
+
+            debugStore.setNodeStatus(nodeId, status, ts, error);
+
+            // Propagate status to accessory nodes (e.g. LLM node connected to AI agent)
+            const accessorySourceIds = edges
+              .filter(
+                (e) =>
+                  e.target === nodeId &&
+                  typeof e.targetHandle === "string" &&
+                  e.targetHandle.startsWith("acc:")
+              )
+              .map((e) => e.source);
+            for (const accId of accessorySourceIds) {
+              debugStore.setNodeStatus(accId, status, ts, error);
+            }
           }
           break;
+        }
         default:
           break;
       }
