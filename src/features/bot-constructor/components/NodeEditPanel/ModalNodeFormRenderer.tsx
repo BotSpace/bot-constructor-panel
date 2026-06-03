@@ -8,9 +8,24 @@ import {
   ModalHandlersList,
 } from "@/features/bot-constructor/components/NodeEditPanel/modal-footer-widgets";
 import { NodePanelProvider } from "@/features/bot-constructor/contexts/NodePanelContext";
+import { useFlowStore } from "@/features/bot-constructor/store";
 import { useTranslations } from "next-intl";
 import { ChevronDown, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+/** Clear a field's stored value so a removed optional field stays hidden. */
+function clearedFieldData(field: NodeFieldManifest): Record<string, unknown> {
+  switch (field.type) {
+    case "action-keyboard":
+      return { rows: [], keyboard_kind: "inline" };
+    case "action-handlers":
+      return { handlers: [] };
+    case "action-recipients":
+      return { recipients: { sendToSender: true, additionalIds: [] } };
+    default:
+      return field.key ? { [field.key]: undefined } : {};
+  }
+}
 
 interface ModalNodeFormRendererProps {
   nodeId: string;
@@ -46,6 +61,43 @@ function isFieldVisible(data: Record<string, unknown>, field: NodeFieldManifest)
 
 function fieldKey(field: NodeFieldManifest): string {
   return field.key ?? field.widgetKey ?? field.type;
+}
+
+/**
+ * True if an optional field already holds a non-default value in the node data.
+ * Such fields must stay visible across a page refresh (where the in-memory
+ * "added" set resets), otherwise the user's configured values look lost.
+ */
+function optionalFieldConfigured(
+  field: NodeFieldManifest,
+  data: Record<string, unknown>
+): boolean {
+  const arrLen = (v: unknown) => (Array.isArray(v) ? v.length : 0);
+
+  switch (field.type) {
+    case "action-keyboard":
+      return arrLen(data.rows) > 0;
+    case "action-handlers":
+      return arrLen(data.handlers) > 0;
+    case "action-recipients": {
+      const r = data.recipients as
+        | { sendToSender?: boolean; additionalIds?: unknown[] }
+        | undefined;
+      return arrLen(r?.additionalIds) > 0 || r?.sendToSender === false;
+    }
+    default: {
+      const key = field.key;
+      if (!key) return false;
+      const v = data[key];
+      if (v === undefined || v === null) return false;
+      if (typeof v === "boolean") return v === true;
+      if (typeof v === "string") return v.trim() !== "";
+      if (typeof v === "number") return true;
+      if (Array.isArray(v)) return v.length > 0;
+      if (typeof v === "object") return Object.keys(v).length > 0;
+      return Boolean(v);
+    }
+  }
 }
 
 function AddOptionButton({
@@ -108,6 +160,7 @@ export function ModalNodeFormRenderer({
     manifest.descriptionFallback
   );
 
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [addedOptionalKeys, setAddedOptionalKeys] = useState<string[]>([]);
 
   const allFields = (manifest.content || [])
@@ -125,12 +178,16 @@ export function ModalNodeFormRenderer({
 
   const requiredFields = allFields.filter((f) => !f.optional);
 
-  const addedOptionalFields = allFields.filter(
-    (f) => f.optional && addedOptionalKeys.includes(fieldKey(f))
-  );
+  // An optional field is shown if the user added it this session OR it already
+  // carries a configured value (so it survives a page refresh).
+  const isShownOptional = (f: NodeFieldManifest) =>
+    f.optional &&
+    (addedOptionalKeys.includes(fieldKey(f)) || optionalFieldConfigured(f, data));
+
+  const addedOptionalFields = allFields.filter(isShownOptional);
 
   const availableOptionalFields = allFields.filter(
-    (f) => f.optional && !addedOptionalKeys.includes(fieldKey(f))
+    (f) => f.optional && !isShownOptional(f)
   );
 
   const shownFields = [...requiredFields, ...addedOptionalFields];
@@ -151,11 +208,13 @@ export function ModalNodeFormRenderer({
                     type="button"
                     className="flex h-7 w-7 shrink-0 items-center justify-center self-center rounded-md border-r border-white/10 pr-3 text-zinc-500 hover:text-red-400"
                     title="Maydonni olib tashlash"
-                    onClick={() =>
+                    onClick={() => {
                       setAddedOptionalKeys((prev) =>
                         prev.filter((k) => k !== fieldKey(field))
-                      )
-                    }
+                      );
+                      // Also clear its stored value so it doesn't auto-reappear.
+                      updateNodeData(nodeId, clearedFieldData(field));
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
