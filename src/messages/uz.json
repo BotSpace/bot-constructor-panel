@@ -60,6 +60,18 @@
       "callbackQuery": {
         "name": "Inline tugma bosilganda",
         "description": "Inline tugmani bosganda."
+      },
+      "callbackButton": {
+        "name": "Maxsus inline tugma",
+        "description": "Maxsus inline button tomonidan trigger qilinadi."
+      },
+      "externalWebhook": {
+        "name": "Tashqi Webhook",
+        "description": "Tashqi webhook (stripe/payme/...) kelganda trigger qilinadi."
+      },
+      "cron": {
+        "name": "Cron (Periodik)",
+        "description": "Cron jadval bo'yicha periodik ishga tushadi."
       }
     },
     "actions": {
@@ -162,6 +174,10 @@
       "downloadFile": {
         "name": "Fayl yuklab olish",
         "description": "Faylni yuklab oladi va saqlaydi."
+      },
+      "unpinAll": {
+        "name": "Barcha pinlarni olib tashlash",
+        "description": "Chatdagi barcha qadangan xabarlarni olib tashlaydi."
       }
     },
     "flowControl": {
@@ -197,6 +213,10 @@
       "if": {
         "name": "If (Agar)",
         "description": "Shartni tekshiradi va TRUE/FALSE/NEXT yo'nalishlarga ajratadi."
+      },
+      "scheduler": {
+        "name": "Rejalashtiruvchi",
+        "description": "Kelajakdagi vaqtda flow'ni davom ettiradi."
       }
     },
     "integrations": {
@@ -208,6 +228,14 @@
       "callbackAnswer": {
         "name": "Callback Javob",
         "description": "Inline tugma bosilganda javob beradi."
+      },
+      "download": {
+        "name": "Fayl yuklash (Download)",
+        "description": "Telegram file/photo'ni yuklab olib state'ga saqlaydi."
+      },
+      "answerInlineQuery": {
+        "name": "Inline Query Javobi",
+        "description": "Inline query'ga natijalar qaytaradi."
       }
     },
     "ai": {
@@ -302,6 +330,18 @@
       "loadCollectionItem": {
         "name": "Yuklab olish",
         "description": "Foydalanuvchidan kelgan ma'lumot yuklab olish"
+      },
+      "loadCollectionList": {
+        "name": "Collection ro'yxatini yuklash",
+        "description": "Collection'dan documents ro'yxati (filter, sort, limit)."
+      },
+      "updateCollection": {
+        "name": "Collection yangilash",
+        "description": "Collection documentini yangilaydi."
+      },
+      "deleteCollection": {
+        "name": "Collection o'chirish",
+        "description": "Collection documentini o'chiradi."
       }
     }
   },

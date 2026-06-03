@@ -60,6 +60,18 @@
       "callbackQuery": {
         "name": "Iinline button pressed",
         "description": "Inline button is pressed."
+      },
+      "callbackButton": {
+        "name": "Custom inline button trigger",
+        "description": "Triggered by a specific inline button."
+      },
+      "externalWebhook": {
+        "name": "External Webhook",
+        "description": "Triggered by an external webhook (stripe/payme/...)."
+      },
+      "cron": {
+        "name": "Cron (Periodic)",
+        "description": "Runs periodically on a cron schedule."
       }
     },
     "actions": {
@@ -162,6 +174,10 @@
       "downloadFile": {
         "name": "Download file",
         "description": "Downloads and saves a file."
+      },
+      "unpinAll": {
+        "name": "Unpin all messages",
+        "description": "Removes all pinned messages from the chat."
       }
     },
     "flowControl": {
@@ -197,6 +213,10 @@
       "if": {
         "name": "If",
         "description": "Checks condition and routes to TRUE/FALSE/NEXT."
+      },
+      "scheduler": {
+        "name": "Scheduler",
+        "description": "Continues flow at a future scheduled time."
       }
     },
     "integrations": {
@@ -208,6 +228,14 @@
       "callbackAnswer": {
         "name": "Callback Answer",
         "description": "Answers inline button is pressed."
+      },
+      "download": {
+        "name": "Download File",
+        "description": "Downloads a Telegram file/photo and saves it to state."
+      },
+      "answerInlineQuery": {
+        "name": "Answer Inline Query",
+        "description": "Returns results for an inline query."
       }
     },
     "ai": {
@@ -302,6 +330,18 @@
       "loadCollectionItem": {
         "name": "Get item from Collection",
         "description": "Load a single item from Collection and save to context"
+      },
+      "loadCollectionList": {
+        "name": "Load Collection List",
+        "description": "Load a list of documents from a collection (filter, sort, limit)."
+      },
+      "updateCollection": {
+        "name": "Update Collection",
+        "description": "Update a document in a collection."
+      },
+      "deleteCollection": {
+        "name": "Delete from Collection",
+        "description": "Delete a document from a collection."
       }
     }
   },

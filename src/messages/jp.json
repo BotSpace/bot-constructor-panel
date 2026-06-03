@@ -60,6 +60,18 @@
       "callbackQuery": {
         "name": "インラインボタン押下時",
         "description": "インラインボタンが押されたとき。"
+      },
+      "callbackButton": {
+        "name": "特定インラインボタントリガー",
+        "description": "特定のインラインボタンによってトリガーされます。"
+      },
+      "externalWebhook": {
+        "name": "外部Webhookトリガー",
+        "description": "外部Webhook（stripe/payme/...）によってトリガーされます。"
+      },
+      "cron": {
+        "name": "Cron（定期実行）",
+        "description": "cronスケジュールで定期的に実行されます。"
       }
     },
     "actions": {
@@ -162,6 +174,10 @@
       "downloadFile": {
         "name": "ファイルをダウンロード",
         "description": "ファイルをダウンロードして保存します。"
+      },
+      "unpinAll": {
+        "name": "すべてのピンを解除",
+        "description": "チャット内のすべてのピン留めメッセージを解除します。"
       }
     },
     "flowControl": {
@@ -200,6 +216,18 @@
       "callbackAnswer": {
         "name": "コールバック応答",
         "description": "インラインボタンが押されたときに応答します。"
+      },
+      "download": {
+        "name": "ファイルダウンロード",
+        "description": "TelegramのファイルやフォトをダウンロードしてStateに保存します。"
+      },
+      "answerInlineQuery": {
+        "name": "インラインクエリへの回答",
+        "description": "インラインクエリに対して結果を返します。"
+      },
+      "scheduler": {
+        "name": "スケジューラー",
+        "description": "未来の指定した時刻にフローを続行します。"
       }
     },
     "ai": {
@@ -294,6 +322,18 @@
       "loadCollectionItem": {
         "name": "データを読み込む",
         "description": "コレクションから単一のアイテムを読み込み、コンテキストに保存"
+      },
+      "loadCollectionList": {
+        "name": "コレクションリストを読み込む",
+        "description": "コレクションからドキュメントのリストを読み込みます（フィルター、ソート、制限）。"
+      },
+      "updateCollection": {
+        "name": "コレクションを更新",
+        "description": "コレクション内のドキュメントを更新します。"
+      },
+      "deleteCollection": {
+        "name": "コレクションから削除",
+        "description": "コレクションからドキュメントを削除します。"
       }
     }
   },

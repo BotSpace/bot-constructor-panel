@@ -60,6 +60,18 @@
       "callbackQuery": {
         "name": "При нажатии inline кнопки",
         "description": "Когда inline кнопка нажата."
+      },
+      "callbackButton": {
+        "name": "Специальная inline кнопка",
+        "description": "Триггер от конкретной inline кнопки."
+      },
+      "externalWebhook": {
+        "name": "Внешний вебхук",
+        "description": "Триггер от внешнего вебхука (stripe/payme/...)."
+      },
+      "cron": {
+        "name": "Cron (Периодический)",
+        "description": "Запускается периодически по расписанию cron."
       }
     },
     "actions": {
@@ -162,6 +174,10 @@
       "downloadFile": {
         "name": "Скачать файл",
         "description": "Скачивает и сохраняет файл."
+      },
+      "unpinAll": {
+        "name": "Открепить все сообщения",
+        "description": "Открепляет все закреплённые сообщения в чате."
       }
     },
     "flowControl": {
@@ -200,6 +216,18 @@
       "callbackAnswer": {
         "name": "Ответ на callback",
         "description": "Отвечает при нажатии inline кнопки."
+      },
+      "download": {
+        "name": "Скачать файл (Download)",
+        "description": "Скачивает Telegram файл/фото и сохраняет в state."
+      },
+      "answerInlineQuery": {
+        "name": "Ответ на inline запрос",
+        "description": "Возвращает результаты для inline запроса."
+      },
+      "scheduler": {
+        "name": "Планировщик",
+        "description": "Продолжает flow в запланированное время."
       }
     },
     "ai": {
@@ -294,6 +322,18 @@
       "loadCollectionItem": {
         "name": "Загрузить данные",
         "description": "Загрузить один элемент из коллекции и сохранить в контекст"
+      },
+      "loadCollectionList": {
+        "name": "Загрузить список коллекции",
+        "description": "Загрузить список документов из коллекции (фильтр, сортировка, лимит)."
+      },
+      "updateCollection": {
+        "name": "Обновить коллекцию",
+        "description": "Обновить документ в коллекции."
+      },
+      "deleteCollection": {
+        "name": "Удалить из коллекции",
+        "description": "Удалить документ из коллекции."
       }
     }
   },
