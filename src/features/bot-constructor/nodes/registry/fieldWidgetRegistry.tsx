@@ -134,6 +134,7 @@ const PANEL_ONLY_FIELD_TYPES = new Set([
   "dynamic-params",
   "array-editor",
   "state-type-select",
+  "collection-binding",
 ]);
 
 function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
