@@ -377,13 +377,18 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
 
   if (field.type === "checkbox" || field.type === "switch") {
     return (
-      <FieldShell compact>
-        {field.label ? <Label className="cursor-pointer text-sm text-zinc-200">{field.label}</Label> : null}
-        <Switch
-          checked={Boolean(value)}
-          onCheckedChange={(checked) => updateNodeData(nodeId, { [fieldKey]: checked })}
-        />
-      </FieldShell>
+      <div className="space-y-1">
+        <FieldShell compact>
+          {field.label ? <Label className="cursor-pointer text-sm text-zinc-200">{field.label}</Label> : null}
+          <Switch
+            checked={Boolean(value)}
+            onCheckedChange={(checked) => updateNodeData(nodeId, { [fieldKey]: checked })}
+          />
+        </FieldShell>
+        {field.helpText ? (
+          <p className="text-xs leading-relaxed text-zinc-500">{field.helpText}</p>
+        ) : null}
+      </div>
     );
   }
 

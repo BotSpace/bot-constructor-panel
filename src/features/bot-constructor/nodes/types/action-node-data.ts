@@ -21,6 +21,7 @@ export interface SendTextMessageNodeData {
   parseMode: ParseMode;
   disableNotification: boolean;
   protectContent: boolean;
+  remove_keyboard?: boolean;
   dynamicMessages?: DynamicMessage[];
   keyboard: KeyboardConfig;
   handlers?: HandlerData[];
@@ -35,6 +36,7 @@ export interface SendPhotoNodeData {
   caption?: string;
   disableNotification?: boolean;
   protectContent?: boolean;
+  remove_keyboard?: boolean;
   keyboard: KeyboardConfig;
   handlers?: HandlerData[];
 }
@@ -54,6 +56,7 @@ export interface SendVideoNodeData {
   thumbnailFileId?: string;
   disableNotification: boolean;
   protectContent?: boolean;
+  remove_keyboard?: boolean;
   parseMode: ParseMode;
   keyboard: KeyboardConfig;
   handlers?: HandlerData[];
@@ -73,6 +76,7 @@ export interface SendAudioNodeData {
   thumbnailFileId?: string;
   disableNotification?: boolean;
   protectContent?: boolean;
+  remove_keyboard?: boolean;
   keyboard: KeyboardConfig;
   handlers?: HandlerData[];
 }
@@ -88,6 +92,7 @@ export interface SendFileNodeData {
   disableContentTypeDetection?: boolean;
   disableNotification?: boolean;
   protectContent?: boolean;
+  remove_keyboard?: boolean;
   keyboard: KeyboardConfig;
   handlers?: HandlerData[];
 }
@@ -98,6 +103,7 @@ export interface SendContactNodeData {
   firstName?: string;
   lastName?: string;
   vcard?: string;
+  remove_keyboard?: boolean;
   keyboard: KeyboardConfig;
   handlers?: HandlerData[];
 }
@@ -106,6 +112,7 @@ export interface SendLocationNodeData {
   recipients?: RecipientConfig;
   latitude?: number;
   longitude?: number;
+  remove_keyboard?: boolean;
   keyboard: KeyboardConfig;
   handlers?: HandlerData[];
 }
@@ -125,6 +132,7 @@ export interface SendPollNodeData {
   explanation?: string;
   openPeriod?: number;
   closeDate?: string;
+  remove_keyboard?: boolean;
   keyboard?: KeyboardConfig;
   handlers?: HandlerData[];
 }
@@ -140,6 +148,7 @@ export interface MediaItem {
 export interface MediaGroupNodeData {
   mediaItems?: MediaItem[];
   disableNotification?: boolean;
+  remove_keyboard?: boolean;
   keyboard: KeyboardConfig;
   handlers?: HandlerData[];
 }
@@ -161,6 +170,7 @@ export interface EditOrSendMessageNodeData {
   parseMode: ParseMode;
   disableNotification: boolean;
   disableWebPagePreview: boolean;
+  remove_keyboard?: boolean;
   keyboard: KeyboardConfig;
   dynamicMessages?: DynamicMessage[];
   handlers?: HandlerData[];
