@@ -439,11 +439,10 @@ function RowCard({
 export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
-  // Determine whether dynamic columns are allowed.
-  // Default: allow if key name contains 'keyboard', 'buttons', 'rows', or config explicitly sets it.
-  const allowDynamic =
-    field.allowDynamicColumns ??
-    /keyboard|button|row/i.test(field.key);
+  // Dynamic columns are opt-in via manifest only. Default OFF — a plain
+  // nested-rows shows just a single "add column" button (no Static/Dynamic
+  // switch). Set `allowDynamicColumns: true` in the field manifest to enable.
+  const allowDynamic = field.allowDynamicColumns === true;
 
   const rows = normalizeRows(data[field.key]);
 
