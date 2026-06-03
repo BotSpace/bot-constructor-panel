@@ -88,6 +88,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
               .setNodeStatus(
                 data.node_id as string,
                 data.status as never,
+                typeof data.ts === "number" ? (data.ts as number) : undefined,
                 data.error as string | undefined
               );
           }
