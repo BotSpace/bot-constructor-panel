@@ -93,25 +93,34 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             const debugStore = useDebugStatusStore.getState();
             const { nodes, edges } = useFlowStore.getState();
 
+            const flowNode = nodes.find((n) => n.id === nodeId);
+            const manifest = flowNode?.type
+              ? getNodeManifestByType(flowNode.type)
+              : undefined;
+            const isTrigger = manifest?.sidebar?.groupId === "triggers";
+
             // When a trigger fires, reset all nodes and mark all triggers as waiting
-            if (status === "running") {
-              const flowNode = nodes.find((n) => n.id === nodeId);
-              const manifest = flowNode?.type
-                ? getNodeManifestByType(flowNode.type)
-                : undefined;
-              if (manifest?.sidebar?.groupId === "triggers") {
-                const triggerIds = nodes
-                  .filter(
-                    (n) =>
-                      n.type &&
-                      getNodeManifestByType(n.type)?.sidebar?.groupId === "triggers"
-                  )
-                  .map((n) => n.id);
-                debugStore.startNewRun(triggerIds);
-              }
+            if (status === "running" && isTrigger) {
+              const triggerIds = nodes
+                .filter(
+                  (n) =>
+                    n.type &&
+                    getNodeManifestByType(n.type)?.sidebar?.groupId === "triggers"
+                )
+                .map((n) => n.id);
+              debugStore.startNewRun(triggerIds);
             }
 
             debugStore.setNodeStatus(nodeId, status, ts, error);
+
+            // Trigger nodes revert to "waiting" after success — they stay
+            // yellow while the rest of the flow executes downstream.
+            if (status === "success" && isTrigger) {
+              const revertTs = (ts ?? Date.now()) + 1;
+              setTimeout(() => {
+                useDebugStatusStore.getState().setNodeStatus(nodeId, "waiting", revertTs);
+              }, 1500);
+            }
 
             // Propagate status to accessory nodes (e.g. LLM node connected to AI agent)
             const accessorySourceIds = edges

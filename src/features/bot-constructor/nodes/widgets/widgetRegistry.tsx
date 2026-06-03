@@ -34,7 +34,8 @@ import {
 } from "@/features/bot-constructor/nodes/triggers/shared";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
-import { AlertCircle, ArrowRight, GripVertical, Key, ListPlus, PlusIcon, Trash2, X } from "lucide-react";
+import { AlertCircle, ArrowRight, Bot, GripVertical, Key, ListPlus, PlusIcon, Trash2, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { CodeEditorDialog } from "@/features/bot-constructor/nodes/custom/CustomCodeNode/components/CodeEditorDialog";
 import AddItemModal from "@/features/bot-constructor/nodes/custom/FormNode/components/add-item-modal";
@@ -2036,64 +2037,156 @@ function AIAgentAdvancedWidget({ nodeId, data }: WidgetProps) {
 const ALL_CRUD_OPS = ["create", "read", "update", "delete"] as const;
 type CrudOp = (typeof ALL_CRUD_OPS)[number];
 
+// ── AICollectionToolConfigWidget types ──────────────────────────────────────
+
+type CollectionAction = "create" | "read" | "update" | "delete" | "list";
+
+type AiFieldEntry = {
+  field: string;
+  value: string;
+  aiMode: boolean;
+  aiDescription: string;
+};
+
+const emptyEntry = (): AiFieldEntry => ({
+  field: "",
+  value: "",
+  aiMode: false,
+  aiDescription: "",
+});
+
+const COLL_ACTIONS: { value: CollectionAction; label: string }[] = [
+  { value: "create", label: "Create" },
+  { value: "read", label: "Read" },
+  { value: "update", label: "Update" },
+  { value: "delete", label: "Delete" },
+  { value: "list", label: "List" },
+];
+
+// Sub-component: one field row with AI toggle
+function AiFieldRow({
+  entry,
+  fieldOptions,
+  valuePlaceholder,
+  onChange,
+  onRemove,
+}: {
+  entry: AiFieldEntry;
+  fieldOptions: string[];
+  valuePlaceholder?: string;
+  onChange: (next: AiFieldEntry) => void;
+  onRemove?: () => void;
+}) {
+  const val = entry.aiMode ? entry.aiDescription : entry.value;
+  const setVal = (v: string) =>
+    onChange(entry.aiMode ? { ...entry, aiDescription: v } : { ...entry, value: v });
+
+  return (
+    <div className="flex items-center gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.02] px-2 py-1.5">
+      {/* Field name */}
+      {fieldOptions.length > 0 ? (
+        <Select value={entry.field} onValueChange={(v) => onChange({ ...entry, field: v })}>
+          <SelectTrigger className="h-7 w-28 shrink-0 text-[11px] font-mono">
+            <SelectValue placeholder="field" />
+          </SelectTrigger>
+          <SelectContent>
+            {fieldOptions.map((f) => (
+              <SelectItem key={f} value={f} className="text-[11px] font-mono">
+                {f}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <Input
+          className="h-7 w-28 shrink-0 text-[11px] font-mono"
+          placeholder="field"
+          value={entry.field}
+          onChange={(e) => onChange({ ...entry, field: e.target.value })}
+        />
+      )}
+
+      {/* Value / AI description */}
+      <Input
+        className={cn(
+          "h-7 min-w-0 flex-1 text-[11px]",
+          entry.aiMode &&
+            "border-blue-500/40 bg-blue-500/5 text-blue-200 placeholder:text-blue-400/40"
+        )}
+        placeholder={entry.aiMode ? "AI uchun tavsif..." : valuePlaceholder ?? "Qiymat..."}
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+      />
+
+      {/* AI toggle */}
+      <button
+        type="button"
+        title={entry.aiMode ? "AI mode yoqilgan — o'chirish" : "AI mode yoqish"}
+        className={cn(
+          "flex h-7 w-7 shrink-0 items-center justify-center rounded transition-colors",
+          entry.aiMode
+            ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+            : "text-zinc-500 hover:text-zinc-300"
+        )}
+        onClick={() => onChange({ ...entry, aiMode: !entry.aiMode })}
+      >
+        <Bot className="h-3.5 w-3.5" />
+      </button>
+
+      {onRemove ? (
+        <button
+          type="button"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-zinc-500 hover:text-red-400"
+          onClick={onRemove}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const { data: collections } = useCollectionStore();
 
   const collection = typeof data.collection === "string" ? data.collection : "";
-  const operations: CrudOp[] = Array.isArray(data.operations)
-    ? (data.operations as CrudOp[])
-    : ["create", "read", "update", "delete"];
-  const searchFields = Array.isArray(data.searchFields)
-    ? (data.searchFields as { field: string; description: string }[])
-    : [];
+  const action: CollectionAction = (data.action as CollectionAction) || "create";
 
-  const handleCollectionChange = (value: string) => {
-    updateNodeData(nodeId, { collection: value });
-  };
+  const { data: collectionDetail } = useReactQueryAction<CollectionDetail>({
+    url: collection ? `cms/projects/[id]/collections/${collection}/` : undefined,
+    enabled: Boolean(collection),
+  });
+  const fieldOptions = (collectionDetail?.fields ?? []).map((f) => f.name);
 
-  const toggleOperation = (op: CrudOp, checked: boolean) => {
-    const next = checked
-      ? [...operations.filter((o) => o !== op), op].sort(
-          (a, b) => ALL_CRUD_OPS.indexOf(a) - ALL_CRUD_OPS.indexOf(b)
-        )
-      : operations.filter((o) => o !== op);
-    updateNodeData(nodeId, { operations: next });
-  };
+  // Action-specific data
+  const toEntries = (raw: unknown): AiFieldEntry[] =>
+    Array.isArray(raw)
+      ? (raw as AiFieldEntry[]).map((e) => ({ ...emptyEntry(), ...e }))
+      : [];
+  const toEntry = (raw: unknown): AiFieldEntry =>
+    raw && typeof raw === "object" ? { ...emptyEntry(), ...(raw as AiFieldEntry) } : emptyEntry();
 
-  const updateSearchField = (index: number, key: "field" | "description", value: string) => {
-    const next = searchFields.map((item, i) =>
-      i === index ? { ...item, [key]: value } : item
-    );
-    updateNodeData(nodeId, {
-      searchFields: next,
-      parametersSchema: buildParametersSchema(next),
-    });
-  };
+  const createFields = toEntries(data.createFields);
+  const readFilter = toEntry(data.readFilter);
+  const readContextKey = typeof data.readContextKey === "string" ? data.readContextKey : "";
+  const updateFilter = toEntry(data.updateFilter);
+  const updateFields = toEntries(data.updateFields);
+  const deleteFilter = toEntry(data.deleteFilter);
+  const listFilters = toEntries(data.listFilters);
+  const listLimit = typeof data.listLimit === "number" ? data.listLimit : 10;
+  const listContextKey = typeof data.listContextKey === "string" ? data.listContextKey : "";
 
-  const addSearchField = () => {
-    const next = [...searchFields, { field: "", description: "" }];
-    updateNodeData(nodeId, {
-      searchFields: next,
-      parametersSchema: buildParametersSchema(next),
-    });
-  };
-
-  const removeSearchField = (index: number) => {
-    const next = searchFields.filter((_, i) => i !== index);
-    updateNodeData(nodeId, {
-      searchFields: next,
-      parametersSchema: buildParametersSchema(next),
-    });
-  };
+  const upd = (patch: Record<string, unknown>) => updateNodeData(nodeId, patch);
 
   return (
     <div className="grid gap-3">
+      {/* Collection selector */}
       <div className="grid gap-1.5">
         <Label className="text-xs text-muted-foreground">Collection</Label>
-        <Select value={collection} onValueChange={handleCollectionChange}>
+        <Select value={collection} onValueChange={(v) => upd({ collection: v })}>
           <SelectTrigger className="h-8 text-xs">
-            <SelectValue placeholder="Select collection" />
+            <SelectValue placeholder="Collection tanlang" />
           </SelectTrigger>
           <SelectContent>
             {collections?.map((col) => (
@@ -2105,65 +2198,182 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
         </Select>
       </div>
 
+      {/* Action tabs */}
       <div className="grid gap-1.5">
-        <Label className="text-xs text-muted-foreground">Operations</Label>
-        <div className="flex flex-wrap gap-2">
-          {ALL_CRUD_OPS.map((op) => (
-            <label key={op} className="flex cursor-pointer items-center gap-1.5">
-              <Checkbox
-                checked={operations.includes(op)}
-                onCheckedChange={(checked) => toggleOperation(op, checked === true)}
-                className="h-3.5 w-3.5"
-              />
-              <span className="text-[11px] font-mono">{op}</span>
-            </label>
+        <Label className="text-xs text-muted-foreground">Amal</Label>
+        <div className="flex gap-1 rounded-lg border border-white/[0.08] bg-white/[0.02] p-1">
+          {COLL_ACTIONS.map((a) => (
+            <button
+              key={a.value}
+              type="button"
+              className={cn(
+                "flex-1 rounded-md py-1 text-[11px] font-medium transition-colors",
+                action === a.value
+                  ? "bg-white/10 text-white"
+                  : "text-zinc-500 hover:text-zinc-300"
+              )}
+              onClick={() => upd({ action: a.value })}
+            >
+              {a.label}
+            </button>
           ))}
         </div>
       </div>
 
-      <div className="grid gap-2">
-        <div className="flex items-center justify-between">
-          <Label className="text-xs text-muted-foreground">Search Fields</Label>
-          <button
-            type="button"
-            className="flex items-center gap-1 rounded px-2 py-0.5 text-[10px] text-muted-foreground hover:bg-primary/5 hover:text-foreground border border-dashed"
-            onClick={addSearchField}
-          >
-            <PlusIcon className="h-3 w-3" />
-            Add field
-          </button>
-        </div>
-        {searchFields.length === 0 ? (
-          <p className="text-[10px] text-muted-foreground italic">
-            No search fields defined. The LLM will not know what to filter by.
-          </p>
-        ) : null}
-        {searchFields.map((item, index) => (
-          <div key={index} className="flex items-start gap-2 rounded-md border bg-muted/20 p-2">
-            <div className="flex-1 grid gap-1.5">
-              <Input
-                className="h-7 text-[11px] font-mono"
-                placeholder="field name (e.g. username)"
-                value={item.field}
-                onChange={(e) => updateSearchField(index, "field", e.target.value)}
-              />
-              <Input
-                className="h-7 text-[11px]"
-                placeholder="description for the LLM"
-                value={item.description}
-                onChange={(e) => updateSearchField(index, "description", e.target.value)}
-              />
-            </div>
+      {/* CREATE — fields to set */}
+      {action === "create" && (
+        <div className="grid gap-1.5">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs text-muted-foreground">Fieldlar</Label>
             <button
               type="button"
-              onClick={() => removeSearchField(index)}
-              className="mt-1 rounded p-0.5 text-muted-foreground hover:text-destructive"
+              className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-0.5 text-[10px] text-zinc-500 hover:text-zinc-300"
+              onClick={() => upd({ createFields: [...createFields, emptyEntry()] })}
             >
-              <X className="h-3.5 w-3.5" />
+              <PlusIcon className="h-3 w-3" /> Field
             </button>
           </div>
-        ))}
-      </div>
+          {createFields.length === 0 && (
+            <p className="text-[10px] italic text-zinc-500">Qo'shiladigan fieldlar yo'q.</p>
+          )}
+          {createFields.map((e, i) => (
+            <AiFieldRow
+              key={i}
+              entry={e}
+              fieldOptions={fieldOptions}
+              valuePlaceholder="Qiymat yoki {{var}}"
+              onChange={(next) => upd({ createFields: createFields.map((x, j) => (j === i ? next : x)) })}
+              onRemove={() => upd({ createFields: createFields.filter((_, j) => j !== i) })}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* READ — single filter + context key */}
+      {action === "read" && (
+        <>
+          <div className="grid gap-1.5">
+            <Label className="text-xs text-muted-foreground">Filter (topish sharti)</Label>
+            <AiFieldRow
+              entry={readFilter}
+              fieldOptions={fieldOptions}
+              valuePlaceholder="Qiymat yoki {{var}}"
+              onChange={(next) => upd({ readFilter: next })}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label className="text-xs text-muted-foreground">Context key</Label>
+            <Input
+              className="h-7 text-xs font-mono"
+              placeholder="masalan: found_user"
+              value={readContextKey}
+              onChange={(e) => upd({ readContextKey: e.target.value })}
+            />
+          </div>
+        </>
+      )}
+
+      {/* UPDATE — filter + fields to update */}
+      {action === "update" && (
+        <>
+          <div className="grid gap-1.5">
+            <Label className="text-xs text-muted-foreground">Filter (yangilanadigan yozuv)</Label>
+            <AiFieldRow
+              entry={updateFilter}
+              fieldOptions={fieldOptions}
+              valuePlaceholder="Qiymat yoki {{var}}"
+              onChange={(next) => upd({ updateFilter: next })}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-muted-foreground">Yangilanadigan fieldlar</Label>
+              <button
+                type="button"
+                className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-0.5 text-[10px] text-zinc-500 hover:text-zinc-300"
+                onClick={() => upd({ updateFields: [...updateFields, emptyEntry()] })}
+              >
+                <PlusIcon className="h-3 w-3" /> Field
+              </button>
+            </div>
+            {updateFields.length === 0 && (
+              <p className="text-[10px] italic text-zinc-500">Yangilanadigan fieldlar yo'q.</p>
+            )}
+            {updateFields.map((e, i) => (
+              <AiFieldRow
+                key={i}
+                entry={e}
+                fieldOptions={fieldOptions}
+                valuePlaceholder="Yangi qiymat"
+                onChange={(next) => upd({ updateFields: updateFields.map((x, j) => (j === i ? next : x)) })}
+                onRemove={() => upd({ updateFields: updateFields.filter((_, j) => j !== i) })}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* DELETE — single filter */}
+      {action === "delete" && (
+        <div className="grid gap-1.5">
+          <Label className="text-xs text-muted-foreground">Filter (o'chiriladigan yozuv)</Label>
+          <AiFieldRow
+            entry={deleteFilter}
+            fieldOptions={fieldOptions}
+            valuePlaceholder="Qiymat yoki {{var}}"
+            onChange={(next) => upd({ deleteFilter: next })}
+          />
+        </div>
+      )}
+
+      {/* LIST — filters + limit + context key */}
+      {action === "list" && (
+        <>
+          <div className="grid gap-1.5">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-muted-foreground">Filterlar (ixtiyoriy)</Label>
+              <button
+                type="button"
+                className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-0.5 text-[10px] text-zinc-500 hover:text-zinc-300"
+                onClick={() => upd({ listFilters: [...listFilters, emptyEntry()] })}
+              >
+                <PlusIcon className="h-3 w-3" /> Filter
+              </button>
+            </div>
+            {listFilters.map((e, i) => (
+              <AiFieldRow
+                key={i}
+                entry={e}
+                fieldOptions={fieldOptions}
+                valuePlaceholder="Qiymat yoki {{var}}"
+                onChange={(next) => upd({ listFilters: listFilters.map((x, j) => (j === i ? next : x)) })}
+                onRemove={() => upd({ listFilters: listFilters.filter((_, j) => j !== i) })}
+              />
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-1.5">
+              <Label className="text-xs text-muted-foreground">Limit</Label>
+              <Input
+                type="number"
+                className="h-7 text-xs"
+                value={listLimit}
+                min={1}
+                onChange={(e) => upd({ listLimit: Number(e.target.value) || 10 })}
+              />
+            </div>
+            <div className="grid gap-1.5">
+              <Label className="text-xs text-muted-foreground">Context key</Label>
+              <Input
+                className="h-7 text-xs font-mono"
+                placeholder="masalan: items"
+                value={listContextKey}
+                onChange={(e) => upd({ listContextKey: e.target.value })}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
