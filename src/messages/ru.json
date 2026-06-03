@@ -442,7 +442,31 @@
     "enterWebAppUrl": "Пожалуйста, введите URL Web App.",
     "enterActionValue": "Пожалуйста, введите значение действия.",
     "selectCollectionAndField": "Пожалуйста, выберите коллекцию и поле.",
-    "fileUploadError": "Ошибка загрузки файла. Пожалуйста, попробуйте снова."
+    "fileUploadError": "Ошибка загрузки файла. Пожалуйста, попробуйте снова.",
+    "dynamicButtonForm": {
+      "dynamicButton": "Динамик",
+      "staticButton": "Статик",
+      "collection": "Collection",
+      "mainField": "Основное поле",
+      "buttonTextTemplate": "Текст кнопки (шаблон)",
+      "callbackPattern": "Callback паттерн",
+      "filterSection": "Фильтр",
+      "filterType": "Тип фильтра",
+      "filterTypeStatic": "Статический (фиксированное значение)",
+      "filterTypeState": "State (динамический)",
+      "filterField": "Поле фильтра",
+      "filterValue": "Значение фильтра",
+      "stateKey": "State ключ",
+      "paginationLayout": "Пагинация и разметка",
+      "enablePagination": "Включить пагинацию",
+      "rows": "Строки",
+      "columns": "Столбцы",
+      "noFilter": "— Без фильтра —",
+      "tokenHint": "Токены: {id}, {field_name}",
+      "dynamicButtonTitle": "Динамическая кнопка",
+      "collectionSelect": "Выбрать коллекцию",
+      "fieldSelect": "Выбрать поле"
+    }
   },
   "editor": {
     "selectModel": "Выбрать модель",

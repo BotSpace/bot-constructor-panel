@@ -451,7 +451,31 @@
     "enterWebAppUrl": "Please enter Web App URL.",
     "enterActionValue": "Please enter action value.",
     "selectCollectionAndField": "Please select collection and field.",
-    "fileUploadError": "File upload error. Please try again."
+    "fileUploadError": "File upload error. Please try again.",
+    "dynamicButtonForm": {
+      "dynamicButton": "Dynamic",
+      "staticButton": "Static",
+      "collection": "Collection",
+      "mainField": "Display field",
+      "buttonTextTemplate": "Button text (template)",
+      "callbackPattern": "Callback pattern",
+      "filterSection": "Filter",
+      "filterType": "Filter type",
+      "filterTypeStatic": "Static (fixed value)",
+      "filterTypeState": "State (dynamic)",
+      "filterField": "Filter field",
+      "filterValue": "Filter value",
+      "stateKey": "State key",
+      "paginationLayout": "Pagination & Layout",
+      "enablePagination": "Enable pagination",
+      "rows": "Rows",
+      "columns": "Columns",
+      "noFilter": "— No filter —",
+      "tokenHint": "Tokens: {id}, {field_name}",
+      "dynamicButtonTitle": "Dynamic button",
+      "collectionSelect": "Select collection",
+      "fieldSelect": "Select field"
+    }
   },
   "editor": {
     "selectModel": "Select Model",

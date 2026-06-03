@@ -451,7 +451,31 @@
     "enterWebAppUrl": "Web App URL manzilini kiriting.",
     "enterActionValue": "Iltimos, amal uchun qiymat kiriting.",
     "selectCollectionAndField": "Iltimos, collection va field tanlang.",
-    "fileUploadError": "Fayl yuklashda xatolik yuz berdi. Iltimos, qayta urinib ko'ring."
+    "fileUploadError": "Fayl yuklashda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
+    "dynamicButtonForm": {
+      "dynamicButton": "Dinamik",
+      "staticButton": "Statik",
+      "collection": "Collection",
+      "mainField": "Asosiy field",
+      "buttonTextTemplate": "Tugma matni (template)",
+      "callbackPattern": "Callback pattern",
+      "filterSection": "Filter",
+      "filterType": "Filter turi",
+      "filterTypeStatic": "Statik (qat'iy qiymat)",
+      "filterTypeState": "State (dinamik qiymat)",
+      "filterField": "Filter field",
+      "filterValue": "Filter qiymati",
+      "stateKey": "State key",
+      "paginationLayout": "Pagination va Layout",
+      "enablePagination": "Pagination yoqish",
+      "rows": "Qatorlar",
+      "columns": "Ustunlar",
+      "noFilter": "— Filter yo'q —",
+      "tokenHint": "Tokenlar: {id}, {field_name}",
+      "dynamicButtonTitle": "Dinamik tugma",
+      "collectionSelect": "Collection tanlang",
+      "fieldSelect": "Field tanlang"
+    }
   },
   "editor": {
     "selectModel": "Model tanlash",

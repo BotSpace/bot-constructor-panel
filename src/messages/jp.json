@@ -442,7 +442,31 @@
     "enterWebAppUrl": "Web App URLを入力してください。",
     "enterActionValue": "アクション値を入力してください。",
     "selectCollectionAndField": "コレクションとフィールドを選択してください。",
-    "fileUploadError": "ファイルのアップロードエラーです。もう一度お試しください。"
+    "fileUploadError": "ファイルのアップロードエラーです。もう一度お試しください。",
+    "dynamicButtonForm": {
+      "dynamicButton": "ダイナミック",
+      "staticButton": "スタティック",
+      "collection": "コレクション",
+      "mainField": "表示フィールド",
+      "buttonTextTemplate": "ボタンテキスト（テンプレート）",
+      "callbackPattern": "コールバックパターン",
+      "filterSection": "フィルター",
+      "filterType": "フィルタータイプ",
+      "filterTypeStatic": "静的（固定値）",
+      "filterTypeState": "State（動的）",
+      "filterField": "フィルターフィールド",
+      "filterValue": "フィルター値",
+      "stateKey": "Stateキー",
+      "paginationLayout": "ページネーション＆レイアウト",
+      "enablePagination": "ページネーションを有効化",
+      "rows": "行数",
+      "columns": "列数",
+      "noFilter": "— フィルターなし —",
+      "tokenHint": "トークン: {id}, {field_name}",
+      "dynamicButtonTitle": "ダイナミックボタン",
+      "collectionSelect": "コレクションを選択",
+      "fieldSelect": "フィールドを選択"
+    }
   },
   "editor": {
     "selectModel": "モデルを選択",

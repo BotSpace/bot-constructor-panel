@@ -10,9 +10,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { cn } from "@/lib/utils";
-import { Plus, X } from "lucide-react";
+import { ChevronDown, Database, Plus, Type, X } from "lucide-react";
+import {
+  DynamicButtonForm,
+  CollectionButtonData,
+  DEFAULT_COLLECTION_BUTTON,
+} from "./DynamicButtonForm";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -36,6 +47,8 @@ export interface NestedRowsFieldConfig {
   maxColumns?: number;
   columnFields: NestedColumnFieldSpec[];
   defaultColumn?: Record<string, unknown>;
+  /** Allow dynamic (collection-backed) columns. Default true if key contains "keyboard" or "buttons". */
+  allowDynamicColumns?: boolean;
 }
 
 export interface NestedRowsFieldProps {
@@ -48,12 +61,31 @@ export interface NestedRowsFieldProps {
 // Internal shape
 // ---------------------------------------------------------------------------
 
-interface NestedColumn {
+interface StaticColumn {
   [key: string]: unknown;
 }
 
+interface DynamicColumn {
+  collectionData: CollectionButtonData;
+}
+
+type NestedColumn = StaticColumn | DynamicColumn;
+
 interface NestedRow {
   columns: NestedColumn[];
+}
+
+// ---------------------------------------------------------------------------
+// Column type guards
+// ---------------------------------------------------------------------------
+
+function isDynamicColumn(col: NestedColumn): col is DynamicColumn {
+  return (
+    col !== null &&
+    typeof col === "object" &&
+    "collectionData" in col &&
+    typeof (col as DynamicColumn).collectionData === "object"
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -61,7 +93,7 @@ interface NestedRow {
 // ---------------------------------------------------------------------------
 
 function isColumnFieldVisible(
-  column: NestedColumn,
+  column: StaticColumn,
   spec: NestedColumnFieldSpec
 ): boolean {
   const rule = spec.visibleWhen;
@@ -93,12 +125,12 @@ function normalizeRows(raw: unknown): NestedRow[] {
 }
 
 // ---------------------------------------------------------------------------
-// ColumnField — renders a single spec inside one column
+// ColumnField — renders a single spec inside one static column
 // ---------------------------------------------------------------------------
 
 interface ColumnFieldProps {
   spec: NestedColumnFieldSpec;
-  column: NestedColumn;
+  column: StaticColumn;
   onChange: (key: string, value: unknown) => void;
 }
 
@@ -156,38 +188,109 @@ interface ColumnCardProps {
   column: NestedColumn;
   columnFields: NestedColumnFieldSpec[];
   onFieldChange: (key: string, value: unknown) => void;
+  onDynamicChange: (value: CollectionButtonData) => void;
   onRemove: () => void;
   canRemove: boolean;
+  allowDynamic: boolean;
+  onSwitchType: (toDynamic: boolean) => void;
 }
 
 function ColumnCard({
   column,
   columnFields,
   onFieldChange,
+  onDynamicChange,
   onRemove,
   canRemove,
+  allowDynamic,
+  onSwitchType,
 }: ColumnCardProps) {
-  return (
-    <div className="relative min-w-[140px] flex-1 rounded-lg border border-white/10 bg-white/[0.03] p-2.5 space-y-2">
-      {canRemove ? (
-        <button
-          type="button"
-          aria-label="Ustunni o'chirish"
-          className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded text-white/30 transition-colors hover:text-red-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400"
-          onClick={onRemove}
-        >
-          <X className="h-3 w-3" />
-        </button>
-      ) : null}
+  const dynamic = isDynamicColumn(column);
 
-      {columnFields.map((spec) => (
-        <ColumnField
-          key={spec.key}
-          spec={spec}
-          column={column}
-          onChange={onFieldChange}
+  return (
+    <div
+      className={cn(
+        "relative min-w-[140px] flex-1 rounded-lg border p-2.5 space-y-2 transition-colors",
+        dynamic
+          ? "border-blue-500/25 bg-blue-500/[0.04]"
+          : "border-white/10 bg-white/[0.03]"
+      )}
+    >
+      {/* Top controls: type switcher + remove */}
+      <div className="flex items-center justify-between gap-1">
+        {allowDynamic ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className={cn(
+                  "inline-flex h-5 items-center gap-1 rounded px-1.5 text-[10px] font-medium transition-colors",
+                  dynamic
+                    ? "bg-blue-500/15 text-blue-400/80 hover:bg-blue-500/25"
+                    : "bg-white/[0.06] text-white/40 hover:bg-white/10"
+                )}
+              >
+                {dynamic ? (
+                  <Database className="h-2.5 w-2.5" />
+                ) : (
+                  <Type className="h-2.5 w-2.5" />
+                )}
+                {dynamic ? "Dinamik" : "Statik"}
+                <ChevronDown className="h-2.5 w-2.5 opacity-60" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="min-w-[140px]">
+              <DropdownMenuItem
+                className={cn("text-xs", !dynamic && "bg-accent")}
+                onClick={() => !dynamic || onSwitchType(false)}
+              >
+                <Type className="mr-2 h-3 w-3" />
+                Oddiy tugma
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={cn("text-xs", dynamic && "bg-accent")}
+                onClick={() => dynamic || onSwitchType(true)}
+              >
+                <Database className="mr-2 h-3 w-3 text-blue-400" />
+                <span>
+                  Dinamik{" "}
+                  <span className="text-[10px] text-blue-400/70">(collection)</span>
+                </span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <span className="text-[10px] text-white/30">Tugma</span>
+        )}
+
+        {canRemove ? (
+          <button
+            type="button"
+            aria-label="Ustunni o'chirish"
+            className="flex h-4 w-4 items-center justify-center rounded text-white/30 transition-colors hover:text-red-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400"
+            onClick={onRemove}
+          >
+            <X className="h-3 w-3" />
+          </button>
+        ) : null}
+      </div>
+
+      {/* Content */}
+      {dynamic ? (
+        <DynamicButtonForm
+          value={(column as DynamicColumn).collectionData}
+          onChange={onDynamicChange}
         />
-      ))}
+      ) : (
+        columnFields.map((spec) => (
+          <ColumnField
+            key={spec.key}
+            spec={spec}
+            column={column as StaticColumn}
+            onChange={onFieldChange}
+          />
+        ))
+      )}
     </div>
   );
 }
@@ -200,9 +303,13 @@ interface RowCardProps {
   row: NestedRow;
   rowIndex: number;
   field: NestedRowsFieldConfig;
+  allowDynamic: boolean;
   onColumnFieldChange: (colIdx: number, key: string, value: unknown) => void;
-  onAddColumn: () => void;
+  onColumnDynamicChange: (colIdx: number, value: CollectionButtonData) => void;
+  onAddStaticColumn: () => void;
+  onAddDynamicColumn: () => void;
   onRemoveColumn: (colIdx: number) => void;
+  onSwitchColumnType: (colIdx: number, toDynamic: boolean) => void;
   onRemoveRow: () => void;
 }
 
@@ -210,9 +317,13 @@ function RowCard({
   row,
   rowIndex,
   field,
+  allowDynamic,
   onColumnFieldChange,
-  onAddColumn,
+  onColumnDynamicChange,
+  onAddStaticColumn,
+  onAddDynamicColumn,
   onRemoveColumn,
+  onSwitchColumnType,
   onRemoveRow,
 }: RowCardProps) {
   const maxColumns = field.maxColumns ?? 8;
@@ -243,11 +354,12 @@ function RowCard({
               key={colIdx}
               column={column}
               columnFields={field.columnFields}
-              onFieldChange={(key, value) =>
-                onColumnFieldChange(colIdx, key, value)
-              }
+              onFieldChange={(key, value) => onColumnFieldChange(colIdx, key, value)}
+              onDynamicChange={(value) => onColumnDynamicChange(colIdx, value)}
               onRemove={() => onRemoveColumn(colIdx)}
               canRemove={row.columns.length > 1}
+              allowDynamic={allowDynamic}
+              onSwitchType={(toDynamic) => onSwitchColumnType(colIdx, toDynamic)}
             />
           ))}
         </div>
@@ -255,27 +367,67 @@ function RowCard({
         <p className="text-[11px] text-white/25">Ustun yo'q</p>
       )}
 
-      {/* Add column button */}
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        disabled={!canAddColumn}
-        className={cn(
-          "h-7 w-full border border-dashed border-white/10 text-[11px] text-white/40",
-          "hover:border-white/20 hover:bg-white/[0.03] hover:text-white/60",
-          "disabled:opacity-30"
-        )}
-        onClick={onAddColumn}
-      >
-        <Plus className="mr-1 h-3 w-3" />
-        {field.addColumnLabel ?? "Ustun qo'shish"}
-        {canAddColumn ? (
-          <span className="ml-auto text-white/25">
-            {row.columns.length}/{maxColumns}
-          </span>
-        ) : null}
-      </Button>
+      {/* Add column button(s) */}
+      {allowDynamic ? (
+        <div className="flex gap-1.5">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={!canAddColumn}
+            className={cn(
+              "h-7 flex-1 border border-dashed border-white/10 text-[11px] text-white/40",
+              "hover:border-white/20 hover:bg-white/[0.03] hover:text-white/60",
+              "disabled:opacity-30"
+            )}
+            onClick={onAddStaticColumn}
+          >
+            <Type className="mr-1 h-3 w-3" />
+            Oddiy tugma
+            {canAddColumn ? (
+              <span className="ml-auto text-white/25">
+                {row.columns.length}/{maxColumns}
+              </span>
+            ) : null}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={!canAddColumn}
+            className={cn(
+              "h-7 flex-1 border border-dashed border-blue-500/20 text-[11px] text-blue-400/50",
+              "hover:border-blue-500/30 hover:bg-blue-500/[0.04] hover:text-blue-400/80",
+              "disabled:opacity-30"
+            )}
+            onClick={onAddDynamicColumn}
+          >
+            <Database className="mr-1 h-3 w-3" />
+            Dinamik
+          </Button>
+        </div>
+      ) : (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={!canAddColumn}
+          className={cn(
+            "h-7 w-full border border-dashed border-white/10 text-[11px] text-white/40",
+            "hover:border-white/20 hover:bg-white/[0.03] hover:text-white/60",
+            "disabled:opacity-30"
+          )}
+          onClick={onAddStaticColumn}
+        >
+          <Plus className="mr-1 h-3 w-3" />
+          {field.addColumnLabel ?? "Ustun qo'shish"}
+          {canAddColumn ? (
+            <span className="ml-auto text-white/25">
+              {row.columns.length}/{maxColumns}
+            </span>
+          ) : null}
+        </Button>
+      )}
     </div>
   );
 }
@@ -286,6 +438,12 @@ function RowCard({
 
 export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+
+  // Determine whether dynamic columns are allowed.
+  // Default: allow if key name contains 'keyboard', 'buttons', 'rows', or config explicitly sets it.
+  const allowDynamic =
+    field.allowDynamicColumns ??
+    /keyboard|button|row/i.test(field.key);
 
   const rows = normalizeRows(data[field.key]);
 
@@ -304,7 +462,7 @@ export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
     setRows(rows.filter((_, i) => i !== rowIdx));
   };
 
-  const handleAddColumn = (rowIdx: number) => {
+  const handleAddStaticColumn = (rowIdx: number) => {
     const maxColumns = field.maxColumns ?? 8;
     const row = rows[rowIdx];
     if (!row || row.columns.length >= maxColumns) return;
@@ -313,6 +471,41 @@ export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
       rows.map((r, i) =>
         i === rowIdx ? { ...r, columns: [...r.columns, newColumn] } : r
       )
+    );
+  };
+
+  const handleAddDynamicColumn = (rowIdx: number) => {
+    const maxColumns = field.maxColumns ?? 8;
+    const row = rows[rowIdx];
+    if (!row || row.columns.length >= maxColumns) return;
+    const newColumn: DynamicColumn = {
+      collectionData: { ...DEFAULT_COLLECTION_BUTTON },
+    };
+    setRows(
+      rows.map((r, i) =>
+        i === rowIdx ? { ...r, columns: [...r.columns, newColumn] } : r
+      )
+    );
+  };
+
+  const handleSwitchColumnType = (
+    rowIdx: number,
+    colIdx: number,
+    toDynamic: boolean
+  ) => {
+    setRows(
+      rows.map((r, i) => {
+        if (i !== rowIdx) return r;
+        const newCols = r.columns.map((c, ci) => {
+          if (ci !== colIdx) return c;
+          if (toDynamic) {
+            return { collectionData: { ...DEFAULT_COLLECTION_BUTTON } } as DynamicColumn;
+          } else {
+            return { ...(field.defaultColumn ?? {}) } as StaticColumn;
+          }
+        });
+        return { ...r, columns: newCols };
+      })
     );
   };
 
@@ -346,6 +539,25 @@ export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
     );
   };
 
+  const handleColumnDynamicChange = (
+    rowIdx: number,
+    colIdx: number,
+    value: CollectionButtonData
+  ) => {
+    setRows(
+      rows.map((r, i) =>
+        i === rowIdx
+          ? {
+              ...r,
+              columns: r.columns.map((c, ci) =>
+                ci === colIdx ? { collectionData: value } : c
+              ),
+            }
+          : r
+      )
+    );
+  };
+
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
       {/* Header */}
@@ -367,11 +579,19 @@ export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
               row={row}
               rowIndex={rowIdx}
               field={field}
+              allowDynamic={allowDynamic}
               onColumnFieldChange={(colIdx, key, value) =>
                 handleColumnFieldChange(rowIdx, colIdx, key, value)
               }
-              onAddColumn={() => handleAddColumn(rowIdx)}
+              onColumnDynamicChange={(colIdx, value) =>
+                handleColumnDynamicChange(rowIdx, colIdx, value)
+              }
+              onAddStaticColumn={() => handleAddStaticColumn(rowIdx)}
+              onAddDynamicColumn={() => handleAddDynamicColumn(rowIdx)}
               onRemoveColumn={(colIdx) => handleRemoveColumn(rowIdx, colIdx)}
+              onSwitchColumnType={(colIdx, toDynamic) =>
+                handleSwitchColumnType(rowIdx, colIdx, toDynamic)
+              }
               onRemoveRow={() => handleRemoveRow(rowIdx)}
             />
           ))}
