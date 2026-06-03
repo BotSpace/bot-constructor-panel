@@ -28,6 +28,11 @@ import { TriggerConfigField } from "@/features/bot-constructor/nodes/widgets/gen
 import { DynamicParamsField } from "@/features/bot-constructor/nodes/widgets/generic-fields/DynamicParamsField";
 import { NestedRowsField } from "@/features/bot-constructor/nodes/widgets/generic-fields/NestedRowsField";
 import {
+  DynamicButtonForm,
+  DEFAULT_COLLECTION_BUTTON,
+  type CollectionButtonData,
+} from "@/features/bot-constructor/nodes/widgets/generic-fields/DynamicButtonForm";
+import {
   RichTextMessageField,
   MediaMessageField,
 } from "@/features/bot-constructor/nodes/widgets/shared-message-fields";
@@ -280,6 +285,18 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         nodeId={nodeId}
         data={data}
         field={field as Parameters<typeof NestedRowsField>[0]["field"]}
+      />
+    );
+  }
+
+  // Generic collection binding — reusable in ANY node (not only keyboards).
+  if (field.type === "collection-binding" && field.key) {
+    const key = field.key;
+    const val = (data[key] as CollectionButtonData) ?? DEFAULT_COLLECTION_BUTTON;
+    return (
+      <DynamicButtonForm
+        value={val}
+        onChange={(v) => useFlowStore.getState().updateNodeData(nodeId, { [key]: v })}
       />
     );
   }

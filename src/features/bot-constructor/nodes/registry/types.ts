@@ -93,7 +93,10 @@ export interface NodeFieldManifest {
     | "action-keyboard"
     | "action-handlers"
     // Nested row/column editor (generic; used for keyboards)
-    | "nested-rows";
+    | "nested-rows"
+    // Collection binding (generic; collection + field mapping + filter +
+    // pagination — reusable in any node, not only keyboard buttons)
+    | "collection-binding";
   key?: string;
   widgetKey?: string;
   label?: string;
