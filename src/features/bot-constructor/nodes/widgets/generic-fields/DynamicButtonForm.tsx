@@ -303,14 +303,18 @@ export function DynamicButtonForm({ value, onChange }: DynamicButtonFormProps) {
           <Label className="text-[10px] text-white/40">{t("filterField")}</Label>
           {fieldNames.length > 0 ? (
             <Select
-              value={value.filterField}
-              onValueChange={(v) => set({ filterField: v })}
+              // Radix Select.Item bo'sh string value'ni taqiqlaydi — sentinel
+              // "__none__" ishlatamiz va saqlashda bo'sh stringga aylantiramiz.
+              value={value.filterField || "__none__"}
+              onValueChange={(v) =>
+                set({ filterField: v === "__none__" ? "" : v })
+              }
             >
               <SelectTrigger className="h-7 border-white/10 bg-zinc-950/60 text-[11px]">
                 <SelectValue placeholder={t("fieldSelect")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="" className="text-xs text-white/40">
+                <SelectItem value="__none__" className="text-xs text-white/40">
                   {t("noFilter")}
                 </SelectItem>
                 {fieldNames.map((f) => (
