@@ -194,9 +194,9 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                 <Button
                   key={button.id}
                   variant="outline"
-                  className="w-full text-xs px-2 py-1 relative truncate"
+                  className="w-full text-xs px-2 py-1 relative overflow-visible"
                 >
-                  {label}
+                  <span className="truncate">{label}</span>
                   {!inPanel && isFirstOccurrence && (
                     <PillHandle
                       id={handleId}
