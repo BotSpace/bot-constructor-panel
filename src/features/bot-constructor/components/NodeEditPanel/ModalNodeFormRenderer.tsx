@@ -1,7 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { NodeManifest, NodeFieldManifest } from "@/features/bot-constructor/nodes/registry/types";
 import { ModalFieldWidget } from "@/features/bot-constructor/components/NodeEditPanel/modal-field-widgets";
 import {
@@ -109,75 +114,35 @@ function AddOptionButton({
   onAdd: (key: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
-  const buttonRef = useRef<HTMLButtonElement>(null);
 
-  function handleToggle() {
-    if (!open && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      const estimatedHeight = Math.min(options.length * 36 + 8, 240);
-      const spaceBelow = window.innerHeight - rect.bottom;
-
-      if (spaceBelow < estimatedHeight) {
-        setDropdownStyle({
-          position: "fixed",
-          left: rect.left,
-          width: rect.width,
-          bottom: window.innerHeight - rect.top + 4,
-          zIndex: 9999,
-        });
-      } else {
-        setDropdownStyle({
-          position: "fixed",
-          left: rect.left,
-          width: rect.width,
-          top: rect.bottom + 4,
-          zIndex: 9999,
-        });
-      }
-    }
-    setOpen((v) => !v);
-  }
-
+  // Radix DropdownMenu — Dialog ichida focus-lock, positioning va overflow'ni
+  // o'zi to'g'ri boshqaradi (custom portal kerak emas, click bloklanmaydi).
   return (
-    <div>
-      <button
-        ref={buttonRef}
-        type="button"
-        onClick={handleToggle}
-        className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2.5 text-sm text-zinc-400 transition-colors hover:border-white/20 hover:text-zinc-200"
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2.5 text-sm text-zinc-400 transition-colors hover:border-white/20 hover:text-zinc-200"
+        >
+          <span>Qo&apos;shimcha maydon qo&apos;shish</span>
+          <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="start"
+        className="max-h-60 w-[var(--radix-dropdown-menu-trigger-width)] overflow-y-auto border-white/10 bg-zinc-900"
       >
-        <span>Qo&apos;shimcha maydon qo&apos;shish</span>
-        <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
-      </button>
-
-      {open
-        ? createPortal(
-            <>
-              <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
-              <div
-                style={dropdownStyle}
-                className="rounded-lg border border-white/10 bg-zinc-900 py-1 shadow-xl"
-              >
-                {options.map((field) => (
-                  <button
-                    key={fieldKey(field)}
-                    type="button"
-                    className="flex w-full items-center px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white"
-                    onClick={() => {
-                      onAdd(fieldKey(field));
-                      setOpen(false);
-                    }}
-                  >
-                    {field.label ?? field.key ?? field.type}
-                  </button>
-                ))}
-              </div>
-            </>,
-            document.body
-          )
-        : null}
-    </div>
+        {options.map((field) => (
+          <DropdownMenuItem
+            key={fieldKey(field)}
+            className="text-sm text-zinc-300 focus:bg-white/5 focus:text-white"
+            onSelect={() => onAdd(fieldKey(field))}
+          >
+            {field.label ?? field.key ?? field.type}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
