@@ -210,7 +210,7 @@ function ColumnCard({
   return (
     <div
       className={cn(
-        "relative min-w-[140px] flex-1 rounded-lg border p-2.5 space-y-2 transition-colors",
+        "relative w-full rounded-lg border p-2.5 space-y-2 transition-colors",
         dynamic
           ? "border-blue-500/25 bg-blue-500/[0.04]"
           : "border-white/10 bg-white/[0.03]"
@@ -346,9 +346,9 @@ function RowCard({
         </button>
       </div>
 
-      {/* Columns */}
+      {/* Columns — vertical stack, each button full-width (one per row) */}
       {row.columns.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2">
           {row.columns.map((column, colIdx) => (
             <ColumnCard
               key={colIdx}
