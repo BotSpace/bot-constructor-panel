@@ -4560,18 +4560,31 @@
       "tool": "collection",
       "toolName": "collection",
       "collection": "",
-      "operations": [
-        "create",
-        "read",
-        "update",
-        "delete"
-      ],
-      "searchFields": [],
-      "parametersSchema": {
-        "type": "object",
-        "properties": {},
-        "required": []
+      "action": "create",
+      "createFields": [],
+      "readFilter": {
+        "field": "",
+        "value": "",
+        "aiMode": false,
+        "aiDescription": ""
       },
+      "readContextKey": "",
+      "updateFilter": {
+        "field": "",
+        "value": "",
+        "aiMode": false,
+        "aiDescription": ""
+      },
+      "updateFields": [],
+      "deleteFilter": {
+        "field": "",
+        "value": "",
+        "aiMode": false,
+        "aiDescription": ""
+      },
+      "listFilters": [],
+      "listLimit": 10,
+      "listContextKey": "",
       "description": ""
     }
   },
