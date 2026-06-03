@@ -250,7 +250,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -416,7 +417,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -561,7 +563,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -706,7 +709,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -853,7 +857,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -1163,7 +1168,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -1326,7 +1332,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -1547,7 +1554,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -1830,7 +1838,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -2063,7 +2072,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -2228,7 +2238,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -3235,7 +3246,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
@@ -3832,7 +3844,8 @@
               "notEquals": "request_contact"
             }
           }
-        ]
+        ],
+        "allowDynamicColumns": true
       },
       {
         "type": "checkbox",
