@@ -155,7 +155,7 @@ export interface NodeFieldManifest {
   defaultColumn?: Record<string, unknown>;
   columnFields?: {
     key: string;
-    type: "text" | "select";
+    type: "text" | "select" | "switch";
     label?: string;
     placeholder?: string;
     options?: NodeFieldOptionManifest[];

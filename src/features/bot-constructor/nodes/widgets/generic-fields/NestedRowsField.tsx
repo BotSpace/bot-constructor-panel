@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -31,7 +32,7 @@ import {
 
 export interface NestedColumnFieldSpec {
   key: string;
-  type: "text" | "select";
+  type: "text" | "select" | "switch";
   label?: string;
   placeholder?: string;
   options?: { value: string; label: string }[];
@@ -138,6 +139,23 @@ function ColumnField({ spec, column, onChange }: ColumnFieldProps) {
   if (!isColumnFieldVisible(column, spec)) return null;
 
   const rawValue = column[spec.key];
+
+  if (spec.type === "switch") {
+    // default TRUE: undefined = yoqilgan (backward-compat — eski tugmalar handle oladi)
+    const on = rawValue !== false;
+    return (
+      <div className="flex items-center justify-between gap-2">
+        {spec.label ? (
+          <Label className="text-[11px] text-white/50">{spec.label}</Label>
+        ) : null}
+        <Switch
+          checked={on}
+          onCheckedChange={(v) => onChange(spec.key, v)}
+          className="scale-75"
+        />
+      </div>
+    );
+  }
 
   if (spec.type === "select") {
     const strValue = typeof rawValue === "string" ? rawValue : "";

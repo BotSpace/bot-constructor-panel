@@ -249,6 +249,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -292,7 +297,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "messageText": "",
       "parseMode": "None",
@@ -416,6 +425,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -438,7 +452,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "photoSourceType": "upload",
       "caption": "",
@@ -562,6 +580,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -584,7 +607,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "videoSourceType": "upload",
       "caption": "",
@@ -708,6 +735,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -730,7 +762,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "audioSourceType": "upload",
       "caption": "",
@@ -856,6 +892,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -878,7 +919,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "fileSourceType": "upload",
       "caption": "",
@@ -1167,6 +1212,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -1189,7 +1239,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "recipients": {
         "sendToSender": true,
@@ -1331,6 +1385,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -1353,7 +1412,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "recipients": {
         "sendToSender": true,
@@ -1553,6 +1616,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -1575,7 +1643,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "question": "",
       "options": [],
@@ -1837,6 +1909,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -1859,7 +1936,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "mediaItems": [],
       "disableNotification": false,
@@ -2071,6 +2152,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -2114,7 +2200,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "messageIdSource": "this_message",
       "messageId": null,
@@ -2237,6 +2327,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -2280,7 +2375,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "messageText": "",
       "parseMode": "None",
@@ -3245,6 +3344,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -3262,7 +3366,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "keyboard_kind": "inline",
       "rows": []
@@ -3843,6 +3951,11 @@
               "key": "type",
               "notEquals": "request_contact"
             }
+          },
+          {
+            "key": "handler",
+            "type": "switch",
+            "label": "Handle (ulanish nuqtasi)"
           }
         ],
         "allowDynamicColumns": true
@@ -3860,7 +3973,11 @@
         "optional": true
       }
     ],
-    "footer": [],
+    "footer": [
+      {
+        "type": "handlersList"
+      }
+    ],
     "defaults": {
       "keyboard_kind": "inline",
       "rows": []
@@ -4725,6 +4842,537 @@
       "vectorDbApiKey": "",
       "topK": 5,
       "description": ""
+    }
+  },
+  {
+    "type": "CallbackButtonTriggerNode",
+    "status": "runtime",
+    "category": "triggers",
+    "titleKey": "constructor.triggers.callbackButton.name",
+    "descriptionKey": "constructor.triggers.callbackButton.description",
+    "titleFallback": "Maxsus inline tugma triggeri",
+    "descriptionFallback": "Maxsus inline button tomonidan trigger qilinadi.",
+    "iconName": "mouse-pointer",
+    "colorToken": "trigger-blue",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "triggers",
+      "sortOrder": 26,
+      "elementType": "callback_button"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "trigger-config",
+        "kind": "callback",
+        "stateOptional": true
+      }
+    ],
+    "defaults": {
+      "filter": "any",
+      "global": true,
+      "context": {
+        "value": ""
+      }
+    }
+  },
+  {
+    "type": "ExternalWebhookTriggerNode",
+    "status": "runtime",
+    "category": "triggers",
+    "titleKey": "constructor.triggers.externalWebhook.name",
+    "descriptionKey": "constructor.triggers.externalWebhook.description",
+    "titleFallback": "Tashqi Webhook Triggeri",
+    "descriptionFallback": "Tashqi webhook (stripe/payme/...) kelganda trigger qilinadi.",
+    "iconName": "globe",
+    "colorToken": "trigger-blue",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "triggers",
+      "sortOrder": 27,
+      "elementType": "external_webhook"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "text",
+        "key": "provider",
+        "label": "Provider",
+        "placeholder": "stripe, payme, click, ...",
+        "helpText": "Webhook yuboruvchi servis nomi (ixtiyoriy belgi)"
+      }
+    ],
+    "defaults": {
+      "provider": ""
+    }
+  },
+  {
+    "type": "SendVenueNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.venue.name",
+    "descriptionKey": "constructor.actions.venue.description",
+    "titleFallback": "Joy (Venue) yuborish",
+    "descriptionFallback": "Venue (joy) — joylashuv + nom va manzil bilan yuboradi.",
+    "iconName": "location",
+    "colorToken": "action-emerald",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 91,
+      "elementType": "venue"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "number",
+        "key": "latitude",
+        "label": "Latitude",
+        "placeholder": "41.311151",
+        "step": 1e-06
+      },
+      {
+        "type": "number",
+        "key": "longitude",
+        "label": "Longitude",
+        "placeholder": "69.279737",
+        "step": 1e-06
+      },
+      {
+        "type": "text",
+        "key": "title",
+        "label": "Joy nomi",
+        "placeholder": "Samarqand Metro"
+      },
+      {
+        "type": "text",
+        "key": "address",
+        "label": "Manzil",
+        "placeholder": "Samarqand ko'chasi, 1"
+      },
+      {
+        "type": "action-recipients",
+        "label": "Qabul qiluvchilar",
+        "optional": true
+      }
+    ],
+    "defaults": {
+      "latitude": 0,
+      "longitude": 0,
+      "title": "",
+      "address": "",
+      "recipients": {
+        "sendToSender": true,
+        "additionalIds": []
+      }
+    }
+  },
+  {
+    "type": "UnpinAllMessagesNode",
+    "status": "runtime",
+    "category": "messageOperations",
+    "titleKey": "constructor.messageOperations.unpinAll.name",
+    "descriptionKey": "constructor.messageOperations.unpinAll.description",
+    "titleFallback": "Barcha pinlarni olib tashlash",
+    "descriptionFallback": "Chatdagi barcha qadangan xabarlarni olib tashlaydi.",
+    "iconName": "unpin",
+    "colorToken": "message-op-slate",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "messageOperations",
+      "sortOrder": 55,
+      "elementType": "unpin_all"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [],
+    "defaults": {}
+  },
+  {
+    "type": "SchedulerNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.scheduler.name",
+    "descriptionKey": "constructor.flowControl.scheduler.description",
+    "titleFallback": "Rejalashtiruvchi",
+    "descriptionFallback": "Kelajakdagi vaqtda flow'ni davom ettiradi.",
+    "iconName": "clock",
+    "colorToken": "flow-amber",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 45,
+      "elementType": "scheduler"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "text",
+        "key": "scheduledAt",
+        "label": "Vaqt (ISO yoki {{var}})",
+        "placeholder": "2025-12-31T23:59:59Z yoki {{state.scheduled_time}}",
+        "helpText": "ISO 8601 formatida vaqt yoki state o'zgaruvchisi"
+      }
+    ],
+    "defaults": {
+      "scheduledAt": ""
+    }
+  },
+  {
+    "type": "LoadCollectionListNode",
+    "status": "runtime",
+    "category": "customLogic",
+    "titleKey": "constructor.customLogic.loadCollectionList.name",
+    "descriptionKey": "constructor.customLogic.loadCollectionList.description",
+    "titleFallback": "Collection ro'yxatini yuklash",
+    "descriptionFallback": "Collection'dan documents ro'yxati (filter, sort, limit).",
+    "iconName": "collection",
+    "colorToken": "custom-yellow",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "customLogic",
+      "sortOrder": 35,
+      "elementType": "load_collection_list"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "collection-select",
+        "key": "collection_name",
+        "label": "Collection",
+        "withFilters": false,
+        "contextKeyField": "resultKey"
+      },
+      {
+        "type": "textarea",
+        "key": "filter",
+        "label": "Filter (JSON)",
+        "placeholder": "{\"status\": \"active\"}",
+        "helpText": "MongoDB filter — bo'sh qoldirilsa hammasi olinadi",
+        "optional": true
+      },
+      {
+        "type": "textarea",
+        "key": "sort",
+        "label": "Sort (JSON)",
+        "placeholder": "{\"createdAt\": -1}",
+        "helpText": "1 — o'sish, -1 — kamayish tartibida",
+        "optional": true
+      },
+      {
+        "type": "number",
+        "key": "limit",
+        "label": "Limit",
+        "placeholder": "10",
+        "min": 1,
+        "max": 1000,
+        "helpText": "Maksimal qaytariladigan hujjatlar soni",
+        "optional": true
+      },
+      {
+        "type": "text",
+        "key": "resultKey",
+        "label": "Natija kaliti (state)",
+        "placeholder": "collection_results",
+        "helpText": "State ichida saqlanadigan kalit nomi"
+      }
+    ],
+    "defaults": {
+      "collection_name": "",
+      "filter": "",
+      "sort": "",
+      "limit": 10,
+      "resultKey": "collection_results"
+    }
+  },
+  {
+    "type": "UpdateCollectionNode",
+    "status": "runtime",
+    "category": "customLogic",
+    "titleKey": "constructor.customLogic.updateCollection.name",
+    "descriptionKey": "constructor.customLogic.updateCollection.description",
+    "titleFallback": "Collection yangilash",
+    "descriptionFallback": "Collection documentini yangilaydi.",
+    "iconName": "database",
+    "colorToken": "custom-yellow",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "customLogic",
+      "sortOrder": 50,
+      "elementType": "update_collection"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "collection-select",
+        "key": "collection_name",
+        "label": "Collection",
+        "withFilters": false,
+        "contextKeyField": null
+      },
+      {
+        "type": "textarea",
+        "key": "filter",
+        "label": "Filter (JSON)",
+        "placeholder": "{\"_id\": \"{{state.item_id}}\"}",
+        "helpText": "Qaysi documentni yangilash kerakligini belgilaydi"
+      },
+      {
+        "type": "textarea",
+        "key": "update",
+        "label": "Update (JSON)",
+        "placeholder": "{\"$set\": {\"status\": \"done\"}}",
+        "helpText": "MongoDB update operatori ($set, $inc, $push, ...)"
+      }
+    ],
+    "defaults": {
+      "collection_name": "",
+      "filter": "{}",
+      "update": "{\"$set\": {}}"
+    }
+  },
+  {
+    "type": "DeleteCollectionNode",
+    "status": "runtime",
+    "category": "customLogic",
+    "titleKey": "constructor.customLogic.deleteCollection.name",
+    "descriptionKey": "constructor.customLogic.deleteCollection.description",
+    "titleFallback": "Collection o'chirish",
+    "descriptionFallback": "Collection documentini o'chiradi.",
+    "iconName": "database",
+    "colorToken": "custom-yellow",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "customLogic",
+      "sortOrder": 55,
+      "elementType": "delete_collection"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "collection-select",
+        "key": "collection_name",
+        "label": "Collection",
+        "withFilters": false,
+        "contextKeyField": null
+      },
+      {
+        "type": "textarea",
+        "key": "filter",
+        "label": "Filter (JSON)",
+        "placeholder": "{\"_id\": \"{{state.item_id}}\"}",
+        "helpText": "Qaysi documentni o'chirish kerakligini belgilaydi"
+      }
+    ],
+    "defaults": {
+      "collection_name": "",
+      "filter": "{}"
+    }
+  },
+  {
+    "type": "DownloadNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.download.name",
+    "descriptionKey": "constructor.integrations.download.description",
+    "titleFallback": "Fayl yuklash (Download)",
+    "descriptionFallback": "Telegram file/photo'ni yuklab olib state'ga saqlaydi.",
+    "iconName": "download",
+    "colorToken": "integration-sky",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "integrations",
+      "sortOrder": 20,
+      "elementType": "download"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "text",
+        "key": "fileId",
+        "label": "File ID",
+        "placeholder": "{{state.file_id}} yoki to'g'ridan-to'g'ri ID",
+        "helpText": "Telegram file_id — state o'zgaruvchisi yoki statik qiymat"
+      },
+      {
+        "type": "text",
+        "key": "saveAs",
+        "label": "Saqlash kaliti",
+        "placeholder": "downloaded_file",
+        "helpText": "State ichida URL saqlanadigan kalit nomi"
+      }
+    ],
+    "defaults": {
+      "fileId": "",
+      "saveAs": "downloaded_file"
+    }
+  },
+  {
+    "type": "CronNode",
+    "status": "runtime",
+    "category": "triggers",
+    "titleKey": "constructor.triggers.cron.name",
+    "descriptionKey": "constructor.triggers.cron.description",
+    "titleFallback": "Cron (Periodik)",
+    "descriptionFallback": "Cron jadval bo'yicha periodik ishga tushadi.",
+    "iconName": "clock",
+    "colorToken": "trigger-blue",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "triggers",
+      "sortOrder": 28,
+      "elementType": "cron"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "cron-editor",
+        "key": "cronExpression",
+        "label": "Cron ifodasi"
+      }
+    ],
+    "defaults": {
+      "cronExpression": "0 9 * * *"
+    }
+  },
+  {
+    "type": "AnswerInlineQueryNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.answerInlineQuery.name",
+    "descriptionKey": "constructor.integrations.answerInlineQuery.description",
+    "titleFallback": "Inline Query Javobi",
+    "descriptionFallback": "Inline query'ga natijalar qaytaradi.",
+    "iconName": "message",
+    "colorToken": "integration-sky",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "integrations",
+      "sortOrder": 30,
+      "elementType": "answer_inline_query"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "textarea",
+        "key": "results",
+        "label": "Natijalar (JSON massiv)",
+        "placeholder": "[{\"type\": \"article\", \"id\": \"1\", \"title\": \"Sarlavha\", \"input_message_content\": {\"message_text\": \"Matn\"}}]",
+        "helpText": "Telegram InlineQueryResult massivi — JSON formatida",
+        "rows": 6
+      }
+    ],
+    "defaults": {
+      "results": "[]"
     }
   }
 ]

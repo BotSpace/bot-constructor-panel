@@ -172,16 +172,21 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
             {(() => {
               const seenText = new Set<string>();
               const normalized = getNodeKeyboard(sourceNode?.data ?? { keyboard });
-              return (normalized[normalized.active] as any[][]).flat().map((button: any) => {
-                const label: string =
-                  button.text ||
-                  (button.collectionData?.collection
-                    ? button.collectionData.collection
-                    : "");
-                const isFirstOccurrence = !seenText.has(label);
-                if (isFirstOccurrence) seenText.add(label);
-                return { button, label, isFirstOccurrence };
-              });
+              return (normalized[normalized.active] as any[][])
+                .flat()
+                // handler switch: false bo'lsa tugma handle sifatida ko'rinmaydi
+                // (faqat callback). undefined = true (backward-compat).
+                .filter((button: any) => button?.handler !== false)
+                .map((button: any) => {
+                  const label: string =
+                    button.text ||
+                    (button.collectionData?.collection
+                      ? button.collectionData.collection
+                      : "");
+                  const isFirstOccurrence = !seenText.has(label);
+                  if (isFirstOccurrence) seenText.add(label);
+                  return { button, label, isFirstOccurrence };
+                });
             })().map(({ button, label, isFirstOccurrence }: { button: any; label: string; isFirstOccurrence: boolean }) => {
               const handleId = `target-handler-${sourceNodeId}-${label}`;
               const pos = getHandlePosition(handleId);
