@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { NodeManifest, NodeFieldManifest } from "@/features/bot-constructor/nodes/registry/types";
 import { ModalFieldWidget } from "@/features/bot-constructor/components/NodeEditPanel/modal-field-widgets";
@@ -112,37 +112,39 @@ function AddOptionButton({
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    if (!open || !buttonRef.current) return;
-    const rect = buttonRef.current.getBoundingClientRect();
-    const estimatedHeight = Math.min(options.length * 36 + 8, 240);
-    const spaceBelow = window.innerHeight - rect.bottom;
+  function handleToggle() {
+    if (!open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const estimatedHeight = Math.min(options.length * 36 + 8, 240);
+      const spaceBelow = window.innerHeight - rect.bottom;
 
-    if (spaceBelow < estimatedHeight) {
-      setDropdownStyle({
-        position: "fixed",
-        left: rect.left,
-        width: rect.width,
-        bottom: window.innerHeight - rect.top + 4,
-        zIndex: 9999,
-      });
-    } else {
-      setDropdownStyle({
-        position: "fixed",
-        left: rect.left,
-        width: rect.width,
-        top: rect.bottom + 4,
-        zIndex: 9999,
-      });
+      if (spaceBelow < estimatedHeight) {
+        setDropdownStyle({
+          position: "fixed",
+          left: rect.left,
+          width: rect.width,
+          bottom: window.innerHeight - rect.top + 4,
+          zIndex: 9999,
+        });
+      } else {
+        setDropdownStyle({
+          position: "fixed",
+          left: rect.left,
+          width: rect.width,
+          top: rect.bottom + 4,
+          zIndex: 9999,
+        });
+      }
     }
-  }, [open, options.length]);
+    setOpen((v) => !v);
+  }
 
   return (
     <div>
       <button
         ref={buttonRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={handleToggle}
         className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2.5 text-sm text-zinc-400 transition-colors hover:border-white/20 hover:text-zinc-200"
       >
         <span>Qo&apos;shimcha maydon qo&apos;shish</span>
