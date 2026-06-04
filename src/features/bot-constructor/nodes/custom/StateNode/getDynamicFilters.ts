@@ -6,6 +6,16 @@ export interface DynamicFilterOption {
   group: string;
 }
 
+// Engine StateNode'da bu turlar trigger turidan QAT'I NAZAR ishlaydi (context'da
+// callback_query bo'lsa o'qiladi) — masalan EditOrSend tugma edge'idan kelganda
+// CallbackQueryTriggerNode bo'lmaydi, lekin callback data mavjud.
+const CALLBACK_FILTERS: DynamicFilterOption[] = [
+  { value: "data", label: "Callback Data", group: "Callback" },
+  { value: "callback", label: "Callback (raw)", group: "Callback" },
+  { value: "collection_id", label: "Collection ID", group: "Callback" },
+  { value: "full_data", label: "Full Data (collection hujjati)", group: "Callback" },
+];
+
 const BASE_FILTERS: DynamicFilterOption[] = [
   { value: "user_id", label: "User ID", group: "User" },
   { value: "first_name", label: "First Name", group: "User" },
@@ -287,6 +297,7 @@ export function getDynamicFilters(
         "data",
         "callback",
         "collection_id",
+        "full_data",
         "inline_message_id",
         "game_short_name",
       ];
@@ -316,5 +327,9 @@ export function getDynamicFilters(
   }
 
   const dynamicOptions = toOptions(dynamicFilters, "Dynamic");
-  return [...dynamicOptions, ...BASE_FILTERS];
+  const dynamicValues = new Set(dynamicFilters);
+  const callbackOptions = CALLBACK_FILTERS.filter(
+    (option) => !dynamicValues.has(option.value)
+  );
+  return [...dynamicOptions, ...callbackOptions, ...BASE_FILTERS];
 }
