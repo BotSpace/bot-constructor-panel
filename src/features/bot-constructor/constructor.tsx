@@ -1,6 +1,7 @@
 "use client";
 
 import React, { SVGProps, useCallback, useEffect, useRef, useState } from "react";
+import { getSession } from "@/lib/session-client";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -119,6 +120,47 @@ export default function Constructor() {
     mousePosition: mousePosition,
     onOpenPalette: () => { },
   });
+
+  // Tab yopilganda / fonga o'tganda saqlanmagan o'zgarishlarni best-effort yuboramiz.
+  // visibilitychange(hidden) — sahifa hali tirik, oddiy so'rov yetib boradi;
+  // pagehide — keepalive fetch (~64KB limit) bilan oxirgi urinish.
+  useEffect(() => {
+    let flushing = false;
+    const flush = async () => {
+      const { isDirty, nodes, edges } = useFlowStore.getState();
+      if (!isDirty || flushing) return;
+      flushing = true;
+      try {
+        const session = await getSession();
+        const access = session?.user?.access;
+        if (!access) return;
+        await fetch(`${process.env.NEXT_PUBLIC_API}/api/project/${id}/`, {
+          method: "PATCH",
+          keepalive: true,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access}`,
+          },
+          body: JSON.stringify({ flow: { nodes, edges } }),
+        });
+        useFlowStore.setState({ isDirty: false, lastSavedTime: new Date(), countdownRemaining: null });
+      } catch {
+        /* best-effort — sahifa yopilayotganda xato ko'rsatishning ma'nosi yo'q */
+      } finally {
+        flushing = false;
+      }
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") void flush();
+    };
+    const onPageHide = () => void flush();
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", onPageHide);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", onPageHide);
+    };
+  }, [id]);
 
   // Countdown ni kamaytirish va save qilish
   useEffect(() => {

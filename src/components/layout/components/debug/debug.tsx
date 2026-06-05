@@ -47,8 +47,15 @@ export default function DebugingButtons() {
   /* Ctrl+R is handled in constructor.tsx as a keyboard shortcut */
 
   /* --------------------------- Debug bot actions --------------------------- */
-  function handleRunAndRelaodDebugBot() {
-    saveFlow(id);
+  async function handleRunAndRelaodDebugBot() {
+    // Saqlash tugashini KUTAMIZ — aks holda PATCH va /debug/ poygada bo'lib,
+    // backend eski flow bilan debug konteyner ko'tarishi mumkin.
+    try {
+      await saveFlow(id);
+    } catch {
+      toast.error("Flow saqlanmadi — debug bekor qilindi, qayta urinib ko'ring.");
+      return;
+    }
 
     // Capture original status before optimistic update so we can revert on error
     const prevStatus = project?.debug.status ?? "stopped";

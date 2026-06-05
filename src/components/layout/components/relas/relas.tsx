@@ -31,6 +31,7 @@ import {
 import { instanceAuth } from "@/services/instance";
 import toast from "react-hot-toast";
 import useProjectStore from "@/features/bot-constructor/store/project";
+import { useFlowStore } from "@/features/bot-constructor/store";
 import { useLinkToParent } from "@/components/common/link-to-parrent";
 import Link from "next/link";
 import StatusBadge from "@/components/common/status-badge";
@@ -53,8 +54,20 @@ function ReleasePanel() {
     months?: number;
   } | null>(null);
 
-  function handleCreateRelease(plan_id?: number, months?: number) {
+  async function handleCreateRelease(plan_id?: number, months?: number) {
     const toastId = toast.loading("Release qilinmoqda...");
+
+    // Saqlanmagan o'zgarishlar bo'lsa, release'dan OLDIN majburiy saqlaymiz —
+    // aks holda oxirgi ~1s ichidagi tahrirlar release'ga kirmay qoladi.
+    const { isDirty, saveFlow } = useFlowStore.getState();
+    if (isDirty) {
+      try {
+        await saveFlow(id);
+      } catch {
+        toast.error("Flow saqlanmadi — release bekor qilindi, qayta urinib ko'ring.", { id: toastId });
+        return;
+      }
+    }
 
     const body: Record<string, unknown> = { project: id };
     if (plan_id !== undefined) body.plan_id = plan_id;

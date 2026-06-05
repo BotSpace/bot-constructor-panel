@@ -32,7 +32,7 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     isLoading: false,
     lastSavedTime: null,
     countdownRemaining: null,
-    countdownDuration: 2000, // 2 sekund
+    countdownDuration: 1000, // 1 sekund — tezroq autosave, server uchun baribir batched
 
     startCountdown: () => {
       set({ countdownRemaining: get().countdownDuration });
