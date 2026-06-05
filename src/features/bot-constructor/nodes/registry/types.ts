@@ -91,7 +91,6 @@ export interface NodeFieldManifest {
     // Action panel sub-sections (optional-capable)
     | "action-recipients"
     | "action-keyboard"
-    | "action-handlers"
     // Nested row/column editor (generic; used for keyboards)
     | "nested-rows"
     // Collection binding (generic; collection + field mapping + filter +

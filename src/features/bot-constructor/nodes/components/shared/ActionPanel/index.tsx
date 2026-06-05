@@ -15,13 +15,11 @@ import ActionNodeSettings from "../../../actions/shared/ActionNodeSettings"
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { ParseMode } from "@/features/bot-constructor/nodes/types";
 import { ButtonGenerator, KeyboardConfig } from "@/features/bot-constructor/components";
-import { HandlerAdder } from "../../../actions/shared/HandlerBuilder";
 import { RecipientsManager } from "../../../actions/shared/RecipientSelector";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 import {
   Settings2,
   Users,
-  Workflow,
   Keyboard,
   SlidersHorizontal,
   X,
@@ -37,7 +35,6 @@ interface ActionPanelTypes {
     sendToSender: boolean;
     additionalIds: string[];
   };
-  hideHandlers?: boolean;
 }
 
 function SectionWrapper({
@@ -71,7 +68,7 @@ function SectionWrapper({
 
 const DEFAULT_RECIPIENTS = { sendToSender: true, additionalIds: [] };
 
-export function ActionPanel({ disableNotification, parseMode, protectContent, id, keyboard, recipients, hideHandlers = true }: ActionPanelTypes) {
+export function ActionPanel({ disableNotification, parseMode, protectContent, id, keyboard, recipients }: ActionPanelTypes) {
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const inPanel = useIsInNodePanel();
@@ -102,16 +99,6 @@ export function ActionPanel({ disableNotification, parseMode, protectContent, id
           description="Inline va reply tugmalarni boshqaring"
         >
           <ButtonGenerator initialKeyboard={keyboard} node_id={id} />
-        </SectionWrapper>
-      )}
-
-      {!hideHandlers && (
-        <SectionWrapper
-          icon={Workflow}
-          title="Handlerlar"
-          description="Xabarga javob berish qoidalari"
-        >
-          <HandlerAdder sourceNodeId={id} />
         </SectionWrapper>
       )}
 

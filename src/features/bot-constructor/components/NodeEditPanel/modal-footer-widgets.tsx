@@ -1,17 +1,14 @@
 "use client";
 
 import { ButtonGenerator, KeyboardConfig } from "@/features/bot-constructor/components";
-import { HandlerAdder } from "@/features/bot-constructor/nodes/actions/shared/HandlerBuilder";
 import ActionNodeSettings from "@/features/bot-constructor/nodes/actions/shared/ActionNodeSettings";
 import { RecipientsManager } from "@/features/bot-constructor/nodes/actions/shared/RecipientSelector";
 import { ParseMode } from "@/features/bot-constructor/nodes/types";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { Workflow } from "lucide-react";
 
 interface ModalActionPanelProps {
   nodeId: string;
   data: Record<string, unknown>;
-  hideHandlers?: boolean;
 }
 
 function Section({
@@ -34,7 +31,6 @@ function Section({
 export function ModalActionPanel({
   nodeId,
   data,
-  hideHandlers = true,
 }: ModalActionPanelProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const recipients = data.recipients as
@@ -63,12 +59,6 @@ export function ModalActionPanel({
         </Section>
       ) : null}
 
-      {!hideHandlers ? (
-        <Section title="Handlerlar">
-          <HandlerAdder sourceNodeId={nodeId} />
-        </Section>
-      ) : null}
-
       <Section title="Qo'shimcha sozlamalar">
         <ActionNodeSettings
           notificationDisabled={
@@ -87,16 +77,3 @@ export function ModalActionPanel({
   );
 }
 
-export function ModalHandlersList({
-  nodeId,
-}: {
-  nodeId: string;
-  data: Record<string, unknown>;
-}) {
-  return (
-    <section className="space-y-3">
-      <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">Handlerlar</p>
-      <HandlerAdder sourceNodeId={nodeId} />
-    </section>
-  );
-}
