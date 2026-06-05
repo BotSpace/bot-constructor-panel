@@ -24,7 +24,7 @@ export type WsListener = (
 
 type TokenProvider = () => Promise<string | null | undefined>;
 
-const WATCHDOG_INTERVAL_MS = 1000;
+const WATCHDOG_INTERVAL_MS = 500; // arzon tekshiruv (readyState + timestamp), tarmoq yo'q
 /** Shu muddat trafik bo'lmasa ping yuboramiz. */
 const IDLE_PING_AFTER_MS = 25_000;
 /** Ping'dan keyin shu muddat ichida echo/xabar kelmasa — ulanish o'lik. */
