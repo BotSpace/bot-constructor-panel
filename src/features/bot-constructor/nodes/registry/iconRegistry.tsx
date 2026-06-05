@@ -1,9 +1,11 @@
 import {
+  BadgeCheck,
   BrainCircuit,
   Clapperboard,
   Clock3,
   Code2,
   Copy,
+  CreditCard,
   Database,
   DoorOpen,
   Download,
@@ -20,6 +22,7 @@ import {
   Settings2,
   Split,
   Timer,
+  UserPlus,
   Users,
   Variable,
   Video,
@@ -73,6 +76,9 @@ const LUCIDE_ICONS: Record<string, ReactNode> = {
   form: <FileText className="text-primary" />,
   users: <Users className="text-primary" />,
   variable: <Variable className="text-primary" />,
+  "credit-card": <CreditCard className="text-primary" />,
+  "badge-check": <BadgeCheck className="text-primary" />,
+  "user-plus": <UserPlus className="text-primary" />,
 };
 
 export function resolveNodeIcon(iconName: string): ReactNode | string {
