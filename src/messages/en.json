@@ -72,6 +72,18 @@
       "cron": {
         "name": "Cron (Periodic)",
         "description": "Runs periodically on a cron schedule."
+      },
+      "preCheckout": {
+        "name": "Pre-checkout Payment",
+        "description": "Triggered before the user confirms a payment."
+      },
+      "successfulPayment": {
+        "name": "Successful Payment",
+        "description": "Triggered when a payment is successfully completed."
+      },
+      "chatJoinRequest": {
+        "name": "Chat Join Request",
+        "description": "Triggered when a user sends a join request to a group."
       }
     },
     "actions": {
@@ -139,6 +151,10 @@
       "editMessage": {
         "name": "Edit message",
         "description": "Edits a sent message (text, caption, buttons, media)."
+      },
+      "invoice": {
+        "name": "Invoice",
+        "description": "Sends a Telegram payment invoice."
       }
     },
     "messageOperations": {

@@ -177,3 +177,23 @@ export interface EditOrSendMessageNodeData {
 }
 
 export type { RecipientType };
+
+export interface InvoicePrice {
+  label: string;
+  amount: number;
+}
+
+export interface SendInvoiceNodeData {
+  recipients?: RecipientConfig;
+  title: string;
+  description: string;
+  payload: string;
+  providerToken?: string;
+  currency: string;
+  prices: InvoicePrice[];
+  photoUrl?: string;
+  needName?: boolean;
+  needPhone?: boolean;
+  needEmail?: boolean;
+  needShippingAddress?: boolean;
+}
