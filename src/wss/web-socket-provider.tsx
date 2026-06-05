@@ -89,38 +89,43 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             const status = data.status as "waiting" | "running" | "success" | "error";
             const ts = typeof data.ts === "number" ? (data.ts as number) : undefined;
             const error = data.error as string | undefined;
+            // Engine 3.5.31+: run_id (har update uchun monotonik) + seq (atomik) —
+            // eventlar tartibini tarmoq emas, engine belgilaydi. Store yangi
+            // run_id'da o'zi reset qiladi, eski run eventlarini tashlaydi.
+            const runId =
+              typeof data.run_id === "number" && data.run_id > 0
+                ? (data.run_id as number)
+                : undefined;
+            const seq = typeof data.seq === "number" ? (data.seq as number) : undefined;
 
             const debugStore = useDebugStatusStore.getState();
             const { nodes, edges } = useFlowStore.getState();
 
-            const flowNode = nodes.find((n) => n.id === nodeId);
-            const manifest = flowNode?.type
-              ? getNodeManifestByType(flowNode.type)
-              : undefined;
-            const isTrigger = manifest?.sidebar?.groupId === "triggers";
-
-            // When a trigger fires, reset all nodes and mark all triggers as waiting
-            if (status === "running" && isTrigger) {
-              const triggerIds = nodes
-                .filter(
-                  (n) =>
-                    n.type &&
-                    getNodeManifestByType(n.type)?.sidebar?.groupId === "triggers"
-                )
-                .map((n) => n.id);
-              debugStore.startNewRun(triggerIds);
+            // LEGACY (run_id'siz eski engine): trigger running kelganda reset.
+            // run_id bor bo'lsa bu shart emas — store o'zi boshqaradi va bu
+            // yo'lning "kechikkan trigger eventi keyin kelgan success'ni
+            // o'chiradi" poygasi ham yo'q.
+            if (runId === undefined && status === "running") {
+              const flowNode = nodes.find((n) => n.id === nodeId);
+              const manifest = flowNode?.type
+                ? getNodeManifestByType(flowNode.type)
+                : undefined;
+              if (manifest?.sidebar?.groupId === "triggers") {
+                const triggerIds = nodes
+                  .filter(
+                    (n) =>
+                      n.type &&
+                      getNodeManifestByType(n.type)?.sidebar?.groupId === "triggers"
+                  )
+                  .map((n) => n.id);
+                debugStore.startNewRun(triggerIds);
+              }
             }
 
-            debugStore.setNodeStatus(nodeId, status, ts, error);
+            debugStore.setNodeStatus(nodeId, status, ts, error, runId, seq);
 
-            // Trigger nodes revert to "waiting" after success — they stay
-            // yellow while the rest of the flow executes downstream.
-            if (status === "success" && isTrigger) {
-              const revertTs = (ts ?? Date.now()) + 1;
-              setTimeout(() => {
-                useDebugStatusStore.getState().setNodeStatus(nodeId, "waiting", revertTs);
-              }, 1500);
-            }
+            // Trigger ishlaganda u ham yashil bo'lib QOLADI (avval 1.5s dan
+            // keyin sariqqa qaytarilardi) — keyingi run kelganda reset bo'ladi.
 
             // Propagate status to accessory nodes (e.g. LLM node connected to AI agent)
             const accessorySourceIds = edges
@@ -132,7 +137,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
               )
               .map((e) => e.source);
             for (const accId of accessorySourceIds) {
-              debugStore.setNodeStatus(accId, status, ts, error);
+              debugStore.setNodeStatus(accId, status, ts, error, runId, seq);
             }
           }
           break;
