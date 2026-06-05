@@ -72,6 +72,18 @@
       "cron": {
         "name": "Cron (Periodik)",
         "description": "Cron jadval bo'yicha periodik ishga tushadi."
+      },
+      "preCheckout": {
+        "name": "To'lov tasdiqlash (Pre-checkout)",
+        "description": "Foydalanuvchi to'lovni tasdiqlashdan oldin chaqiriladi."
+      },
+      "successfulPayment": {
+        "name": "Muvaffaqiyatli to'lov",
+        "description": "To'lov muvaffaqiyatli amalga oshganda chaqiriladi."
+      },
+      "chatJoinRequest": {
+        "name": "Guruhga qo'shilish so'rovi",
+        "description": "Foydalanuvchi guruhga qo'shilish so'rovi yuborganda chaqiriladi."
       }
     },
     "actions": {
@@ -139,6 +151,10 @@
       "editMessage": {
         "name": "Xabarni tahrirlash",
         "description": "Yuborilgan xabarni tahrirlash (matn, caption, tugmalar, media)."
+      },
+      "invoice": {
+        "name": "To'lov (Invoice)",
+        "description": "Telegram to'lov invoice yuboradi."
       }
     },
     "messageOperations": {

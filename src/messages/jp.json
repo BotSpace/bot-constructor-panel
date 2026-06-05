@@ -72,6 +72,18 @@
       "cron": {
         "name": "Cron（定期実行）",
         "description": "cronスケジュールで定期的に実行されます。"
+      },
+      "preCheckout": {
+        "name": "支払い前確認 (Pre-checkout)",
+        "description": "支払い確認前にトリガーされます。"
+      },
+      "successfulPayment": {
+        "name": "支払い成功",
+        "description": "支払いが成功したときにトリガーされます。"
+      },
+      "chatJoinRequest": {
+        "name": "グループ参加リクエスト",
+        "description": "ユーザーがグループ参加リクエストを送ったときにトリガーされます。"
       }
     },
     "actions": {
@@ -139,6 +151,10 @@
       "editMessage": {
         "name": "メッセージを編集",
         "description": "送信されたメッセージを編集します（テキスト、キャプション、ボタン、メディア）。"
+      },
+      "invoice": {
+        "name": "インボイス",
+        "description": "Telegram 決済インボイスを送信します。"
       }
     },
     "messageOperations": {

@@ -5484,5 +5484,373 @@
     "defaults": {
       "results": "[]"
     }
+  },
+  {
+    "type": "SendInvoiceNode",
+    "status": "runtime",
+    "category": "actions",
+    "titleKey": "constructor.actions.invoice.name",
+    "descriptionKey": "constructor.actions.invoice.description",
+    "titleFallback": "To'lov (Invoice)",
+    "descriptionFallback": "Telegram to'lov invoice yuboradi.",
+    "iconName": "credit-card",
+    "colorToken": "action-emerald",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "actions",
+      "sortOrder": 145,
+      "elementType": "invoice"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "text",
+        "key": "title",
+        "label": "Sarlavha",
+        "placeholder": "Mahsulot nomi yoki {{state.product_name}}"
+      },
+      {
+        "type": "textarea",
+        "key": "description",
+        "label": "Tavsif",
+        "placeholder": "To'lov haqida qisqacha ma'lumot",
+        "rows": 2
+      },
+      {
+        "type": "text",
+        "key": "payload",
+        "label": "Payload (ichki ID)",
+        "placeholder": "order_123 yoki {{state.order_id}}",
+        "helpText": "To'lov triggerida bu qiymat qaytariladi"
+      },
+      {
+        "type": "text",
+        "key": "providerToken",
+        "label": "Provider Token (ixtiyoriy)",
+        "placeholder": "Bo'sh qoldirsangiz Telegram Stars (XTR)",
+        "helpText": "Bo'sh qoldirsangiz Telegram Stars (XTR) ishlatiladi",
+        "optional": true
+      },
+      {
+        "type": "select",
+        "key": "currency",
+        "label": "Valyuta",
+        "options": [
+          {
+            "value": "XTR",
+            "label": "XTR (Telegram Stars)"
+          },
+          {
+            "value": "USD",
+            "label": "USD"
+          },
+          {
+            "value": "EUR",
+            "label": "EUR"
+          },
+          {
+            "value": "RUB",
+            "label": "RUB"
+          },
+          {
+            "value": "UZS",
+            "label": "UZS"
+          }
+        ]
+      },
+      {
+        "type": "array-editor",
+        "key": "prices",
+        "label": "Narxlar ro'yxati",
+        "addLabel": "Narx qo'shish",
+        "defaultItem": {
+          "label": "",
+          "amount": 0
+        },
+        "itemFields": [
+          {
+            "key": "label",
+            "type": "text",
+            "label": "Nomi",
+            "placeholder": "Masalan: Asosiy narx"
+          },
+          {
+            "key": "amount",
+            "type": "number",
+            "label": "Miqdor (eng kichik birlikda)",
+            "placeholder": "XTR uchun stars soni, USD uchun sentlar"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "key": "photoUrl",
+        "label": "Rasm URL (ixtiyoriy)",
+        "placeholder": "https://example.com/product.jpg",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "needName",
+        "label": "Ism talab qilinsin",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "needPhone",
+        "label": "Telefon raqam talab qilinsin",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "needEmail",
+        "label": "Email talab qilinsin",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "needShippingAddress",
+        "label": "Yetkazib berish manzili talab qilinsin",
+        "optional": true
+      },
+      {
+        "type": "action-recipients",
+        "label": "Qabul qiluvchilar",
+        "optional": true
+      }
+    ],
+    "defaults": {
+      "currency": "XTR",
+      "prices": [
+        {
+          "label": "Narx",
+          "amount": 1
+        }
+      ]
+    }
+  },
+  {
+    "type": "PreCheckoutTriggerNode",
+    "status": "runtime",
+    "category": "triggers",
+    "titleKey": "constructor.triggers.preCheckout.name",
+    "descriptionKey": "constructor.triggers.preCheckout.description",
+    "titleFallback": "To'lov tasdiqlash (Pre-checkout)",
+    "descriptionFallback": "Foydalanuvchi to'lovni tasdiqlashdan oldin chaqiriladi.",
+    "iconName": "credit-card",
+    "colorToken": "trigger-blue",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "triggers",
+      "sortOrder": 35,
+      "elementType": "pre_checkout"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "select",
+        "key": "filter",
+        "label": "Payload filtri",
+        "options": [
+          {
+            "value": "any",
+            "label": "Har qanday"
+          },
+          {
+            "value": "equals",
+            "label": "Teng"
+          },
+          {
+            "value": "starts_with",
+            "label": "Boshlanadi"
+          },
+          {
+            "value": "contains",
+            "label": "O'z ichiga oladi"
+          }
+        ],
+        "variant": "tabs"
+      },
+      {
+        "type": "text",
+        "key": "value",
+        "label": "Qiymat",
+        "placeholder": "Payload qiymati",
+        "visibleWhen": {
+          "key": "filter",
+          "notEquals": "any"
+        }
+      },
+      {
+        "type": "checkbox",
+        "key": "autoAnswer",
+        "label": "Avtomatik tasdiqlash",
+        "helpText": "Avtomatik tasdiqlash (10 soniya ichida javob bermasa to'lov bekor bo'ladi)"
+      },
+      {
+        "type": "checkbox",
+        "key": "global",
+        "label": "Global"
+      }
+    ],
+    "footer": [
+      {
+        "type": "actionPanel",
+        "variant": "messageBasic",
+        "hideHandlers": true
+      }
+    ],
+    "defaults": {
+      "filter": "any",
+      "autoAnswer": true,
+      "global": true
+    },
+    "producesState": [
+      "pre_checkout_payload",
+      "pre_checkout_total_amount",
+      "pre_checkout_currency"
+    ]
+  },
+  {
+    "type": "SuccessfulPaymentTriggerNode",
+    "status": "runtime",
+    "category": "triggers",
+    "titleKey": "constructor.triggers.successfulPayment.name",
+    "descriptionKey": "constructor.triggers.successfulPayment.description",
+    "titleFallback": "Muvaffaqiyatli to'lov",
+    "descriptionFallback": "To'lov muvaffaqiyatli amalga oshganda chaqiriladi.",
+    "iconName": "badge-check",
+    "colorToken": "trigger-blue",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "triggers",
+      "sortOrder": 36,
+      "elementType": "successful_payment"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "select",
+        "key": "filter",
+        "label": "Payload filtri",
+        "options": [
+          {
+            "value": "any",
+            "label": "Har qanday"
+          },
+          {
+            "value": "equals",
+            "label": "Teng"
+          },
+          {
+            "value": "starts_with",
+            "label": "Boshlanadi"
+          },
+          {
+            "value": "contains",
+            "label": "O'z ichiga oladi"
+          }
+        ],
+        "variant": "tabs"
+      },
+      {
+        "type": "text",
+        "key": "value",
+        "label": "Qiymat",
+        "placeholder": "Payload qiymati",
+        "visibleWhen": {
+          "key": "filter",
+          "notEquals": "any"
+        }
+      },
+      {
+        "type": "checkbox",
+        "key": "global",
+        "label": "Global"
+      }
+    ],
+    "defaults": {
+      "filter": "any",
+      "global": true
+    },
+    "producesState": [
+      "payment_payload",
+      "payment_total_amount",
+      "payment_currency",
+      "payment_telegram_charge_id"
+    ]
+  },
+  {
+    "type": "ChatJoinRequestTriggerNode",
+    "status": "runtime",
+    "category": "triggers",
+    "titleKey": "constructor.triggers.chatJoinRequest.name",
+    "descriptionKey": "constructor.triggers.chatJoinRequest.description",
+    "titleFallback": "Guruhga qo'shilish so'rovi",
+    "descriptionFallback": "Foydalanuvchi guruhga qo'shilish so'rovi yuborganda chaqiriladi.",
+    "iconName": "user-plus",
+    "colorToken": "trigger-blue",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "triggers",
+      "sortOrder": 37,
+      "elementType": "chat_join_request"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "checkbox",
+        "key": "global",
+        "label": "Global"
+      }
+    ],
+    "defaults": {
+      "global": true
+    },
+    "producesState": [
+      "join_request_chat_id",
+      "join_request_user_id",
+      "first_name"
+    ]
   }
 ]

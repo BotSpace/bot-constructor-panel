@@ -55,3 +55,22 @@ export interface ReplyButtonTriggerData {
   state?: StateConfig;
 }
 
+export interface PreCheckoutTriggerNodeData {
+  filter: "any" | "equals" | "starts_with" | "contains";
+  value: string;
+  autoAnswer: boolean;
+  global: boolean;
+  state?: StateConfig;
+}
+
+export interface SuccessfulPaymentTriggerNodeData {
+  filter: "any" | "equals" | "starts_with" | "contains";
+  value: string;
+  global: boolean;
+  state?: StateConfig;
+}
+
+export interface ChatJoinRequestTriggerNodeData {
+  global: boolean;
+  state?: StateConfig;
+}
