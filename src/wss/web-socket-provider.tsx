@@ -4,70 +4,38 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
-import { useSession } from "@/lib/session-client";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-} from "react";
+import { getSession, useSession } from "@/lib/session-client";
+import { useEffect } from "react";
+import { wsHub } from "./ws-hub";
 
-type WebSocketType = WebSocket | null;
-
-const WebSocketContext = createContext<WebSocketType>(null);
-
-const RECONNECT_DELAY = 3000;
-const MAX_RECONNECT_ATTEMPTS = 10;
-
+/**
+ * Yupqa provider — butun ulanish hayoti endi `wsHub`da (yagona singleton):
+ * watchdog har 1s readyState tekshiradi, uzilsa cheksiz backoff bilan qayta
+ * ulaydi, idle'da app-level ping/echo bilan yarim-ochiq ulanishlarni tutadi,
+ * har (qayta)ulanishda YANGI access token oladi. Bu komponent faqat hub'ni
+ * yoqadi va kelgan eventlarni store'larga tarqatadi.
+ */
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const session = useSession();
-  // Only the project ID drives (re)connection — NOT the whole project object,
-  // which mutates on every WS message (changeRelease/changeDebug/changeProject)
-  // and previously caused the socket to close+reopen in a loop.
-  const projectId = useProjectStore((s) => s.project?.id);
-
-  const socketRef = useRef<WebSocketType>(null);
-  const reconnectAttempts = useRef(0);
-  const reconnectTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  const access = session.data?.user?.access;
   const authed = session.status === "authenticated";
 
-  const connect = useCallback(() => {
-    if (!authed || !projectId || !access) return;
+  // Hub lifecycle — login bo'lganda yoqamiz. Token har ulanishda yangidan
+  // so'raladi (eskirgan token bilan reconnect urinish muammosi yo'q).
+  useEffect(() => {
+    if (!authed) return;
+    wsHub.start(async () => (await getSession())?.user?.access ?? null);
+    return () => wsHub.stop();
+  }, [authed]);
 
-    // Already connected/connecting → do nothing (avoid duplicate sockets).
-    if (
-      socketRef.current &&
-      (socketRef.current.readyState === WebSocket.OPEN ||
-        socketRef.current.readyState === WebSocket.CONNECTING)
-    ) {
-      return;
-    }
-
-    const ws = new WebSocket(`wss://api.botspace.uz/ws/events?token=${access}`);
-    socketRef.current = ws;
-
-    ws.onopen = () => {
-      reconnectAttempts.current = 0;
-    };
-
-    ws.onmessage = (msg) => {
-      let message: { event?: string; data?: Record<string, unknown> };
-      try {
-        message = JSON.parse(msg.data);
-      } catch {
-        return;
-      }
-
-      // Read the LATEST project + actions from the store (no stale closure).
+  // Event dispatch — store'lardan DOIM eng so'nggi holat o'qiladi (stale
+  // closure yo'q), shuning uchun obuna bir marta o'rnatiladi.
+  useEffect(() => {
+    return wsHub.subscribe((event, data) => {
       const store = useProjectStore.getState();
       const project = store.project;
       if (!project) return;
-      const data = (message.data ?? {}) as Record<string, unknown>;
 
-      switch (message.event) {
+      switch (event) {
         case "release_status": {
           const version = Number(data.version);
           if (
@@ -145,43 +113,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         default:
           break;
       }
-    };
+    });
+  }, []);
 
-    ws.onerror = () => {
-      if (process.env.NODE_ENV === "development") {
-        console.warn("WS connection error - backend may be unavailable");
-      }
-    };
-
-    ws.onclose = () => {
-      socketRef.current = null;
-      if (reconnectAttempts.current < MAX_RECONNECT_ATTEMPTS) {
-        const delay = RECONNECT_DELAY * Math.pow(2, reconnectAttempts.current);
-        reconnectTimeout.current = setTimeout(() => {
-          reconnectAttempts.current += 1;
-          connect();
-        }, delay);
-      }
-    };
-  }, [authed, projectId, access]);
-
-  useEffect(() => {
-    connect();
-
-    return () => {
-      clearTimeout(reconnectTimeout.current);
-      if (socketRef.current) {
-        socketRef.current.close();
-        socketRef.current = null;
-      }
-    };
-  }, [connect]);
-
-  return (
-    <WebSocketContext.Provider value={socketRef.current}>
-      {children}
-    </WebSocketContext.Provider>
-  );
+  return <>{children}</>;
 }
 
-export const useWebSocket = () => useContext(WebSocketContext);
+/** @deprecated Hub'ga to'g'ridan-to'g'ri obuna uchun `wsHub.subscribe` ishlating. */
+export const useWebSocket = () => null;
