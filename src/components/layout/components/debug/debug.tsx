@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   BotMessageSquare,
   RotateCcw,
@@ -8,7 +8,6 @@ import {
   Copy,
   Mail,
   Share2,
-  Play,
   LoaderCircle,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -28,6 +27,10 @@ import BottomButtonGroup from "@/features/bot-constructor/components/bottom-pane
 import { BottomPanelButton } from "@/features/bot-constructor/components/bottom-panel/components/button";
 import { PlayIcon } from "@/components/icons/play";
 import CountdownComponent from "@/components/common/count-down/count-down";
+import {
+  RunningBotLimitModal,
+  RunningBotLimitError,
+} from "@/components/layout/components/running-bot-limit-modal";
 
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugingButtons() {
@@ -37,11 +40,18 @@ export default function DebugingButtons() {
   // Store'dan kerakli qismlarni olamiz
   const { saveFlow } = useFlowStore();
 
+  const [limitError, setLimitError] = useState<RunningBotLimitError | null>(
+    null
+  );
+
   /* Ctrl+R is handled in constructor.tsx as a keyboard shortcut */
 
   /* --------------------------- Debug bot actions --------------------------- */
   function handleRunAndRelaodDebugBot() {
     saveFlow(id);
+
+    // Capture original status before optimistic update so we can revert on error
+    const prevStatus = project?.debug.status ?? "stopped";
 
     if (project)
       changeDebug({
@@ -54,8 +64,21 @@ export default function DebugingButtons() {
       .then(() => {
         toast.success("Bot ishga tushirilmoqda...");
       })
-      .catch(() => {
-        toast.error("Botni ishga tushirishda xatolik yuz berdi.");
+      .catch((err) => {
+        const raw = err?.response?.data;
+        const data = raw?.data ?? raw;
+        // Revert optimistic status update in all error cases
+        if (project)
+          changeDebug({ ...project["debug"], status: prevStatus });
+
+        if (
+          err?.response?.status === 409 &&
+          data?.code === "running_bot_limit"
+        ) {
+          setLimitError(data as RunningBotLimitError);
+        } else {
+          toast.error("Botni ishga tushirishda xatolik yuz berdi.");
+        }
       });
   }
 
@@ -121,64 +144,76 @@ export default function DebugingButtons() {
 
   if (project)
     return (
-      <BottomButtonGroup>
-        {project.debug.status === "running" ? (
-          <>
-            <BottomPanelButton size={'default'} onClick={handleStopBot}>
-              <StopCircle size={16} />
-              <CountdownComponent updated_at={project.debug.updated_at} />
-            </BottomPanelButton>
-            <BottomPanelButton
-              onClick={handleRunAndRelaodDebugBot}
-            >
-              <RotateCcw size={16} />
-            </BottomPanelButton>
-
-            {/* open debug bot */}
-            <BottomPanelButton size={'default'} asChild>
-              <a
-                href={botLink}
-                target="_blank"
-                rel="noopener noreferrer"
+      <>
+        <BottomButtonGroup>
+          {project.debug.status === "running" ? (
+            <>
+              <BottomPanelButton size={'default'} onClick={handleStopBot}>
+                <StopCircle size={16} />
+                <CountdownComponent updated_at={project.debug.updated_at} />
+              </BottomPanelButton>
+              <BottomPanelButton
+                onClick={handleRunAndRelaodDebugBot}
               >
-                <BotMessageSquare className="h-4 w-4" />
-                Open bot
-              </a>
+                <RotateCcw size={16} />
+              </BottomPanelButton>
+
+              {/* open debug bot */}
+              <BottomPanelButton size={'default'} asChild>
+                <a
+                  href={botLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <BotMessageSquare className="h-4 w-4" />
+                  Open bot
+                </a>
+              </BottomPanelButton>
+
+              {/* share  */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <BottomPanelButton size={'icon'}>
+                    <Share2 className="h-4 w-4" />
+                  </BottomPanelButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleCopyLink}>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy link
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShareViaGmail}>
+                    <Mail className="mr-2 h-4 w-4" />
+                    Send via Gmail
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShareViaTelegram}>
+                    <BotMessageSquare className="mr-2 h-4 w-4" />
+                    Send via Telegram
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+            </>
+          ) : project.debug.status === "initializing" ? (
+            <BottomPanelButton size={'icon'} disabled>
+              <LoaderCircle className="h-4 w-4 animate-spin" />
             </BottomPanelButton>
+          ) : (
+            <BottomPanelButton onClick={handleRunAndRelaodDebugBot} variant="outline">
+              <PlayIcon />
+            </BottomPanelButton>
+          )}
+        </BottomButtonGroup>
 
-            {/* share  */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <BottomPanelButton size={'icon'}>
-                  <Share2 className="h-4 w-4" />
-                </BottomPanelButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleCopyLink}>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Copy link
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleShareViaGmail}>
-                  <Mail className="mr-2 h-4 w-4" />
-                  Send via Gmail
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleShareViaTelegram}>
-                  <BotMessageSquare className="mr-2 h-4 w-4" />
-                  Send via Telegram
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-          </>
-        ) : project.debug.status === "initializing" ? (
-          <BottomPanelButton size={'icon'} disabled>
-            <LoaderCircle className="h-4 w-4 animate-spin" />
-          </BottomPanelButton>
-        ) : (
-          <BottomPanelButton onClick={handleRunAndRelaodDebugBot} variant="outline">
-            <PlayIcon />
-          </BottomPanelButton>
+        {limitError && (
+          <RunningBotLimitModal
+            open={limitError !== null}
+            onOpenChange={(v) => { if (!v) setLimitError(null); }}
+            errorData={limitError}
+            currentProjectId={id}
+            onStopSuccess={handleRunAndRelaodDebugBot}
+          />
         )}
-      </BottomButtonGroup>
+      </>
     );
 }
