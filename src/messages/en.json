@@ -252,6 +252,10 @@
       "answerInlineQuery": {
         "name": "Answer Inline Query",
         "description": "Returns results for an inline query."
+      },
+      "payment": {
+        "name": "Payment",
+        "description": "Processes a Click payment via Botspace."
       }
     },
     "ai": {

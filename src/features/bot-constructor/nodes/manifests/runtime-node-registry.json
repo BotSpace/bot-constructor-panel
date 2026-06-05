@@ -5772,5 +5772,83 @@
       "join_request_user_id",
       "first_name"
     ]
+  },
+  {
+    "type": "PaymentNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.payment.name",
+    "descriptionKey": "constructor.integrations.payment.description",
+    "titleFallback": "To'lov (Payment)",
+    "descriptionFallback": "Botspace orqali Click to'lovini amalga oshiradi.",
+    "iconName": "credit-card",
+    "colorToken": "action-emerald",
+    "size": {
+      "width": 180
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "integrations",
+      "sortOrder": 10,
+      "elementType": "payment"
+    },
+    "handles": [
+      {
+        "kind": "target",
+        "side": "left",
+        "id": "target-default",
+        "styleVariant": "accent"
+      },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "paid",
+        "offsetClass": "translate-y-[-200%]",
+        "styleVariant": "success"
+      },
+      {
+        "kind": "source",
+        "side": "right",
+        "id": "failed",
+        "offsetClass": "translate-y-[200%]",
+        "styleVariant": "danger"
+      }
+    ],
+    "content": [
+      {
+        "type": "select",
+        "key": "paymentType",
+        "label": "To'lov tizimi",
+        "options": [
+          {
+            "value": "click",
+            "label": "Click"
+          }
+        ],
+        "variant": "tabs"
+      },
+      {
+        "type": "text",
+        "key": "amount",
+        "label": "Miqdor",
+        "placeholder": "10000 yoki {{state.summa}}"
+      },
+      {
+        "type": "text",
+        "key": "comment",
+        "label": "Izoh (mijozga ko'rinadigan)",
+        "placeholder": "Buyurtma #{{state.order_id}} uchun to'lov"
+      },
+      {
+        "type": "text",
+        "key": "buttonText",
+        "label": "Tugma matni",
+        "placeholder": "💳 To'lash"
+      }
+    ],
+    "defaults": {
+      "paymentType": "click",
+      "buttonText": "💳 To'lash"
+    }
   }
 ]
