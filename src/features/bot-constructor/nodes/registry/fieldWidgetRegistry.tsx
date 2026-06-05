@@ -125,7 +125,6 @@ const PANEL_ONLY_FIELD_TYPES = new Set([
   "nested-rows",
   "action-keyboard",
   "action-recipients",
-  "action-handlers",
   "code-editor",
   "collection-select",
   "condition-list",

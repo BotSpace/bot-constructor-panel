@@ -40,7 +40,6 @@ import { RecipientsManager } from "@/features/bot-constructor/nodes/actions/shar
 import { KeyboardConfig } from "@/features/bot-constructor/components";
 import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 import { InlineKeyboardEditor } from "@/features/bot-constructor/components/ButtonGenerator/InlineKeyboardEditor";
-import { HandlerAdder } from "@/features/bot-constructor/nodes/actions/shared/HandlerBuilder";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { cn } from "@/lib/utils";
 import { Plus, X } from "lucide-react";
@@ -273,10 +272,6 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         onUpdate={(update) => updateNodeData(nodeId, update)}
       />
     );
-  }
-
-  if (field.type === "action-handlers") {
-    return <HandlerAdder sourceNodeId={nodeId} />;
   }
 
   if (field.type === "nested-rows" && field.key && field.columnFields) {

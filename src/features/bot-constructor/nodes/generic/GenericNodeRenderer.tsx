@@ -254,7 +254,6 @@ export function GenericNodeRenderer({
                         additionalIds: [],
                       }
                     }
-                    hideHandlers={footer.hideHandlers}
                   />
                 ) : null
               )}
