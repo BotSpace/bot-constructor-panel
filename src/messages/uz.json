@@ -252,6 +252,10 @@
       "answerInlineQuery": {
         "name": "Inline Query Javobi",
         "description": "Inline query'ga natijalar qaytaradi."
+      },
+      "payment": {
+        "name": "To'lov (Payment)",
+        "description": "Botspace orqali Click to'lovini amalga oshiradi."
       }
     },
     "ai": {
