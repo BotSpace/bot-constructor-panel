@@ -166,17 +166,24 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
       <div className="space-y-2">
         {(() => {
           const normalized = getNodeKeyboard(sourceNode?.data ?? { keyboard });
-          return normalized[normalized.active] as any[][];
-        })().flat().length > 0 && (
+          const NON_ROUTABLE = ["url", "web_app", "login_url", "switch_inline_query", "switch_inline_query_current_chat"];
+          return (normalized[normalized.active] as any[][])
+            .flat()
+            .filter((b: any) => b?.handler !== false && !NON_ROUTABLE.includes(b?.type));
+        })().length > 0 && (
           <div className="flex flex-col gap-2 mb-3 pb-3 border-b">
             {(() => {
               const seenText = new Set<string>();
               const normalized = getNodeKeyboard(sourceNode?.data ?? { keyboard });
               return (normalized[normalized.active] as any[][])
                 .flat()
-                // handler switch: false bo'lsa tugma handle sifatida ko'rinmaydi
-                // (faqat callback). undefined = true (backward-compat).
-                .filter((button: any) => button?.handler !== false)
+                // handler switch: false bo'lsa tugma handle sifatida ko'rinmaydi.
+                // url, web_app, login_url va switch_inline_* turlari callback emas —
+                // ulardan routing edge chiqmasligi kerak, shuning uchun filtrlanadi.
+                .filter((button: any) =>
+                  button?.handler !== false &&
+                  !["url", "web_app", "login_url", "switch_inline_query", "switch_inline_query_current_chat"].includes(button?.type)
+                )
                 .map((button: any) => {
                   const label: string =
                     button.text ||
