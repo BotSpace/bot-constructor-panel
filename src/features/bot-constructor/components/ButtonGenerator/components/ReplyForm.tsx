@@ -106,8 +106,9 @@ export const ReplyForm = ({ onAdd, disabled, nodeId }: ReplyFormProps) => {
     };
 
     if (actionType === "web_app") {
-      if (!webAppUrl) return;
+      if (!webAppUrl || !webAppUrl.startsWith("https://")) return;
       newButton.webApp = { url: webAppUrl };
+      newButton.value = webAppUrl;
     }
 
     onAdd(newButton as ButtonConfig);
