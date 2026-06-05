@@ -35,11 +35,23 @@ import { useLinkToParent } from "@/components/common/link-to-parrent";
 import Link from "next/link";
 import StatusBadge from "@/components/common/status-badge";
 import SelectPlan from "./components/select-plan/select-plan";
+import {
+  RunningBotLimitModal,
+  RunningBotLimitError,
+} from "@/components/layout/components/running-bot-limit-modal";
 
 function ReleasePanel() {
   const { id, lang }: { id: string; lang: string } = useParams();
   const { loading, project } = useProjectStore();
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
+  const [limitError, setLimitError] = useState<RunningBotLimitError | null>(
+    null
+  );
+  // Remembers plan args so we can retry after stopping a bot
+  const [pendingRelease, setPendingRelease] = useState<{
+    plan_id?: number;
+    months?: number;
+  } | null>(null);
 
   function handleCreateRelease(plan_id?: number, months?: number) {
     const toastId = toast.loading("Release qilinmoqda...");
@@ -53,15 +65,26 @@ function ReleasePanel() {
       .then(() => {
         toast.success("Telegram bot release qilindi", { id: toastId });
         setPlanDialogOpen(false);
+        setPendingRelease(null);
       })
       .catch((err) => {
-        const d = err?.response?.data?.data;
-        const message =
-          d?.plan_id?.[0] ??
-          d?.detail ??
-          err?.response?.data?.detail ??
-          "Xatolik yuz berdi";
-        toast.error(message, { id: toastId });
+        const data = err?.response?.data;
+        if (
+          err?.response?.status === 409 &&
+          data?.code === "running_bot_limit"
+        ) {
+          toast.dismiss(toastId);
+          setPendingRelease({ plan_id, months });
+          setLimitError(data as RunningBotLimitError);
+        } else {
+          const d = data?.data;
+          const message =
+            d?.plan_id?.[0] ??
+            d?.detail ??
+            data?.detail ??
+            "Xatolik yuz berdi";
+          toast.error(message, { id: toastId });
+        }
       });
   }
 
@@ -74,6 +97,21 @@ function ReleasePanel() {
   }
 
   if (loading) return null;
+
+  // The limit modal is shared across all branches (state lives in this component)
+  const limitModal = limitError ? (
+    <RunningBotLimitModal
+      open={limitError !== null}
+      onOpenChange={(v) => {
+        if (!v) setLimitError(null);
+      }}
+      errorData={limitError}
+      currentProjectId={id}
+      onStopSuccess={() =>
+        handleCreateRelease(pendingRelease?.plan_id, pendingRelease?.months)
+      }
+    />
+  ) : null;
 
   // No release bot token → prompt for token first
   if (!project?.release_bot) {
@@ -103,6 +141,7 @@ function ReleasePanel() {
             handleCreateRelease(plan_id, months);
           }}
         />
+        {limitModal}
       </>
     );
   }
@@ -128,6 +167,7 @@ function ReleasePanel() {
             handleCreateRelease(plan_id, months);
           }}
         />
+        {limitModal}
       </>
     );
   }
@@ -135,22 +175,28 @@ function ReleasePanel() {
   // Currently initializing
   if (project.release.status === "initializing") {
     return (
-      <Button
-        className="bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200"
-        disabled
-      >
-        Publishing...
-      </Button>
+      <>
+        <Button
+          className="bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200"
+          disabled
+        >
+          Publishing...
+        </Button>
+        {limitModal}
+      </>
     );
   }
 
   // Release exists → show dropdown with re-publish + change tariff
   return (
-    <ReleaseDropDown
-      lang={lang}
-      id={id}
-      onPublish={() => handleCreateRelease()}
-    />
+    <>
+      <ReleaseDropDown
+        lang={lang}
+        id={id}
+        onPublish={() => handleCreateRelease()}
+      />
+      {limitModal}
+    </>
   );
 }
 
