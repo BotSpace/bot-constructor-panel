@@ -68,7 +68,8 @@ function ReleasePanel() {
         setPendingRelease(null);
       })
       .catch((err) => {
-        const data = err?.response?.data;
+        const raw = err?.response?.data;
+        const data = raw?.data ?? raw;
         if (
           err?.response?.status === 409 &&
           data?.code === "running_bot_limit"

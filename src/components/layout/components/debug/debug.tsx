@@ -65,7 +65,8 @@ export default function DebugingButtons() {
         toast.success("Bot ishga tushirilmoqda...");
       })
       .catch((err) => {
-        const data = err?.response?.data;
+        const raw = err?.response?.data;
+        const data = raw?.data ?? raw;
         // Revert optimistic status update in all error cases
         if (project)
           changeDebug({ ...project["debug"], status: prevStatus });
