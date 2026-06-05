@@ -89,8 +89,9 @@ export const InlineForm = ({ onAdd, disabled, nodeId }: InlineFormProps) => {
       if (!loginConfig.url) return;
       newButton.loginUrl = loginConfig as LoginUrlConfig;
     } else if (actionType === "web_app") {
-      if (!webAppUrl) return;
+      if (!webAppUrl || !webAppUrl.startsWith("https://")) return;
       newButton.webApp = { url: webAppUrl };
+      newButton.value = webAppUrl;
     } else {
       if (!value.trim()) return;
       newButton.value = value.trim();

@@ -1,11 +1,10 @@
-// FAYL: constructor/components/ButtonGenerator/utils.ts (YANGILANGAN)
 import { ReactNode } from "react";
 import {
   Link,
   Code,
   Smartphone,
   MapPin,
-  Globe,
+  AppWindow,
   LogIn,
   Repeat,
   BarChart3,
@@ -23,9 +22,8 @@ export const getIconForButton = (button: ButtonConfig): ReactNode => {
       return <Smartphone className={commonClasses} />;
     case "request_location":
       return <MapPin className={commonClasses} />;
-    // --- YANGI IKONKALAR ---
     case "web_app":
-      return <Globe className={commonClasses} />;
+      return <AppWindow className={commonClasses} />;
     case "login_url":
       return <LogIn className={commonClasses} />;
     case "switch_inline_query":

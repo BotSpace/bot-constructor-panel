@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ButtonConfig } from "../types";
+import { cn } from "@/lib/utils";
 
 interface EditButtonDialogProps {
   button: ButtonConfig | null;
@@ -26,20 +27,51 @@ export const EditButtonDialog = ({
 }: EditButtonDialogProps) => {
   const [text, setText] = useState("");
   const [value, setValue] = useState("");
+  const [webAppUrl, setWebAppUrl] = useState("");
 
   useEffect(() => {
     if (button) {
       setText(button.text || "");
-      setValue(button.value || "");
+      if (button.type === "web_app") {
+        setWebAppUrl(button.webApp?.url || button.value || "");
+        setValue("");
+      } else {
+        setValue(button.value || "");
+        setWebAppUrl("");
+      }
     }
   }, [button]);
 
   const handleSave = () => {
-    onSave({ text, value });
+    if (button?.type === "web_app") {
+      if (!webAppUrl.startsWith("https://")) return;
+      onSave({ text, webApp: { url: webAppUrl }, value: webAppUrl });
+    } else {
+      onSave({ text, value });
+    }
     onClose();
   };
 
   if (!button) return null;
+
+  const isWebApp = button.type === "web_app";
+  const isUrlInvalid = isWebApp && webAppUrl.length > 0 && !webAppUrl.startsWith("https://");
+
+  const getValueLabel = () => {
+    switch (button.type) {
+      case "url": return "URL";
+      case "web_app": return "Web App URL";
+      default: return "Callback data";
+    }
+  };
+
+  const getValuePlaceholder = () => {
+    switch (button.type) {
+      case "url": return "https://example.com";
+      case "web_app": return "https://app.example.com";
+      default: return "callback_data";
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -58,26 +90,44 @@ export const EditButtonDialog = ({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="edit-value">
-              {button.type === "url" ? "URL" : "Callback data"}
-            </Label>
-            <Input
-              id="edit-value"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder={
-                button.type === "url"
-                  ? "https://example.com"
-                  : "callback_data"
-              }
-            />
+            <Label htmlFor="edit-value">{getValueLabel()}</Label>
+            {isWebApp ? (
+              <>
+                <Input
+                  id="edit-value"
+                  value={webAppUrl}
+                  onChange={(e) => setWebAppUrl(e.target.value)}
+                  placeholder={getValuePlaceholder()}
+                  className={cn(
+                    isUrlInvalid && "border-destructive focus-visible:ring-destructive"
+                  )}
+                />
+                {isUrlInvalid && (
+                  <p className="text-[11px] text-destructive">
+                    URL https:// bilan boshlanishi shart
+                  </p>
+                )}
+              </>
+            ) : (
+              <Input
+                id="edit-value"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                placeholder={getValuePlaceholder()}
+              />
+            )}
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             Bekor qilish
           </Button>
-          <Button onClick={handleSave}>Saqlash</Button>
+          <Button
+            onClick={handleSave}
+            disabled={isWebApp && (!webAppUrl || !webAppUrl.startsWith("https://"))}
+          >
+            Saqlash
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
