@@ -301,11 +301,6 @@
           }
         ],
         "variant": "tabs"
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [
@@ -467,11 +462,6 @@
           "key": "keyboard_kind",
           "notEquals": "reply"
         }
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [
@@ -633,11 +623,6 @@
           "key": "keyboard_kind",
           "notEquals": "reply"
         }
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [
@@ -799,11 +784,6 @@
           "key": "keyboard_kind",
           "notEquals": "reply"
         }
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [
@@ -967,11 +947,6 @@
           "key": "keyboard_kind",
           "notEquals": "reply"
         }
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [
@@ -1062,11 +1037,6 @@
         "type": "description",
         "textKey": "constructor.actions.voice.description",
         "textFallback": "Voice message yuboradi."
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [],
@@ -1121,11 +1091,6 @@
         "type": "description",
         "textKey": "constructor.actions.videoNote.description",
         "textFallback": "Dumaloq video xabar yuboradi."
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [],
@@ -1298,11 +1263,6 @@
           "key": "keyboard_kind",
           "notEquals": "reply"
         }
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [
@@ -1482,11 +1442,6 @@
           "key": "keyboard_kind",
           "notEquals": "reply"
         }
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [
@@ -1724,11 +1679,6 @@
           "key": "keyboard_kind",
           "notEquals": "reply"
         }
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [
@@ -2028,11 +1978,6 @@
           "key": "keyboard_kind",
           "notEquals": "reply"
         }
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [
@@ -2292,11 +2237,6 @@
           }
         ],
         "variant": "tabs"
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [
@@ -2478,11 +2418,6 @@
           }
         ],
         "variant": "tabs"
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [
@@ -2615,11 +2550,6 @@
         "type": "description",
         "textKey": "constructor.messageOperations.copy.description",
         "textFallback": "Xabarni nusxalab yuboradi."
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [],
@@ -2670,11 +2600,6 @@
         "type": "description",
         "textKey": "constructor.messageOperations.pin.description",
         "textFallback": "Xabarni guruhda qadab qo'yadi."
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [],
@@ -2895,11 +2820,6 @@
       {
         "type": "description",
         "textFallback": "Bu node file turidagi MessageTrigger'dan keyin kelishi kerak. Fayl ID trigger'dan avtomatik olinadi."
-      },
-      {
-        "type": "action-handlers",
-        "label": "Handler qo'shish",
-        "optional": true
       }
     ],
     "footer": [],

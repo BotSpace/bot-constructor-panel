@@ -9,10 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { NodeManifest, NodeFieldManifest } from "@/features/bot-constructor/nodes/registry/types";
 import { ModalFieldWidget } from "@/features/bot-constructor/components/NodeEditPanel/modal-field-widgets";
-import {
-  ModalActionPanel,
-  ModalHandlersList,
-} from "@/features/bot-constructor/components/NodeEditPanel/modal-footer-widgets";
+import { ModalActionPanel } from "@/features/bot-constructor/components/NodeEditPanel/modal-footer-widgets";
 import { NodePanelProvider } from "@/features/bot-constructor/contexts/NodePanelContext";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useTranslations } from "next-intl";
@@ -24,8 +21,6 @@ function clearedFieldData(field: NodeFieldManifest): Record<string, unknown> {
   switch (field.type) {
     case "action-keyboard":
       return { rows: [], keyboard_kind: "inline" };
-    case "action-handlers":
-      return { handlers: [] };
     case "action-recipients":
       return { recipients: { sendToSender: true, additionalIds: [] } };
     default:
@@ -83,8 +78,6 @@ function optionalFieldConfigured(
   switch (field.type) {
     case "action-keyboard":
       return arrLen(data.rows) > 0;
-    case "action-handlers":
-      return arrLen(data.handlers) > 0;
     case "action-recipients": {
       const r = data.recipients as
         | { sendToSender?: boolean; additionalIds?: unknown[] }
@@ -251,24 +244,13 @@ export function ModalNodeFormRenderer({
           />
         ) : null}
 
-        {manifest.footer?.length ? (
+        {manifest.footer?.some((f) => f.type === "actionPanel") ? (
           <div className="space-y-3 border-t border-white/10 pt-4">
             {manifest.footer.map((footer, index) => {
               if (footer.type === "actionPanel") {
                 return (
                   <ModalActionPanel
                     key={`${manifest.type}-action-panel-${index}`}
-                    nodeId={nodeId}
-                    data={data}
-                    hideHandlers={footer.hideHandlers}
-                  />
-                );
-              }
-
-              if (footer.type === "handlersList") {
-                return (
-                  <ModalHandlersList
-                    key={`${manifest.type}-handlers-${index}`}
                     nodeId={nodeId}
                     data={data}
                   />
