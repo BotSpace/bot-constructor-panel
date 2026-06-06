@@ -22,8 +22,10 @@ import {
   Settings2,
   Split,
   Timer,
+  UserCheck,
   UserPlus,
   Users,
+  UserX,
   Variable,
   Video,
   WandSparkles,
@@ -79,6 +81,8 @@ const LUCIDE_ICONS: Record<string, ReactNode> = {
   "credit-card": <CreditCard className="text-primary" />,
   "badge-check": <BadgeCheck className="text-primary" />,
   "user-plus": <UserPlus className="text-primary" />,
+  "user-check": <UserCheck className="text-emerald-500" />,
+  "user-x": <UserX className="text-red-500" />,
 };
 
 export function resolveNodeIcon(iconName: string): ReactNode | string {
