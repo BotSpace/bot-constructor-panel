@@ -169,14 +169,16 @@ export function ModalNodeFormRenderer({
 
   const requiredFields = allFields.filter((f) => !f.optional);
 
-  // Pre-configured optional fields (have a value from a previous session) —
-  // shown in manifest order so they feel stable on page refresh.
-  const configuredOptionalFields = allFields.filter(
-    (f) =>
-      f.optional &&
-      !addedOptionalKeys.includes(fieldKey(f)) &&
-      optionalFieldConfigured(f, data)
-  );
+  // Optional fields shown by default. `defaultVisible` gives node authors
+  // explicit control; otherwise fall back to the value-based heuristic (shown
+  // when the field already holds a non-default value, so configured values
+  // survive a page refresh where the in-memory "added" set resets).
+  const configuredOptionalFields = allFields.filter((f) => {
+    if (!f.optional || addedOptionalKeys.includes(fieldKey(f))) return false;
+    if (f.defaultVisible === true) return true;
+    if (f.defaultVisible === false) return false;
+    return optionalFieldConfigured(f, data);
+  });
 
   // Manually added this session — in the ORDER the user added them so each
   // new field always appears at the very bottom of the list.

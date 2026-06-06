@@ -191,7 +191,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -300,7 +301,8 @@
             "label": "HTML"
           }
         ],
-        "variant": "tabs"
+        "variant": "tabs",
+        "defaultVisible": false
       }
     ],
     "footer": [
@@ -373,7 +375,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -534,7 +537,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -695,7 +699,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -858,7 +863,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -1174,7 +1180,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -1353,7 +1360,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -1590,7 +1598,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -1889,7 +1898,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -2138,7 +2148,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -2236,7 +2247,8 @@
             "label": "HTML"
           }
         ],
-        "variant": "tabs"
+        "variant": "tabs",
+        "defaultVisible": false
       }
     ],
     "footer": [
@@ -2308,7 +2320,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -2417,7 +2430,8 @@
             "label": "HTML"
           }
         ],
-        "variant": "tabs"
+        "variant": "tabs",
+        "defaultVisible": false
       }
     ],
     "footer": [
@@ -3316,7 +3330,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
@@ -3923,7 +3938,8 @@
             "value": "reply",
             "label": "Reply"
           }
-        ]
+        ],
+        "defaultVisible": false
       },
       {
         "type": "nested-rows",
