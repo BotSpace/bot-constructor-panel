@@ -248,6 +248,14 @@
       "payment": {
         "name": "支払い (Payment)",
         "description": "Botspace経由でClick決済を処理します。"
+      },
+      "approveChatJoinRequest": {
+        "name": "参加リクエストを承認",
+        "description": "グループまたはチャンネルへの参加リクエストを承認します。"
+      },
+      "declineChatJoinRequest": {
+        "name": "参加リクエストを拒否",
+        "description": "グループまたはチャンネルへの参加リクエストを拒否します。"
       }
     },
     "ai": {

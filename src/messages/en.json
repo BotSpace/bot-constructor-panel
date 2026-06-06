@@ -256,6 +256,14 @@
       "payment": {
         "name": "Payment",
         "description": "Processes a Click payment via Botspace."
+      },
+      "approveChatJoinRequest": {
+        "name": "Approve join request",
+        "description": "Approves a user join request to a group or channel."
+      },
+      "declineChatJoinRequest": {
+        "name": "Decline join request",
+        "description": "Declines a user join request to a group or channel."
       }
     },
     "ai": {

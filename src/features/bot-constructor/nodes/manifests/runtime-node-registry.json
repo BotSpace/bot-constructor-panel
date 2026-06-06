@@ -5850,5 +5850,95 @@
       "paymentType": "click",
       "buttonText": "💳 To'lash"
     }
+  },
+  {
+    "type": "ApproveChatJoinRequestNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.approveChatJoinRequest.name",
+    "descriptionKey": "constructor.integrations.approveChatJoinRequest.description",
+    "titleFallback": "Qo'shilishni tasdiqlash",
+    "descriptionFallback": "Guruh/kanalga qo'shilish so'rovini tasdiqlaydi.",
+    "iconName": "user-check",
+    "colorToken": "action-emerald",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "integrations",
+      "sortOrder": 40,
+      "elementType": "approve_chat_join_request"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "text",
+        "key": "chatId",
+        "label": "Chat ID",
+        "placeholder": "Bo'sh = so'rov kelgan guruh ({{join_request_chat_id}})",
+        "optional": true
+      },
+      {
+        "type": "text",
+        "key": "userId",
+        "label": "User ID",
+        "placeholder": "Bo'sh = so'rovchi ({{join_request_user_id}})",
+        "optional": true
+      }
+    ],
+    "defaults": {}
+  },
+  {
+    "type": "DeclineChatJoinRequestNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.declineChatJoinRequest.name",
+    "descriptionKey": "constructor.integrations.declineChatJoinRequest.description",
+    "titleFallback": "Qo'shilishni rad etish",
+    "descriptionFallback": "Guruh/kanalga qo'shilish so'rovini rad etadi.",
+    "iconName": "user-x",
+    "colorToken": "action-red",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "integrations",
+      "sortOrder": 41,
+      "elementType": "decline_chat_join_request"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "text",
+        "key": "chatId",
+        "label": "Chat ID",
+        "placeholder": "Bo'sh = so'rov kelgan guruh ({{join_request_chat_id}})",
+        "optional": true
+      },
+      {
+        "type": "text",
+        "key": "userId",
+        "label": "User ID",
+        "placeholder": "Bo'sh = so'rovchi ({{join_request_user_id}})",
+        "optional": true
+      }
+    ],
+    "defaults": {}
   }
 ]

@@ -248,6 +248,14 @@
       "payment": {
         "name": "Оплата (Payment)",
         "description": "Обрабатывает платёж через Click (Botspace)."
+      },
+      "approveChatJoinRequest": {
+        "name": "Подтвердить вступление",
+        "description": "Подтверждает запрос пользователя на вступление в группу или канал."
+      },
+      "declineChatJoinRequest": {
+        "name": "Отклонить вступление",
+        "description": "Отклоняет запрос пользователя на вступление в группу или канал."
       }
     },
     "ai": {
