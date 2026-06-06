@@ -113,6 +113,14 @@ export interface NodeFieldManifest {
   visibleWhen?: NodeVisibilityRule;
   /** true = hidden by default; user explicitly adds via "Add option" dropdown */
   optional?: boolean;
+  /**
+   * Explicit control over whether an `optional` field is shown by default in
+   * the node edit panel (overrides the value-based heuristic):
+   *   - true  → always shown by default (even with no value)
+   *   - false → never shown by default; only via "Add optional field" (even if it holds a value)
+   *   - undefined → value-based: shown only when the field already holds a non-default value
+   */
+  defaultVisible?: boolean;
   /** For select: "tabs" renders a segmented control instead of a dropdown (use for ≤4 options) */
   variant?: "commandTrigger" | "tabs";
   /** true = field value is auto-saved to flow context as state_<key>; shown read-only in the variable panel */
