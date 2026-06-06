@@ -256,6 +256,14 @@
       "payment": {
         "name": "To'lov (Payment)",
         "description": "Botspace orqali Click to'lovini amalga oshiradi."
+      },
+      "approveChatJoinRequest": {
+        "name": "Qo'shilishni tasdiqlash",
+        "description": "Foydalanuvchining guruh yoki kanalga qo'shilish so'rovini tasdiqlaydi."
+      },
+      "declineChatJoinRequest": {
+        "name": "Qo'shilishni rad etish",
+        "description": "Foydalanuvchining guruh yoki kanalga qo'shilish so'rovini rad etadi."
       }
     },
     "ai": {
