@@ -596,6 +596,51 @@
       "saved": "Сохранено",
       "unsaved": "Несохранённые изменения",
       "savedAt": "Сохранено в {time}"
+    },
+    "nodePanel": {
+      "noConfig": "Для этого типа узла настройки не найдены"
+    },
+    "nodeSelector": {
+      "title": "Добавить узел",
+      "description": "Выберите категорию и нажмите нужный узел",
+      "searchPlaceholder": "Поиск...",
+      "noResults": "Ничего не найдено"
+    },
+    "topBar": {
+      "back": "Назад",
+      "addNode": "Добавить узел",
+      "addNodeTitle": "Добавить узел (Ctrl+N)",
+      "env": "Переменные окружения",
+      "subtitle": "Конструктор"
+    },
+    "shortcuts": {
+      "dialogTitle": "Горячие клавиши",
+      "dialogDescription": "Комбинации клавиш для быстрой работы",
+      "toggleHint": "чтобы открыть/закрыть это окно",
+      "groupGeneral": "Общие",
+      "groupNodes": "Управление узлами",
+      "groupView": "Вид",
+      "groupPanel": "Панели",
+      "save": "Сохранить",
+      "undo": "Отменить",
+      "redo": "Повторить",
+      "search": "Поиск",
+      "showShortcuts": "Показать горячие клавиши",
+      "selectAll": "Выделить всё",
+      "copy": "Копировать",
+      "paste": "Вставить",
+      "duplicate": "Дублировать",
+      "delete": "Удалить",
+      "addNode": "Добавить узел",
+      "autoLayout": "Форматировать (auto-layout)",
+      "zoomIn": "Приблизить",
+      "zoomOut": "Отдалить",
+      "fitView": "Вписать в экран",
+      "searchPanel": "Панель поиска",
+      "debugConsole": "Консоль отладки",
+      "reloadBot": "Перезапустить debug-бота",
+      "runStopBot": "Запуск/остановка debug-бота",
+      "addNodeModal": "Окно добавления узла"
     }
   },
   "variablePanel": {

@@ -596,6 +596,51 @@
       "saved": "保存済み",
       "unsaved": "未保存の変更",
       "savedAt": "{time} に保存"
+    },
+    "nodePanel": {
+      "noConfig": "このノードタイプの設定が見つかりません"
+    },
+    "nodeSelector": {
+      "title": "ノードを追加",
+      "description": "カテゴリを選び、必要なノードをクリックしてください",
+      "searchPlaceholder": "検索...",
+      "noResults": "何も見つかりません"
+    },
+    "topBar": {
+      "back": "戻る",
+      "addNode": "ノードを追加",
+      "addNodeTitle": "ノードを追加 (Ctrl+N)",
+      "env": "環境変数",
+      "subtitle": "コンストラクター"
+    },
+    "shortcuts": {
+      "dialogTitle": "キーボードショートカット",
+      "dialogDescription": "作業を速めるためのキーの組み合わせ",
+      "toggleHint": "を押すとこのウィンドウを開閉できます",
+      "groupGeneral": "一般",
+      "groupNodes": "ノード管理",
+      "groupView": "表示",
+      "groupPanel": "パネル",
+      "save": "保存",
+      "undo": "元に戻す",
+      "redo": "やり直す",
+      "search": "検索",
+      "showShortcuts": "ショートカットを表示",
+      "selectAll": "すべて選択",
+      "copy": "コピー",
+      "paste": "貼り付け",
+      "duplicate": "複製",
+      "delete": "削除",
+      "addNode": "ノードを追加",
+      "autoLayout": "整形 (auto-layout)",
+      "zoomIn": "ズームイン",
+      "zoomOut": "ズームアウト",
+      "fitView": "画面に合わせる",
+      "searchPanel": "検索パネル",
+      "debugConsole": "デバッグコンソール",
+      "reloadBot": "デバッグボットを再読み込み",
+      "runStopBot": "デバッグボットの実行/停止",
+      "addNodeModal": "ノード追加ダイアログ"
     }
   },
   "variablePanel": {

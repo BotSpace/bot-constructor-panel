@@ -21,6 +21,7 @@ import { SaveStatusBadge } from "@/features/bot-constructor/components/save-stat
 import { Separator } from "@/components/ui/separator";
 import { NodeEditDialog } from "@/features/bot-constructor/components/NodeEditPanel";
 import { Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 function PageInner() {
   const { id }: { id: string } = useParams();
@@ -88,6 +89,7 @@ function N8nTopBar({
   id: string;
   onAddNode: () => void;
 }) {
+  const t = useTranslations("editor.topBar");
   const { lang } = useParams<{ lang: string }>();
   const { handleClick: backToHome } = useLinkToParent({ href: `/${lang}/app/bots/${id}` });
 
@@ -99,7 +101,7 @@ function N8nTopBar({
         size="icon"
         className="h-9 w-9 shrink-0 text-white/70 hover:text-white hover:bg-white/10"
         onClick={backToHome}
-        title="Orqaga"
+        title={t("back")}
       >
         <ArrowLeft className="h-4 w-4" />
       </Button>
@@ -122,10 +124,10 @@ function N8nTopBar({
         size="sm"
         className="h-9 gap-1.5 text-sm px-4"
         onClick={onAddNode}
-        title="Node qo'shish (Ctrl+N)"
+        title={t("addNodeTitle")}
       >
         <Plus className="h-4 w-4" />
-        Node qo'shish
+        {t("addNode")}
       </Button>
 
       <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20" />
@@ -141,6 +143,7 @@ function MobileView({
   id: string;
   project: { name: string };
 }) {
+  const t = useTranslations("editor.topBar");
   const [envOpen, setEnvOpen] = useState(false);
   const { lang } = useParams<{ lang: string }>();
   const { handleClick: backToHome } = useLinkToParent({ href: `/${lang}/app/bots/${id}` });
@@ -152,19 +155,19 @@ function MobileView({
     >
       {/* ── Top bar ── */}
       <div className="shrink-0 flex items-center gap-2 px-3 py-2 border-b border-border bg-background">
-        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={backToHome}>
+        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={backToHome} title={t("back")}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold truncate">{project.name}</p>
-          <p className="text-[10px] text-muted-foreground leading-none">Constructor</p>
+          <p className="text-[10px] text-muted-foreground leading-none">{t("subtitle")}</p>
         </div>
         <Button
           variant="ghost"
           size="icon"
           className="h-8 w-8 shrink-0"
           onClick={() => setEnvOpen(true)}
-          title="Kalitlar"
+          title={t("env")}
         >
           <Key className="h-4 w-4" />
         </Button>
