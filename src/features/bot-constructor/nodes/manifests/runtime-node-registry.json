@@ -301,8 +301,7 @@
             "label": "HTML"
           }
         ],
-        "variant": "tabs",
-        "defaultVisible": false
+        "variant": "tabs"
       }
     ],
     "footer": [
@@ -2247,8 +2246,7 @@
             "label": "HTML"
           }
         ],
-        "variant": "tabs",
-        "defaultVisible": false
+        "variant": "tabs"
       }
     ],
     "footer": [
@@ -2430,8 +2428,7 @@
             "label": "HTML"
           }
         ],
-        "variant": "tabs",
-        "defaultVisible": false
+        "variant": "tabs"
       }
     ],
     "footer": [

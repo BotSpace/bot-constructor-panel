@@ -71,7 +71,8 @@ function fieldKey(field: NodeFieldManifest): string {
  */
 function optionalFieldConfigured(
   field: NodeFieldManifest,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
+  defaultValue?: unknown
 ): boolean {
   const arrLen = (v: unknown) => (Array.isArray(v) ? v.length : 0);
 
@@ -89,6 +90,9 @@ function optionalFieldConfigured(
       if (!key) return false;
       const v = data[key];
       if (v === undefined || v === null) return false;
+      // A value equal to the field's manifest default is NOT a user
+      // configuration — keep such fields collapsed (e.g. parseMode === "None").
+      if (defaultValue !== undefined && v === defaultValue) return false;
       if (typeof v === "boolean") return v === true;
       if (typeof v === "string") return v.trim() !== "";
       if (typeof v === "number") return true;
@@ -177,7 +181,7 @@ export function ModalNodeFormRenderer({
     if (!f.optional || addedOptionalKeys.includes(fieldKey(f))) return false;
     if (f.defaultVisible === true) return true;
     if (f.defaultVisible === false) return false;
-    return optionalFieldConfigured(f, data);
+    return optionalFieldConfigured(f, data, manifest.defaults?.[fieldKey(f)]);
   });
 
   // Manually added this session — in the ORDER the user added them so each
