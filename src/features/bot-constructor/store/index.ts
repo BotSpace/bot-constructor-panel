@@ -33,7 +33,10 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     isLoading: false,
     lastSavedTime: null,
     countdownRemaining: null,
-    countdownDuration: 1000, // 1 sekund — tezroq autosave, server uchun baribir batched
+    // 300ms — deyarli darhol persist. Jonli sync collab WS orqali (zudlik bilan);
+    // bu faqat bazaga saqlash. Kichik oyna tez yozishni guruhlaydi — har harf
+    // bosilganda butun flow PATCH bo'lib serverni bombardimon qilmasligi uchun.
+    countdownDuration: 300,
 
     startCountdown: () => {
       set({ countdownRemaining: get().countdownDuration });
