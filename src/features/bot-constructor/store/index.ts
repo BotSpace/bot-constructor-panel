@@ -5,6 +5,7 @@ import { FlowStoreState } from "./types";
 import { createFlowSlice } from "./flowSlice";
 import { createClipboardSlice } from "./clipboardSlice";
 import { createHistorySlice } from "./historySlice";
+import { createCollabSlice } from "./collabSlice";
 import { createActions } from "./actions";
 import { Connection, addEdge } from "reactflow";
 import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
@@ -67,6 +68,7 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     ...createFlowSlice(set, get, {} as any),
     ...createClipboardSlice(set, get, {} as any),
     ...createHistorySlice(set, get, {} as any),
+    ...createCollabSlice(set, get, {} as any),
     ...createActions(set, get, {} as any),
 
     onConnect: (connection: Connection) => {
@@ -171,7 +173,8 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
         },
       };
 
-      const newEdges = addEdge(newEdge, get().edges);
+      const prevEdges = get().edges;
+      const newEdges = addEdge(newEdge, prevEdges);
 
       // Haqiqiy o'zgarishlarni tekshirish
       const hasRealChanges =
@@ -182,6 +185,13 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
         edges: newEdges,
         isDirty: hasRealChanges,
       });
+
+      // Collab: broadcast the freshly created edge (the one addEdge appended).
+      if (newEdges.length > prevEdges.length) {
+        const prevIds = new Set(prevEdges.map((e) => e.id));
+        const added = newEdges.find((e) => !prevIds.has(e.id));
+        if (added) get().emitCollabOp({ t: "ea", edge: added });
+      }
 
       // EditMessage nodedan boshqa nodega ulanish holatini tekshirish
       if (isEditMessageEdge && connection.source && connection.target) {

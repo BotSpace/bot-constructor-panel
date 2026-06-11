@@ -36,9 +36,13 @@ import { instanceAuth } from "@/services/instance";
 import { useTheme } from "next-themes";
 import { NodeSelectionDialog } from "./components/NodeSelectionDialog";
 import { Connection, Node } from "reactflow";
+import { useCollab } from "@/wss/collab/use-collab";
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
+
+  // Real-time collaboration: dedicated collab WS for this project (best-effort).
+  useCollab(id);
 
   // Store'dan kerakli qismlarni olamiz
   const {
