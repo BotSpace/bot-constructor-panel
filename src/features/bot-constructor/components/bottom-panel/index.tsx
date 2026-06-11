@@ -27,6 +27,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useTranslations } from 'next-intl'
 
 interface Props {
     addNodeOpen?: boolean;
@@ -43,6 +44,7 @@ const MORE_W = 48
 const ALL_COUNT = 6
 
 function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
+    const t = useTranslations('editor.toolbar')
     const { isOpen, height, toggle } = debugConsoleStore()
     const { toggleSearchPanel } = useSearchStore()
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false)
@@ -95,9 +97,10 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
         {
             key: 'edges',
             inline: (
-                <BottomPanelButton 
+                <BottomPanelButton
                     onClick={toggleEdgesVisibility}
-                    title={edgesVisible ? "Edgelarni yashirish" : "Edgelarni ko'rsatish"}
+                    title={edgesVisible ? t('hideEdges') : t('showEdges')}
+                    aria-label={edgesVisible ? t('hideEdges') : t('showEdges')}
                 >
                     {edgesVisible ? <Eye size={20} /> : <EyeOff size={20} />}
                 </BottomPanelButton>
@@ -105,77 +108,77 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
             overflow: (
                 <DropdownMenuItem key="edges" onClick={toggleEdgesVisibility}>
                     {edgesVisible ? <Eye size={16} className="mr-2" /> : <EyeOff size={16} className="mr-2" />}
-                    {edgesVisible ? "Edgelarni yashirish" : "Edgelarni ko'rsatish"}
+                    {edgesVisible ? t('hideEdges') : t('showEdges')}
                 </DropdownMenuItem>
             ),
         },
         {
             key: 'env',
             inline: (
-                <BottomPanelButton onClick={() => setEnvManageOpen(true)} title="Kalitlar">
+                <BottomPanelButton onClick={() => setEnvManageOpen(true)} title={t('env')} aria-label={t('env')}>
                     <Key size={20} />
                 </BottomPanelButton>
             ),
             overflow: (
                 <DropdownMenuItem key="env" onClick={() => setEnvManageOpen(true)}>
                     <Key size={16} className="mr-2" />
-                    Kalitlar
+                    {t('env')}
                 </DropdownMenuItem>
             ),
         },
         {
             key: 'terminal',
             inline: (
-                <BottomPanelButton onClick={toggle}>
+                <BottomPanelButton onClick={toggle} title={t('terminal')} aria-label={t('terminal')}>
                     <SquareCommandIcon />
                 </BottomPanelButton>
             ),
             overflow: (
                 <DropdownMenuItem key="terminal" onClick={toggle}>
                     <SquareCommandIcon className="mr-2 h-4 w-4" />
-                    Terminal
+                    {t('terminal')}
                 </DropdownMenuItem>
             ),
         },
         {
             key: 'search',
             inline: (
-                <BottomPanelButton onClick={toggleSearchPanel}>
+                <BottomPanelButton onClick={toggleSearchPanel} title={t('search')} aria-label={t('search')}>
                     <Search size={20} />
                 </BottomPanelButton>
             ),
             overflow: (
                 <DropdownMenuItem key="search" onClick={toggleSearchPanel}>
                     <Search size={16} className="mr-2" />
-                    Qidiruv
+                    {t('search')}
                 </DropdownMenuItem>
             ),
         },
         {
             key: 'collections',
             inline: (
-                <BottomPanelButton onClick={() => setCollectionOpen(true)}>
+                <BottomPanelButton onClick={() => setCollectionOpen(true)} title={t('collections')} aria-label={t('collections')}>
                     <Database size={20} />
                 </BottomPanelButton>
             ),
             overflow: (
                 <DropdownMenuItem key="collections" onClick={() => setCollectionOpen(true)}>
                     <Database size={16} className="mr-2" />
-                    Ma'lumotlar
+                    {t('collections')}
                 </DropdownMenuItem>
             ),
         },
         {
             key: 'shortcuts',
             inline: (
-                <BottomPanelButton onClick={() => setShortcutsOpen(true)} title="Shortcutlar">
+                <BottomPanelButton onClick={() => setShortcutsOpen(true)} title={t('shortcuts')} aria-label={t('shortcuts')}>
                     <Keyboard size={20} />
                 </BottomPanelButton>
             ),
             overflow: (
                 <DropdownMenuItem key="shortcuts" onClick={() => setShortcutsOpen(true)}>
                     <Keyboard size={16} className="mr-2" />
-                    Shortcutlar
+                    {t('shortcuts')}
                 </DropdownMenuItem>
             ),
         },
@@ -195,7 +198,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                     <CardContent className='p-2 flex items-center justify-center gap-2'>
 
                         {/* Home — always visible */}
-                        <BottomPanelButton onClick={backToHome}>
+                        <BottomPanelButton onClick={backToHome} title={t('back')} aria-label={t('back')}>
                             <ArrowLeftIcon />
                         </BottomPanelButton>
 
@@ -208,7 +211,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                         {overflowed.length > 0 && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <BottomPanelButton title="Ko'proq">
+                                    <BottomPanelButton title={t('more')} aria-label={t('more')}>
                                         <MoreHorizontal size={20} />
                                     </BottomPanelButton>
                                 </DropdownMenuTrigger>

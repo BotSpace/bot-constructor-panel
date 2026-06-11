@@ -2,6 +2,7 @@
 
 import { Check, AlertCircle, Loader2 } from "lucide-react";
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { useFlowStore } from "../store";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +11,7 @@ interface SaveStatusBadgeProps {
 }
 
 export function SaveStatusBadge({ className }: SaveStatusBadgeProps) {
+  const t = useTranslations("editor.saveStatus");
   const { isDirty, isLoading, lastSavedTime, countdownRemaining } =
     useFlowStore();
 
@@ -41,22 +43,22 @@ export function SaveStatusBadge({ className }: SaveStatusBadgeProps) {
     saving: {
       styles: `${baseStyles} bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 border border-purple-500/30`,
       icon: <Loader2 className="w-4 h-4 animate-spin" />,
-      text: "Saving...",
+      text: t("saving"),
     },
     saved: {
       styles: `${baseStyles} bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 border border-green-500/30`,
       icon: <Check className="w-4 h-4" />,
-      text: "Saved",
+      text: t("saved"),
     },
     countdown: {
       styles: `${baseStyles} bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-500/30`,
       icon: <AlertCircle className="w-4 h-4" />,
-      text: "Unsaved changes",
+      text: t("unsaved"),
     },
     unsaved: {
       styles: `${baseStyles} bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-500/30`,
       icon: <AlertCircle className="w-4 h-4" />,
-      text: "Unsaved changes",
+      text: t("unsaved"),
     },
   };
 
@@ -72,7 +74,15 @@ export function SaveStatusBadge({ className }: SaveStatusBadgeProps) {
         </span>
       )}
       {lastSavedTime && status === "saved" && (
-        <span className="text-xs opacity-75">
+        <span
+          className="text-xs opacity-75"
+          title={t("savedAt", {
+            time: lastSavedTime.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          })}
+        >
           {lastSavedTime.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",

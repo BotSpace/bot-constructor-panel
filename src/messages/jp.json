@@ -155,6 +155,10 @@
       "invoice": {
         "name": "インボイス",
         "description": "Telegram 決済インボイスを送信します。"
+      },
+      "editOrSend": {
+        "name": "編集または送信",
+        "description": "コールバック時はメッセージを編集し、それ以外は新規送信します。"
       }
     },
     "messageOperations": {
@@ -221,6 +225,30 @@
       "form": {
         "name": "フォーム",
         "description": "フォームを通じてユーザーデータを収集します。"
+      },
+      "forLoop": {
+        "name": "For ループ",
+        "description": "リストの要素を繰り返し処理します。"
+      },
+      "forLoopContinue": {
+        "name": "ループ継続",
+        "description": "ループの反復を終了し、次の要素へ進みます。"
+      },
+      "if": {
+        "name": "If (条件分岐)",
+        "description": "条件を確認し、TRUE/FALSE/NEXT へ振り分けます。"
+      },
+      "elseif": {
+        "name": "Else If (それ以外の条件)",
+        "description": "If の後に追加の条件を確認します。"
+      },
+      "else": {
+        "name": "Else (それ以外)",
+        "description": "他の条件に一致しない場合に実行されます。"
+      },
+      "scheduler": {
+        "name": "スケジューラー",
+        "description": "将来の予定時刻にフローを継続します。"
       }
     },
     "integrations": {
@@ -260,6 +288,14 @@
       "createInviteLink": {
         "name": "招待リンクを作成",
         "description": "チャンネルまたはグループの招待リンクを作成します。"
+      },
+      "subflow": {
+        "name": "サブフロー",
+        "description": "別のフローまたはプラグインを実行します。"
+      },
+      "subflowExit": {
+        "name": "終了",
+        "description": "サブフロー完了後の終了ポイント。"
       }
     },
     "ai": {
@@ -543,7 +579,24 @@
   "editor": {
     "selectModel": "モデルを選択",
     "yourPrompt": "プロンプト",
-    "enterPrompt": "プロンプトをここに入力...（送信は Cmd/Ctrl + Enter）"
+    "enterPrompt": "プロンプトをここに入力...（送信は Cmd/Ctrl + Enter）",
+    "toolbar": {
+      "back": "戻る",
+      "showEdges": "接続を表示",
+      "hideEdges": "接続を非表示",
+      "env": "環境変数",
+      "terminal": "ターミナル",
+      "search": "検索",
+      "collections": "コレクション",
+      "shortcuts": "キーボードショートカット",
+      "more": "もっと見る"
+    },
+    "saveStatus": {
+      "saving": "保存中...",
+      "saved": "保存済み",
+      "unsaved": "未保存の変更",
+      "savedAt": "{time} に保存"
+    }
   },
   "variablePanel": {
     "title": "利用可能な変数",
