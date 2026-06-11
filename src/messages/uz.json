@@ -589,6 +589,51 @@
       "saved": "Saqlandi",
       "unsaved": "Saqlanmagan o'zgarishlar",
       "savedAt": "{time} da saqlandi"
+    },
+    "nodePanel": {
+      "noConfig": "Bu node turi uchun konfiguratsiya topilmadi"
+    },
+    "nodeSelector": {
+      "title": "Node qo'shish",
+      "description": "Kategoriyani tanlang va kerakli node ni bosing",
+      "searchPlaceholder": "Qidirish...",
+      "noResults": "Hech narsa topilmadi"
+    },
+    "topBar": {
+      "back": "Orqaga",
+      "addNode": "Node qo'shish",
+      "addNodeTitle": "Node qo'shish (Ctrl+N)",
+      "env": "Muhit o'zgaruvchilari",
+      "subtitle": "Konstruktor"
+    },
+    "shortcuts": {
+      "dialogTitle": "Klaviatura yorliqlari",
+      "dialogDescription": "Tezroq ishlash uchun klaviatura kombinatsiyalari",
+      "toggleHint": "bosib bu oynani ochish/yopish mumkin",
+      "groupGeneral": "Umumiy",
+      "groupNodes": "Node boshqaruvi",
+      "groupView": "Ko'rinish",
+      "groupPanel": "Panel",
+      "save": "Saqlash",
+      "undo": "Bekor qilish (Undo)",
+      "redo": "Qaytarish (Redo)",
+      "search": "Qidirish",
+      "showShortcuts": "Yorliqlarni ko'rish",
+      "selectAll": "Hammasini tanlash",
+      "copy": "Nusxa olish (Copy)",
+      "paste": "Qo'yish (Paste)",
+      "duplicate": "Dublikat qilish",
+      "delete": "O'chirish",
+      "addNode": "Node qo'shish",
+      "autoLayout": "Formatlash (auto-layout)",
+      "zoomIn": "Kattalashtirish (Zoom in)",
+      "zoomOut": "Kichiklashtirish (Zoom out)",
+      "fitView": "Ekranga moslashtirish",
+      "searchPanel": "Qidirish paneli",
+      "debugConsole": "Debug konsol",
+      "reloadBot": "Debug botni reload qilish",
+      "runStopBot": "Debug botni run/stop",
+      "addNodeModal": "Node qo'shish oynasi"
     }
   },
   "variablePanel": {

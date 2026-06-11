@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useElements } from "@/features/bot-constructor/data/useElements";
 import { ElementItemType, ElementTypes } from "@/types/element-types";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import {
     Search,
@@ -57,6 +58,7 @@ export function NodeSelectionDialog({
     onOpenChange,
     onSelect,
 }: NodeSelectionDialogProps) {
+    const t = useTranslations("editor.nodeSelector");
     const [searchQuery, setSearchQuery] = useState("");
     const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
     const [activeElementIndex, setActiveElementIndex] = useState(0);
@@ -233,9 +235,9 @@ export function NodeSelectionDialog({
                 onKeyDown={handleKeyDown}
             >
                 <DialogHeader className="px-5 pt-5 pb-3">
-                    <DialogTitle>Node qo'shish</DialogTitle>
+                    <DialogTitle>{t("title")}</DialogTitle>
                     <DialogDescription>
-                        Kategoriyani tanlang va kerakli node ni bosing
+                        {t("description")}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -245,7 +247,7 @@ export function NodeSelectionDialog({
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             ref={searchInputRef}
-                            placeholder="Qidirish..."
+                            placeholder={t("searchPlaceholder")}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="pl-9"
@@ -356,7 +358,7 @@ export function NodeSelectionDialog({
                             </React.Fragment>
                         ) : (
                             <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
-                                Hech narsa topilmadi
+                                {t("noResults")}
                             </div>
                         )}
                     </div>

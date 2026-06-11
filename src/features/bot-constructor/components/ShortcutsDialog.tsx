@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 
 interface ShortcutsDialogProps {
   open: boolean;
@@ -17,11 +17,11 @@ interface ShortcutsDialogProps {
 
 interface ShortcutItem {
   keys: string[];
-  description: string;
+  descriptionKey: string;
 }
 
 interface ShortcutGroup {
-  title: string;
+  titleKey: string;
   icon: string;
   shortcuts: ShortcutItem[];
 }
@@ -34,49 +34,49 @@ const mod = isMac ? "⌘" : "Ctrl";
 
 const SHORTCUT_GROUPS: ShortcutGroup[] = [
   {
-    title: "Umumiy",
+    titleKey: "groupGeneral",
     icon: "⚡",
     shortcuts: [
-      { keys: [mod, "S"], description: "Saqlash" },
-      { keys: [mod, "Z"], description: "Bekor qilish (Undo)" },
-      { keys: [mod, "Y"], description: "Qaytarish (Redo)" },
-      { keys: [mod, "Shift", "Z"], description: "Qaytarish (Redo)" },
-      { keys: [mod, "F"], description: "Qidirish" },
-      { keys: ["?"], description: "Shortcutlarni ko'rish" },
+      { keys: [mod, "S"], descriptionKey: "save" },
+      { keys: [mod, "Z"], descriptionKey: "undo" },
+      { keys: [mod, "Y"], descriptionKey: "redo" },
+      { keys: [mod, "Shift", "Z"], descriptionKey: "redo" },
+      { keys: [mod, "F"], descriptionKey: "search" },
+      { keys: ["?"], descriptionKey: "showShortcuts" },
     ],
   },
   {
-    title: "Node boshqaruvi",
+    titleKey: "groupNodes",
     icon: "🔲",
     shortcuts: [
-      { keys: [mod, "A"], description: "Hammasini tanlash" },
-      { keys: [mod, "C"], description: "Nusxa olish (Copy)" },
-      { keys: [mod, "V"], description: "Qo'yish (Paste)" },
-      { keys: [mod, "D"], description: "Dublikat qilish" },
-      { keys: ["Delete"], description: "O'chirish" },
-      { keys: ["Backspace"], description: "O'chirish" },
-      { keys: [mod, "Space"], description: "Node qo'shish" },
+      { keys: [mod, "A"], descriptionKey: "selectAll" },
+      { keys: [mod, "C"], descriptionKey: "copy" },
+      { keys: [mod, "V"], descriptionKey: "paste" },
+      { keys: [mod, "D"], descriptionKey: "duplicate" },
+      { keys: ["Delete"], descriptionKey: "delete" },
+      { keys: ["Backspace"], descriptionKey: "delete" },
+      { keys: [mod, "Space"], descriptionKey: "addNode" },
     ],
   },
   {
-    title: "Ko'rinish",
+    titleKey: "groupView",
     icon: "👁",
     shortcuts: [
-      { keys: [mod, "I"], description: "Formatlash (auto-layout)" },
-      { keys: [mod, "+"], description: "Kattalashtirish (Zoom in)" },
-      { keys: [mod, "-"], description: "Kichiklashtirish (Zoom out)" },
-      { keys: [mod, "0"], description: "Ekranga moslashtirish" },
+      { keys: [mod, "I"], descriptionKey: "autoLayout" },
+      { keys: [mod, "+"], descriptionKey: "zoomIn" },
+      { keys: [mod, "-"], descriptionKey: "zoomOut" },
+      { keys: [mod, "0"], descriptionKey: "fitView" },
     ],
   },
   {
-    title: "Panel",
+    titleKey: "groupPanel",
     icon: "📋",
     shortcuts: [
-      { keys: [mod, "K"], description: "Qidirish paneli" },
-      { keys: [mod, "`"], description: "Debug konsol" },
-      { keys: [mod, "R"], description: "Debug botni reload qilish" },
-      { keys: [mod, "D"], description: "Debug botni run/stop" },
-      { keys: [mod, "N"], description: "Node qo'shish modali" },
+      { keys: [mod, "K"], descriptionKey: "searchPanel" },
+      { keys: [mod, "`"], descriptionKey: "debugConsole" },
+      { keys: [mod, "R"], descriptionKey: "reloadBot" },
+      { keys: [mod, "D"], descriptionKey: "runStopBot" },
+      { keys: [mod, "N"], descriptionKey: "addNodeModal" },
     ],
   },
 ];
@@ -90,6 +90,7 @@ function KeyBadge({ children }: { children: string }) {
 }
 
 export function ShortcutsDialog({ open, onOpenChange }: ShortcutsDialogProps) {
+  const t = useTranslations("editor.shortcuts");
   // "?" shortcut to toggle
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -115,18 +116,18 @@ export function ShortcutsDialog({ open, onOpenChange }: ShortcutsDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-auto gap-0 p-0">
         <DialogHeader className="px-5 pt-5 pb-3">
-          <DialogTitle>Klaviatura yorliqlari</DialogTitle>
+          <DialogTitle>{t("dialogTitle")}</DialogTitle>
           <DialogDescription>
-            Tezroq ishlash uchun klaviatura kombinatsiyalari
+            {t("dialogDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="px-5 pb-5 grid grid-cols-2 gap-4 max-h-[500px] overflow-y-auto">
           {SHORTCUT_GROUPS.map((group) => (
-            <div key={group.title} className="flex flex-col gap-2">
+            <div key={group.titleKey} className="flex flex-col gap-2">
               <h3 className="text-xs font-semibold text-foreground flex items-center gap-1.5 pt-2 border-t border-border/50">
                 <span>{group.icon}</span>
-                {group.title}
+                {t(group.titleKey)}
               </h3>
               <div className="flex flex-col gap-1.5">
                 {group.shortcuts.map((shortcut, idx) => (
@@ -135,7 +136,7 @@ export function ShortcutsDialog({ open, onOpenChange }: ShortcutsDialogProps) {
                     className="flex items-center justify-between gap-2"
                   >
                     <span className="text-xs text-muted-foreground truncate">
-                      {shortcut.description}
+                      {t(shortcut.descriptionKey)}
                     </span>
                     <div className="flex items-center gap-0.5 shrink-0">
                       {shortcut.keys.map((key, ki) => (
@@ -159,7 +160,7 @@ export function ShortcutsDialog({ open, onOpenChange }: ShortcutsDialogProps) {
         <div className="px-5 py-3 border-t bg-muted/30 text-center">
           <span className="text-[10px] text-muted-foreground">
             <KeyBadge>?</KeyBadge>
-            <span className="ml-2">bosib bu oynani ochish/yopish mumkin</span>
+            <span className="ml-2">{t("toggleHint")}</span>
           </span>
         </div>
       </DialogContent>

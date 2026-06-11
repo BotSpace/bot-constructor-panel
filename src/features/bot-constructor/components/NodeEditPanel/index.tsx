@@ -2,14 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { ModalNodeFormRenderer } from "@/features/bot-constructor/components/NodeEditPanel/ModalNodeFormRenderer";
-import { NodeOverviewPanel } from "@/features/bot-constructor/components/NodeEditPanel/NodeOverviewPanel";
 import { NodeVariablePanel } from "@/features/bot-constructor/components/NodeEditPanel/NodeVariablePanel";
 import { VariableInsertionProvider } from "@/features/bot-constructor/components/NodeEditPanel/variable-insertion";
 import { NodePanelProvider } from "@/features/bot-constructor/contexts/NodePanelContext";
@@ -63,85 +62,82 @@ export function NodeEditDialog() {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent
+    <Sheet open={isOpen} onOpenChange={handleOpenChange} modal={false}>
+      <SheetContent
+        side="right"
+        showOverlay={false}
         showCloseButton={false}
+        onInteractOutside={(e) => e.preventDefault()}
         className={cn(
-          "h-[min(820px,calc(100vh-2rem))] w-[min(1180px,calc(100vw-2rem))]",
-          "!max-w-none gap-0 overflow-hidden border-white/10 bg-[#141414] p-0 text-white shadow-2xl"
+          "w-full gap-0 overflow-hidden border-l border-white/10 bg-[#141414] p-0 text-white shadow-2xl",
+          "sm:max-w-[560px]"
         )}
       >
         <NodePanelProvider>
-        <VariableInsertionProvider className="flex h-full min-h-0 flex-col">
-          <DialogHeader className="shrink-0 border-b border-white/10 bg-[#171717] px-5 py-4">
-            <div className="flex items-center gap-3">
-              <div
-                className={cn(
-                  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-sm font-bold",
-                  colorClass
-                )}
-              >
-                {label.charAt(0)}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <DialogTitle className="truncate text-base font-semibold text-white">
-                  {label}
-                </DialogTitle>
-                <DialogDescription className="truncate text-xs text-zinc-500">
-                  ID: {editingNodeId}
-                </DialogDescription>
-              </div>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 text-zinc-400 hover:bg-red-500/10 hover:text-red-300"
-                title="Node'ni o'chirish"
-                onClick={handleDelete}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 text-zinc-400 hover:bg-white/10 hover:text-white"
-                title="Yopish"
-                onClick={() => setEditingNodeId(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </DialogHeader>
-
-          <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] lg:grid-cols-[320px_minmax(0,1fr)_320px] lg:grid-rows-1">
-            {manifest && editingNode ? (
-              <NodeOverviewPanel nodeId={editingNodeId!} manifest={manifest} />
-            ) : (
-              <div className="hidden border-r border-white/10 bg-[#0f0f0f] lg:block" />
-            )}
-
-            <div className="min-h-0 overflow-y-auto bg-[#101010] node-edit-dialog-body">
-              {manifest && editingNode ? (
-                <ModalNodeFormRenderer
-                  nodeId={editingNodeId!}
-                  data={editingNode.data as Record<string, unknown>}
-                  manifest={manifest}
-                />
-              ) : (
-                <div className="flex h-40 items-center justify-center text-sm text-zinc-500">
-                  Bu node turi uchun konfiguratsiya topilmadi
+          <VariableInsertionProvider className="flex h-full min-h-0 flex-col">
+            <SheetHeader className="shrink-0 gap-0 space-y-0 border-b border-white/10 bg-[#171717] px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-sm font-bold",
+                    colorClass
+                  )}
+                >
+                  {label.charAt(0)}
                 </div>
-              )}
-            </div>
 
-            <NodeVariablePanel stateKeys={stateKeys} />
-          </div>
-        </VariableInsertionProvider>
+                <div className="min-w-0 flex-1">
+                  <SheetTitle className="truncate text-base font-semibold text-white">
+                    {label}
+                  </SheetTitle>
+                  <SheetDescription className="truncate text-xs text-zinc-500">
+                    ID: {editingNodeId}
+                  </SheetDescription>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 text-zinc-400 hover:bg-red-500/10 hover:text-red-300"
+                  title={t("common.delete")}
+                  onClick={handleDelete}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 text-zinc-400 hover:bg-white/10 hover:text-white"
+                  title={t("common.close")}
+                  onClick={() => setEditingNodeId(null)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </SheetHeader>
+
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div className="min-h-0 flex-1 overflow-y-auto bg-[#101010] node-edit-dialog-body">
+                {manifest && editingNode ? (
+                  <ModalNodeFormRenderer
+                    nodeId={editingNodeId!}
+                    data={editingNode.data as Record<string, unknown>}
+                    manifest={manifest}
+                  />
+                ) : (
+                  <div className="flex h-40 items-center justify-center text-sm text-zinc-500">
+                    {t("editor.nodePanel.noConfig")}
+                  </div>
+                )}
+              </div>
+
+              <NodeVariablePanel stateKeys={stateKeys} />
+            </div>
+          </VariableInsertionProvider>
         </NodePanelProvider>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 

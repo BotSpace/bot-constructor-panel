@@ -589,6 +589,51 @@
       "saved": "Saved",
       "unsaved": "Unsaved changes",
       "savedAt": "Last saved at {time}"
+    },
+    "nodePanel": {
+      "noConfig": "No configuration found for this node type"
+    },
+    "nodeSelector": {
+      "title": "Add node",
+      "description": "Pick a category and click the node you need",
+      "searchPlaceholder": "Search...",
+      "noResults": "Nothing found"
+    },
+    "topBar": {
+      "back": "Back",
+      "addNode": "Add node",
+      "addNodeTitle": "Add node (Ctrl+N)",
+      "env": "Environment variables",
+      "subtitle": "Constructor"
+    },
+    "shortcuts": {
+      "dialogTitle": "Keyboard shortcuts",
+      "dialogDescription": "Keyboard combinations for faster work",
+      "toggleHint": "to open/close this window",
+      "groupGeneral": "General",
+      "groupNodes": "Node management",
+      "groupView": "View",
+      "groupPanel": "Panels",
+      "save": "Save",
+      "undo": "Undo",
+      "redo": "Redo",
+      "search": "Search",
+      "showShortcuts": "Show shortcuts",
+      "selectAll": "Select all",
+      "copy": "Copy",
+      "paste": "Paste",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "addNode": "Add node",
+      "autoLayout": "Format (auto-layout)",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "fitView": "Fit to screen",
+      "searchPanel": "Search panel",
+      "debugConsole": "Debug console",
+      "reloadBot": "Reload debug bot",
+      "runStopBot": "Run/stop debug bot",
+      "addNodeModal": "Add node dialog"
     }
   },
   "variablePanel": {
