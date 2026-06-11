@@ -5807,10 +5807,7 @@
     },
     "handles": [
       {
-        "kind": "target",
-        "side": "left",
-        "id": "target-default",
-        "styleVariant": "accent"
+        "preset": "target-default"
       },
       {
         "kind": "source",
