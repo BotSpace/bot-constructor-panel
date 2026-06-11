@@ -74,10 +74,6 @@ export interface FlowStoreState
   isDirty: boolean;
   isLoading: boolean;
   lastSavedTime: Date | null;
-  countdownRemaining: number | null; // Sanoq qolgan vaqt (millisekundlarda)
-  countdownDuration: number; // Sanoq umumiy vaqti (millisekundlarda)
-  startCountdown: () => void;
-  stopCountdown: () => void;
   collapseAllSignal: number;
   collapseAllNodes: () => void;
   expandAllSignal: number;

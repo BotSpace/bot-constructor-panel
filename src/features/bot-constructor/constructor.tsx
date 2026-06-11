@@ -55,10 +55,6 @@ export default function Constructor() {
     saveFlow,
     loadFlow,
     isDirty,
-    initialState,
-    startCountdown,
-    stopCountdown,
-    countdownRemaining,
     edgesVisible,
   } = useFlowStore();
 
@@ -87,7 +83,6 @@ export default function Constructor() {
   } | null>(null);
   const connectionSuccessfulRef = useRef(false);
 
-  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   // Tracks whether loadFlow has already been called for the current project.
   // Without this guard, every changeDebug/changeRelease call mutates the
   // project object reference, re-triggering the effect and overwriting
@@ -147,7 +142,7 @@ export default function Constructor() {
           },
           body: JSON.stringify({ flow: { nodes, edges } }),
         });
-        useFlowStore.setState({ isDirty: false, lastSavedTime: new Date(), countdownRemaining: null });
+        useFlowStore.setState({ isDirty: false, lastSavedTime: new Date() });
       } catch {
         /* best-effort — sahifa yopilayotganda xato ko'rsatishning ma'nosi yo'q */
       } finally {
@@ -166,65 +161,22 @@ export default function Constructor() {
     };
   }, [id]);
 
-  // Countdown ni kamaytirish va save qilish
+  // Periodik safety-net (backstop) autosave — har 20s da bir marta.
+  // Jonli sync collab WS orqali zudlik bilan boradi va har bir op endi
+  // server tomonda incremental ravishda project.flow ga saqlanadi (primary).
+  // Bu periodik saqlash faqat zaxira: op-channel o'tkazib yuborgan narsalarni
+  // (masalan undo/redo va bulk amallar) butun flow PATCH bilan moslashtiradi.
+  // Idle-debounce EMAS — uzluksiz tahrirlash davomida ham ishlashi kerak.
   useEffect(() => {
-    // Agar countdown yo'q bo'lsa, interval ni tozalaymiz
-    if (countdownRemaining === null) {
-      if (countdownIntervalRef.current) {
-        clearInterval(countdownIntervalRef.current);
-        countdownIntervalRef.current = null;
-      }
-      return;
-    }
-
-    // Agar countdown 0 ga yetgan bo'lsa, save qilamiz
-    if (countdownRemaining <= 0) {
-      if (countdownIntervalRef.current) {
-        clearInterval(countdownIntervalRef.current);
-        countdownIntervalRef.current = null;
-      }
-
-      // Agar hali ham o'zgarishlar bo'lsa, save qilamiz
+    const interval = setInterval(() => {
+      const { isDirty, initialState } = useFlowStore.getState();
       if (isDirty && initialState) {
         saveFlow(id);
       }
-      return;
-    }
+    }, 20000);
 
-    // Countdown ni har 100ms da kamaytiramiz
-    countdownIntervalRef.current = setInterval(() => {
-      const current = useFlowStore.getState().countdownRemaining;
-      if (current !== null && current > 0) {
-        useFlowStore.setState({
-          countdownRemaining: Math.max(0, current - 100),
-        });
-      } else {
-        if (countdownIntervalRef.current) {
-          clearInterval(countdownIntervalRef.current);
-          countdownIntervalRef.current = null;
-        }
-      }
-    }, 100);
-
-    return () => {
-      if (countdownIntervalRef.current) {
-        clearInterval(countdownIntervalRef.current);
-        countdownIntervalRef.current = null;
-      }
-    };
-  }, [countdownRemaining, isDirty, initialState, saveFlow, id]);
-
-  // Bu useEffect nodes va edges o'zgarishini kuzatib boradi va countdown ni boshlaydi
-  useEffect(() => {
-    // Agar initial state hali o'rnatilmagan bo'lsa yoki o'zgarishlar yo'q bo'lsa, countdown ni to'xtatamiz
-    if (!initialState || !isDirty) {
-      stopCountdown();
-      return;
-    }
-
-    // Countdown ni boshlaymiz
-    startCountdown();
-  }, [nodes, edges, isDirty, initialState, startCountdown, stopCountdown]);
+    return () => clearInterval(interval);
+  }, [saveFlow, id]);
 
   const onDrop = useCallback(
     (event: React.DragEvent) => {
