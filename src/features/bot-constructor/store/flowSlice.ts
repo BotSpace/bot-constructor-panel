@@ -9,6 +9,12 @@ import {
 } from "reactflow";
 import { FlowStoreState, FlowSlice } from "./types";
 
+// Per-node debounce timers for broadcasting "nu" (node data update) ops, so a
+// stream of keystrokes on one node coalesces into a single op (~300ms) while
+// edits to different nodes stay independent.
+const NU_DEBOUNCE_MS = 300;
+const nuDebounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
 export const createFlowSlice: StateCreator<
   FlowStoreState,
   [],
@@ -71,6 +77,19 @@ export const createFlowSlice: StateCreator<
       nodes: newNodes,
       isDirty: hasRealChanges,
     });
+
+    // ── Collab: broadcast LOCAL node moves + removals ──────────────────────
+    // Position: only after a drag settles (dragging===false) — not every frame.
+    // Remove: a node was deleted locally.
+    const { emitCollabOp } = get();
+    for (const change of changes) {
+      if (change.type === "position" && change.dragging === false) {
+        const moved = newNodes.find((n) => n.id === change.id);
+        if (moved) emitCollabOp({ t: "nm", id: moved.id, position: moved.position });
+      } else if (change.type === "remove") {
+        emitCollabOp({ t: "nd", id: change.id });
+      }
+    }
   },
 
   // --- onNodesChange tugadi ---
@@ -102,6 +121,16 @@ export const createFlowSlice: StateCreator<
       edges: newEdges,
       isDirty: hasRealChanges,
     });
+
+    // ── Collab: broadcast LOCAL edge add/remove ────────────────────────────
+    const { emitCollabOp } = get();
+    for (const change of changes) {
+      if (change.type === "add" && change.item) {
+        emitCollabOp({ t: "ea", edge: change.item });
+      } else if (change.type === "remove") {
+        emitCollabOp({ t: "ed", id: change.id });
+      }
+    }
   },
 
   onConnect: (connection) => {
@@ -148,6 +177,20 @@ export const createFlowSlice: StateCreator<
       nodes: newNodes,
       isDirty: hasRealChanges,
     });
+
+    // ── Collab: broadcast LOCAL node data update (debounced per node id) ───
+    // Coalesce rapid edits (typing) on the same node into one "nu" op carrying
+    // the FULL node.data after the change.
+    const existing = nuDebounceTimers.get(nodeId);
+    if (existing) clearTimeout(existing);
+    nuDebounceTimers.set(
+      nodeId,
+      setTimeout(() => {
+        nuDebounceTimers.delete(nodeId);
+        const node = get().nodes.find((n) => n.id === nodeId);
+        if (node) get().emitCollabOp({ t: "nu", id: nodeId, data: node.data });
+      }, NU_DEBOUNCE_MS)
+    );
   },
 
   updateEdgeData: (edgeId, newData) => {
@@ -220,6 +263,14 @@ export const createFlowSlice: StateCreator<
       edges: nextEdges,
       isDirty: true,
     });
+
+    // ── Collab: broadcast LOCAL deletions ──────────────────────────────────
+    const { emitCollabOp } = get();
+    const removedEdgeIds = edges
+      .filter((e) => !nextEdges.includes(e))
+      .map((e) => e.id);
+    for (const id of removedEdgeIds) emitCollabOp({ t: "ed", id });
+    for (const id of selectedNodeIds) emitCollabOp({ t: "nd", id });
   },
 
   selectAll: () => {
