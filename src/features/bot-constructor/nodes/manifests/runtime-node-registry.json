@@ -6024,7 +6024,8 @@
         "key": "resultVar",
         "label": "Natija o'zgaruvchisi",
         "placeholder": "invite_link",
-        "optional": true
+        "optional": true,
+        "is_state": true
       }
     ],
     "defaults": {
