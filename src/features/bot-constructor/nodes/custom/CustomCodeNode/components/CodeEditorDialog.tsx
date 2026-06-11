@@ -17,6 +17,52 @@ import { Button } from "@/components/ui/button";
 import { Code2, AlertCircle } from "lucide-react";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 
+// Custom code uchun state/context yordamchi funksiyalari (autocomplete).
+// state_* helper'lar prefiksni AVTOMATIK qo'shadi — foydalanuvchi toza nom beradi
+// (masalan "name"), keyin node maydonlarida {{name}} yoki {{state.name}} ishlaydi.
+// set_context esa prefiks qo'shmaydi (kalitni o'zi qanday bo'lsa shunday saqlaydi).
+const HELPER_COMPLETIONS = [
+  {
+    label: "set_state",
+    type: "function",
+    apply: 'set_state("name", value)',
+    detail: "State yozish — 'state_' avtomatik qo'shiladi",
+    info: 'set_state("name", value) → node maydonida {{name}} yoki {{state.name}}',
+  },
+  {
+    label: "get_state",
+    type: "function",
+    apply: 'get_state("name")',
+    detail: "State o'qish — 'state_' avtomatik qo'shiladi",
+    info: 'get_state("name") → state_name qiymatini qaytaradi',
+  },
+  {
+    label: "has_state",
+    type: "function",
+    apply: 'has_state("name")',
+    detail: "State mavjudligini tekshirish",
+  },
+  {
+    label: "delete_state",
+    type: "function",
+    apply: 'delete_state("name")',
+    detail: "State qiymatni o'chirish",
+  },
+  {
+    label: "set_context",
+    type: "function",
+    apply: 'set_context("key", value)',
+    detail: "Context yozish — prefiks YO'Q (kalit o'zgarmaydi)",
+    info: 'set_context("key", value) → node maydonida {{key}}',
+  },
+  {
+    label: "get_context",
+    type: "function",
+    apply: 'get_context("key")',
+    detail: "Context qiymatni o'qish",
+  },
+];
+
 interface Props {
   code: string;
   onChange: (value: string) => void;
@@ -63,7 +109,7 @@ export const CodeEditorDialog = ({ code, onChange, globals }: Props) => {
             boost: 99, // Bizning o'zgaruvchilarni ro'yxatda yuqoriroqqa chiqaradi
             info: `Bot global ob'ekti`,
           })),
-          // Bu yerga yana qo'shimcha snippetlar qo'shish mumkin
+          ...HELPER_COMPLETIONS,
           {
             label: "console.log",
             type: "function",
