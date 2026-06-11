@@ -155,6 +155,10 @@
       "invoice": {
         "name": "Счёт (Invoice)",
         "description": "Отправляет платёжный счёт Telegram."
+      },
+      "editOrSend": {
+        "name": "Изменить или отправить",
+        "description": "Редактирует сообщение при callback, иначе отправляет новое."
       }
     },
     "messageOperations": {
@@ -221,6 +225,30 @@
       "form": {
         "name": "Форма",
         "description": "Собирает данные пользователя через форму."
+      },
+      "forLoop": {
+        "name": "Цикл For",
+        "description": "Перебирает элементы списка."
+      },
+      "forLoopContinue": {
+        "name": "Продолжить цикл",
+        "description": "Завершает итерацию цикла и переходит к следующему элементу."
+      },
+      "if": {
+        "name": "If (Если)",
+        "description": "Проверяет условие и направляет в TRUE/FALSE/NEXT."
+      },
+      "elseif": {
+        "name": "Else If (Иначе если)",
+        "description": "Дополнительная проверка условия после If."
+      },
+      "else": {
+        "name": "Else (Иначе)",
+        "description": "Выполняется, если другие условия не подошли."
+      },
+      "scheduler": {
+        "name": "Планировщик",
+        "description": "Продолжает поток в запланированное время в будущем."
       }
     },
     "integrations": {
@@ -260,6 +288,14 @@
       "createInviteLink": {
         "name": "Создать ссылку-приглашение",
         "description": "Создаёт пригласительную ссылку для канала или группы."
+      },
+      "subflow": {
+        "name": "Подпоток",
+        "description": "Запускает другой поток или плагин."
+      },
+      "subflowExit": {
+        "name": "Выход",
+        "description": "Точка выхода после завершения подпотока."
       }
     },
     "ai": {
@@ -543,7 +579,24 @@
   "editor": {
     "selectModel": "Выбрать модель",
     "yourPrompt": "Ваш запрос",
-    "enterPrompt": "Введите ваш запрос здесь... (Cmd/Ctrl + Enter для отправки)"
+    "enterPrompt": "Введите ваш запрос здесь... (Cmd/Ctrl + Enter для отправки)",
+    "toolbar": {
+      "back": "Назад",
+      "showEdges": "Показать связи",
+      "hideEdges": "Скрыть связи",
+      "env": "Переменные окружения",
+      "terminal": "Терминал",
+      "search": "Поиск",
+      "collections": "Коллекции",
+      "shortcuts": "Горячие клавиши",
+      "more": "Ещё"
+    },
+    "saveStatus": {
+      "saving": "Сохранение...",
+      "saved": "Сохранено",
+      "unsaved": "Несохранённые изменения",
+      "savedAt": "Сохранено в {time}"
+    }
   },
   "variablePanel": {
     "title": "Доступные переменные",

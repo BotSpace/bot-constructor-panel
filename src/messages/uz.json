@@ -155,6 +155,10 @@
       "invoice": {
         "name": "To'lov (Invoice)",
         "description": "Telegram to'lov invoice yuboradi."
+      },
+      "editOrSend": {
+        "name": "Tahrirlash yoki yuborish",
+        "description": "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi."
       }
     },
     "messageOperations": {
@@ -233,6 +237,14 @@
       "scheduler": {
         "name": "Rejalashtiruvchi",
         "description": "Kelajakdagi vaqtda flow'ni davom ettiradi."
+      },
+      "forLoop": {
+        "name": "For Loop",
+        "description": "Ro'yxat elementlari bo'yicha aylanib chiqadi."
+      },
+      "forLoopContinue": {
+        "name": "Loop Continue",
+        "description": "Loop iteratsiyasini tugatadi va keyingi elementga o'tadi."
       }
     },
     "integrations": {
@@ -268,6 +280,14 @@
       "createInviteLink": {
         "name": "Taklif havolasi yaratish",
         "description": "Kanal/guruh uchun taklif (invite) havolasi yaratadi."
+      },
+      "subflow": {
+        "name": "Subflow",
+        "description": "Boshqa oqim yoki plugin ishga tushiradi."
+      },
+      "subflowExit": {
+        "name": "Chiqish",
+        "description": "Subflow tugagandan keyin chiqish nuqtasi."
       }
     },
     "ai": {
@@ -552,7 +572,24 @@
   "editor": {
     "selectModel": "Model tanlash",
     "yourPrompt": "Sizning so'rovingiz",
-    "enterPrompt": "So'rovingizni bu yerga kiriting... (Yuborish uchun Cmd/Ctrl + Enter)"
+    "enterPrompt": "So'rovingizni bu yerga kiriting... (Yuborish uchun Cmd/Ctrl + Enter)",
+    "toolbar": {
+      "back": "Orqaga",
+      "showEdges": "Bog'lanishlarni ko'rsatish",
+      "hideEdges": "Bog'lanishlarni yashirish",
+      "env": "Muhit o'zgaruvchilari",
+      "terminal": "Terminal",
+      "search": "Qidiruv",
+      "collections": "Kolleksiyalar",
+      "shortcuts": "Tezkor tugmalar",
+      "more": "Ko'proq"
+    },
+    "saveStatus": {
+      "saving": "Saqlanmoqda...",
+      "saved": "Saqlandi",
+      "unsaved": "Saqlanmagan o'zgarishlar",
+      "savedAt": "{time} da saqlandi"
+    }
   },
   "variablePanel": {
     "title": "Mavjud o'zgaruvchilar",

@@ -155,6 +155,10 @@
       "invoice": {
         "name": "Invoice",
         "description": "Sends a Telegram payment invoice."
+      },
+      "editOrSend": {
+        "name": "Edit or send",
+        "description": "Edits the message on callback, otherwise sends a new one."
       }
     },
     "messageOperations": {
@@ -233,6 +237,14 @@
       "scheduler": {
         "name": "Scheduler",
         "description": "Continues flow at a future scheduled time."
+      },
+      "forLoop": {
+        "name": "For Loop",
+        "description": "Iterates over list items."
+      },
+      "forLoopContinue": {
+        "name": "Loop Continue",
+        "description": "Ends the loop iteration and moves to the next item."
       }
     },
     "integrations": {
@@ -268,6 +280,14 @@
       "createInviteLink": {
         "name": "Create invite link",
         "description": "Creates an invite link for a channel or group."
+      },
+      "subflow": {
+        "name": "Subflow",
+        "description": "Runs another flow or plugin."
+      },
+      "subflowExit": {
+        "name": "Exit",
+        "description": "Exit point after the subflow finishes."
       }
     },
     "ai": {
@@ -552,7 +572,24 @@
   "editor": {
     "selectModel": "Select Model",
     "yourPrompt": "Your Prompt",
-    "enterPrompt": "Enter your prompt here... (Cmd/Ctrl + Enter to submit)"
+    "enterPrompt": "Enter your prompt here... (Cmd/Ctrl + Enter to submit)",
+    "toolbar": {
+      "back": "Back",
+      "showEdges": "Show connections",
+      "hideEdges": "Hide connections",
+      "env": "Environment variables",
+      "terminal": "Terminal",
+      "search": "Search",
+      "collections": "Collections",
+      "shortcuts": "Keyboard shortcuts",
+      "more": "More"
+    },
+    "saveStatus": {
+      "saving": "Saving...",
+      "saved": "Saved",
+      "unsaved": "Unsaved changes",
+      "savedAt": "Last saved at {time}"
+    }
   },
   "variablePanel": {
     "title": "Available variables",

@@ -2270,7 +2270,7 @@
     "category": "messageOperations",
     "titleKey": "constructor.actions.editOrSend.name",
     "descriptionKey": "constructor.actions.editOrSend.description",
-    "titleFallback": "Edit yoki Yuborish",
+    "titleFallback": "Tahrirlash yoki yuborish",
     "descriptionFallback": "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi.",
     "iconName": "edit",
     "colorToken": "message-op-teal",
