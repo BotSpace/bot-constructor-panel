@@ -32,7 +32,12 @@ export const createCollabSlice: StateCreator<
   emitCollabOp: (op: CollabOp) => {
     const { collabBroadcast, isApplyingRemote, isLoading } = get();
     if (isApplyingRemote || isLoading || !collabBroadcast) return;
-    collabBroadcast(op);
+    const sent = collabBroadcast(op);
+    // Op WS orqali OCHIQ socketga yozildi → server (collab-worker) uni
+    // project.flow'ga saqlaydi, shuning uchun o'zgarishni "saqlangan" deb
+    // belgilaymiz. Yuborilmasa (socket yopiq) isDirty o'zgarmaydi — 20s periodik
+    // safety-net autosave / pagehide flush keyin ushlab qoladi.
+    if (sent) set({ isDirty: false, lastSavedTime: new Date() });
   },
 
   applyRemoteOp: (op: CollabOp) => {

@@ -326,10 +326,18 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   },
 
   formatFlow: async () => {
-    const { nodes, edges } = get();
+    const { nodes, edges, emitCollabOp } = get();
     const formated = getFormatFlow(nodes, edges);
 
-    set({ nodes: formated.nodes, edges: formated.edges }); // To avoid unused variable warning
+    set({ nodes: formated.nodes, edges: formated.edges, isDirty: true });
+
+    // Format barcha node pozitsiyalarini qayta joylashtiradi — bu o'zgarish
+    // chokepoint'lardan o'tmaydi, shuning uchun har bir yangi pozitsiyani WS
+    // orqali QO'LDA tarqatamiz (nm). Shunda boshqa klientlar ham, server
+    // (collab-worker) ham yangilanadi. Yuborilsa emitCollabOp isDirty'ni tozalaydi.
+    for (const node of formated.nodes) {
+      emitCollabOp({ t: "nm", id: node.id, position: node.position });
+    }
   },
 
   loadFlow: async (flow) => {
