@@ -264,6 +264,10 @@
       "declineChatJoinRequest": {
         "name": "Qo'shilishni rad etish",
         "description": "Foydalanuvchining guruh yoki kanalga qo'shilish so'rovini rad etadi."
+      },
+      "createInviteLink": {
+        "name": "Taklif havolasi yaratish",
+        "description": "Kanal/guruh uchun taklif (invite) havolasi yaratadi."
       }
     },
     "ai": {

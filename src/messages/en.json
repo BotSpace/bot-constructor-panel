@@ -264,6 +264,10 @@
       "declineChatJoinRequest": {
         "name": "Decline join request",
         "description": "Declines a user join request to a group or channel."
+      },
+      "createInviteLink": {
+        "name": "Create invite link",
+        "description": "Creates an invite link for a channel or group."
       }
     },
     "ai": {
