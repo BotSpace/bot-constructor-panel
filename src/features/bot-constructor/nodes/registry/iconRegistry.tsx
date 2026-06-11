@@ -13,6 +13,7 @@ import {
   Globe,
   Image,
   LayoutGrid,
+  Link,
   MessageSquare,
   Mic,
   MousePointerClick,
@@ -83,6 +84,7 @@ const LUCIDE_ICONS: Record<string, ReactNode> = {
   "user-plus": <UserPlus className="text-primary" />,
   "user-check": <UserCheck className="text-emerald-500" />,
   "user-x": <UserX className="text-red-500" />,
+  link: <Link className="text-teal-500" />,
 };
 
 export function resolveNodeIcon(iconName: string): ReactNode | string {

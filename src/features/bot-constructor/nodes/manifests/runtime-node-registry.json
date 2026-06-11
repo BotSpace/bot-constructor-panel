@@ -5956,5 +5956,79 @@
       }
     ],
     "defaults": {}
+  },
+  {
+    "type": "CreateInviteLinkNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.createInviteLink.name",
+    "descriptionKey": "constructor.integrations.createInviteLink.description",
+    "titleFallback": "Taklif havolasi yaratish",
+    "descriptionFallback": "Kanal/guruh uchun taklif (invite) havolasi yaratadi.",
+    "iconName": "link",
+    "colorToken": "action-teal",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "integrations",
+      "sortOrder": 42,
+      "elementType": "create_invite_link"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "text",
+        "key": "chatId",
+        "label": "Chat ID",
+        "placeholder": "Bo'sh = joriy chat (kanal id: -100...)",
+        "optional": true
+      },
+      {
+        "type": "text",
+        "key": "name",
+        "label": "Havola nomi",
+        "placeholder": "Ixtiyoriy (admin ko'radi)",
+        "optional": true
+      },
+      {
+        "type": "number",
+        "key": "memberLimit",
+        "label": "A'zolar chegarasi",
+        "placeholder": "1 = shaxsiy havola",
+        "optional": true
+      },
+      {
+        "type": "number",
+        "key": "expireDate",
+        "label": "Amal qilish muddati (unix)",
+        "placeholder": "Ixtiyoriy",
+        "optional": true
+      },
+      {
+        "type": "checkbox",
+        "key": "createsJoinRequest",
+        "label": "Qo'shilish so'rovini talab qilish",
+        "optional": true
+      },
+      {
+        "type": "text",
+        "key": "resultVar",
+        "label": "Natija o'zgaruvchisi",
+        "placeholder": "invite_link",
+        "optional": true
+      }
+    ],
+    "defaults": {
+      "resultVar": "invite_link"
+    }
   }
 ]

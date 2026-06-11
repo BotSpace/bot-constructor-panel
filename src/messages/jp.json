@@ -256,6 +256,10 @@
       "declineChatJoinRequest": {
         "name": "参加リクエストを拒否",
         "description": "グループまたはチャンネルへの参加リクエストを拒否します。"
+      },
+      "createInviteLink": {
+        "name": "招待リンクを作成",
+        "description": "チャンネルまたはグループの招待リンクを作成します。"
       }
     },
     "ai": {
