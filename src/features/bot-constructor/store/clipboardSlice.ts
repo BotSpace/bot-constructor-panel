@@ -71,6 +71,12 @@ export const createClipboardSlice: StateCreator<
       edges: [...edges, ...newEdges],
       isDirty: true,
     });
+
+    // Collab: paste qilingan node/edge'larni WS orqali tarqatamiz — aks holda
+    // boshqa klientlarga sync bo'lmaydi va server (collab-worker) saqlamaydi.
+    const { emitCollabOp } = get();
+    for (const node of newNodes) emitCollabOp({ t: "na", node: { ...node, selected: false } });
+    for (const edge of newEdges) emitCollabOp({ t: "ea", edge });
   },
   duplicateSelection: () => {
     const { nodes, edges, saveToHistory } = get();
@@ -114,5 +120,10 @@ export const createClipboardSlice: StateCreator<
       edges: [...get().edges, ...newEdges],
       isDirty: true,
     });
+
+    // Collab: nusxalangan node/edge'larni WS orqali tarqatamiz.
+    const { emitCollabOp } = get();
+    for (const node of newNodes) emitCollabOp({ t: "na", node: { ...node, selected: false } });
+    for (const edge of newEdges) emitCollabOp({ t: "ea", edge });
   },
 });
