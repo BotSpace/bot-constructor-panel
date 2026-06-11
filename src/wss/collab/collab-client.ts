@@ -80,13 +80,17 @@ export class CollabClient {
     this.backoffUntil = 0;
   }
 
-  /** Broadcast a LOCAL op to the project room as a binary frame. Best-effort. */
-  send(op: CollabOp) {
-    if (this.ws?.readyState !== WebSocket.OPEN) return;
+  /** Broadcast a LOCAL op to the project room as a binary frame. Best-effort.
+   *  Returns true if the frame was actually written to an OPEN socket (→ the
+   *  server will persist it), false otherwise (socket closed/dead). */
+  send(op: CollabOp): boolean {
+    if (this.ws?.readyState !== WebSocket.OPEN) return false;
     try {
       this.ws.send(encodeOp(op));
+      return true;
     } catch {
       /* socket died mid-send — watchdog reconnects */
+      return false;
     }
   }
 

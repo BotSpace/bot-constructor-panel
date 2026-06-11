@@ -54,8 +54,8 @@ export interface CollabSlice {
   /** Remote op qo'llanayotganda true — chokepoint'lar qayta broadcast qilmasligi uchun. */
   isApplyingRemote: boolean;
   /** Collab hook o'rnatadigan broadcaster; null bo'lsa collab ulanmagan. */
-  collabBroadcast: ((op: CollabOp) => void) | null;
-  setCollabBroadcast: (fn: ((op: CollabOp) => void) | null) => void;
+  collabBroadcast: ((op: CollabOp) => boolean) | null;
+  setCollabBroadcast: (fn: ((op: CollabOp) => boolean) | null) => void;
   /** Lokal op'ni broadcast qiladi (guard tekshiruvlari bilan). */
   emitCollabOp: (op: CollabOp) => void;
   /** Kelgan remote op'ni canvas'ga qo'llaydi (silent — dirty/undo/broadcast yo'q). */
