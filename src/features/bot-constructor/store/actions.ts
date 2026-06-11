@@ -315,7 +315,6 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
         isDirty: false, // O'zgarishlar saqlandi
         initialState: { nodes, edges }, // Boshlang'ich holatni yangilaymiz
         lastSavedTime: new Date(), // Saqlash vaqtini yangilaymiz
-        countdownRemaining: null, // Countdown ni to'xtatamiz
       });
     } catch (error) {
       console.error("Saqlashda xatolik:", error);
