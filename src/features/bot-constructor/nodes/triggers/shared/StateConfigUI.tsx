@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Database, Key, Type } from "lucide-react";
+import { Database, Key, Type, X } from "lucide-react";
 import { StateConfig, StateType } from "./state-config-types";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -17,6 +17,10 @@ interface StateConfigComponentProps {
   onStateChange: (state?: StateConfig) => void;
   availableTypes: StateType[];
   nodeId: string;
+  /** Optional ("+" bilan qo'shiladigan) oqim: enable-checkbox o'rniga
+   *  to'g'ridan-to'g'ri fieldlar + "olib tashlash" tugmasi ko'rsatiladi. */
+  hideToggle?: boolean;
+  onRemove?: () => void;
 }
 
 const StateConfigComponent = ({
@@ -24,6 +28,8 @@ const StateConfigComponent = ({
   onStateChange,
   availableTypes,
   nodeId,
+  hideToggle,
+  onRemove,
 }: StateConfigComponentProps) => {
   const enabled = !!state;
 
@@ -62,25 +68,8 @@ const StateConfigComponent = ({
     }
   };
 
-  return (
-    <div className="space-y-3 pt-2 border-t border-border">
-      <div className="flex items-center gap-2">
-        <Checkbox
-          id={`state-enabled-${nodeId}`}
-          checked={enabled}
-          onCheckedChange={handleEnabledChange}
-        />
-        <Label
-          htmlFor={`state-enabled-${nodeId}`}
-          className="text-sm font-medium cursor-pointer flex items-center gap-1.5"
-        >
-          <Database className="h-3.5 w-3.5 text-purple-400" />
-          Ma'lumotni saqlash
-        </Label>
-      </div>
-
-      {enabled && state && (
-        <div className="space-y-3 pl-6 animate-in fade-in-50 slide-in-from-top-1">
+  const fields = state ? (
+    <div className="space-y-3 pl-6 animate-in fade-in-50 slide-in-from-top-1">
           <div className="space-y-1.5">
             <Label
               htmlFor={`state-key-${nodeId}`}
@@ -146,8 +135,53 @@ const StateConfigComponent = ({
               />
             </div>
           )}
+    </div>
+  ) : null;
+
+  // Optional "+" oqimi: checkbox o'rniga sarlavha + "olib tashlash" tugmasi,
+  // fieldlar darhol ko'rinadi (state allaqachon parent tomonidan init qilingan).
+  if (hideToggle) {
+    return (
+      <div className="space-y-3 pt-2 border-t border-border">
+        <div className="flex items-center justify-between">
+          <Label className="text-sm font-medium flex items-center gap-1.5">
+            <Database className="h-3.5 w-3.5 text-purple-400" />
+            Ma'lumotni saqlash
+          </Label>
+          {onRemove && (
+            <button
+              type="button"
+              onClick={onRemove}
+              className="flex items-center gap-1 text-xs text-zinc-500 transition-colors hover:text-red-400"
+            >
+              <X className="h-3.5 w-3.5" />
+              Olib tashlash
+            </button>
+          )}
         </div>
-      )}
+        {fields}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3 pt-2 border-t border-border">
+      <div className="flex items-center gap-2">
+        <Checkbox
+          id={`state-enabled-${nodeId}`}
+          checked={enabled}
+          onCheckedChange={handleEnabledChange}
+        />
+        <Label
+          htmlFor={`state-enabled-${nodeId}`}
+          className="text-sm font-medium cursor-pointer flex items-center gap-1.5"
+        >
+          <Database className="h-3.5 w-3.5 text-purple-400" />
+          Ma'lumotni saqlash
+        </Label>
+      </div>
+
+      {enabled && fields}
     </div>
   );
 };
