@@ -69,7 +69,7 @@ function MessageTriggerConfig({
   stateOptional?: boolean;
 }) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [showState, setShowState] = useState(false);
+  const [showState, setShowState] = useState(Boolean((data as MessageData).state));
 
   const typedData = data as MessageData;
 
@@ -137,20 +137,36 @@ function MessageTriggerConfig({
         stateOptional && !showState ? (
           <button
             type="button"
-            onClick={() => setShowState(true)}
+            onClick={() => {
+              setShowState(true);
+              if (!typedData.state) {
+                updateNodeData(nodeId, {
+                  state: { key: "", type: availableStateTypes[0] || "text" },
+                });
+              }
+            }}
             className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
           >
             <Plus className="h-3 w-3" />
             Ma&apos;lumotni saqlash
           </button>
-        ) : (stateOptional && showState) || !stateOptional ? (
+        ) : (
           <StateConfigUI
             state={typedData.state}
             onStateChange={(state) => updateNodeData(nodeId, { state })}
             availableTypes={availableStateTypes}
             nodeId={nodeId}
+            hideToggle={stateOptional}
+            onRemove={
+              stateOptional
+                ? () => {
+                    setShowState(false);
+                    updateNodeData(nodeId, { state: undefined });
+                  }
+                : undefined
+            }
           />
-        ) : null
+        )
       ) : null}
     </div>
   );
@@ -186,7 +202,7 @@ function CallbackQueryTriggerConfig({
   stateOptional?: boolean;
 }) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [showState, setShowState] = useState(false);
+  const [showState, setShowState] = useState(Boolean((data as CallbackData).state));
   const nodes = useFlowStore((state) => state.nodes);
   const edges = useFlowStore((state) => state.edges);
 
@@ -339,7 +355,14 @@ function CallbackQueryTriggerConfig({
       {stateOptional && !showState ? (
         <button
           type="button"
-          onClick={() => setShowState(true)}
+          onClick={() => {
+            setShowState(true);
+            if (!typedData.state) {
+              updateNodeData(nodeId, {
+                state: { key: "", type: availableStateTypes[0] || "text" },
+              });
+            }
+          }}
           className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
         >
           <Plus className="h-3 w-3" />
@@ -351,6 +374,15 @@ function CallbackQueryTriggerConfig({
           onStateChange={(state) => updateNodeData(nodeId, { state })}
           availableTypes={availableStateTypes}
           nodeId={nodeId}
+          hideToggle={stateOptional}
+          onRemove={
+            stateOptional
+              ? () => {
+                  setShowState(false);
+                  updateNodeData(nodeId, { state: undefined });
+                }
+              : undefined
+          }
         />
       )}
     </div>
@@ -384,7 +416,7 @@ function ReplyButtonTriggerConfig({
   stateOptional?: boolean;
 }) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [showState, setShowState] = useState(false);
+  const [showState, setShowState] = useState(Boolean((data as ReplyData).state));
   const nodes = useFlowStore((state) => state.nodes);
   const edges = useFlowStore((state) => state.edges);
 
@@ -489,7 +521,14 @@ function ReplyButtonTriggerConfig({
       {stateOptional && !showState ? (
         <button
           type="button"
-          onClick={() => setShowState(true)}
+          onClick={() => {
+            setShowState(true);
+            if (!typedData.state) {
+              updateNodeData(nodeId, {
+                state: { key: "", type: getStateTypesForReplyButtonTrigger()[0] || "text" },
+              });
+            }
+          }}
           className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
         >
           <Plus className="h-3 w-3" />
@@ -501,6 +540,15 @@ function ReplyButtonTriggerConfig({
           onStateChange={(state) => updateNodeData(nodeId, { state })}
           availableTypes={getStateTypesForReplyButtonTrigger()}
           nodeId={nodeId}
+          hideToggle={stateOptional}
+          onRemove={
+            stateOptional
+              ? () => {
+                  setShowState(false);
+                  updateNodeData(nodeId, { state: undefined });
+                }
+              : undefined
+          }
         />
       )}
     </div>
