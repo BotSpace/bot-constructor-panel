@@ -18,6 +18,15 @@ import { cn } from "@/lib/utils";
 
 /** Clear a field's stored value so a removed optional field stays hidden. */
 function clearedFieldData(field: NodeFieldManifest): Record<string, unknown> {
+  // The keyboard type selector (keyboard_kind) and its button rows are one
+  // logical keyboard, but they are split into two independently removable
+  // optional fields. Removing only the type selector would leave orphaned
+  // `rows`, which getNodeKeyboard() then silently reinterprets as an INLINE
+  // keyboard (kind !== "reply" → inline) — turning a saved reply keyboard into
+  // an inline one. Clearing both keeps the keyboard consistent.
+  if (field.key === "keyboard_kind") {
+    return { keyboard_kind: undefined, rows: [] };
+  }
   switch (field.type) {
     case "action-keyboard":
       return { rows: [], keyboard_kind: "inline" };
@@ -180,7 +189,11 @@ export function ModalNodeFormRenderer({
   const configuredOptionalFields = allFields.filter((f) => {
     if (!f.optional || addedOptionalKeys.includes(fieldKey(f))) return false;
     if (f.defaultVisible === true) return true;
-    if (f.defaultVisible === false) return false;
+    // `defaultVisible: false` and the default (undefined) case both defer to the
+    // value heuristic: with manifest.defaults a field sitting at its default
+    // value stays hidden, but a user-configured non-default value (e.g. a reply
+    // keyboard or HTML parse mode) is always surfaced so the setting never looks
+    // lost on refresh.
     return optionalFieldConfigured(f, data, manifest.defaults?.[fieldKey(f)]);
   });
 

@@ -117,7 +117,10 @@ export interface NodeFieldManifest {
    * Explicit control over whether an `optional` field is shown by default in
    * the node edit panel (overrides the value-based heuristic):
    *   - true  → always shown by default (even with no value)
-   *   - false → never shown by default; only via "Add optional field" (even if it holds a value)
+   *   - false → hidden by default, EXCEPT when it already holds a non-default
+   *             value (so a configured keyboard type / parse mode is never
+   *             hidden, which would look like data loss); otherwise reachable
+   *             only via "Add optional field"
    *   - undefined → value-based: shown only when the field already holds a non-default value
    */
   defaultVisible?: boolean;
