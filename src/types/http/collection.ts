@@ -1,6 +1,7 @@
 export interface CollectionListItem {
   id: string | number;
   name: string;
+  system?: boolean;
 }
 
 export interface CollectionDetail {

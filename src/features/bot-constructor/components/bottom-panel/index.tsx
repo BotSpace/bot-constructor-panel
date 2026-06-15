@@ -19,7 +19,7 @@ import { ShortcutsDialog } from '../ShortcutsDialog'
 import { useFlowStore } from '../../store'
 import { useReactFlow } from 'reactflow'
 import { ElementItemType } from '@/types/element-types'
-import { CollectionIframeDialog } from '../CollectionIframe/CollectionIframe'
+import { CollectionManageDialog } from '../CollectionIframe/CollectionManageDialog'
 import { EnvManageDialog } from '../EnvManageDialog/EnvManageDialog'
 import {
     DropdownMenu,
@@ -247,7 +247,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 projectId={id as string}
             />
 
-            <CollectionIframeDialog
+            <CollectionManageDialog
                 open={collectionOpen}
                 onOpenChange={setCollectionOpen}
             />

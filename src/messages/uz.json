@@ -658,5 +658,19 @@
       "message_location_lon": "Joylashuv uzunligi (lon)",
       "callback_query_data": "Inline tugma callback data"
     }
+  },
+  "collections": {
+    "title": "Kolleksiyalar",
+    "description": "Botingiz ma'lumotlar kolleksiyalarini boshqaring.",
+    "empty": "Hozircha kolleksiyalar yo'q.",
+    "deleteTitle": "Kolleksiyani o'chirish",
+    "deleteDescription": "\"{name}\" kolleksiyasini o'chirishni xohlaysizmi? Bu amalni bekor qilib bo'lmaydi.",
+    "deleteConfirm": "O'chirish",
+    "deleteCancel": "Bekor qilish",
+    "deleteSuccess": "Kolleksiya muvaffaqiyatli o'chirildi",
+    "deleteError": "Kolleksiyani o'chirishda xatolik",
+    "deleteErrorSystem": "Tizim kolleksiyasini o'chirib bo'lmaydi",
+    "systemBadge": "Tizimiy",
+    "close": "Yopish"
   }
 }

@@ -658,5 +658,19 @@
       "message_location_lon": "Location longitude",
       "callback_query_data": "Inline button callback data"
     }
+  },
+  "collections": {
+    "title": "Collections",
+    "description": "Manage your bot data collections.",
+    "empty": "No collections yet.",
+    "deleteTitle": "Delete collection",
+    "deleteDescription": "Are you sure you want to delete the collection \"{name}\"? This action cannot be undone.",
+    "deleteConfirm": "Delete",
+    "deleteCancel": "Cancel",
+    "deleteSuccess": "Collection deleted successfully",
+    "deleteError": "Error deleting collection",
+    "deleteErrorSystem": "System collection cannot be deleted",
+    "systemBadge": "System",
+    "close": "Close"
   }
 }
