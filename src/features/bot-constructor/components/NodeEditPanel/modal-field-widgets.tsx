@@ -402,6 +402,10 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
   }
 
   const inputType = field.type === "number" ? "number" : "text";
+  // `text` fields legitimately hold numbers — e.g. a PaymentNode `amount` the
+  // agent/import wrote as a JSON number (the field is `text` so it can also take
+  // `{{state.summa}}`). Coerce numeric values to string; otherwise the input
+  // renders empty even though the value exists and the engine reads it fine.
   const normalizedValue =
     field.type === "number"
       ? value === undefined || value === null
@@ -409,7 +413,9 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         : String(value)
       : typeof value === "string"
         ? value
-        : "";
+        : typeof value === "number"
+          ? String(value)
+          : "";
 
   return (
     <FieldShell label={field.label} helpText={field.helpText}>
