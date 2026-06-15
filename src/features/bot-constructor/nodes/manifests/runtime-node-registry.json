@@ -4375,7 +4375,7 @@
         "type": "text",
         "key": "model",
         "label": "Model",
-        "placeholder": "llama3.1"
+        "placeholder": "gpt-oss:120b"
       },
       {
         "type": "text",
