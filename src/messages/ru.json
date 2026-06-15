@@ -665,5 +665,19 @@
       "message_location_lon": "Долгота геолокации",
       "callback_query_data": "Данные inline-кнопки"
     }
+  },
+  "collections": {
+    "title": "Коллекции",
+    "description": "Управление коллекциями данных вашего бота.",
+    "empty": "Коллекций пока нет.",
+    "deleteTitle": "Удалить коллекцию",
+    "deleteDescription": "Вы уверены, что хотите удалить коллекцию \"{name}\"? Это действие нельзя отменить.",
+    "deleteConfirm": "Удалить",
+    "deleteCancel": "Отмена",
+    "deleteSuccess": "Коллекция успешно удалена",
+    "deleteError": "Ошибка при удалении коллекции",
+    "deleteErrorSystem": "Системную коллекцию нельзя удалить",
+    "systemBadge": "Системная",
+    "close": "Закрыть"
   }
 }

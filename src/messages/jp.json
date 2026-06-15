@@ -665,5 +665,19 @@
       "message_location_lon": "位置情報（経度）",
       "callback_query_data": "インラインボタンのコールバックデータ"
     }
+  },
+  "collections": {
+    "title": "コレクション",
+    "description": "ボットのデータコレクションを管理します。",
+    "empty": "コレクションがまだありません。",
+    "deleteTitle": "コレクションを削除",
+    "deleteDescription": "コレクション \"{name}\" を削除してもよろしいですか？この操作は元に戻せません。",
+    "deleteConfirm": "削除",
+    "deleteCancel": "キャンセル",
+    "deleteSuccess": "コレクションが正常に削除されました",
+    "deleteError": "コレクションの削除中にエラーが発生しました",
+    "deleteErrorSystem": "システムコレクションは削除できません",
+    "systemBadge": "システム",
+    "close": "閉じる"
   }
 }
