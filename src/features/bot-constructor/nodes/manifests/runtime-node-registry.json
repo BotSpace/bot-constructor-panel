@@ -4804,11 +4804,14 @@
         "rows": 2
       },
       {
-        "type": "textarea",
+        "type": "tool-params",
+        "key": "parametersSchema",
+        "label": "Input parametrlari (AI shularni beradi)"
+      },
+      {
+        "type": "code-editor",
         "key": "jsCode",
-        "label": "JavaScript Code",
-        "placeholder": "// return value becomes the tool result\nreturn args.input;",
-        "rows": 5
+        "label": "JavaScript kodi"
       }
     ],
     "defaults": {

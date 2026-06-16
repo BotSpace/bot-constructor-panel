@@ -88,6 +88,7 @@ export interface NodeFieldManifest {
     | "cron-editor"
     | "trigger-config"
     | "dynamic-params"
+    | "tool-params"
     // Action panel sub-sections (optional-capable)
     | "action-recipients"
     | "action-keyboard"
