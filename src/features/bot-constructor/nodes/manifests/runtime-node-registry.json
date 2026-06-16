@@ -5833,6 +5833,10 @@
           {
             "value": "click",
             "label": "Click"
+          },
+          {
+            "value": "paycue",
+            "label": "Paycue"
           }
         ],
         "variant": "tabs"
