@@ -5857,7 +5857,8 @@
         "type": "text",
         "key": "buttonText",
         "label": "Tugma matni",
-        "placeholder": "💳 To'lash"
+        "placeholder": "💳 To'lash",
+        "optional": true
       }
     ],
     "defaults": {
