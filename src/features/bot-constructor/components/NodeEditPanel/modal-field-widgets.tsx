@@ -20,6 +20,7 @@ import { NodeFieldManifest } from "@/features/bot-constructor/nodes/registry/typ
 import { renderCustomWidget } from "@/features/bot-constructor/nodes/widgets/widgetRegistry";
 import { ArrayEditorField } from "@/features/bot-constructor/nodes/widgets/generic-fields/ArrayEditorField";
 import { CodeEditorField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CodeEditorField";
+import { ToolParamsField } from "@/features/bot-constructor/nodes/widgets/generic-fields/ToolParamsField";
 import { CollectionSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CollectionSelectField";
 import { StateTypeSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/StateTypeSelectField";
 import { ConditionListField } from "@/features/bot-constructor/nodes/widgets/generic-fields/ConditionListField";
@@ -197,6 +198,16 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         nodeId={nodeId}
         data={data}
         field={field as Parameters<typeof CodeEditorField>[0]["field"]}
+      />
+    );
+  }
+
+  if (field.type === "tool-params") {
+    return (
+      <ToolParamsField
+        nodeId={nodeId}
+        data={data}
+        field={field as Parameters<typeof ToolParamsField>[0]["field"]}
       />
     );
   }
