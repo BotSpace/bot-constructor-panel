@@ -222,12 +222,15 @@ export function ModalNodeFormRenderer({
               field.optional ? (
                 <div
                   key={`${manifest.type}-${fieldKey(field)}-${index}`}
-                  className="flex items-center gap-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-200"
+                  className="flex items-start gap-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-200"
                 >
-                  {/* Persistent remove control on the left, separated by a divider */}
+                  {/* Persistent remove control on the left, separated by a divider.
+                      mt-7 drops it to the input's vertical center (past the
+                      text-xs label + space-y-1.5 gap) instead of centering on the
+                      whole label+input block. */}
                   <button
                     type="button"
-                    className="flex h-7 w-7 shrink-0 items-center justify-center self-center rounded-md border-r border-white/10 pr-3 text-zinc-500 hover:text-red-400"
+                    className="mt-7 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-r border-white/10 pr-3 text-zinc-500 hover:text-red-400"
                     title="Maydonni olib tashlash"
                     onClick={() => {
                       setAddedOptionalKeys((prev) =>
