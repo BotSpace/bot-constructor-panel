@@ -589,7 +589,8 @@
       "search": "検索",
       "collections": "コレクション",
       "shortcuts": "キーボードショートカット",
-      "more": "もっと見る"
+      "more": "もっと見る",
+      "credentials": "クレデンシャル"
     },
     "saveStatus": {
       "saving": "保存中...",
@@ -678,6 +679,21 @@
     "deleteError": "コレクションの削除中にエラーが発生しました",
     "deleteErrorSystem": "システムコレクションは削除できません",
     "systemBadge": "システム",
+    "close": "閉じる"
+  },
+  "credentials": {
+    "title": "クレデンシャル",
+    "description": "ボット認証情報を管理します。",
+    "empty": "まだクレデンシャルがありません。",
+    "addNew": "追加",
+    "filterAll": "すべてのタイプ",
+    "newType": "新しいタイプ",
+    "deleteTitle": "クレデンシャルを削除",
+    "deleteDescription": "\"{name}\" を削除してもよろしいですか？この操作は元に戻せません。",
+    "deleteConfirm": "削除",
+    "deleteCancel": "キャンセル",
+    "deleteSuccess": "クレデンシャルが削除されました",
+    "deleteError": "削除中にエラーが発生しました",
     "close": "閉じる"
   }
 }

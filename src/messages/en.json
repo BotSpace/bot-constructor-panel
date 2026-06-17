@@ -582,7 +582,8 @@
       "search": "Search",
       "collections": "Collections",
       "shortcuts": "Keyboard shortcuts",
-      "more": "More"
+      "more": "More",
+      "credentials": "Credentials"
     },
     "saveStatus": {
       "saving": "Saving...",
@@ -671,6 +672,21 @@
     "deleteError": "Error deleting collection",
     "deleteErrorSystem": "System collection cannot be deleted",
     "systemBadge": "System",
+    "close": "Close"
+  },
+  "credentials": {
+    "title": "Credentials",
+    "description": "Manage authentication credentials for your bot.",
+    "empty": "No credentials yet.",
+    "addNew": "Add credential",
+    "filterAll": "All types",
+    "newType": "New type",
+    "deleteTitle": "Delete credential",
+    "deleteDescription": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+    "deleteConfirm": "Delete",
+    "deleteCancel": "Cancel",
+    "deleteSuccess": "Credential deleted",
+    "deleteError": "Error deleting credential",
     "close": "Close"
   }
 }
