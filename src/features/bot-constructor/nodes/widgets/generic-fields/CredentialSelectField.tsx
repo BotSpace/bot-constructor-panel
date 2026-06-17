@@ -162,6 +162,7 @@ export function CredentialSelectField({
         onOpenChange={setAddOpen}
         lockedTypeKey={typeKey}
         onSuccess={(created) => {
+          if (!created) return;
           // Auto-select the newly created credential
           updateNodeData(nodeId, { [dataKey]: created.id });
           // Invalidate local cache and refresh
