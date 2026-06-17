@@ -30,11 +30,9 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Shield, Pencil, Trash2, Plus, FlaskConical } from "lucide-react";
 import toast from "react-hot-toast";
-import { useParams } from "next/navigation";
 import { useCredentialStore, useCredentialTypesStore } from "@/features/credentials/store";
 import { CredentialListItem } from "@/types/http/credential";
 import { CredentialFormModal } from "./CredentialFormModal";
-import { CustomTypeBuilderModal } from "./CustomTypeBuilderModal";
 import { cn } from "@/lib/utils";
 
 interface CredentialManageDialogProps {
@@ -48,7 +46,6 @@ export function CredentialManageDialog({
   open,
   onOpenChange,
 }: CredentialManageDialogProps) {
-  const { id: projectId } = useParams<{ id: string }>();
   const {
     credentials,
     total,
@@ -68,15 +65,14 @@ export function CredentialManageDialog({
   const [testing, setTesting] = useState<number | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editItem, setEditItem] = useState<CredentialListItem | null>(null);
-  const [builderOpen, setBuilderOpen] = useState(false);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // Load data whenever the dialog opens or filter/page changes
   useEffect(() => {
-    if (!open || !projectId) return;
-    loadCredentials(projectId, { page, type: typeFilter });
-  }, [open, projectId, page, typeFilter]);
+    if (!open) return;
+    loadCredentials({ page, type: typeFilter });
+  }, [open, page, typeFilter]);
 
   // Load types for filter dropdown
   useEffect(() => {
@@ -90,10 +86,10 @@ export function CredentialManageDialog({
   };
 
   const handleDeleteConfirm = async () => {
-    if (!pendingDelete || !projectId) return;
+    if (!pendingDelete) return;
     setDeleting(true);
     try {
-      await deleteCredential(projectId, pendingDelete.id);
+      await deleteCredential(pendingDelete.id);
       toast.success("Credential o'chirildi");
       setPendingDelete(null);
     } catch {
@@ -104,10 +100,9 @@ export function CredentialManageDialog({
   };
 
   const handleTest = async (item: CredentialListItem) => {
-    if (!projectId) return;
     setTesting(item.id);
     try {
-      const result = await testCredential(projectId, item.id);
+      const result = await testCredential(item.id);
       if (result?.ok) {
         toast.success("Credential ishlayapti!");
       } else {
@@ -131,7 +126,7 @@ export function CredentialManageDialog({
   };
 
   const handleFormSuccess = () => {
-    if (projectId) loadCredentials(projectId, { page, type: typeFilter });
+    loadCredentials({ page, type: typeFilter });
   };
 
   return (
@@ -144,7 +139,7 @@ export function CredentialManageDialog({
               Credentials
             </DialogTitle>
             <DialogDescription>
-              Loyiha uchun autentifikatsiya ma&apos;lumotlarini boshqaring
+              Autentifikatsiya ma&apos;lumotlari — barcha loyihalaringiz uchun umumiy
             </DialogDescription>
           </DialogHeader>
 
@@ -168,16 +163,6 @@ export function CredentialManageDialog({
             </Select>
 
             <div className="flex-1" />
-
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 gap-1 text-xs"
-              onClick={() => setBuilderOpen(true)}
-            >
-              <Plus className="h-3 w-3" />
-              Yangi tur
-            </Button>
 
             <Button size="sm" className="h-8 gap-1 text-xs" onClick={handleCreate}>
               <Plus className="h-3 w-3" />
@@ -332,21 +317,11 @@ export function CredentialManageDialog({
       </AlertDialog>
 
       {/* Create / Edit form */}
-      {projectId ? (
-        <CredentialFormModal
-          open={formOpen}
-          onOpenChange={setFormOpen}
-          projectId={projectId}
-          editItem={editItem}
-          onSuccess={handleFormSuccess}
-        />
-      ) : null}
-
-      {/* Custom type builder */}
-      <CustomTypeBuilderModal
-        open={builderOpen}
-        onOpenChange={setBuilderOpen}
-        onSuccess={() => loadTypes()}
+      <CredentialFormModal
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        editItem={editItem}
+        onSuccess={handleFormSuccess}
       />
     </>
   );

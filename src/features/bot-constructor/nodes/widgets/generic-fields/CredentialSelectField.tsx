@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -28,7 +27,6 @@ export function CredentialSelectField({
   data,
   dataKey = "credential_id",
 }: CredentialSelectFieldProps) {
-  const { id: projectId } = useParams<{ id: string }>();
   const updateNodeData = useFlowStore((s) => s.updateNodeData);
   const { credentials, loading, loadCredentials } = useCredentialStore();
   const [addOpen, setAddOpen] = useState(false);
@@ -43,10 +41,11 @@ export function CredentialSelectField({
         : "";
 
   useEffect(() => {
-    if (projectId && !credentials) {
-      loadCredentials(projectId);
+    if (!credentials) {
+      loadCredentials();
     }
-  }, [projectId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChange = (value: string) => {
     if (value === "__none__") {
@@ -104,19 +103,16 @@ export function CredentialSelectField({
         </Button>
       </div>
 
-      {projectId ? (
-        <CredentialFormModal
-          open={addOpen}
-          onOpenChange={setAddOpen}
-          projectId={projectId}
-          onSuccess={(created) => {
-            // Auto-select the newly created credential
-            updateNodeData(nodeId, { [dataKey]: created.id });
-            // Reload list
-            loadCredentials(projectId);
-          }}
-        />
-      ) : null}
+      <CredentialFormModal
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        onSuccess={(created) => {
+          // Auto-select the newly created credential
+          updateNodeData(nodeId, { [dataKey]: created.id });
+          // Reload list
+          loadCredentials();
+        }}
+      />
     </>
   );
 }

@@ -35,6 +35,7 @@ export interface CredentialType {
 export interface CredentialListItem {
   id: number;
   name: string;
+  type_key: string;
   type: Pick<CredentialType, "key" | "label" | "icon" | "mode">;
   updated_at: string;
   data: Record<string, string | null>;
@@ -69,11 +70,3 @@ export interface PatchCredentialPayload {
   data?: Record<string, string | number>;
 }
 
-export interface CreateCredentialTypePayload {
-  key: string;
-  label: string;
-  description?: string;
-  icon?: string;
-  mode: CredentialMode;
-  fields: CredentialFieldDef[];
-}
