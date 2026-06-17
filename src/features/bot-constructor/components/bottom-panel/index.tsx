@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from './components/button'
-import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff } from 'lucide-react'
+import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff, Shield } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -21,6 +21,7 @@ import { useReactFlow } from 'reactflow'
 import { ElementItemType } from '@/types/element-types'
 import { CollectionManageDialog } from '../CollectionIframe/CollectionManageDialog'
 import { EnvManageDialog } from '../EnvManageDialog/EnvManageDialog'
+import { CredentialManageDialog } from '@/features/credentials/components/CredentialManageDialog'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -41,7 +42,7 @@ interface Props {
 const FIXED_W = 227
 const SLOT = 48
 const MORE_W = 48
-const ALL_COUNT = 6
+const ALL_COUNT = 7
 
 function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const t = useTranslations('editor.toolbar')
@@ -57,6 +58,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     }
     const [envManageOpen, setEnvManageOpen] = useState(false)
     const [collectionOpen, setCollectionOpen] = useState(false)
+    const [credentialOpen, setCredentialOpen] = useState(false)
     const { addNode, edgesVisible, toggleEdgesVisibility } = useFlowStore()
     const { getViewport } = useReactFlow()
     const { id } = useParams()
@@ -169,6 +171,20 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
             ),
         },
         {
+            key: 'credentials',
+            inline: (
+                <BottomPanelButton onClick={() => setCredentialOpen(true)} title={t('credentials')} aria-label={t('credentials')}>
+                    <Shield size={20} />
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="credentials" onClick={() => setCredentialOpen(true)}>
+                    <Shield size={16} className="mr-2" />
+                    {t('credentials')}
+                </DropdownMenuItem>
+            ),
+        },
+        {
             key: 'shortcuts',
             inline: (
                 <BottomPanelButton onClick={() => setShortcutsOpen(true)} title={t('shortcuts')} aria-label={t('shortcuts')}>
@@ -250,6 +266,11 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
             <CollectionManageDialog
                 open={collectionOpen}
                 onOpenChange={setCollectionOpen}
+            />
+
+            <CredentialManageDialog
+                open={credentialOpen}
+                onOpenChange={setCredentialOpen}
             />
         </>
     )

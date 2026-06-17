@@ -582,7 +582,8 @@
       "search": "Qidiruv",
       "collections": "Kolleksiyalar",
       "shortcuts": "Tezkor tugmalar",
-      "more": "Ko'proq"
+      "more": "Ko'proq",
+      "credentials": "Credential'lar"
     },
     "saveStatus": {
       "saving": "Saqlanmoqda...",
@@ -671,6 +672,21 @@
     "deleteError": "Kolleksiyani o'chirishda xatolik",
     "deleteErrorSystem": "Tizim kolleksiyasini o'chirib bo'lmaydi",
     "systemBadge": "Tizimiy",
+    "close": "Yopish"
+  },
+  "credentials": {
+    "title": "Credential'lar",
+    "description": "Botingiz uchun autentifikatsiya ma'lumotlarini boshqaring.",
+    "empty": "Hozircha credential yo'q.",
+    "addNew": "Credential qo'shish",
+    "filterAll": "Barcha turlar",
+    "newType": "Yangi tur",
+    "deleteTitle": "Credential o'chirish",
+    "deleteDescription": "\"{name}\" credential'ni o'chirishni xohlaysizmi? Bu amalni bekor qilib bo'lmaydi.",
+    "deleteConfirm": "O'chirish",
+    "deleteCancel": "Bekor qilish",
+    "deleteSuccess": "Credential o'chirildi",
+    "deleteError": "O'chirishda xatolik",
     "close": "Yopish"
   }
 }

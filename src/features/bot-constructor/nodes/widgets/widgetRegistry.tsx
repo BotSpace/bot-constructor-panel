@@ -61,6 +61,7 @@ import {
 import {
   RichTextMessageField,
 } from "@/features/bot-constructor/nodes/widgets/shared-message-fields";
+import { CredentialSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CredentialSelectField";
 
 interface WidgetProps {
   nodeId: string;
@@ -594,10 +595,14 @@ function HTTPRequestWidget({ nodeId, data }: WidgetProps) {
     responseVariable?: string;
     timeout?: number;
     storeHeaders?: boolean;
+    credential_id?: number | null;
   };
 
   return (
     <div className="space-y-3">
+      {/* Credential selector — id stored as credential_id in node data */}
+      <CredentialSelectField nodeId={nodeId} data={data} dataKey="credential_id" />
+
       <div className="flex flex-col gap-2">
         <Label>HTTP Metod</Label>
         <Select
