@@ -245,6 +245,12 @@ interface CredentialFormModalProps {
   editItem?: CredentialListItem | null;
   /** Called after successful create/update */
   onSuccess?: (credential: CredentialListItem) => void;
+  /**
+   * When set, skips the type-picker step and locks the form to this
+   * credential type key (e.g. "telegram", "openai"). The user cannot
+   * change the type.
+   */
+  lockedTypeKey?: string;
 }
 
 export function CredentialFormModal({
@@ -252,14 +258,16 @@ export function CredentialFormModal({
   onOpenChange,
   editItem,
   onSuccess,
+  lockedTypeKey,
 }: CredentialFormModalProps) {
   const { types, typesLoading, loadTypes } = useCredentialTypesStore();
   const { createCredential, updateCredential } = useCredentialStore();
 
   const isEdit = Boolean(editItem);
 
-  // Step 1 = type picker, step 2 = data form
-  const [step, setStep] = useState<1 | 2>(isEdit ? 2 : 1);
+  // Step 1 = type picker, step 2 = data form.
+  // When lockedTypeKey is provided we go straight to step 2.
+  const [step, setStep] = useState<1 | 2>(isEdit || lockedTypeKey ? 2 : 1);
   const [selectedType, setSelectedType] = useState<CredentialType | null>(null);
   const [name, setName] = useState("");
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
@@ -288,12 +296,27 @@ export function CredentialFormModal({
       }
       setFieldValues(initialValues);
     } else {
-      setStep(1);
-      setSelectedType(null);
+      // Reset to locked type (or no type) for new credential
+      const lockedType = lockedTypeKey
+        ? (types?.find((t) => t.key === lockedTypeKey) ?? null)
+        : null;
+      setStep(lockedTypeKey ? 2 : 1);
+      setSelectedType(lockedType);
       setName("");
-      setFieldValues({});
+      // Pre-fill defaults for locked type if already loaded
+      if (lockedType) {
+        const defaults: Record<string, string> = {};
+        lockedType.fields.forEach((f) => {
+          if (f.default !== undefined && f.default !== null) {
+            defaults[f.name] = String(f.default);
+          }
+        });
+        setFieldValues(defaults);
+      } else {
+        setFieldValues({});
+      }
     }
-  }, [open, isEdit, editItem?.id]);
+  }, [open, isEdit, editItem?.id, lockedTypeKey]);
 
   // Load types on open
   useEffect(() => {
@@ -309,6 +332,23 @@ export function CredentialFormModal({
       if (matched && !selectedType) setSelectedType(matched);
     }
   }, [types, open]);
+
+  // Resolve locked type once types list arrives (modal may open before fetch)
+  useEffect(() => {
+    if (!open || !lockedTypeKey || !types || selectedType) return;
+    const matched = types.find((t) => t.key === lockedTypeKey) ?? null;
+    if (matched) {
+      setSelectedType(matched);
+      setStep(2);
+      const defaults: Record<string, string> = {};
+      matched.fields.forEach((f) => {
+        if (f.default !== undefined && f.default !== null) {
+          defaults[f.name] = String(f.default);
+        }
+      });
+      setFieldValues((prev) => ({ ...defaults, ...prev }));
+    }
+  }, [types, open, lockedTypeKey]);
 
   const handleTypeSelect = (type: CredentialType) => {
     setSelectedType(type);
@@ -387,7 +427,7 @@ export function CredentialFormModal({
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {step === 2 && !isEdit ? (
+            {step === 2 && !isEdit && !lockedTypeKey ? (
               <button
                 type="button"
                 onClick={() => setStep(1)}

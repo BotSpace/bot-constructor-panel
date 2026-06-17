@@ -27,6 +27,7 @@ import {
   RichTextMessageField,
   MediaMessageField,
 } from "@/features/bot-constructor/nodes/widgets/shared-message-fields";
+import { CredentialSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CredentialSelectField";
 
 interface FieldWidgetProps {
   nodeId: string;
@@ -134,6 +135,7 @@ const PANEL_ONLY_FIELD_TYPES = new Set([
   "array-editor",
   "state-type-select",
   "collection-binding",
+  "credential",
 ]);
 
 function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
