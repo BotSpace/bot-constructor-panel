@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------
 
 export type CredentialFieldType = "text" | "password" | "number" | "select" | "textarea";
-export type CredentialMode = "apikey" | "bearer" | "header" | "basic" | "none";
+export type CredentialMode = "apikey" | "bearer" | "header" | "basic" | "none" | "oauth2";
 
 export interface CredentialFieldOption {
   value: string;
@@ -29,6 +29,10 @@ export interface CredentialType {
   fields: CredentialFieldDef[];
   system?: boolean;
   owner?: number | null;
+  /** OAuth2-only: provider key (e.g. "google") */
+  provider?: string;
+  /** OAuth2-only: requested scopes */
+  scopes?: string[];
 }
 
 // List / detail: secret fields are masked as "••••last4" or null

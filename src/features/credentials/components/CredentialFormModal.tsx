@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,8 +20,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Eye, EyeOff, ChevronLeft } from "lucide-react";
+import {
+  Loader2,
+  Eye,
+  EyeOff,
+  ChevronLeft,
+  Key,
+  Shield,
+  Mail,
+  Table,
+  Folder,
+  Send,
+  User,
+  Globe,
+  List,
+  LucideIcon,
+  ExternalLink,
+  CheckCircle2,
+  RefreshCw,
+} from "lucide-react";
 import toast from "react-hot-toast";
+import { instanceAuth } from "@/services/instance";
 import { useCredentialTypesStore, useCredentialStore } from "@/features/credentials/store";
 import {
   CredentialType,
@@ -31,14 +50,29 @@ import {
 import { cn } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Icon map: registry icon string → lucide component
 // ---------------------------------------------------------------------------
 
-function maskLabel(value: string | null | undefined): string {
-  if (!value) return "";
-  // Backend returns "••••last4" style — just show it as placeholder hint
-  return value;
+const ICON_MAP: Record<string, LucideIcon> = {
+  key: Key,
+  shield: Shield,
+  mail: Mail,
+  table: Table,
+  folder: Folder,
+  send: Send,
+  user: User,
+  globe: Globe,
+  list: List,
+};
+
+function getTypeIcon(iconName: string | undefined): LucideIcon {
+  if (!iconName) return Key;
+  return ICON_MAP[iconName] ?? Key;
 }
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function isMasked(value: string | null | undefined): boolean {
   return typeof value === "string" && value.startsWith("••••");
@@ -123,7 +157,7 @@ function FieldRenderer({ field, value, isEdit, onChange }: FieldRendererProps) {
 }
 
 // ---------------------------------------------------------------------------
-// Step 1 — pick credential type
+// Step 1 — card grid type picker
 // ---------------------------------------------------------------------------
 
 function TypePicker({
@@ -148,33 +182,36 @@ function TypePicker({
         onChange={(e) => setSearch(e.target.value)}
         autoFocus
       />
-      <div className="max-h-[320px] overflow-y-auto space-y-1 pr-1">
+      <div className="max-h-[320px] overflow-y-auto pr-0.5">
         {filtered.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground py-8">
             Hech narsa topilmadi
           </p>
         ) : (
-          filtered.map((type) => (
-            <button
-              key={type.key}
-              type="button"
-              onClick={() => onSelect(type)}
-              className={cn(
-                "flex w-full items-center gap-3 rounded-lg border px-4 py-3",
-                "text-left hover:bg-muted/40 transition-colors"
-              )}
-            >
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{type.label}</p>
-                <p className="text-xs text-muted-foreground">{type.mode}</p>
-              </div>
-              {type.system && (
-                <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
-                  Tizimiy
-                </span>
-              )}
-            </button>
-          ))
+          <div className="grid grid-cols-3 gap-2">
+            {filtered.map((type) => {
+              const Icon = getTypeIcon(type.icon);
+              return (
+                <button
+                  key={type.key}
+                  type="button"
+                  onClick={() => onSelect(type)}
+                  className={cn(
+                    "flex flex-col items-center gap-1.5 rounded-lg border p-3",
+                    "hover:bg-muted/50 hover:border-primary/40 transition-colors",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  )}
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
+                    <Icon className="h-4 w-4 text-foreground" />
+                  </div>
+                  <span className="text-[11px] font-medium text-center leading-tight line-clamp-2">
+                    {type.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
@@ -182,7 +219,7 @@ function TypePicker({
 }
 
 // ---------------------------------------------------------------------------
-// Step 2 — credential data form
+// Step 2a — credential data form (non-oauth types)
 // ---------------------------------------------------------------------------
 
 interface DataFormProps {
@@ -235,6 +272,147 @@ function DataForm({
 }
 
 // ---------------------------------------------------------------------------
+// Step 2b — OAuth2 connect panel
+// ---------------------------------------------------------------------------
+
+interface OAuthConnectProps {
+  type: CredentialType;
+  /** When editing, the existing credential's account email (if available) */
+  accountEmail?: string | null;
+  onSuccess: () => void;
+}
+
+function OAuthConnect({ type, accountEmail, onSuccess }: OAuthConnectProps) {
+  const [connecting, setConnecting] = useState(false);
+  const listenerRef = useRef<((e: MessageEvent) => void) | null>(null);
+
+  // Clean up message listener on unmount
+  useEffect(() => {
+    return () => {
+      if (listenerRef.current) {
+        window.removeEventListener("message", listenerRef.current);
+        listenerRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleConnect = async () => {
+    if (connecting) return;
+    setConnecting(true);
+
+    try {
+      const { data } = await instanceAuth.post(
+        `/v1/credentials/oauth/${type.provider}/start/`,
+        { type_key: type.key }
+      );
+      // Unwrap envelope if present
+      const payload = (data?.data ?? data) as { authorize_url?: string };
+      const authorizeUrl = payload?.authorize_url;
+
+      if (!authorizeUrl) {
+        toast.error("OAuth URL olinmadi");
+        setConnecting(false);
+        return;
+      }
+
+      // Remove any previous listener
+      if (listenerRef.current) {
+        window.removeEventListener("message", listenerRef.current);
+      }
+
+      // Open OAuth popup
+      const popup = window.open(authorizeUrl, "oauth", "width=520,height=640");
+
+      // Detect popup closed without postMessage (user closed manually)
+      const pollClosed = setInterval(() => {
+        if (popup?.closed) {
+          clearInterval(pollClosed);
+          if (listenerRef.current) {
+            window.removeEventListener("message", listenerRef.current);
+            listenerRef.current = null;
+          }
+          setConnecting(false);
+        }
+      }, 500);
+
+      // Listen for postMessage from callback page
+      const handler = (e: MessageEvent) => {
+        if (!e.data || e.data.type !== "credential-oauth") return;
+
+        clearInterval(pollClosed);
+        window.removeEventListener("message", handler);
+        listenerRef.current = null;
+        setConnecting(false);
+
+        if (e.data.ok === true) {
+          toast.success("Muvaffaqiyatli ulandi");
+          onSuccess();
+        } else {
+          toast.error(
+            e.data.error
+              ? `OAuth xatoligi: ${e.data.error}`
+              : "OAuth ulashda xatolik"
+          );
+        }
+      };
+
+      listenerRef.current = handler;
+      window.addEventListener("message", handler);
+    } catch {
+      toast.error("OAuth boshlanmadi");
+      setConnecting(false);
+    }
+  };
+
+  const Icon = getTypeIcon(type.icon);
+  const isReconnect = Boolean(accountEmail);
+
+  return (
+    <div className="flex flex-col items-center justify-center gap-5 py-6">
+      <div className="flex h-14 w-14 items-center justify-center rounded-xl border bg-muted">
+        <Icon className="h-7 w-7 text-foreground" />
+      </div>
+
+      {isReconnect ? (
+        <div className="flex flex-col items-center gap-1 text-center">
+          <div className="flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400">
+            <CheckCircle2 className="h-4 w-4" />
+            <span>Ulangan</span>
+          </div>
+          {accountEmail ? (
+            <p className="text-xs text-muted-foreground">{accountEmail}</p>
+          ) : null}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground text-center max-w-[260px]">
+          {type.label} ga ulanish uchun quyidagi tugmani bosing
+        </p>
+      )}
+
+      <Button
+        onClick={handleConnect}
+        disabled={connecting}
+        variant={isReconnect ? "outline" : "default"}
+        className="gap-2"
+      >
+        {connecting ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : isReconnect ? (
+          <RefreshCw className="h-4 w-4" />
+        ) : (
+          <ExternalLink className="h-4 w-4" />
+        )}
+        {connecting
+          ? "Kutilmoqda..."
+          : isReconnect
+            ? "Qayta ulash"
+            : `${type.label} bilan ulash`}
+      </Button>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main modal
 // ---------------------------------------------------------------------------
 
@@ -244,7 +422,7 @@ interface CredentialFormModalProps {
   /** Pass existing credential to enter edit mode */
   editItem?: CredentialListItem | null;
   /** Called after successful create/update */
-  onSuccess?: (credential: CredentialListItem) => void;
+  onSuccess?: (credential?: CredentialListItem) => void;
   /**
    * When set, skips the type-picker step and locks the form to this
    * credential type key (e.g. "telegram", "openai"). The user cannot
@@ -261,11 +439,11 @@ export function CredentialFormModal({
   lockedTypeKey,
 }: CredentialFormModalProps) {
   const { types, typesLoading, loadTypes } = useCredentialTypesStore();
-  const { createCredential, updateCredential } = useCredentialStore();
+  const { createCredential, updateCredential, loadCredentials } = useCredentialStore();
 
   const isEdit = Boolean(editItem);
 
-  // Step 1 = type picker, step 2 = data form.
+  // Step 1 = type picker, step 2 = data form (or oauth connect).
   // When lockedTypeKey is provided we go straight to step 2.
   const [step, setStep] = useState<1 | 2>(isEdit || lockedTypeKey ? 2 : 1);
   const [selectedType, setSelectedType] = useState<CredentialType | null>(null);
@@ -281,29 +459,23 @@ export function CredentialFormModal({
       setStep(2);
       setName(editItem.name);
 
-      // Find the matching type from loaded types
       const matchedType = types?.find((t) => t.key === editItem.type.key) ?? null;
       setSelectedType(matchedType);
 
-      // Seed field values from masked data (show masked placeholders)
       const initialValues: Record<string, string> = {};
       if (editItem.data) {
         Object.entries(editItem.data).forEach(([k, v]) => {
-          // For masked (secret) fields, leave empty so user can type new value
-          // or leave blank to keep existing
           initialValues[k] = isMasked(v) ? "" : (v ?? "");
         });
       }
       setFieldValues(initialValues);
     } else {
-      // Reset to locked type (or no type) for new credential
       const lockedType = lockedTypeKey
         ? (types?.find((t) => t.key === lockedTypeKey) ?? null)
         : null;
       setStep(lockedTypeKey ? 2 : 1);
       setSelectedType(lockedType);
       setName("");
-      // Pre-fill defaults for locked type if already loaded
       if (lockedType) {
         const defaults: Record<string, string> = {};
         lockedType.fields.forEach((f) => {
@@ -316,6 +488,7 @@ export function CredentialFormModal({
         setFieldValues({});
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, isEdit, editItem?.id, lockedTypeKey]);
 
   // Load types on open
@@ -323,17 +496,19 @@ export function CredentialFormModal({
     if (open && !types && !typesLoading) {
       loadTypes();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  // When type is selected in edit mode, also load
+  // When types load in edit mode, resolve the type object
   useEffect(() => {
     if (open && types && isEdit && editItem) {
       const matched = types.find((t) => t.key === editItem.type.key) ?? null;
       if (matched && !selectedType) setSelectedType(matched);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [types, open]);
 
-  // Resolve locked type once types list arrives (modal may open before fetch)
+  // Resolve locked type once types list arrives
   useEffect(() => {
     if (!open || !lockedTypeKey || !types || selectedType) return;
     const matched = types.find((t) => t.key === lockedTypeKey) ?? null;
@@ -348,11 +523,11 @@ export function CredentialFormModal({
       });
       setFieldValues((prev) => ({ ...defaults, ...prev }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [types, open, lockedTypeKey]);
 
   const handleTypeSelect = (type: CredentialType) => {
     setSelectedType(type);
-    // Pre-fill defaults
     const defaults: Record<string, string> = {};
     type.fields.forEach((f) => {
       if (f.default !== undefined && f.default !== null) {
@@ -374,7 +549,6 @@ export function CredentialFormModal({
     for (const field of selectedType.fields) {
       if (!field.required) continue;
       const val = fieldValues[field.name] ?? "";
-      // In edit mode, if secret field is empty => keep existing (ok)
       if (!val && isEdit && field.secret) continue;
       if (!val) return `"${field.label}" maydoni to'ldirilishi shart`;
     }
@@ -390,11 +564,10 @@ export function CredentialFormModal({
 
     setSaving(true);
     try {
-      // Build data: skip empty secret fields in edit mode
       const data: Record<string, string | number> = {};
       selectedType!.fields.forEach((f) => {
         const val = fieldValues[f.name] ?? "";
-        if (isEdit && f.secret && !val) return; // keep existing
+        if (isEdit && f.secret && !val) return;
         if (val !== "") {
           data[f.name] = f.type === "number" ? Number(val) : val;
         }
@@ -422,6 +595,31 @@ export function CredentialFormModal({
     }
   };
 
+  // Resolve whether current type is oauth2
+  const isOAuth2 = selectedType?.mode === "oauth2";
+
+  // For oauth edit mode: find account_email from editItem.data
+  const accountEmail =
+    isEdit && editItem?.data?.account_email
+      ? (editItem.data.account_email ?? null)
+      : null;
+
+  // OAuth success: close modal + refresh list + call parent
+  const handleOAuthSuccess = () => {
+    loadCredentials();
+    onSuccess?.();
+    onOpenChange(false);
+  };
+
+  // Dialog title
+  const dialogTitle = isEdit
+    ? "Credential tahrirlash"
+    : step === 1
+      ? "Credential turi tanlang"
+      : selectedType
+        ? selectedType.label
+        : "Credential yaratish";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[520px]">
@@ -436,13 +634,7 @@ export function CredentialFormModal({
                 <ChevronLeft className="h-4 w-4" />
               </button>
             ) : null}
-            {isEdit
-              ? "Credential tahrirlash"
-              : step === 1
-                ? "Credential turi tanlang"
-                : selectedType
-                  ? selectedType.label
-                  : "Credential yaratish"}
+            {dialogTitle}
           </DialogTitle>
           {step === 1 ? (
             <DialogDescription>
@@ -461,14 +653,22 @@ export function CredentialFormModal({
               <TypePicker types={types ?? []} onSelect={handleTypeSelect} />
             )
           ) : selectedType ? (
-            <DataForm
-              type={selectedType}
-              name={name}
-              onNameChange={setName}
-              fieldValues={fieldValues}
-              onFieldChange={handleFieldChange}
-              isEdit={isEdit}
-            />
+            isOAuth2 ? (
+              <OAuthConnect
+                type={selectedType}
+                accountEmail={accountEmail}
+                onSuccess={handleOAuthSuccess}
+              />
+            ) : (
+              <DataForm
+                type={selectedType}
+                name={name}
+                onNameChange={setName}
+                fieldValues={fieldValues}
+                onFieldChange={handleFieldChange}
+                isEdit={isEdit}
+              />
+            )
           ) : (
             <div className="flex items-center justify-center py-10">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -476,7 +676,8 @@ export function CredentialFormModal({
           )}
         </div>
 
-        {step === 2 ? (
+        {/* Footer: only show Save/Create for non-oauth data forms */}
+        {step === 2 && !isOAuth2 ? (
           <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
               Bekor qilish
