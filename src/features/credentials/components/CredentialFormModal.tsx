@@ -284,15 +284,13 @@ interface OAuthConnectProps {
 
 function OAuthConnect({ type, accountEmail, onSuccess }: OAuthConnectProps) {
   const [connecting, setConnecting] = useState(false);
-  const listenerRef = useRef<((e: MessageEvent) => void) | null>(null);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
-  // Clean up message listener on unmount
+  // Tear down listeners/timers/popup on unmount
   useEffect(() => {
     return () => {
-      if (listenerRef.current) {
-        window.removeEventListener("message", listenerRef.current);
-        listenerRef.current = null;
-      }
+      cleanupRef.current?.();
+      cleanupRef.current = null;
     };
   }, []);
 
@@ -300,12 +298,36 @@ function OAuthConnect({ type, accountEmail, onSuccess }: OAuthConnectProps) {
     if (connecting) return;
     setConnecting(true);
 
+    let settled = false;
+    const finish = (ok: boolean, errMsg?: string | null) => {
+      if (settled) return;
+      settled = true;
+      cleanupRef.current?.();
+      cleanupRef.current = null;
+      setConnecting(false);
+      if (ok) {
+        toast.success("Muvaffaqiyatli ulandi");
+        onSuccess();
+      } else if (errMsg) {
+        toast.error(errMsg);
+      }
+    };
+
+    const fetchList = async (): Promise<CredentialListItem[]> => {
+      const { data } = await instanceAuth.get(`/v1/credentials/`, {
+        params: { type_key: type.key, page: 1, page_size: 50 },
+      });
+      const raw = (data ?? {}) as Record<string, unknown>;
+      const inner = raw.data as Record<string, unknown> | undefined;
+      const candidates: unknown[] = [raw.results, inner?.results, inner, data];
+      return (candidates.find(Array.isArray) as CredentialListItem[] | undefined) ?? [];
+    };
+
     try {
       const { data } = await instanceAuth.post(
         `/v1/credentials/oauth/${type.provider}/start/`,
         { type_key: type.key }
       );
-      // Unwrap envelope if present
       const payload = (data?.data ?? data) as { authorize_url?: string };
       const authorizeUrl = payload?.authorize_url;
 
@@ -315,52 +337,65 @@ function OAuthConnect({ type, accountEmail, onSuccess }: OAuthConnectProps) {
         return;
       }
 
-      // Remove any previous listener
-      if (listenerRef.current) {
-        window.removeEventListener("message", listenerRef.current);
+      // Snapshot existing credentials of this type so we can detect the new/updated one.
+      const snapshot = new Set<string>();
+      try {
+        (await fetchList()).forEach((c) =>
+          snapshot.add(`${c.id}:${c.updated_at}`)
+        );
+      } catch {
+        /* empty snapshot still works */
       }
 
-      // Open OAuth popup
       const popup = window.open(authorizeUrl, "oauth", "width=520,height=640");
 
-      // Detect popup closed without postMessage (user closed manually)
-      const pollClosed = setInterval(() => {
-        if (popup?.closed) {
-          clearInterval(pollClosed);
-          if (listenerRef.current) {
-            window.removeEventListener("message", listenerRef.current);
-            listenerRef.current = null;
-          }
-          setConnecting(false);
-        }
-      }, 500);
-
-      // Listen for postMessage from callback page
+      // Fast path: postMessage from the callback page. Google sets COOP on its consent
+      // pages which severs window.opener, so this often never arrives — the poll below
+      // is the reliable path.
       const handler = (e: MessageEvent) => {
         if (!e.data || e.data.type !== "credential-oauth") return;
-
-        clearInterval(pollClosed);
-        window.removeEventListener("message", handler);
-        listenerRef.current = null;
-        setConnecting(false);
-
-        if (e.data.ok === true) {
-          toast.success("Muvaffaqiyatli ulandi");
-          onSuccess();
-        } else {
-          toast.error(
-            e.data.error
-              ? `OAuth xatoligi: ${e.data.error}`
-              : "OAuth ulashda xatolik"
+        if (e.data.ok === true) finish(true);
+        else
+          finish(
+            false,
+            e.data.error ? `OAuth xatoligi: ${e.data.error}` : "OAuth ulashda xatolik"
           );
+      };
+      window.addEventListener("message", handler);
+
+      // Reliable path: poll the backend until a credential for this type appears/updates.
+      const poll = setInterval(async () => {
+        try {
+          const now = await fetchList();
+          if (now.some((c) => !snapshot.has(`${c.id}:${c.updated_at}`))) {
+            finish(true);
+          }
+        } catch {
+          /* keep polling */
+        }
+      }, 2500);
+
+      // If the user closes the popup, give the poll a few cycles, then silently cancel.
+      let graceTicks = 0;
+      const closeWatch = setInterval(() => {
+        if (popup?.closed && ++graceTicks >= 8) finish(false, null);
+      }, 500);
+
+      const timeout = setTimeout(() => finish(false, null), 180000);
+
+      cleanupRef.current = () => {
+        window.removeEventListener("message", handler);
+        clearInterval(poll);
+        clearInterval(closeWatch);
+        clearTimeout(timeout);
+        try {
+          popup?.close();
+        } catch {
+          /* close may be blocked — harmless */
         }
       };
-
-      listenerRef.current = handler;
-      window.addEventListener("message", handler);
     } catch {
-      toast.error("OAuth boshlanmadi");
-      setConnecting(false);
+      finish(false, "OAuth boshlanmadi");
     }
   };
 
