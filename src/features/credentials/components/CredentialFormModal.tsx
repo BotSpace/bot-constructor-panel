@@ -241,7 +241,6 @@ function DataForm({
 interface CredentialFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  projectId: string;
   /** Pass existing credential to enter edit mode */
   editItem?: CredentialListItem | null;
   /** Called after successful create/update */
@@ -251,7 +250,6 @@ interface CredentialFormModalProps {
 export function CredentialFormModal({
   open,
   onOpenChange,
-  projectId,
   editItem,
   onSuccess,
 }: CredentialFormModalProps) {
@@ -364,10 +362,10 @@ export function CredentialFormModal({
 
       let result: CredentialListItem;
       if (isEdit && editItem) {
-        result = await updateCredential(projectId, editItem.id, { name: name.trim(), data });
+        result = await updateCredential(editItem.id, { name: name.trim(), data });
         toast.success("Credential yangilandi");
       } else {
-        result = await createCredential(projectId, {
+        result = await createCredential({
           name: name.trim(),
           type_key: selectedType!.key,
           data,

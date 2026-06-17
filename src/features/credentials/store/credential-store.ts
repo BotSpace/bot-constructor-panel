@@ -6,7 +6,6 @@ import {
   CredentialType,
   CreateCredentialPayload,
   PatchCredentialPayload,
-  CreateCredentialTypePayload,
 } from "@/types/http/credential";
 
 // ---------------------------------------------------------------------------
@@ -26,14 +25,13 @@ function extractResults<T>(raw: unknown): T[] {
 }
 
 // ---------------------------------------------------------------------------
-// Types store (global, not project-scoped)
+// Types store — READ-ONLY registry, defined in backend code (not user-created).
 // ---------------------------------------------------------------------------
 
 type CredentialTypesStore = {
   types: CredentialType[] | null;
   typesLoading: boolean;
   loadTypes: () => void;
-  createType: (payload: CreateCredentialTypePayload) => Promise<CredentialType>;
 };
 
 export const useCredentialTypesStore = create<CredentialTypesStore>((set, get) => ({
@@ -55,17 +53,11 @@ export const useCredentialTypesStore = create<CredentialTypesStore>((set, get) =
       })
       .finally(() => set({ typesLoading: false }));
   },
-
-  async createType(payload) {
-    const { data } = await instanceAuth.post("/v1/credentials/types/", payload);
-    const created: CredentialType = data?.data ?? data;
-    set((s) => ({ types: [...(s.types ?? []), created] }));
-    return created;
-  },
 }));
 
 // ---------------------------------------------------------------------------
-// Project credentials store
+// Credentials store — GLOBAL per user (owner-scoped). NOT project-scoped:
+// one credential set is shared across all of the user's bots/projects.
 // ---------------------------------------------------------------------------
 
 type CredentialStore = {
@@ -75,13 +67,13 @@ type CredentialStore = {
   page: number;
   pageSize: number;
   typeFilter: string;
-  loadCredentials: (projectId: string, opts?: { page?: number; type?: string }) => void;
+  loadCredentials: (opts?: { page?: number; type?: string }) => void;
   setPage: (page: number) => void;
   setTypeFilter: (type: string) => void;
-  createCredential: (projectId: string, payload: CreateCredentialPayload) => Promise<CredentialListItem>;
-  updateCredential: (projectId: string, id: number, payload: PatchCredentialPayload) => Promise<CredentialListItem>;
-  deleteCredential: (projectId: string, id: number) => Promise<void>;
-  testCredential: (projectId: string, id: number) => Promise<{ ok: boolean }>;
+  createCredential: (payload: CreateCredentialPayload) => Promise<CredentialListItem>;
+  updateCredential: (id: number, payload: PatchCredentialPayload) => Promise<CredentialListItem>;
+  deleteCredential: (id: number) => Promise<void>;
+  testCredential: (id: number) => Promise<{ ok: boolean }>;
 };
 
 export const useCredentialStore = create<CredentialStore>((set, get) => ({
@@ -92,7 +84,7 @@ export const useCredentialStore = create<CredentialStore>((set, get) => ({
   pageSize: 20,
   typeFilter: "",
 
-  loadCredentials(projectId, opts) {
+  loadCredentials(opts) {
     const { page: currentPage, pageSize, typeFilter: currentType } = get();
     const page = opts?.page ?? currentPage;
     const type = opts?.type ?? currentType;
@@ -100,10 +92,10 @@ export const useCredentialStore = create<CredentialStore>((set, get) => ({
     set({ loading: true });
 
     const params: Record<string, string | number> = { page, page_size: pageSize };
-    if (type) params.type = type;
+    if (type) params.type_key = type;
 
     instanceAuth
-      .get(`/v1/credentials/projects/${projectId}/credentials/`, { params })
+      .get(`/v1/credentials/`, { params })
       .then(({ data }) => {
         const results = extractResults<CredentialListItem>(data);
         const raw = (data ?? {}) as Record<string, unknown>;
@@ -129,11 +121,8 @@ export const useCredentialStore = create<CredentialStore>((set, get) => ({
     set({ typeFilter: type, page: 1 });
   },
 
-  async createCredential(projectId, payload) {
-    const { data } = await instanceAuth.post(
-      `/v1/credentials/projects/${projectId}/credentials/`,
-      payload
-    );
+  async createCredential(payload) {
+    const { data } = await instanceAuth.post(`/v1/credentials/`, payload);
     const created: CredentialListItem = data?.data ?? data;
     set((s) => ({
       credentials: [created, ...(s.credentials ?? [])],
@@ -142,11 +131,8 @@ export const useCredentialStore = create<CredentialStore>((set, get) => ({
     return created;
   },
 
-  async updateCredential(projectId, id, payload) {
-    const { data } = await instanceAuth.patch(
-      `/v1/credentials/projects/${projectId}/credentials/${id}/`,
-      payload
-    );
+  async updateCredential(id, payload) {
+    const { data } = await instanceAuth.patch(`/v1/credentials/${id}/`, payload);
     const updated: CredentialListItem = data?.data ?? data;
     set((s) => ({
       credentials: (s.credentials ?? []).map((c) => (c.id === id ? updated : c)),
@@ -154,18 +140,16 @@ export const useCredentialStore = create<CredentialStore>((set, get) => ({
     return updated;
   },
 
-  async deleteCredential(projectId, id) {
-    await instanceAuth.delete(`/v1/credentials/projects/${projectId}/credentials/${id}/`);
+  async deleteCredential(id) {
+    await instanceAuth.delete(`/v1/credentials/${id}/`);
     set((s) => ({
       credentials: (s.credentials ?? []).filter((c) => c.id !== id),
       total: Math.max(0, s.total - 1),
     }));
   },
 
-  async testCredential(projectId, id) {
-    const { data } = await instanceAuth.post(
-      `/v1/credentials/projects/${projectId}/credentials/${id}/test/`
-    );
+  async testCredential(id) {
+    const { data } = await instanceAuth.post(`/v1/credentials/${id}/test/`);
     return data?.data ?? data;
   },
 }));
