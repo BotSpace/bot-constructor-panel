@@ -22,6 +22,7 @@ import { ArrayEditorField } from "@/features/bot-constructor/nodes/widgets/gener
 import { CodeEditorField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CodeEditorField";
 import { ToolParamsField } from "@/features/bot-constructor/nodes/widgets/generic-fields/ToolParamsField";
 import { CollectionSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CollectionSelectField";
+import { CredentialSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CredentialSelectField";
 import { StateTypeSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/StateTypeSelectField";
 import { ConditionListField } from "@/features/bot-constructor/nodes/widgets/generic-fields/ConditionListField";
 import { CronEditorField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CronEditorField";
@@ -268,6 +269,19 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         nodeId={nodeId}
         data={data}
         field={field as Parameters<typeof DynamicParamsField>[0]["field"]}
+      />
+    );
+  }
+
+  if (field.type === "credential") {
+    return (
+      <CredentialSelectField
+        nodeId={nodeId}
+        data={data}
+        dataKey={field.key || "credential_id"}
+        typeKey={field.credentialType}
+        label={field.label}
+        required={false}
       />
     );
   }

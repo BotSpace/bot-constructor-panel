@@ -96,7 +96,9 @@ export interface NodeFieldManifest {
     | "nested-rows"
     // Collection binding (generic; collection + field mapping + filter +
     // pagination — reusable in any node, not only keyboard buttons)
-    | "collection-binding";
+    | "collection-binding"
+    // Credential selector — shows only credentials matching `credentialType`
+    | "credential";
   key?: string;
   widgetKey?: string;
   label?: string;
@@ -159,6 +161,11 @@ export interface NodeFieldManifest {
   schemaKey?: string;
   paramsKey?: string;
   descriptionKey?: string;
+  // credential field
+  /** Required credential type key (e.g. "telegram", "openai"). When set the
+   *  selector shows only credentials of this type and the "new credential"
+   *  dialog opens pre-locked to this type. Omit to show all credentials. */
+  credentialType?: string;
   // nested-rows
   addRowLabel?: string;
   addColumnLabel?: string;
