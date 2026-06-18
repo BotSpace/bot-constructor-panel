@@ -12,6 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   getEnvList,
   createEnv,
@@ -29,6 +31,7 @@ import {
   X,
   Eye,
   EyeOff,
+  Lock,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -42,7 +45,10 @@ interface EditingEnv {
   id: number | null;
   key: string;
   value: string;
+  secret: boolean;
 }
+
+const MASKED = "••••••••";
 
 export function EnvManageDialog({
   open,
@@ -54,7 +60,8 @@ export function EnvManageDialog({
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState<EditingEnv | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [visibleValues, setVisibleValues] = useState<Set<number>>(new Set());
+  const [visibleIds, setVisibleIds] = useState<Set<number>>(new Set());
+  const [showEditValue, setShowEditValue] = useState(false);
 
   const fetchEnvs = useCallback(async () => {
     if (!projectId) return;
@@ -73,20 +80,24 @@ export function EnvManageDialog({
     if (open) {
       fetchEnvs();
       setEditing(null);
-      setVisibleValues(new Set());
+      setVisibleIds(new Set());
+      setShowEditValue(false);
     }
   }, [open, fetchEnvs]);
 
   const handleStartCreate = () => {
-    setEditing({ id: null, key: "", value: "" });
+    setEditing({ id: null, key: "", value: "", secret: false });
+    setShowEditValue(true);
   };
 
   const handleStartEdit = (env: Env) => {
-    setEditing({ id: env.id, key: env.key, value: env.value });
+    setEditing({ id: env.id, key: env.key, value: "", secret: env.secret });
+    setShowEditValue(false);
   };
 
   const handleCancelEdit = () => {
     setEditing(null);
+    setShowEditValue(false);
   };
 
   const handleSave = async () => {
@@ -95,8 +106,13 @@ export function EnvManageDialog({
     const trimmedKey = editing.key.trim();
     const trimmedValue = editing.value.trim();
 
-    if (!trimmedKey || !trimmedValue) {
-      toast.error("Kalit va qiymat bo'sh bo'lishi mumkin emas");
+    if (!trimmedKey) {
+      toast.error("Kalit nomi bo'sh bo'lishi mumkin emas");
+      return;
+    }
+
+    if (editing.id === null && !trimmedValue) {
+      toast.error("Qiymat bo'sh bo'lishi mumkin emas");
       return;
     }
 
@@ -106,17 +122,21 @@ export function EnvManageDialog({
         await createEnv({
           key: trimmedKey,
           value: trimmedValue,
+          secret: editing.secret,
           project: projectId,
         });
         toast.success("Kalit muvaffaqiyatli qo'shildi");
       } else {
-        await updateEnv(editing.id, {
+        const payload: { key?: string; value?: string; secret?: boolean } = {
           key: trimmedKey,
-          value: trimmedValue,
-        });
+          secret: editing.secret,
+        };
+        if (trimmedValue) payload.value = trimmedValue;
+        await updateEnv(editing.id, payload);
         toast.success("Kalit muvaffaqiyatli yangilandi");
       }
       setEditing(null);
+      setShowEditValue(false);
       await fetchEnvs();
     } catch {
       toast.error(
@@ -143,8 +163,8 @@ export function EnvManageDialog({
     }
   };
 
-  const toggleValueVisibility = (id: number) => {
-    setVisibleValues((prev) => {
+  const toggleVisible = (id: number) => {
+    setVisibleIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -152,7 +172,12 @@ export function EnvManageDialog({
     });
   };
 
-  const maskValue = (value: string) => "•".repeat(Math.min(value.length, 24));
+  const displayValue = (env: Env) => {
+    if (env.secret) {
+      return visibleIds.has(env.id) ? env.value : MASKED;
+    }
+    return env.value;
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -187,19 +212,59 @@ export function EnvManageDialog({
                   disabled={saving}
                   autoFocus
                 />
-                <Input
-                  placeholder="Qiymati"
-                  value={editing.value}
-                  onChange={(e) =>
-                    setEditing({ ...editing, value: e.target.value })
+                <div className="relative">
+                  <Input
+                    placeholder={
+                      editing.id !== null
+                        ? "Yangi qiymat (o'zgartirmaslik uchun bo'sh qoldiring)"
+                        : "Qiymati"
+                    }
+                    type={showEditValue ? "text" : "password"}
+                    value={editing.value}
+                    onChange={(e) =>
+                      setEditing({ ...editing, value: e.target.value })
+                    }
+                    disabled={saving}
+                    className="pr-9"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSave();
+                      if (e.key === "Escape") handleCancelEdit();
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowEditValue((v) => !v)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showEditValue ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Secret toggle */}
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="secret-toggle"
+                  checked={editing.secret}
+                  onCheckedChange={(checked) =>
+                    setEditing({ ...editing, secret: checked })
                   }
                   disabled={saving}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSave();
-                    if (e.key === "Escape") handleCancelEdit();
-                  }}
                 />
+                <Label
+                  htmlFor="secret-toggle"
+                  className="flex items-center gap-1.5 cursor-pointer text-sm"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  Maxfiy (qiymatni API da yashirish)
+                </Label>
               </div>
+
               <div className="flex justify-end gap-2">
                 <Button
                   variant="outline"
@@ -214,7 +279,9 @@ export function EnvManageDialog({
                   size="sm"
                   onClick={handleSave}
                   disabled={
-                    saving || !editing.key.trim() || !editing.value.trim()
+                    saving ||
+                    !editing.key.trim() ||
+                    (editing.id === null && !editing.value.trim())
                   }
                 >
                   {saving ? (
@@ -247,33 +314,39 @@ export function EnvManageDialog({
                     className="flex items-center gap-3 rounded-lg border px-4 py-3 group hover:bg-muted/40 transition-colors"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-mono font-medium truncate">
-                        {env.key}
-                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-mono font-medium truncate">
+                          {env.key}
+                        </p>
+                        {env.secret && (
+                          <Lock className="w-3 h-3 text-muted-foreground shrink-0" />
+                        )}
+                      </div>
                       <p className="text-xs text-muted-foreground font-mono truncate">
-                        {visibleValues.has(env.id)
-                          ? env.value
-                          : maskValue(env.value)}
+                        {displayValue(env)}
                       </p>
                     </div>
 
                     <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => toggleValueVisibility(env.id)}
-                        title={
-                          visibleValues.has(env.id)
-                            ? "Qiymatni yashirish"
-                            : "Qiymatni ko'rsatish"
-                        }
-                      >
-                        {visibleValues.has(env.id) ? (
-                          <EyeOff className="w-4 h-4" />
-                        ) : (
-                          <Eye className="w-4 h-4" />
-                        )}
-                      </Button>
+                      {/* Show/hide toggle — only for secret vars; non-secret always readable */}
+                      {env.secret && (
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => toggleVisible(env.id)}
+                          title={
+                            visibleIds.has(env.id)
+                              ? "Qiymatni yashirish"
+                              : "Qiymatni ko'rsatish"
+                          }
+                        >
+                          {visibleIds.has(env.id) ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon-sm"
@@ -306,10 +379,7 @@ export function EnvManageDialog({
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Yopish
           </Button>
           <Button onClick={handleStartCreate} disabled={editing !== null}>
