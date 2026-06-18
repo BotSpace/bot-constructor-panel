@@ -81,6 +81,10 @@
         "name": "支払い成功",
         "description": "支払いが成功したときにトリガーされます。"
       },
+      "paymentStatus": {
+        "name": "支払いステータス",
+        "description": "Payment Linkの注文ステータスが届いたときにトリガーされます。"
+      },
       "chatJoinRequest": {
         "name": "グループ参加リクエスト",
         "description": "ユーザーがグループ参加リクエストを送ったときにトリガーされます。"

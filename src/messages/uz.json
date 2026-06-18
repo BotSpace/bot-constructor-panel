@@ -81,6 +81,10 @@
         "name": "Muvaffaqiyatli to'lov",
         "description": "To'lov muvaffaqiyatli amalga oshganda chaqiriladi."
       },
+      "paymentStatus": {
+        "name": "To'lov statusi",
+        "description": "Payment Link order statusi kelganda chaqiriladi."
+      },
       "chatJoinRequest": {
         "name": "Guruhga qo'shilish so'rovi",
         "description": "Foydalanuvchi guruhga qo'shilish so'rovi yuborganda chaqiriladi."
