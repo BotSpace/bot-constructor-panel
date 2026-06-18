@@ -136,6 +136,7 @@ const PANEL_ONLY_FIELD_TYPES = new Set([
   "state-type-select",
   "collection-binding",
   "credential",
+  "dynamic_select",
 ]);
 
 function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {

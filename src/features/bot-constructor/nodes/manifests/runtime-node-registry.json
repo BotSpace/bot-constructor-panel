@@ -6119,16 +6119,36 @@
 				]
 			},
 			{
-				"type": "text",
+				"type": "dynamic_select",
 				"key": "spreadsheet_id",
-				"label": "Spreadsheet ID",
-				"placeholder": "1AbC..."
+				"label": "Jadval (Spreadsheet)",
+				"resource": "google_spreadsheets",
+				"credentialKey": "credential_id"
+			},
+			{
+				"type": "dynamic_select",
+				"key": "sheet",
+				"label": "Varaq (Sheet)",
+				"resource": "google_sheet_tabs",
+				"credentialKey": "credential_id",
+				"dependsOn": ["spreadsheet_id"]
+			},
+			{
+				"type": "dynamic_select",
+				"key": "column",
+				"label": "Ustun (Field)",
+				"resource": "google_sheet_columns",
+				"credentialKey": "credential_id",
+				"dependsOn": ["spreadsheet_id", "sheet"],
+				"optional": true,
+				"helpText": "Sheet ustunlari — qiymat berishda {{column}} sifatida ishlatishingiz mumkin"
 			},
 			{
 				"type": "text",
 				"key": "range",
-				"label": "Range",
-				"placeholder": "Sheet1!A1"
+				"label": "Range (ixtiyoriy)",
+				"placeholder": "A1 yoki A1:C10",
+				"optional": true
 			},
 			{
 				"type": "textarea",
@@ -6148,6 +6168,8 @@
 		"defaults": {
 			"operation": "append",
 			"spreadsheet_id": "",
+			"sheet": "",
+			"column": "",
 			"range": "",
 			"values": "",
 			"responseVariable": "sheets_response"

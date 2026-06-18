@@ -98,7 +98,9 @@ export interface NodeFieldManifest {
     // pagination — reusable in any node, not only keyboard buttons)
     | "collection-binding"
     // Credential selector — shows only credentials matching `credentialType`
-    | "credential";
+    | "credential"
+    // Dynamic (load-options) select — loads options from backend via credential
+    | "dynamic_select";
   key?: string;
   widgetKey?: string;
   label?: string;
@@ -166,6 +168,13 @@ export interface NodeFieldManifest {
    *  selector shows only credentials of this type and the "new credential"
    *  dialog opens pre-locked to this type. Omit to show all credentials. */
   credentialType?: string;
+  // dynamic_select field
+  /** Resource name passed to POST /v1/credentials/options/<resource>/ */
+  resource?: string;
+  /** Data key that holds the credential id used by this dynamic field (default: "credential_id") */
+  credentialKey?: string;
+  /** Other data keys this resource depends on (their values become `params`) */
+  dependsOn?: string[];
   // nested-rows
   addRowLabel?: string;
   addColumnLabel?: string;
