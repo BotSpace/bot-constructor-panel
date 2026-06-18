@@ -24,6 +24,19 @@ function extractResults<T>(raw: unknown): T[] {
   return (candidates.find(Array.isArray) as T[] | undefined) ?? [];
 }
 
+// A Credential carries its OWN `data` field (masked values), so a naive `raw.data ?? raw`
+// unwrap would return the inner masked dict instead of the credential. Only unwrap when the
+// payload isn't already a credential (detect id/type_key).
+function unwrapCredential(raw: unknown): CredentialListItem {
+  const r = (raw ?? {}) as Record<string, unknown>;
+  if (r.id !== undefined || r.type_key !== undefined) return r as CredentialListItem;
+  const inner = r.data as Record<string, unknown> | undefined;
+  if (inner && (inner.id !== undefined || inner.type_key !== undefined)) {
+    return inner as CredentialListItem;
+  }
+  return r as CredentialListItem;
+}
+
 // ---------------------------------------------------------------------------
 // Types store — READ-ONLY registry, defined in backend code (not user-created).
 // ---------------------------------------------------------------------------
@@ -123,7 +136,7 @@ export const useCredentialStore = create<CredentialStore>((set, get) => ({
 
   async createCredential(payload) {
     const { data } = await instanceAuth.post(`/v1/credentials/`, payload);
-    const created: CredentialListItem = data?.data ?? data;
+    const created: CredentialListItem = unwrapCredential(data);
     set((s) => ({
       credentials: [created, ...(s.credentials ?? [])],
       total: s.total + 1,
@@ -133,7 +146,7 @@ export const useCredentialStore = create<CredentialStore>((set, get) => ({
 
   async updateCredential(id, payload) {
     const { data } = await instanceAuth.patch(`/v1/credentials/${id}/`, payload);
-    const updated: CredentialListItem = data?.data ?? data;
+    const updated: CredentialListItem = unwrapCredential(data);
     set((s) => ({
       credentials: (s.credentials ?? []).map((c) => (c.id === id ? updated : c)),
     }));
