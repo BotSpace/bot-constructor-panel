@@ -253,6 +253,14 @@
         "name": "HTTP So'rov",
         "description": "Tashqi API'ga so'rov yuboradi."
       },
+      "googleSheets": {
+        "name": "Google Sheets",
+        "description": "Google Sheets jadvaliga ma'lumot yozadi yoki o'qiydi."
+      },
+      "googleDrive": {
+        "name": "Google Drive",
+        "description": "Google Drive'dagi fayllar bilan ishlaydi."
+      },
       "callbackAnswer": {
         "name": "Callback Javob",
         "description": "Inline tugma bosilganda javob beradi."

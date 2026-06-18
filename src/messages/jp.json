@@ -257,6 +257,14 @@
         "name": "HTTPリクエスト",
         "description": "外部APIにリクエストを送信します。"
       },
+      "googleSheets": {
+        "name": "Google Sheets",
+        "description": "Google Sheetsスプレッドシートのデータを読み書きします。"
+      },
+      "googleDrive": {
+        "name": "Google Drive",
+        "description": "Google Driveのファイルを一覧、アップロード、作成、削除します。"
+      },
       "callbackAnswer": {
         "name": "コールバック応答",
         "description": "インラインボタンが押されたときに応答します。"

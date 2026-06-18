@@ -253,6 +253,14 @@
         "name": "HTTP Request",
         "description": "Sends a request to external API."
       },
+      "googleSheets": {
+        "name": "Google Sheets",
+        "description": "Read from or write to a Google Sheets spreadsheet."
+      },
+      "googleDrive": {
+        "name": "Google Drive",
+        "description": "List, upload, create or delete files in Google Drive."
+      },
       "callbackAnswer": {
         "name": "Callback Answer",
         "description": "Answers inline button is pressed."

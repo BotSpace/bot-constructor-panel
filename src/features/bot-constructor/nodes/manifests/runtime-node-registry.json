@@ -6033,5 +6033,186 @@
     "defaults": {
       "resultVar": "invite_link"
     }
+  },
+  {
+    "type": "GoogleSheetsNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.googleSheets.name",
+    "descriptionKey": "constructor.integrations.googleSheets.description",
+    "titleFallback": "Google Sheets",
+    "descriptionFallback": "Google Sheets jadvaliga ma'lumot yozadi yoki o'qiydi.",
+    "iconName": "table",
+    "colorToken": "integration-green",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "integrations",
+      "sortOrder": 200,
+      "elementType": "google_sheets"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "credential",
+        "key": "credential_id",
+        "credentialType": "google_sheets",
+        "label": "Google Sheets credential"
+      },
+      {
+        "type": "select",
+        "key": "operation",
+        "label": "Amal",
+        "options": [
+          { "value": "append", "label": "Qator qo'shish" },
+          { "value": "read", "label": "O'qish" },
+          { "value": "update", "label": "Yangilash" },
+          { "value": "clear", "label": "Tozalash" }
+        ]
+      },
+      {
+        "type": "text",
+        "key": "spreadsheet_id",
+        "label": "Spreadsheet ID",
+        "placeholder": "1AbC..."
+      },
+      {
+        "type": "text",
+        "key": "range",
+        "label": "Range",
+        "placeholder": "Sheet1!A1"
+      },
+      {
+        "type": "textarea",
+        "key": "values",
+        "label": "Values (JSON 2D)",
+        "placeholder": "[[\"a\",\"b\"]]",
+        "optional": true
+      },
+      {
+        "type": "text",
+        "key": "responseVariable",
+        "label": "Natija o'zgaruvchisi",
+        "placeholder": "sheets_response",
+        "optional": true
+      }
+    ],
+    "defaults": {
+      "operation": "append",
+      "spreadsheet_id": "",
+      "range": "",
+      "values": "",
+      "responseVariable": "sheets_response"
+    },
+    "producesState": [
+      "sheets_response",
+      "sheets_success"
+    ]
+  },
+  {
+    "type": "GoogleDriveNode",
+    "status": "runtime",
+    "category": "integrations",
+    "titleKey": "constructor.integrations.googleDrive.name",
+    "descriptionKey": "constructor.integrations.googleDrive.description",
+    "titleFallback": "Google Drive",
+    "descriptionFallback": "Google Drive'dagi fayllar bilan ishlaydi.",
+    "iconName": "folder",
+    "colorToken": "integration-green",
+    "size": {
+      "width": 150
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "integrations",
+      "sortOrder": 210,
+      "elementType": "google_drive"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "credential",
+        "key": "credential_id",
+        "credentialType": "google_drive",
+        "label": "Google Drive credential"
+      },
+      {
+        "type": "select",
+        "key": "operation",
+        "label": "Amal",
+        "options": [
+          { "value": "list", "label": "Ro'yxat" },
+          { "value": "create_folder", "label": "Papka yaratish" },
+          { "value": "upload", "label": "Fayl yuklash" },
+          { "value": "delete", "label": "O'chirish" }
+        ]
+      },
+      {
+        "type": "text",
+        "key": "query",
+        "label": "Qidiruv (q)",
+        "optional": true
+      },
+      {
+        "type": "text",
+        "key": "file_name",
+        "label": "Fayl/papka nomi",
+        "optional": true
+      },
+      {
+        "type": "text",
+        "key": "folder_id",
+        "label": "Papka ID (parent)",
+        "optional": true
+      },
+      {
+        "type": "textarea",
+        "key": "content",
+        "label": "Matn (upload)",
+        "optional": true
+      },
+      {
+        "type": "text",
+        "key": "file_id",
+        "label": "Fayl ID (delete)",
+        "optional": true
+      },
+      {
+        "type": "text",
+        "key": "responseVariable",
+        "label": "Natija o'zgaruvchisi",
+        "placeholder": "drive_response",
+        "optional": true
+      }
+    ],
+    "defaults": {
+      "operation": "list",
+      "query": "",
+      "file_name": "",
+      "folder_id": "",
+      "content": "",
+      "file_id": "",
+      "responseVariable": "drive_response"
+    },
+    "producesState": [
+      "drive_response",
+      "drive_success"
+    ]
   }
 ]
