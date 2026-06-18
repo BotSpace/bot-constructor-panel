@@ -38,10 +38,17 @@ export function useEdgeColor(sourceHandle?: string | null) {
     selectedStroke = "#3b82f6"; // blue-500
   }
 
+  // Neutral (accessory) edge color — matches the generic/default edge so
+  // accessory edges (AI tool/provider connectors) are visually consistent with
+  // regular flow edges rather than standing out as blue.
+  const neutralStroke = isDark ? "#9ca3af" : "#6b7280"; // gray-400 / gray-500
+
   return {
     /** Default edge stroke color */
     stroke,
     /** Selected edge stroke color */
     selectedStroke,
+    /** Neutral color for accessory / non-semantic edges */
+    neutralStroke,
   };
 }
