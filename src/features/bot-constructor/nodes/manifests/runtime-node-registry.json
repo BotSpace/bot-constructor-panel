@@ -4302,15 +4302,7 @@
 				"key": "credential_id",
 				"credentialType": "openai",
 				"label": "Credential",
-				"optional": true
-			},
-			{
-				"type": "text",
-				"key": "apiKey",
-				"label": "API Key",
-				"placeholder": "sk-... or {{env.OPENAI_KEY}}",
-				"optional": true,
-				"helpText": "Credential tanlansangiz shart emas (credential'dan olinadi)."
+				"required": true
 			},
 			{
 				"type": "text",
@@ -4385,7 +4377,7 @@
 				"key": "credential_id",
 				"credentialType": "ollama",
 				"label": "Credential",
-				"optional": true
+				"required": true
 			},
 			{
 				"type": "text",
@@ -4398,14 +4390,6 @@
 				"key": "baseURL",
 				"label": "Base URL",
 				"placeholder": "https://ollama.com/v1"
-			},
-			{
-				"type": "text",
-				"key": "apiKey",
-				"label": "API Key (ollama.com uchun)",
-				"placeholder": "ollama.com dan olingan API kalit",
-				"optional": true,
-				"helpText": "Credential tanlansangiz shart emas (credential'dan olinadi)."
 			},
 			{
 				"type": "number",
@@ -4468,15 +4452,7 @@
 				"key": "credential_id",
 				"credentialType": "ai_studio",
 				"label": "Credential",
-				"optional": true
-			},
-			{
-				"type": "text",
-				"key": "apiKey",
-				"label": "API Key",
-				"placeholder": "AIzaSy... or {{env.GEMINI_KEY}}",
-				"optional": true,
-				"helpText": "Credential tanlansangiz shart emas (credential'dan olinadi)."
+				"required": true
 			},
 			{
 				"type": "text",

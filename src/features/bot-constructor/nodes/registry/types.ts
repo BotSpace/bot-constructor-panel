@@ -118,6 +118,8 @@ export interface NodeFieldManifest {
   visibleWhen?: NodeVisibilityRule;
   /** true = hidden by default; user explicitly adds via "Add option" dropdown */
   optional?: boolean;
+  /** true = field is required (shows a "required" hint; used by the credential field) */
+  required?: boolean;
   /**
    * Explicit control over whether an `optional` field is shown by default in
    * the node edit panel (overrides the value-based heuristic):
