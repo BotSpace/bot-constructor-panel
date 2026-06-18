@@ -47,6 +47,26 @@ npm run prepare       # Setup Husky git hooks
 node scripts/analyze-project.js  # Analyze codebase statistics
 ```
 
+### Local Run With Dashboard
+
+Run the dashboard and constructor together for authenticated local testing:
+
+```bash
+# terminal 1, from ../dashboard
+NODE_OPTIONS=--no-experimental-webstorage npm run dev
+
+# terminal 2, from this repo
+NODE_OPTIONS=--no-experimental-webstorage DASHBOARD_URL=http://localhost:3010 ADMIN_PANEL=http://localhost:3010 MONO=1 npx next dev --port 3001
+```
+
+- Dashboard runs on `http://localhost:3010`.
+- Constructor runs on `http://localhost:3001`.
+- Do not use bare `npm run dev` for constructor local auth testing: without `MONO=1`, Next uses the `/constructor` base path.
+- Do not leave `DASHBOARD_URL` unset locally: middleware falls back to `http://localhost:3000/login`, but the dashboard dev script uses port `3010`.
+- If running constructor from a git worktree outside the repo, make sure the worktree has the same `.env` values as the main checkout. A local symlink is fine: `ln -s /path/to/bot-constructor-panel/.env .env`.
+- Keep `SESSION_SECRET` and `SESSION_COOKIE_NAME` the same in both apps. Current defaults are `dev-secret-change-me-please-32chars` and `bm_session`.
+- On Node 25, use `NODE_OPTIONS=--no-experimental-webstorage`; otherwise SSR can fail with `localStorage.getItem is not a function`.
+
 **Husky pre-push hook** is currently disabled (skips `npm run build` due to network restrictions in CI). Re-enable when Google Fonts network access is resolved.
 
 ---

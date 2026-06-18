@@ -81,6 +81,10 @@
         "name": "Successful Payment",
         "description": "Triggered when a payment is successfully completed."
       },
+      "paymentStatus": {
+        "name": "Payment Status",
+        "description": "Triggered when a Payment Link order status arrives."
+      },
       "chatJoinRequest": {
         "name": "Chat Join Request",
         "description": "Triggered when a user sends a join request to a group."

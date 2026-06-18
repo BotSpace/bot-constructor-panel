@@ -33,6 +33,7 @@ import { useSearchStore } from "./search/search-store";
 import { debugConsoleStore } from "@/components/layout/components/debug-console/store";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { instanceAuth } from "@/services/instance";
+import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry";
 import { useTheme } from "next-themes";
 import { NodeSelectionDialog } from "./components/NodeSelectionDialog";
 import { Connection, Node } from "reactflow";
@@ -432,18 +433,39 @@ export default function Constructor() {
       if (pendingConnectionRef.current) {
         const { source, sourceHandle, position } = pendingConnectionRef.current;
 
-        // Place the new node at the same Y as the source so it lands on the same
-        // row. If that spot is already occupied by another node (e.g. a sibling
-        // branch), push the new node downward until the row is free.
+        // Place regular flow nodes on the same row as the source. Accessory
+        // nodes (AI provider/tool ports) should land below their parent port.
         const allNodes = useFlowStore.getState().nodes;
         const sourceNode = allNodes.find((n) => n.id === source);
         let adjustedPosition = position;
         if (sourceNode) {
-          const NODE_W = 280;
+          const sourceManifest = getNodeManifestByType(sourceNode.type ?? "");
+          const elementManifest = getNodeManifestByType(element.triggerId);
+          const NODE_W = elementManifest?.size.width ?? 280;
           const NODE_H = 160;
           const V_GAP = 40;
-          let candidateY = sourceNode.position.y;
-          const overlapsAt = (y: number) =>
+          const isAccessoryPort = sourceHandle?.startsWith("acc:") ?? false;
+          const accessoryGap = 16;
+          const accessoryPortX =
+            sourceHandle === "acc:ai_model"
+              ? 0.3
+              : sourceHandle === "acc:ai_tool"
+                ? 0.7
+                : 0.5;
+          const isModelPort = sourceHandle === "acc:ai_model";
+          let candidateX = isAccessoryPort
+            ? sourceNode.position.x +
+              ((sourceNode.width ?? sourceManifest?.size.width ?? NODE_W) * accessoryPortX) -
+              NODE_W / 2 -
+              (isModelPort ? 30 : 0)
+            : position.x;
+          let candidateY = isAccessoryPort
+            ? sourceNode.position.y +
+              (sourceNode.height ?? NODE_H) +
+              accessoryGap +
+              (isModelPort ? 90 : 0)
+            : sourceNode.position.y;
+          const overlapsAt = (x: number, y: number) =>
             allNodes.some((n) => {
               if (n.id === source) return false;
               const nx = n.position.x;
@@ -451,18 +473,22 @@ export default function Constructor() {
               const nw = n.width ?? NODE_W;
               const nh = n.height ?? NODE_H;
               return (
-                position.x < nx + nw &&
-                position.x + NODE_W > nx &&
+                x < nx + nw &&
+                x + NODE_W > nx &&
                 y < ny + nh &&
                 y + NODE_H > ny
               );
             });
           let guard = 0;
-          while (overlapsAt(candidateY) && guard < 50) {
-            candidateY += NODE_H + V_GAP;
+          while (overlapsAt(candidateX, candidateY) && guard < 50) {
+            if (isAccessoryPort) {
+              candidateX += NODE_W + V_GAP;
+            } else {
+              candidateY += NODE_H + V_GAP;
+            }
             guard += 1;
           }
-          adjustedPosition = { x: position.x, y: candidateY };
+          adjustedPosition = { x: candidateX, y: candidateY };
         }
 
         // Yangi node yaratish

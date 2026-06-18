@@ -10,7 +10,7 @@
 		"iconName": "keyboard",
 		"colorToken": "trigger-blue",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -68,7 +68,7 @@
 		"iconName": "clock",
 		"colorToken": "trigger-blue",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -108,7 +108,7 @@
 		"iconName": "message",
 		"colorToken": "trigger-blue",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -149,7 +149,7 @@
 		"iconName": "message",
 		"colorToken": "action-amber",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -328,7 +328,7 @@
 		"iconName": "photo",
 		"colorToken": "action-purple",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -485,7 +485,7 @@
 		"iconName": "video",
 		"colorToken": "action-red",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -642,7 +642,7 @@
 		"iconName": "music",
 		"colorToken": "action-pink",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -801,7 +801,7 @@
 		"iconName": "file",
 		"colorToken": "action-gray",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -958,7 +958,7 @@
 		"iconName": "clapperboard",
 		"colorToken": "action-fuchsia",
 		"size": {
-			"width": 150,
+			"width": 200,
 			"height": 150
 		},
 		"sidebar": {
@@ -995,7 +995,7 @@
 		"iconName": "microphone",
 		"colorToken": "action-violet",
 		"size": {
-			"width": 150,
+			"width": 200,
 			"height": 150
 		},
 		"sidebar": {
@@ -1049,7 +1049,7 @@
 		"iconName": "video",
 		"colorToken": "action-purple",
 		"size": {
-			"width": 150,
+			"width": 200,
 			"height": 150
 		},
 		"sidebar": {
@@ -1103,7 +1103,7 @@
 		"iconName": "location",
 		"colorToken": "action-emerald",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -1266,7 +1266,7 @@
 		"iconName": "contact",
 		"colorToken": "action-teal",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -1441,7 +1441,7 @@
 		"iconName": "poll",
 		"colorToken": "action-fuchsia",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -1679,7 +1679,7 @@
 		"iconName": "sticker",
 		"colorToken": "action-pink",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -1748,7 +1748,7 @@
 		"iconName": "gallery",
 		"colorToken": "action-indigo",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -1967,7 +1967,7 @@
 		"iconName": "dice",
 		"colorToken": "action-amber",
 		"size": {
-			"width": 150,
+			"width": 200,
 			"height": 150
 		},
 		"sidebar": {
@@ -2033,7 +2033,7 @@
 		"iconName": "edit",
 		"colorToken": "message-op-slate",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -2230,7 +2230,7 @@
 		"iconName": "edit",
 		"colorToken": "message-op-teal",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -2409,7 +2409,7 @@
 		"iconName": "forward",
 		"colorToken": "message-op-slate-light",
 		"size": {
-			"width": 150,
+			"width": 200,
 			"height": 150
 		},
 		"sidebar": {
@@ -2452,7 +2452,7 @@
 		"iconName": "admin",
 		"colorToken": "message-op-red",
 		"size": {
-			"width": 150,
+			"width": 200,
 			"height": 150
 		},
 		"sidebar": {
@@ -2489,7 +2489,7 @@
 		"iconName": "copy",
 		"colorToken": "message-op-slate",
 		"size": {
-			"width": 150,
+			"width": 200,
 			"height": 150
 		},
 		"sidebar": {
@@ -2539,7 +2539,7 @@
 		"iconName": "pin",
 		"colorToken": "message-op-slate",
 		"size": {
-			"width": 150,
+			"width": 200,
 			"height": 150
 		},
 		"sidebar": {
@@ -2589,7 +2589,7 @@
 		"iconName": "unpin",
 		"colorToken": "message-op-slate",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -2638,7 +2638,7 @@
 		"iconName": "trash",
 		"colorToken": "message-op-red",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -2687,8 +2687,8 @@
 		"iconName": "typing",
 		"colorToken": "message-op-gray",
 		"size": {
-			"width": 150,
-			"height": 150
+			"width": 200,
+			"minHeight": 150
 		},
 		"sidebar": {
 			"enabled": true,
@@ -2761,7 +2761,7 @@
 		"iconName": "download",
 		"colorToken": "message-op-indigo",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -2799,7 +2799,7 @@
 		"iconName": "code",
 		"colorToken": "custom-yellow",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -2843,7 +2843,7 @@
 		"iconName": "database",
 		"colorToken": "custom-yellow",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -2880,7 +2880,7 @@
 		"iconName": "collection",
 		"colorToken": "custom-yellow",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -2919,7 +2919,7 @@
 		"iconName": "download",
 		"colorToken": "message-op-indigo",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -2971,7 +2971,7 @@
 		"iconName": "plugin",
 		"colorToken": "integration-indigo",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": false,
@@ -3051,7 +3051,7 @@
 		"iconName": "split",
 		"colorToken": "flow-violet",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -3104,7 +3104,7 @@
 		"iconName": "repeat",
 		"colorToken": "flow-indigo",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -3157,7 +3157,7 @@
 		"iconName": "arrow-right",
 		"colorToken": "flow-purple",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -3198,7 +3198,7 @@
 		"iconName": "timer",
 		"colorToken": "flow-amber",
 		"size": {
-			"width": 150,
+			"width": 200,
 			"height": 150
 		},
 		"sidebar": {
@@ -3241,7 +3241,7 @@
 		"iconName": "dice",
 		"colorToken": "flow-yellow",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -3379,7 +3379,7 @@
 		"iconName": "variable",
 		"colorToken": "flow-yellow",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -3469,7 +3469,7 @@
 		"iconName": "users",
 		"colorToken": "flow-purple",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -3547,7 +3547,7 @@
 		"iconName": "form",
 		"colorToken": "flow-green",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -3638,7 +3638,7 @@
 		"iconName": "loop",
 		"colorToken": "flow-green",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -3695,7 +3695,7 @@
 		"iconName": "corner-up-left",
 		"colorToken": "flow-purple",
 		"size": {
-			"width": 150,
+			"width": 200,
 			"height": 150
 		},
 		"sidebar": {
@@ -3729,7 +3729,7 @@
 		"iconName": "globe",
 		"colorToken": "integration-green",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -3849,7 +3849,7 @@
 		"iconName": "reply",
 		"colorToken": "integration-sky",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -3987,7 +3987,7 @@
 		"iconName": "mouse-pointer",
 		"colorToken": "trigger-blue",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -4029,7 +4029,7 @@
 		"iconName": "reply",
 		"colorToken": "trigger-blue",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -4836,7 +4836,7 @@
 		"iconName": "mouse-pointer",
 		"colorToken": "trigger-blue",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -4878,7 +4878,7 @@
 		"iconName": "globe",
 		"colorToken": "trigger-blue",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -4918,7 +4918,7 @@
 		"iconName": "location",
 		"colorToken": "action-emerald",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -4989,7 +4989,7 @@
 		"iconName": "unpin",
 		"colorToken": "message-op-slate",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5019,7 +5019,7 @@
 		"iconName": "clock",
 		"colorToken": "flow-amber",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5059,7 +5059,7 @@
 		"iconName": "collection",
 		"colorToken": "custom-yellow",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5136,7 +5136,7 @@
 		"iconName": "database",
 		"colorToken": "custom-yellow",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5192,7 +5192,7 @@
 		"iconName": "database",
 		"colorToken": "custom-yellow",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5240,7 +5240,7 @@
 		"iconName": "download",
 		"colorToken": "integration-sky",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5288,7 +5288,7 @@
 		"iconName": "clock",
 		"colorToken": "trigger-blue",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5326,7 +5326,7 @@
 		"iconName": "message",
 		"colorToken": "integration-sky",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5367,7 +5367,7 @@
 		"iconName": "credit-card",
 		"colorToken": "action-emerald",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5521,7 +5521,7 @@
 		"iconName": "credit-card",
 		"colorToken": "trigger-blue",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5613,7 +5613,7 @@
 		"iconName": "badge-check",
 		"colorToken": "trigger-blue",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5682,6 +5682,104 @@
 		]
 	},
 	{
+		"type": "PaymentStatusTriggerNode",
+		"status": "runtime",
+		"category": "triggers",
+		"titleKey": "constructor.triggers.paymentStatus.name",
+		"descriptionKey": "constructor.triggers.paymentStatus.description",
+		"titleFallback": "To'lov statusi",
+		"descriptionFallback": "Payment Link order statusi kelganda chaqiriladi.",
+		"iconName": "credit-card",
+		"colorToken": "trigger-blue",
+		"size": {
+			"width": 200
+		},
+		"sidebar": {
+			"enabled": true,
+			"groupId": "triggers",
+			"sortOrder": 37,
+			"elementType": "payment_status"
+		},
+		"handles": [
+			{
+				"preset": "target-default"
+			},
+			{
+				"preset": "source-default"
+			}
+		],
+		"content": [
+			{
+				"type": "select",
+				"key": "status",
+				"label": "Status",
+				"options": [
+					{
+						"value": "any",
+						"label": "Har qanday"
+					},
+					{
+						"value": "paid",
+						"label": "Paid"
+					},
+					{
+						"value": "failed",
+						"label": "Failed"
+					}
+				],
+				"variant": "tabs"
+			},
+			{
+				"type": "text",
+				"key": "orderId",
+				"label": "Order ID",
+				"placeholder": "{{payment_order_id}} yoki bo'sh"
+			},
+			{
+				"type": "select",
+				"key": "provider",
+				"label": "Provider",
+				"options": [
+					{
+						"value": "",
+						"label": "Har qanday"
+					},
+					{
+						"value": "click",
+						"label": "Click"
+					},
+					{
+						"value": "paycue",
+						"label": "Paycue"
+					}
+				]
+			},
+			{
+				"type": "checkbox",
+				"key": "global",
+				"label": "Global"
+			}
+		],
+		"defaults": {
+			"status": "paid",
+			"provider": "",
+			"global": true
+		},
+		"producesState": [
+			"payment_order_id",
+			"payment_status",
+			"payment_amount",
+			"payment_net",
+			"payment_commission",
+			"payment_comment",
+			"payment_provider",
+			"order_id",
+			"status",
+			"amount",
+			"provider"
+		]
+	},
+	{
 		"type": "ChatJoinRequestTriggerNode",
 		"status": "runtime",
 		"category": "triggers",
@@ -5692,12 +5790,12 @@
 		"iconName": "user-plus",
 		"colorToken": "trigger-blue",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
 			"groupId": "triggers",
-			"sortOrder": 37,
+			"sortOrder": 38,
 			"elementType": "chat_join_request"
 		},
 		"handles": [
@@ -5815,7 +5913,7 @@
 		"iconName": "user-check",
 		"colorToken": "action-emerald",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5860,7 +5958,7 @@
 		"iconName": "user-x",
 		"colorToken": "action-red",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5905,7 +6003,7 @@
 		"iconName": "link",
 		"colorToken": "action-teal",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -5980,7 +6078,7 @@
 		"iconName": "table",
 		"colorToken": "integration-green",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
@@ -6102,7 +6200,7 @@
 		"iconName": "folder",
 		"colorToken": "integration-green",
 		"size": {
-			"width": 150
+			"width": 200
 		},
 		"sidebar": {
 			"enabled": true,
