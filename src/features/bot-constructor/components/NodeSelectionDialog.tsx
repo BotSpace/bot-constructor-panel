@@ -2,14 +2,15 @@
 
 import React, { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetDescription,
+} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { useElements } from "@/features/bot-constructor/data/useElements";
 import { ElementItemType, ElementTypes } from "@/types/element-types";
 import { useTranslations } from "next-intl";
@@ -18,33 +19,48 @@ import {
     Search,
     Zap,
     MessageSquare,
-    Mail,
+    Settings,
     GitBranch,
     Plug,
-    Code,
+    Code2,
     Star,
+    BrainCircuit,
+    Globe,
+    LayoutGrid,
+    ArrowLeft,
+    ChevronRight,
+    Layers,
+    Pencil,
 } from "lucide-react";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
     "sidebar-triggers": <Zap className="h-4 w-4" />,
     "sidebar-actions": <MessageSquare className="h-4 w-4" />,
-    "sidebar-plugins": <Plug className="h-4 w-4" />,
+    "sidebar-messageOperations": <Pencil className="h-4 w-4" />,
+    "sidebar-flowControl": <GitBranch className="h-4 w-4" />,
+    "sidebar-integrations": <Globe className="h-4 w-4" />,
+    "sidebar-customLogic": <Code2 className="h-4 w-4" />,
+    "sidebar-ai": <BrainCircuit className="h-4 w-4" />,
+    "must-have": <Star className="h-4 w-4 text-amber-500" />,
 };
 
-const CATEGORY_ICON_FALLBACKS = [
-    <Mail className="h-4 w-4" key="mail" />,
-    <GitBranch className="h-4 w-4" key="git" />,
+// Fallbacks for plugin categories (indexed by position)
+const FALLBACK_ICONS = [
     <Plug className="h-4 w-4" key="plug" />,
-    <Code className="h-4 w-4" key="code" />,
+    <Settings className="h-4 w-4" key="settings" />,
+    <Layers className="h-4 w-4" key="layers" />,
+    <LayoutGrid className="h-4 w-4" key="grid" />,
 ];
 
 function getCategoryIcon(group: ElementTypes, index: number): React.ReactNode {
     if (group.id && CATEGORY_ICONS[group.id]) return CATEGORY_ICONS[group.id];
-    // Plugin categories: use the first element's icon (emoji from API)
     if (group.id?.startsWith("plugin-") && group.elements?.[0]?.icon) {
-        return <span className="text-sm">{group.elements[0].icon}</span>;
+        const rawIcon = group.elements[0].icon;
+        if (typeof rawIcon === "string") {
+            return <span className="text-sm">{rawIcon}</span>;
+        }
     }
-    return CATEGORY_ICON_FALLBACKS[index % CATEGORY_ICON_FALLBACKS.length];
+    return FALLBACK_ICONS[index % FALLBACK_ICONS.length];
 }
 
 interface NodeSelectionDialogProps {
@@ -60,16 +76,16 @@ export function NodeSelectionDialog({
 }: NodeSelectionDialogProps) {
     const t = useTranslations("editor.nodeSelector");
     const [searchQuery, setSearchQuery] = useState("");
-    const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+    // drill-in: null = category list view, string = selected category id
+    const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
     const [activeElementIndex, setActiveElementIndex] = useState(0);
-    const [focusPanel, setFocusPanel] = useState<"categories" | "elements">("categories");
     const searchInputRef = useRef<HTMLInputElement>(null);
     const elementRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
-    const categoryRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+    const categoryRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+    const [activeCategoryIndexNav, setActiveCategoryIndexNav] = useState(0);
 
     const elements = useElements();
 
-    // Must have element ID lari
     const MUST_HAVE_IDS = useMemo(
         () => ["CommandTriggerNode", "SendTextMessageNode", "MessageTriggerNode", "EditMessageNode", "EditOrSendMessageNode"] as const,
         []
@@ -80,10 +96,7 @@ export function NodeSelectionDialog({
         for (const id of MUST_HAVE_IDS) {
             for (const group of elements) {
                 const el = group.elements?.find((e) => e.triggerId === id);
-                if (el) {
-                    found.push(el);
-                    break;
-                }
+                if (el) { found.push(el); break; }
             }
         }
         return found;
@@ -93,7 +106,7 @@ export function NodeSelectionDialog({
         const query = searchQuery.trim().toLowerCase();
 
         const mustHaveGroup: ElementTypes = {
-            title: "⭐ Tez-tez",
+            title: "Tez-tez",
             id: "must-have",
             elements: query
                 ? mustHaveElements.filter(
@@ -122,37 +135,47 @@ export function NodeSelectionDialog({
             : baseGroups;
     }, [elements, searchQuery, mustHaveElements]);
 
-    useEffect(() => {
-        setActiveCategoryIndex(0);
-        setActiveElementIndex(0);
-        setFocusPanel("categories");
-    }, [searchQuery]);
+    // When searching, show flat search results instead of drill-down
+    const isSearching = searchQuery.trim().length > 0;
 
+    // Active group for the drilled-in view
+    const activeDrillGroup = useMemo(
+        () => filteredGroups.find((g) => g.id === activeCategoryId) ?? null,
+        [filteredGroups, activeCategoryId]
+    );
+
+    // Reset state when opening/closing
     useEffect(() => {
         if (open) {
             setSearchQuery("");
-            setActiveCategoryIndex(0);
+            setActiveCategoryId(null);
             setActiveElementIndex(0);
-            setFocusPanel("categories");
-            setTimeout(() => searchInputRef.current?.focus(), 100);
+            setActiveCategoryIndexNav(0);
+            setTimeout(() => searchInputRef.current?.focus(), 80);
         }
     }, [open]);
 
+    // When search query changes, collapse back to category list (search shows flat results)
     useEffect(() => {
+        setActiveCategoryId(null);
         setActiveElementIndex(0);
-    }, [activeCategoryIndex]);
+        setActiveCategoryIndexNav(0);
+    }, [searchQuery]);
 
+    // Scroll active element into view
     useEffect(() => {
-        if (focusPanel === "elements") {
+        if (activeCategoryId) {
             elementRefs.current.get(activeElementIndex)?.scrollIntoView({ block: "nearest" });
         }
-    }, [activeElementIndex, focusPanel]);
+    }, [activeElementIndex, activeCategoryId]);
 
+    // Scroll active category into view (keyboard nav)
     useEffect(() => {
-        if (focusPanel === "categories") {
-            categoryRefs.current.get(activeCategoryIndex)?.scrollIntoView({ block: "nearest" });
+        if (!activeCategoryId && !isSearching) {
+            const id = filteredGroups[activeCategoryIndexNav]?.id;
+            if (id) categoryRefs.current.get(id)?.scrollIntoView({ block: "nearest" });
         }
-    }, [activeCategoryIndex, focusPanel]);
+    }, [activeCategoryIndexNav, activeCategoryId, isSearching, filteredGroups]);
 
     const handleSelect = useCallback(
         (element: ElementItemType) => {
@@ -163,207 +186,305 @@ export function NodeSelectionDialog({
         [onSelect, onOpenChange]
     );
 
+    const handleBack = useCallback(() => {
+        setActiveCategoryId(null);
+        setActiveElementIndex(0);
+        setTimeout(() => searchInputRef.current?.focus(), 50);
+    }, []);
+
+    const handleDrillIn = useCallback((categoryId: string) => {
+        setActiveCategoryId(categoryId);
+        setActiveElementIndex(0);
+    }, []);
+
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent) => {
-            const groupCount = filteredGroups.length;
-            const elementCount = filteredGroups[activeCategoryIndex]?.elements?.length || 0;
+            if (isSearching) {
+                // In search: no drill-in, just navigate flat list (handled by natural tab/enter)
+                return;
+            }
 
-            switch (e.key) {
-                case "ArrowDown": {
-                    e.preventDefault();
-                    if (focusPanel === "categories") {
-                        setActiveCategoryIndex((i) => Math.min(i + 1, groupCount - 1));
-                    } else {
+            if (!activeCategoryId) {
+                // Category list navigation
+                const groupCount = filteredGroups.length;
+                switch (e.key) {
+                    case "ArrowDown":
+                        e.preventDefault();
+                        setActiveCategoryIndexNav((i) => Math.min(i + 1, groupCount - 1));
+                        break;
+                    case "ArrowUp":
+                        e.preventDefault();
+                        setActiveCategoryIndexNav((i) => Math.max(i - 1, 0));
+                        break;
+                    case "Enter":
+                    case "ArrowRight": {
+                        e.preventDefault();
+                        const group = filteredGroups[activeCategoryIndexNav];
+                        if (group?.id) handleDrillIn(group.id);
+                        break;
+                    }
+                }
+            } else {
+                // Drilled-in element navigation
+                const elementCount = activeDrillGroup?.elements?.length || 0;
+                switch (e.key) {
+                    case "ArrowDown":
+                        e.preventDefault();
                         setActiveElementIndex((i) => Math.min(i + 1, elementCount - 1));
-                    }
-                    break;
-                }
-                case "ArrowUp": {
-                    e.preventDefault();
-                    if (focusPanel === "categories") {
-                        setActiveCategoryIndex((i) => Math.max(i - 1, 0));
-                    } else {
+                        break;
+                    case "ArrowUp":
+                        e.preventDefault();
                         setActiveElementIndex((i) => Math.max(i - 1, 0));
-                    }
-                    break;
-                }
-                case "ArrowRight": {
-                    if (focusPanel === "categories" && elementCount > 0) {
+                        break;
+                    case "Enter": {
                         e.preventDefault();
-                        setFocusPanel("elements");
-                        setActiveElementIndex(0);
-                    }
-                    break;
-                }
-                case "ArrowLeft": {
-                    if (focusPanel === "elements") {
-                        e.preventDefault();
-                        setFocusPanel("categories");
-                    }
-                    break;
-                }
-                case "Enter": {
-                    e.preventDefault();
-                    if (focusPanel === "categories" && elementCount > 0) {
-                        setFocusPanel("elements");
-                        setActiveElementIndex(0);
-                    } else if (focusPanel === "elements") {
-                        const el = filteredGroups[activeCategoryIndex]?.elements?.[activeElementIndex];
+                        const el = activeDrillGroup?.elements?.[activeElementIndex];
                         if (el) handleSelect(el);
+                        break;
                     }
-                    break;
-                }
-                case "Escape": {
-                    if (focusPanel === "elements") {
+                    case "ArrowLeft":
+                    case "Escape":
                         e.preventDefault();
                         e.stopPropagation();
-                        setFocusPanel("categories");
-                    }
-                    break;
+                        handleBack();
+                        break;
                 }
             }
         },
-        [focusPanel, filteredGroups, activeCategoryIndex, activeElementIndex, handleSelect]
+        [
+            isSearching,
+            activeCategoryId,
+            filteredGroups,
+            activeCategoryIndexNav,
+            activeDrillGroup,
+            activeElementIndex,
+            handleDrillIn,
+            handleSelect,
+            handleBack,
+        ]
     );
 
-    const activeGroup = filteredGroups[activeCategoryIndex];
+    // Build flat search results across all groups
+    const searchResults = useMemo(() => {
+        if (!isSearching) return [];
+        const query = searchQuery.trim().toLowerCase();
+        const results: Array<{ element: ElementItemType; groupTitle: string }> = [];
+        for (const group of filteredGroups) {
+            for (const el of group.elements || []) {
+                if (
+                    el.name.toLowerCase().includes(query) ||
+                    el.description.toLowerCase().includes(query)
+                ) {
+                    results.push({ element: el, groupTitle: group.title });
+                }
+            }
+        }
+        return results;
+    }, [isSearching, searchQuery, filteredGroups]);
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent
-                className="sm:max-w-[820px] max-h-[90vh] gap-0 p-0 overflow-auto"
+        <Sheet open={open} onOpenChange={onOpenChange} modal={false}>
+            <SheetContent
+                side="right"
+                showOverlay={false}
+                showCloseButton={false}
+                onInteractOutside={(e) => e.preventDefault()}
+                className={cn(
+                    "w-full gap-0 overflow-hidden border-l border-white/10 bg-[#141414] p-0 text-white shadow-2xl",
+                    "sm:max-w-[420px]"
+                )}
                 onKeyDown={handleKeyDown}
             >
-                <DialogHeader className="px-5 pt-5 pb-3">
-                    <DialogTitle>{t("title")}</DialogTitle>
-                    <DialogDescription>
-                        {t("description")}
-                    </DialogDescription>
-                </DialogHeader>
+                {/* Header */}
+                <SheetHeader className="shrink-0 gap-0 space-y-0 border-b border-white/10 bg-[#171717] px-5 py-4">
+                    <div className="flex items-center gap-3">
+                        {activeCategoryId && !isSearching ? (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-zinc-400 hover:bg-white/10 hover:text-white shrink-0"
+                                onClick={handleBack}
+                                aria-label="Back"
+                            >
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                        ) : (
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/5 border border-white/10">
+                                <Layers className="h-4 w-4 text-zinc-400" />
+                            </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                            <SheetTitle className="text-base font-semibold text-white leading-tight">
+                                {activeCategoryId && !isSearching
+                                    ? (activeDrillGroup?.title ?? t("title"))
+                                    : t("title")}
+                            </SheetTitle>
+                            <SheetDescription className="text-xs text-zinc-500 mt-0.5">
+                                {activeCategoryId && !isSearching
+                                    ? `${activeDrillGroup?.elements?.length ?? 0} ta node`
+                                    : t("description")}
+                            </SheetDescription>
+                        </div>
+                    </div>
+                </SheetHeader>
 
                 {/* Search */}
-                <div className="px-5 pb-3">
+                <div className="shrink-0 px-4 py-3 border-b border-white/10 bg-[#141414]">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                         <Input
                             ref={searchInputRef}
                             placeholder={t("searchPlaceholder")}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9"
+                            className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-zinc-500 focus-visible:ring-primary/40"
                         />
                     </div>
                 </div>
 
-                {/* Two-column layout */}
-                <div className="flex border-t h-[500px]">
-                    {/* Left: Categories */}
-                    <div className="w-[260px] border-r bg-muted/30 flex flex-col min-h-0 overflow-hidden">
-                        <ScrollArea className="h-full">
-                            <div className="py-2">
-                                {filteredGroups.map((group, index) => (
-                                    <button
-                                        key={group.id || index}
-                                        ref={(el) => {
-                                            if (el) categoryRefs.current.set(index, el);
-                                            else categoryRefs.current.delete(index);
+                {/* Content */}
+                <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+                    {isSearching ? (
+                        /* ---- SEARCH RESULTS (flat, grouped by category) ---- */
+                        <ScrollArea className="flex-1">
+                            {searchResults.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-16 text-sm text-zinc-500 gap-2">
+                                    <Search className="h-8 w-8 opacity-30" />
+                                    <span>{t("noResults")}</span>
+                                </div>
+                            ) : (
+                                <div className="p-3 flex flex-col gap-1">
+                                    {searchResults.map(({ element, groupTitle }, idx) => (
+                                        <NodeCard
+                                            key={`${element.triggerId}-${idx}`}
+                                            element={element}
+                                            isActive={false}
+                                            groupLabel={groupTitle}
+                                            onClick={() => handleSelect(element)}
+                                            onMouseEnter={() => {}}
+                                            refCallback={() => {}}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </ScrollArea>
+                    ) : activeCategoryId && activeDrillGroup ? (
+                        /* ---- DRILLED-IN NODE LIST ---- */
+                        <ScrollArea className="flex-1">
+                            <div className="p-3 flex flex-col gap-1">
+                                {activeDrillGroup.elements?.map((element, idx) => (
+                                    <NodeCard
+                                        key={`${element.triggerId}-${idx}`}
+                                        element={element}
+                                        isActive={idx === activeElementIndex}
+                                        onClick={() => handleSelect(element)}
+                                        onMouseEnter={() => setActiveElementIndex(idx)}
+                                        refCallback={(el) => {
+                                            if (el) elementRefs.current.set(idx, el);
+                                            else elementRefs.current.delete(idx);
                                         }}
-                                        onMouseEnter={() => {
-                                            setActiveCategoryIndex(index);
-                                            setFocusPanel("categories");
-                                        }}
-                                        onClick={() => {
-                                            setActiveCategoryIndex(index);
-                                            setFocusPanel("elements");
-                                            setActiveElementIndex(0);
-                                        }}
-                                        className={cn(
-                                            "flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors",
-                                            "hover:bg-accent/60",
-                                            index === activeCategoryIndex &&
-                                            "bg-accent text-accent-foreground font-medium border-r-2 border-primary"
-                                        )}
-                                    >
-                                        <span className="shrink-0 text-muted-foreground">
-                                            {group.id === "must-have" ? (
-                                                <Star className="h-4 w-4 text-amber-500" />
-                                            ) : (
-                                                getCategoryIcon(group, index)
-                                            )}
-                                        </span>
-                                        <span className="truncate">{group.title}</span>
-                                        <span className="ml-auto text-xs text-muted-foreground tabular-nums">
-                                            {group.elements?.length || 0}
-                                        </span>
-                                    </button>
+                                    />
                                 ))}
                             </div>
                         </ScrollArea>
-                    </div>
-
-                    {/* Right: Nodes */}
-                    <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-                        {activeGroup ? (
-                            <React.Fragment key={activeGroup.id || activeCategoryIndex}>
-                                <div className="px-4 py-3 border-b bg-muted/20 shrink-0">
-                                    <h3 className="text-sm font-semibold text-foreground">
-                                        {activeGroup.title}
-                                    </h3>
-                                    <p className="text-xs text-muted-foreground mt-0.5">
-                                        {activeGroup.elements?.length || 0} ta node mavjud
-                                    </p>
-                                </div>
-                                <ScrollArea className="flex-1 overflow-auto">
-                                    <div className="p-2 grid gap-1">
-                                        {activeGroup.elements?.map((element, idx) => (
-                                            <button
-                                                key={`${element.triggerId}-${idx}`}
-                                                ref={(el) => {
-                                                    if (el) elementRefs.current.set(idx, el);
-                                                    else elementRefs.current.delete(idx);
-                                                }}
-                                                onClick={() => handleSelect(element)}
-                                                onMouseEnter={() => {
-                                                    setFocusPanel("elements");
-                                                    setActiveElementIndex(idx);
-                                                }}
-                                                className={cn(
-                                                    "group flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-all",
-                                                    "hover:bg-accent/50 focus-visible:outline-none",
-                                                    "active:scale-[0.98] transition-transform duration-100",
-                                                    focusPanel === "elements" && idx === activeElementIndex &&
-                                                    "bg-accent/50 ring-1 ring-primary/30"
-                                                )}
-                                            >
-                                                <div
-                                                    className={cn(
-                                                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-md border text-lg",
-                                                        element.color
-                                                    )}
-                                                >
-                                                    {element.icon}
+                    ) : (
+                        /* ---- CATEGORY LIST ---- */
+                        <ScrollArea className="flex-1">
+                            <div className="py-3 flex flex-col gap-1 px-3">
+                                {filteredGroups.map((group, index) => {
+                                    const isActive = index === activeCategoryIndexNav;
+                                    return (
+                                        <button
+                                            key={group.id || index}
+                                            ref={(el) => {
+                                                if (el && group.id) categoryRefs.current.set(group.id, el);
+                                                else if (group.id) categoryRefs.current.delete(group.id);
+                                            }}
+                                            onMouseEnter={() => setActiveCategoryIndexNav(index)}
+                                            onClick={() => group.id && handleDrillIn(group.id)}
+                                            className={cn(
+                                                "group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors",
+                                                "hover:bg-white/5",
+                                                isActive && "bg-white/8 ring-1 ring-white/10"
+                                            )}
+                                        >
+                                            {/* Category icon */}
+                                            <div className={cn(
+                                                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-sm",
+                                                group.id === "must-have"
+                                                    ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
+                                                    : "bg-white/5 border-white/10 text-zinc-400"
+                                            )}>
+                                                {getCategoryIcon(group, index)}
+                                            </div>
+                                            {/* Title + count */}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-sm font-medium text-white truncate">
+                                                    {/* Strip emoji prefix from titles like "🚀 Triggerlar" */}
+                                                    {group.title.replace(/^[\p{Emoji_Presentation}\p{Emoji}\s]+/u, "").trim() || group.title}
                                                 </div>
-                                                <div className="flex flex-col gap-0.5 min-w-0">
-                                                    <span className="text-sm font-medium leading-tight text-foreground">
-                                                        {element.name}
-                                                    </span>
-                                                    <span className="text-xs leading-snug text-muted-foreground line-clamp-2">
-                                                        {element.description}
-                                                    </span>
+                                                <div className="text-xs text-zinc-500 mt-0.5">
+                                                    {group.elements?.length ?? 0} ta node
                                                 </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </ScrollArea>
-                            </React.Fragment>
-                        ) : (
-                            <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
-                                {t("noResults")}
+                                            </div>
+                                            {/* Node count badge + chevron */}
+                                            <ChevronRight className="h-4 w-4 text-zinc-600 group-hover:text-zinc-400 shrink-0 transition-colors" />
+                                        </button>
+                                    );
+                                })}
                             </div>
-                        )}
-                    </div>
+                        </ScrollArea>
+                    )}
                 </div>
-            </DialogContent>
-        </Dialog>
+            </SheetContent>
+        </Sheet>
+    );
+}
+
+// ---- Internal NodeCard component ----
+
+interface NodeCardProps {
+    element: ElementItemType;
+    isActive: boolean;
+    groupLabel?: string;
+    onClick: () => void;
+    onMouseEnter: () => void;
+    refCallback: (el: HTMLButtonElement | null) => void;
+}
+
+function NodeCard({ element, isActive, groupLabel, onClick, onMouseEnter, refCallback }: NodeCardProps) {
+    return (
+        <button
+            ref={refCallback}
+            onClick={onClick}
+            onMouseEnter={onMouseEnter}
+            className={cn(
+                "group flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition-all",
+                "hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40",
+                isActive && "bg-white/8 ring-1 ring-white/10"
+            )}
+        >
+            <div
+                className={cn(
+                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-base",
+                    element.color || "bg-white/5 border-white/10 text-zinc-300"
+                )}
+            >
+                {element.icon}
+            </div>
+            <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                <span className="text-sm font-medium leading-tight text-white">
+                    {element.name}
+                </span>
+                <span className="text-xs leading-snug text-zinc-500 line-clamp-2">
+                    {element.description}
+                </span>
+                {groupLabel && (
+                    <span className="text-[10px] text-zinc-600 mt-0.5 truncate">
+                        {groupLabel.replace(/^[\p{Emoji_Presentation}\p{Emoji}\s]+/u, "").trim()}
+                    </span>
+                )}
+            </div>
+        </button>
     );
 }
