@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -79,8 +79,8 @@ function fieldKey(field: NodeFieldManifest): string {
 
 /**
  * True if an optional field already holds a non-default value in the node data.
- * Such fields must stay visible across a page refresh (where the in-memory
- * "added" set resets), otherwise the user's configured values look lost.
+ * Used ONLY for backward-compat: when `activeOptionalFields` is absent we derive
+ * the initial active set from value presence so existing flows don't break.
  */
 function optionalFieldConfigured(
   field: NodeFieldManifest,
@@ -114,6 +114,26 @@ function optionalFieldConfigured(
       return Boolean(v);
     }
   }
+}
+
+/**
+ * Derive the initial `activeOptionalFields` from node data for backward-compat.
+ * Called when `data.activeOptionalFields` is absent/empty — reads existing field
+ * values so previously configured optional fields remain visible on first load.
+ */
+function deriveActiveOptionalKeys(
+  fields: NodeFieldManifest[],
+  data: Record<string, unknown>,
+  defaults?: Record<string, unknown>
+): string[] {
+  return fields
+    .filter(
+      (f) =>
+        f.optional &&
+        !f.visibleWhen &&
+        optionalFieldConfigured(f, data, defaults?.[fieldKey(f)])
+    )
+    .map(fieldKey);
 }
 
 function AddOptionButton({
@@ -169,7 +189,39 @@ export function ModalNodeFormRenderer({
   );
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [addedOptionalKeys, setAddedOptionalKeys] = useState<string[]>([]);
+
+  // ── activeOptionalFields ─────────────────────────────────────────────────
+  // Persistent list of manually activated optional fields, stored inside node
+  // data so it survives panel close/reopen without relying on value presence.
+  //
+  // Backward-compat: when the key is absent (existing flows) we derive the
+  // initial list from value presence (same heuristic as before) and persist it
+  // once — after that the list is the source of truth.
+  const allManifestFields = manifest.content || [];
+
+  const storedActive = useMemo(() => {
+    const v = data.activeOptionalFields;
+    return Array.isArray(v) ? (v as string[]) : null;
+  }, [data.activeOptionalFields]);
+
+  // On first render for nodes that lack activeOptionalFields, derive and persist.
+  useEffect(() => {
+    if (storedActive !== null) return; // already present — nothing to do
+    const derived = deriveActiveOptionalKeys(allManifestFields, data, manifest.defaults);
+    // Always write, even if empty — that marks the node as "migrated" so we
+    // won't re-derive on the next render (storedActive will be [] not null).
+    updateNodeData(nodeId, { activeOptionalFields: derived });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodeId]); // run once per node (nodeId change = different node)
+
+  // Use storedActive when available, fall back to derived for the current
+  // render while the useEffect above hasn't fired yet.
+  const activeOptionalKeys: string[] = useMemo(() => {
+    if (storedActive !== null) return storedActive;
+    return deriveActiveOptionalKeys(allManifestFields, data, manifest.defaults);
+  }, [storedActive, allManifestFields, data, manifest.defaults]);
+
+  // ── Field lists ──────────────────────────────────────────────────────────
 
   const allFields = (manifest.content || [])
     .filter((field) => isFieldVisible(data, field))
@@ -186,44 +238,20 @@ export function ModalNodeFormRenderer({
 
   const requiredFields = allFields.filter((f) => !f.optional);
 
-  // Optional fields shown by default. `defaultVisible` gives node authors
-  // explicit control; otherwise fall back to the value-based heuristic (shown
-  // when the field already holds a non-default value, so configured values
-  // survive a page refresh where the in-memory "added" set resets).
-  const configuredOptionalFields = allFields.filter((f) => {
-    if (!f.optional || addedOptionalKeys.includes(fieldKey(f))) return false;
-    if (f.defaultVisible === true) return true;
-    // `defaultVisible: false` and the default (undefined) case both defer to the
-    // value heuristic: with manifest.defaults a field sitting at its default
-    // value stays hidden, but a user-configured non-default value (e.g. a reply
-    // keyboard or HTML parse mode) is always surfaced so the setting never looks
-    // lost on refresh.
-    return optionalFieldConfigured(f, data, manifest.defaults?.[fieldKey(f)]);
-  });
-
-  // Auto-revealed optional fields: an optional field with a `visibleWhen` rule is
-  // condition-driven. `allFields` is already filtered by isFieldVisible above, so any
-  // optional+visibleWhen field present here means its condition currently matches — show
-  // it automatically (no manual "add"). When the trigger value changes and the condition
-  // stops matching, the field drops out of `allFields` and disappears on its own.
-  const autoRevealedFields = allFields.filter(
-    (f) => f.optional && f.visibleWhen && !addedOptionalKeys.includes(fieldKey(f))
-  );
+  // Auto-revealed optional fields: optional + visibleWhen — condition-driven,
+  // managed automatically. Shown/hidden by isFieldVisible above; no manual add.
+  const autoRevealedFields = allFields.filter((f) => f.optional && f.visibleWhen);
   const autoRevealedKeys = new Set(autoRevealedFields.map(fieldKey));
 
-  // Manually added this session — in the ORDER the user added them so each
-  // new field always appears at the very bottom of the list.
-  const manuallyAddedFields = addedOptionalKeys
-    .map((key) => allFields.find((f) => fieldKey(f) === key))
+  // Manually activated optional fields (no visibleWhen), in activation order.
+  // Source of truth is activeOptionalKeys (stored in node data).
+  const manuallyAddedFields = activeOptionalKeys
+    .map((key) => allFields.find((f) => fieldKey(f) === key && !f.visibleWhen))
     .filter((f): f is NodeFieldManifest => Boolean(f));
 
-  // Dedupe across the three sources (a configured value + matching condition can overlap).
+  // Dedupe across auto-revealed + manually added (edge case: field has both).
   const seenOptional = new Set<string>();
-  const addedOptionalFields = [
-    ...autoRevealedFields,
-    ...configuredOptionalFields,
-    ...manuallyAddedFields,
-  ].filter((f) => {
+  const addedOptionalFields = [...autoRevealedFields, ...manuallyAddedFields].filter((f) => {
     const k = fieldKey(f);
     if (seenOptional.has(k)) return false;
     seenOptional.add(k);
@@ -232,13 +260,28 @@ export function ModalNodeFormRenderer({
 
   const shownOptionalKeys = new Set(addedOptionalFields.map(fieldKey));
 
-  // Condition-driven fields (visibleWhen) are auto-managed — keep them out of the
-  // manual "add optional field" list.
+  // Dropdown shows only fields not yet active and not condition-driven.
   const availableOptionalFields = allFields.filter(
     (f) => f.optional && !f.visibleWhen && !shownOptionalKeys.has(fieldKey(f))
   );
 
   const shownFields = [...requiredFields, ...addedOptionalFields];
+
+  // ── Handlers ─────────────────────────────────────────────────────────────
+
+  function handleAddOptional(key: string) {
+    const next = [...activeOptionalKeys, key];
+    updateNodeData(nodeId, { activeOptionalFields: next });
+  }
+
+  function handleRemoveOptional(field: NodeFieldManifest) {
+    const key = fieldKey(field);
+    const next = activeOptionalKeys.filter((k) => k !== key);
+    updateNodeData(nodeId, {
+      activeOptionalFields: next,
+      ...clearedFieldData(field),
+    });
+  }
 
   return (
     <NodePanelProvider>
@@ -261,13 +304,7 @@ export function ModalNodeFormRenderer({
                     type="button"
                     className="mt-7 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-r border-white/10 pr-3 text-zinc-500 hover:text-red-400"
                     title="Maydonni olib tashlash"
-                    onClick={() => {
-                      setAddedOptionalKeys((prev) =>
-                        prev.filter((k) => k !== fieldKey(field))
-                      );
-                      // Also clear its stored value so it doesn't auto-reappear.
-                      updateNodeData(nodeId, clearedFieldData(field));
-                    }}
+                    onClick={() => handleRemoveOptional(field)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -291,7 +328,7 @@ export function ModalNodeFormRenderer({
         {availableOptionalFields.length > 0 ? (
           <AddOptionButton
             options={availableOptionalFields}
-            onAdd={(key) => setAddedOptionalKeys((prev) => [...prev, key])}
+            onAdd={handleAddOptional}
           />
         ) : null}
 
