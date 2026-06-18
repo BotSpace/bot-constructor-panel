@@ -34,6 +34,9 @@ import {
   User,
   Globe,
   List,
+  Bot,
+  Sparkles,
+  Boxes,
   LucideIcon,
   ExternalLink,
   CheckCircle2,
@@ -63,6 +66,9 @@ const ICON_MAP: Record<string, LucideIcon> = {
   user: User,
   globe: Globe,
   list: List,
+  bot: Bot,
+  sparkles: Sparkles,
+  boxes: Boxes,
 };
 
 function getTypeIcon(iconName: string | undefined): LucideIcon {
@@ -188,24 +194,28 @@ function TypePicker({
             Hech narsa topilmadi
           </p>
         ) : (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {filtered.map((type) => {
               const Icon = getTypeIcon(type.icon);
+              const color = type.color || undefined;
               return (
                 <button
                   key={type.key}
                   type="button"
                   onClick={() => onSelect(type)}
                   className={cn(
-                    "flex flex-col items-center gap-1.5 rounded-lg border p-3",
+                    "flex items-center gap-2.5 rounded-lg border p-3 text-left",
                     "hover:bg-muted/50 hover:border-primary/40 transition-colors",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   )}
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
-                    <Icon className="h-4 w-4 text-foreground" />
+                  <div
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted"
+                    style={color ? { backgroundColor: `${color}1A` } : undefined}
+                  >
+                    <Icon className="h-5 w-5" style={color ? { color } : undefined} />
                   </div>
-                  <span className="text-[11px] font-medium text-center leading-tight line-clamp-2">
+                  <span className="text-[12px] font-medium leading-tight line-clamp-2">
                     {type.label}
                   </span>
                 </button>

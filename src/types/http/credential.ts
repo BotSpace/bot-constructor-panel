@@ -25,6 +25,8 @@ export interface CredentialType {
   label: string;
   description?: string;
   icon?: string;
+  /** Brand color (hex) for the icon */
+  color?: string;
   mode: CredentialMode;
   fields: CredentialFieldDef[];
   system?: boolean;
