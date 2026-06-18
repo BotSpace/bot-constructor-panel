@@ -34,6 +34,12 @@ export interface ToolParamsFieldConfig {
   type: "tool-params";
   key?: string; // default "parametersSchema"
   label?: string;
+  /** Helper text under the label. Default is AI-tool wording; override for other nodes. */
+  hint?: string;
+  /** Shown when there are no params. Default is AI-tool wording. */
+  emptyHint?: string;
+  /** Placeholder for each param's description input. */
+  descriptionPlaceholder?: string;
 }
 
 export interface ToolParamsFieldProps {
@@ -95,12 +101,17 @@ export function ToolParamsField({ nodeId, data, field }: ToolParamsFieldProps) {
     <div className="space-y-2">
       {field.label ? <Label className="text-sm text-zinc-200">{field.label}</Label> : null}
       <p className="text-xs leading-relaxed text-zinc-500">
-        AI shu parametrlarni bilib chaqiradi. Kodda <code className="text-zinc-400">args.&lt;nom&gt;</code> orqali olasiz.
+        {field.hint ?? (
+          <>
+            AI shu parametrlarni bilib chaqiradi. Kodda{" "}
+            <code className="text-zinc-400">args.&lt;nom&gt;</code> orqali olasiz.
+          </>
+        )}
       </p>
 
       {rows.length === 0 ? (
         <div className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] p-3 text-center text-xs text-zinc-500">
-          Parametr yo&apos;q — AI argumentsiz chaqiradi.
+          {field.emptyHint ?? "Parametr yo'q — AI argumentsiz chaqiradi."}
         </div>
       ) : (
         <div className="space-y-2">
@@ -131,7 +142,7 @@ export function ToolParamsField({ nodeId, data, field }: ToolParamsFieldProps) {
                 <Input
                   value={row.description}
                   onChange={(e) => update(index, { description: e.target.value })}
-                  placeholder="izoh (AI uchun) — nima uchun kerak"
+                  placeholder={field.descriptionPlaceholder ?? "izoh (AI uchun) — nima uchun kerak"}
                   className="h-9 border-white/10 bg-zinc-950/60 text-sm sm:col-span-2"
                 />
                 <label className="flex cursor-pointer items-center gap-2 text-xs text-zinc-400 sm:col-span-2">
