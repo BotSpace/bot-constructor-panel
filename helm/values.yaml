@@ -2,7 +2,7 @@ fullnameOverride: "constructor"
 
 image:
   repository: registry.iprogrammer.uz/botspace/botmother-constructor
-  tag: "4cb4b96"
+  tag: "2d8f031"
   pullPolicy: IfNotPresent
 
 imagePullSecrets:
