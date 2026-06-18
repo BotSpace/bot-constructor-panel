@@ -257,6 +257,14 @@
         "name": "HTTP Запрос",
         "description": "Отправляет запрос к внешнему API."
       },
+      "googleSheets": {
+        "name": "Google Sheets",
+        "description": "Читает или записывает данные в таблицу Google Sheets."
+      },
+      "googleDrive": {
+        "name": "Google Drive",
+        "description": "Работает с файлами в Google Drive."
+      },
       "callbackAnswer": {
         "name": "Ответ на callback",
         "description": "Отвечает при нажатии inline кнопки."

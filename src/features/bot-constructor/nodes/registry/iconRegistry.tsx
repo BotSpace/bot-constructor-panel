@@ -10,6 +10,7 @@ import {
   DoorOpen,
   Download,
   FileText,
+  Folder,
   Globe,
   Image,
   LayoutGrid,
@@ -22,6 +23,7 @@ import {
   Send,
   Settings2,
   Split,
+  Table2,
   Timer,
   UserCheck,
   UserPlus,
@@ -85,6 +87,8 @@ const LUCIDE_ICONS: Record<string, ReactNode> = {
   "user-check": <UserCheck className="text-emerald-500" />,
   "user-x": <UserX className="text-red-500" />,
   link: <Link className="text-teal-500" />,
+  table: <Table2 className="text-primary" />,
+  folder: <Folder className="text-primary" />,
 };
 
 export function resolveNodeIcon(iconName: string): ReactNode | string {
