@@ -282,7 +282,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         dataKey={field.key || "credential_id"}
         typeKey={field.credentialType}
         label={field.label}
-        required={false}
+        required={field.required ?? false}
       />
     );
   }
