@@ -1,107 +1,211 @@
 import {
   BadgeCheck,
+  Blocks,
   BrainCircuit,
-  Clapperboard,
-  Clock3,
+  CalendarClock,
+  ChevronRightSquare,
+  CircleArrowRight,
+  CircleX,
+  Clock,
   Code2,
+  CodeXml,
+  Contact,
   Copy,
   CreditCard,
   Database,
-  DoorOpen,
+  Dices,
   Download,
+  FilePlus2,
   FileText,
   Folder,
+  FolderOpen,
   Globe,
   Image,
   Images,
-  LayoutGrid,
+  KeyRound,
+  LayoutList,
   Link,
-  MessageSquare,
+  LogOut,
+  Megaphone,
+  MessageCircle,
+  MessageCircleMore,
+  MessageSquareDashed,
   Mic,
+  Milestone,
   MousePointerClick,
   Music,
   Pencil,
-  Plug,
+  Pin,
+  PinOff,
+  Play,
+  Plug2,
   RefreshCcw,
-  Route,
   Send,
   Settings2,
-  Split,
+  Shuffle,
+  Sparkles,
+  SplitSquareHorizontal,
   Table2,
-  Trash2,
   Timer,
-  CornerUpLeft,
+  Trash2,
+  Truck,
   UserCheck,
+  UserMinus,
   UserPlus,
   Users,
-  UserX,
   Variable,
   Video,
-  WandSparkles,
+  Webhook,
   Wrench,
   Zap,
 } from "lucide-react";
 import { ReactNode } from "react";
 
 const EMOJI_ICONS: Record<string, string> = {
-  keyboard: "⌨️",
-  typing: "⌨️",
-  admin: "👤",
-  dice: "🎲",
   sticker: "🎭",
-  forward: "➡️",
-  location: "📍",
-  contact: "👤",
-  pin: "📌",
+  dice: "🎲",
   poll: "📊",
 };
 
 const LUCIDE_ICONS: Record<string, ReactNode> = {
-  "brain-circuit": <BrainCircuit className="text-primary" />,
-  "settings-2": <Settings2 className="text-primary" />,
-  wrench: <Wrench className="text-primary" />,
-  zap: <Zap className="text-primary" />,
-  "code-2": <Code2 className="text-primary" />,
-  message: <MessageSquare className="text-primary" />,
-  photo: <Image className="text-primary" />,
-  video: <Video className="text-primary" />,
-  music: <Music className="text-primary" />,
-  file: <FileText className="text-primary" />,
-  clapperboard: <Clapperboard className="text-primary" />,
-  microphone: <Mic className="text-primary" />,
-  timer: <Timer className="text-primary" />,
-  "mouse-pointer": <MousePointerClick className="text-primary" />,
-  door: <DoorOpen className="text-primary" />,
-  code: <WandSparkles className="text-primary" />,
-  database: <Database className="text-primary" />,
-  collection: <LayoutGrid className="text-primary" />,
-  split: <Split className="text-primary" />,
-  repeat: <Route className="text-primary" />,
-  "arrow-right": <Send className="text-primary" />,
-  globe: <Globe className="text-primary" />,
-  download: <Download className="text-primary" />,
-  clock: <Clock3 className="text-primary" />,
-  form: <FileText className="text-primary" />,
-  users: <Users className="text-primary" />,
-  variable: <Variable className="text-primary" />,
-  "credit-card": <CreditCard className="text-primary" />,
-  "badge-check": <BadgeCheck className="text-primary" />,
-  "user-plus": <UserPlus className="text-primary" />,
-  "user-check": <UserCheck className="text-emerald-500" />,
-  "user-x": <UserX className="text-red-500" />,
-  link: <Link className="text-teal-500" />,
-  table: <Table2 className="text-primary" />,
-  folder: <Folder className="text-primary" />,
-  // Previously missing icons — now mapped:
-  edit: <Pencil className="text-primary" />,
-  gallery: <Images className="text-primary" />,
-  copy: <Copy className="text-primary" />,
-  trash: <Trash2 className="text-primary" />,
-  plugin: <Plug className="text-primary" />,
-  loop: <RefreshCcw className="text-primary" />,
-  "corner-up-left": <CornerUpLeft className="text-primary" />,
-  reply: <CornerUpLeft className="text-primary" />,
-  unpin: <MousePointerClick className="text-primary" />,
+  // ── Triggers ──────────────────────────────────────────────────────────────
+  /** CommandTriggerNode: /start /help style command */
+  keyboard: <Zap className="text-primary" strokeWidth={2} />,
+  /** CronTriggerNode / CronNode / SchedulerNode: scheduled */
+  clock: <CalendarClock className="text-primary" strokeWidth={2} />,
+  /** MessageTriggerNode: incoming message */
+  message: <MessageCircle className="text-primary" strokeWidth={2} />,
+  /** CallbackQueryTriggerNode / CallbackButtonTriggerNode: button tap */
+  "mouse-pointer": <MousePointerClick className="text-primary" strokeWidth={2} />,
+  /** ReplyButtonTriggerNode: reply */
+  reply: <MessageSquareDashed className="text-primary" strokeWidth={2} />,
+  /** ExternalWebhookTriggerNode: webhook */
+  globe: <Globe className="text-primary" strokeWidth={2} />,
+  /** PreCheckoutTriggerNode */
+  "credit-card": <CreditCard className="text-primary" strokeWidth={2} />,
+  /** SuccessfulPaymentTriggerNode */
+  "badge-check": <BadgeCheck className="text-primary" strokeWidth={2} />,
+  /** ChatJoinRequestTriggerNode */
+  "user-plus": <UserPlus className="text-primary" strokeWidth={2} />,
+
+  // ── Send / media actions ──────────────────────────────────────────────────
+  /** SendTextMessageNode / AnswerInlineQueryNode */
+  "arrow-right": <Send className="text-primary" strokeWidth={2} />,
+  /** SendPhotoNode */
+  photo: <Image className="text-primary" strokeWidth={2} />,
+  /** SendVideoNode / SendVideoNoteNode */
+  video: <Video className="text-primary" strokeWidth={2} />,
+  /** SendAudioNode */
+  music: <Music className="text-primary" strokeWidth={2} />,
+  /** SendFileNode */
+  file: <FileText className="text-primary" strokeWidth={2} />,
+  /** SendAnimationNode */
+  clapperboard: <Play className="text-primary" strokeWidth={2} />,
+  /** SendVoiceNode */
+  microphone: <Mic className="text-primary" strokeWidth={2} />,
+  /** SendLocationNode / SendVenueNode */
+  location: <Milestone className="text-primary" strokeWidth={2} />,
+  /** SendContactNode */
+  contact: <Contact className="text-primary" strokeWidth={2} />,
+  /** SendMediaGroupNode */
+  gallery: <Images className="text-primary" strokeWidth={2} />,
+  /** SendInvoiceNode / PaymentNode / AIPaymentLinkToolNode */
+  "payment": <CreditCard className="text-primary" strokeWidth={2} />,
+
+  // ── Message operations ────────────────────────────────────────────────────
+  /** EditMessageNode / EditOrSendMessageNode */
+  edit: <Pencil className="text-primary" strokeWidth={2} />,
+  /** ForwardMessageNode */
+  forward: <CircleArrowRight className="text-primary" strokeWidth={2} />,
+  /** SendToAdminNode: megaphone/broadcast */
+  admin: <Megaphone className="text-primary" strokeWidth={2} />,
+  /** CopyMessageNode */
+  copy: <Copy className="text-primary" strokeWidth={2} />,
+  /** PinMessageNode */
+  pin: <Pin className="text-primary" strokeWidth={2} />,
+  /** UnpinMessageNode / UnpinAllMessagesNode */
+  unpin: <PinOff className="text-primary" strokeWidth={2} />,
+  /** DeleteMessageNode */
+  trash: <Trash2 className="text-primary" strokeWidth={2} />,
+  /** ChatActionNode: typing indicator */
+  typing: <MessageCircleMore className="text-primary" strokeWidth={2} />,
+  /** DownloadFileNode / DownloadNode */
+  download: <Download className="text-primary" strokeWidth={2} />,
+  /** CreateInviteLinkNode */
+  link: <Link className="text-primary" strokeWidth={2} />,
+
+  // ── Flow control ──────────────────────────────────────────────────────────
+  /** IfConditionNode */
+  split: <SplitSquareHorizontal className="text-primary" strokeWidth={2} />,
+  /** ElseIfNode */
+  repeat: <RefreshCcw className="text-primary" strokeWidth={2} />,
+  /** DelayNode */
+  timer: <Timer className="text-primary" strokeWidth={2} />,
+  /** RandomNode */
+  shuffle: <Shuffle className="text-primary" strokeWidth={2} />,
+  /** ForLoopNode */
+  loop: <RefreshCcw className="text-primary" strokeWidth={2} />,
+  /** ForLoopContinueNode */
+  "corner-up-left": <CircleX className="text-primary" strokeWidth={2} />,
+  /** FormNode */
+  form: <FilePlus2 className="text-primary" strokeWidth={2} />,
+  /** CheckMembershipNode */
+  users: <Users className="text-primary" strokeWidth={2} />,
+
+  // ── Data / state ──────────────────────────────────────────────────────────
+  /** StateNode */
+  database: <Database className="text-primary" strokeWidth={2} />,
+  /** CollectionNode / LoadCollectionListNode */
+  collection: <LayoutList className="text-primary" strokeWidth={2} />,
+  /** VariableNode */
+  variable: <Variable className="text-primary" strokeWidth={2} />,
+
+  // ── Integration ───────────────────────────────────────────────────────────
+  /** HTTPRequestNode / AIHTTPToolNode */
+  "http": <Webhook className="text-primary" strokeWidth={2} />,
+  /** SubFlowNode */
+  plugin: <Blocks className="text-primary" strokeWidth={2} />,
+  /** SubFlowExitNode */
+  door: <LogOut className="text-primary" strokeWidth={2} />,
+  /** CallbackQueryAnswerNode */
+  "callback-answer": <ChevronRightSquare className="text-primary" strokeWidth={2} />,
+  /** GoogleSheetsNode / AIGoogleSheetsToolNode */
+  table: <Table2 className="text-primary" strokeWidth={2} />,
+  /** GoogleDriveNode */
+  folder: <FolderOpen className="text-primary" strokeWidth={2} />,
+
+  // ── User management ───────────────────────────────────────────────────────
+  "user-check": <UserCheck className="text-primary" strokeWidth={2} />,
+  "user-x": <UserMinus className="text-primary" strokeWidth={2} />,
+
+  // ── AI ────────────────────────────────────────────────────────────────────
+  /** AIAgentNode / AIKnowledgeToolNode */
+  "brain-circuit": <BrainCircuit className="text-primary" strokeWidth={2} />,
+  /** AIOpenAI / Gemini / Anthropic / Ollama provider — sparkle for AI providers */
+  "settings-2": <Sparkles className="text-primary" strokeWidth={2} />,
+  /** wrench */
+  wrench: <Wrench className="text-primary" strokeWidth={2} />,
+  /** AICustomCodeToolNode */
+  "code-2": <CodeXml className="text-primary" strokeWidth={2} />,
+  /** AIKnowledgeToolNode */
+  "knowledge": <BrainCircuit className="text-primary" strokeWidth={2} />,
+  /** AICollectionToolNode */
+  "ai-collection": <LayoutList className="text-primary" strokeWidth={2} />,
+  /** AIDateTimeToolNode */
+  "datetime": <Clock className="text-primary" strokeWidth={2} />,
+
+  // ── Custom code ───────────────────────────────────────────────────────────
+  /** CustomCodeNode */
+  code: <Code2 className="text-primary" strokeWidth={2} />,
+
+  // ── Credentials / security ────────────────────────────────────────────────
+  "key": <KeyRound className="text-primary" strokeWidth={2} />,
+  "credential": <KeyRound className="text-primary" strokeWidth={2} />,
+
+  // ── Misc ──────────────────────────────────────────────────────────────────
+  zap: <Zap className="text-primary" strokeWidth={2} />,
+  "plug": <Plug2 className="text-primary" strokeWidth={2} />,
+  "truck": <Truck className="text-primary" strokeWidth={2} />,
 };
 
 export function resolveNodeIcon(iconName: string): ReactNode | string {
@@ -113,5 +217,6 @@ export function resolveNodeIcon(iconName: string): ReactNode | string {
     return LUCIDE_ICONS[iconName];
   }
 
-  return "⬚";
+  // Graceful fallback — use a neutral icon instead of a placeholder box.
+  return <Sparkles className="text-primary" strokeWidth={2} />;
 }

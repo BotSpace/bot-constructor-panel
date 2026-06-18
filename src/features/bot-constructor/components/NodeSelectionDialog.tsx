@@ -288,7 +288,7 @@ export function NodeSelectionDialog({
                 side="right"
                 showOverlay={false}
                 showCloseButton={false}
-                onInteractOutside={(e) => e.preventDefault()}
+                onInteractOutside={() => onOpenChange(false)}
                 className={cn(
                     "w-full gap-0 overflow-hidden border-l border-white/10 bg-[#141414] p-0 text-white shadow-2xl",
                     "sm:max-w-[420px]"

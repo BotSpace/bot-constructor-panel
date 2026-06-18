@@ -4,6 +4,24 @@ export type DebugNodeStatus = "waiting" | "running" | "success" | "error";
 
 const TERMINAL: DebugNodeStatus[] = ["success", "error"];
 
+/**
+ * Returns true if the incoming status should NOT override the current status.
+ * Rule: once a node has reached a terminal state (success/error) it stays there
+ * until the next run resets everything. "waiting" / "running" from a stale
+ * trigger event must never flip a green/red node back to yellow/spinning.
+ */
+function terminalGuard(
+  prevStatus: DebugNodeStatus | undefined,
+  incoming: DebugNodeStatus
+): boolean {
+  if (!prevStatus) return false;
+  const prevTerminal = TERMINAL.includes(prevStatus);
+  const incomingTerminal = TERMINAL.includes(incoming);
+  // Already at terminal → only another terminal (e.g. error after success) or
+  // nothing overrides it. "waiting"/"running" cannot replace terminal.
+  return prevTerminal && !incomingTerminal;
+}
+
 /** Inactivity (ms) after which all statuses auto-clear. */
 const AUTO_CLEAR_MS = 60_000;
 
@@ -100,6 +118,12 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
           return isNewRun ? { ...base, currentRunId: runId } : state;
         }
 
+        // Terminal guard: do not let waiting/running override success/error
+        // on the same run (e.g. a late trigger event after node already ran).
+        if (!isNewRun && terminalGuard(base.statuses[nodeId], status)) {
+          return state;
+        }
+
         return {
           currentRunId: runId,
           statuses: { ...base.statuses, [nodeId]: status },
@@ -124,6 +148,10 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
       // no ordering guarantee. Apply ordering: newer ts wins; on an equal ts a
       // terminal status (success/error) beats a non-terminal one. Re-running a
       // node (a fresh run) carries a newer ts so it repaints correctly.
+      // Terminal guard: once success/error is set, waiting/running cannot
+      // override it (protects against late trigger events arriving after node ran).
+      if (terminalGuard(prevStatus, status)) return state;
+
       if (prevTs !== undefined) {
         if (incomingTs < prevTs) return state;
         if (incomingTs === prevTs) {

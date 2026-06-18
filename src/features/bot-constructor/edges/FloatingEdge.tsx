@@ -39,9 +39,14 @@ function FloatingEdge({
     label,
 }: Omit<EdgeProps, "markerEnd">) {
     const nodes = useNodes();
-    const { stroke: defaultColor, selectedStroke } = useEdgeColor(sourceHandleId);
+    const { stroke: defaultColor, selectedStroke, neutralStroke } = useEdgeColor(sourceHandleId);
+    // Accessory edges (tool/provider → AI agent) should use the neutral edge
+    // color instead of the handle-type color so they blend with regular edges.
+    const isAccessoryEdgeCheck = typeof targetHandleId === "string" && targetHandleId.startsWith("acc:");
     // Prefer edge's own style.stroke (e.g. orange for edit-message) over computed color
-    const edgeColor = (style as any)?.stroke || defaultColor;
+    const edgeColor = isAccessoryEdgeCheck
+      ? neutralStroke
+      : (style as any)?.stroke || defaultColor;
 
     // Find target node for entry-side selection and label
     const targetNode = nodes.find((node) => node.id === target);
