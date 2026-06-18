@@ -29,12 +29,12 @@ function extractResults<T>(raw: unknown): T[] {
 // payload isn't already a credential (detect id/type_key).
 function unwrapCredential(raw: unknown): CredentialListItem {
   const r = (raw ?? {}) as Record<string, unknown>;
-  if (r.id !== undefined || r.type_key !== undefined) return r as CredentialListItem;
+  if (r.id !== undefined || r.type_key !== undefined) return r as unknown as CredentialListItem;
   const inner = r.data as Record<string, unknown> | undefined;
   if (inner && (inner.id !== undefined || inner.type_key !== undefined)) {
-    return inner as CredentialListItem;
+    return inner as unknown as CredentialListItem;
   }
-  return r as CredentialListItem;
+  return r as unknown as CredentialListItem;
 }
 
 // ---------------------------------------------------------------------------
