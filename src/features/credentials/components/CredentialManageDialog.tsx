@@ -198,7 +198,7 @@ export function CredentialManageDialog({
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{item.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {item.type.label}
+                          {item.type?.label ?? item.type_key}
                         </p>
                       </div>
 

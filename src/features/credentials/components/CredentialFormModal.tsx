@@ -527,7 +527,7 @@ export function CredentialFormModal({
       setStep(2);
       setName(editItem.name);
 
-      const matchedType = types?.find((t) => t.key === editItem.type.key) ?? null;
+      const matchedType = types?.find((t) => t.key === (editItem.type?.key ?? editItem.type_key)) ?? null;
       setSelectedType(matchedType);
 
       const initialValues: Record<string, string> = {};
@@ -570,7 +570,7 @@ export function CredentialFormModal({
   // When types load in edit mode, resolve the type object
   useEffect(() => {
     if (open && types && isEdit && editItem) {
-      const matched = types.find((t) => t.key === editItem.type.key) ?? null;
+      const matched = types.find((t) => t.key === (editItem.type?.key ?? editItem.type_key)) ?? null;
       if (matched && !selectedType) setSelectedType(matched);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -137,7 +137,7 @@ export function CredentialSelectField({
                 {c.name}
                 {!typeKey ? (
                   <span className="ml-1.5 text-[10px] text-muted-foreground">
-                    ({c.type.label})
+                    ({c.type?.label ?? c.type_key})
                   </span>
                 ) : null}
               </SelectItem>
