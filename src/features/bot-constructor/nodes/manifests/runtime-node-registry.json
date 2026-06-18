@@ -6136,7 +6136,14 @@
 				"key": "values",
 				"label": "Values (JSON 2D)",
 				"placeholder": "[[\"a\",\"b\"]]",
-				"optional": true
+				"optional": true,
+				"visibleWhen": {
+					"key": "operation",
+					"oneOf": [
+						"append",
+						"update"
+					]
+				}
 			},
 			{
 				"type": "text",
@@ -6221,13 +6228,24 @@
 				"type": "text",
 				"key": "query",
 				"label": "Qidiruv (q)",
-				"optional": true
+				"optional": true,
+				"visibleWhen": {
+					"key": "operation",
+					"equals": "list"
+				}
 			},
 			{
 				"type": "text",
 				"key": "file_name",
 				"label": "Fayl/papka nomi",
-				"optional": true
+				"optional": true,
+				"visibleWhen": {
+					"key": "operation",
+					"oneOf": [
+						"create_folder",
+						"upload"
+					]
+				}
 			},
 			{
 				"type": "dynamic_select",
@@ -6235,13 +6253,24 @@
 				"label": "Papka (Folder)",
 				"optional": true,
 				"resource": "google_drive_folders",
-				"credentialKey": "credential_id"
+				"credentialKey": "credential_id",
+				"visibleWhen": {
+					"key": "operation",
+					"oneOf": [
+						"create_folder",
+						"upload"
+					]
+				}
 			},
 			{
 				"type": "textarea",
 				"key": "content",
 				"label": "Matn (upload)",
-				"optional": true
+				"optional": true,
+				"visibleWhen": {
+					"key": "operation",
+					"equals": "upload"
+				}
 			},
 			{
 				"type": "dynamic_select",
@@ -6249,7 +6278,11 @@
 				"label": "Fayl (delete)",
 				"optional": true,
 				"resource": "google_drive_files",
-				"credentialKey": "credential_id"
+				"credentialKey": "credential_id",
+				"visibleWhen": {
+					"key": "operation",
+					"equals": "delete"
+				}
 			},
 			{
 				"type": "text",
