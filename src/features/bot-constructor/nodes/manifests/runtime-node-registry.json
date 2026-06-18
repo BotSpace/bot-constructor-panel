@@ -4119,7 +4119,10 @@
 					"AIHTTPToolNode",
 					"AICollectionToolNode",
 					"AICustomCodeToolNode",
-					"AIKnowledgeToolNode"
+					"AIKnowledgeToolNode",
+					"AIDateTimeToolNode",
+					"AIGoogleSheetsToolNode",
+					"AIPaymentLinkToolNode"
 				],
 				"styleVariant": "success"
 			}
@@ -6236,5 +6239,180 @@
 			"drive_response",
 			"drive_success"
 		]
+	},
+	{
+		"type": "AIDateTimeToolNode",
+		"status": "runtime",
+		"category": "ai",
+		"accessory": true,
+		"accessoryAttachesTo": [
+			"ai_tool"
+		],
+		"titleKey": "constructor.ai.dateTimeTool.name",
+		"descriptionKey": "constructor.ai.dateTimeTool.description",
+		"titleFallback": "DateTime",
+		"descriptionFallback": "Lets the agent get the current date and time.",
+		"iconName": "clock",
+		"colorToken": "ai-sky",
+		"size": {
+			"width": 180
+		},
+		"sidebar": {
+			"enabled": true,
+			"groupId": "ai",
+			"sortOrder": 34,
+			"elementType": "ai_tool_datetime"
+		},
+		"handles": [
+			{
+				"preset": "source-top"
+			}
+		],
+		"content": [
+			{
+				"type": "text",
+				"key": "tz",
+				"label": "Timezone",
+				"placeholder": "UTC",
+				"helpText": "IANA timezone, e.g. Asia/Tashkent. Defaults to UTC."
+			},
+			{
+				"type": "text",
+				"key": "format",
+				"label": "Date Format",
+				"placeholder": "2006-01-02 15:04:05",
+				"helpText": "Go time layout or leave empty for ISO 8601."
+			}
+		],
+		"defaults": {
+			"tool": "datetime",
+			"tz": "UTC",
+			"format": ""
+		}
+	},
+	{
+		"type": "AIGoogleSheetsToolNode",
+		"status": "runtime",
+		"category": "ai",
+		"accessory": true,
+		"accessoryAttachesTo": [
+			"ai_tool"
+		],
+		"titleKey": "constructor.ai.googleSheetsTool.name",
+		"descriptionKey": "constructor.ai.googleSheetsTool.description",
+		"titleFallback": "Google Sheets",
+		"descriptionFallback": "Lets the agent read or append rows in Google Sheets.",
+		"iconName": "table",
+		"colorToken": "integration-green",
+		"size": {
+			"width": 180
+		},
+		"sidebar": {
+			"enabled": true,
+			"groupId": "ai",
+			"sortOrder": 35,
+			"elementType": "ai_tool_google_sheets"
+		},
+		"handles": [
+			{
+				"preset": "source-top"
+			}
+		],
+		"content": [
+			{
+				"type": "credential",
+				"key": "credential_id",
+				"credentialType": "google_sheets",
+				"label": "Google Sheets Credential",
+				"required": true
+			},
+			{
+				"type": "text",
+				"key": "spreadsheetId",
+				"label": "Spreadsheet ID",
+				"placeholder": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms",
+				"helpText": "Google Sheets spreadsheet ID from the URL."
+			},
+			{
+				"type": "text",
+				"key": "sheet",
+				"label": "Sheet Name",
+				"placeholder": "Sheet1"
+			},
+			{
+				"type": "select",
+				"key": "operation",
+				"label": "Operation",
+				"options": [
+					{
+						"value": "read",
+						"label": "Read"
+					},
+					{
+						"value": "append",
+						"label": "Append"
+					}
+				],
+				"variant": "tabs"
+			}
+		],
+		"defaults": {
+			"tool": "google_sheets",
+			"credential_id": "",
+			"spreadsheetId": "",
+			"sheet": "Sheet1",
+			"operation": "read"
+		}
+	},
+	{
+		"type": "AIPaymentLinkToolNode",
+		"status": "runtime",
+		"category": "ai",
+		"accessory": true,
+		"accessoryAttachesTo": [
+			"ai_tool"
+		],
+		"titleKey": "constructor.ai.paymentLinkTool.name",
+		"descriptionKey": "constructor.ai.paymentLinkTool.description",
+		"titleFallback": "Payment Link",
+		"descriptionFallback": "Lets the agent generate a payment link.",
+		"iconName": "credit-card",
+		"colorToken": "ai-emerald",
+		"size": {
+			"width": 180
+		},
+		"sidebar": {
+			"enabled": true,
+			"groupId": "ai",
+			"sortOrder": 36,
+			"elementType": "ai_tool_payment_link"
+		},
+		"handles": [
+			{
+				"preset": "source-top"
+			}
+		],
+		"content": [
+			{
+				"type": "select",
+				"key": "paymentType",
+				"label": "Payment Provider",
+				"options": [
+					{
+						"value": "click",
+						"label": "Click"
+					},
+					{
+						"value": "paycue",
+						"label": "PayCue"
+					}
+				],
+				"variant": "tabs"
+			}
+		],
+		"defaults": {
+			"tool": "payment_link",
+			"paymentType": "click"
+		}
 	}
 ]

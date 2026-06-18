@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
 import { ActionPanel } from "@/features/bot-constructor/nodes/components/shared/ActionPanel";
 import { NodeHeader } from "@/features/bot-constructor/nodes/actions/shared/NodeHeader";
@@ -87,6 +88,18 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
         <span className="text-[10px] font-semibold tracking-wide uppercase text-center leading-tight text-foreground/75 max-w-[110px] line-clamp-2">
           {title}
         </span>
+
+        {/* Category badge for accessory nodes */}
+        {manifest.accessoryAttachesTo?.includes("ai_tool") && (
+          <Badge className="text-[8px] font-semibold tracking-widest uppercase px-1.5 py-0 h-3.5 pointer-events-none bg-emerald-500/15 text-emerald-600 border-emerald-500/30">
+            tool
+          </Badge>
+        )}
+        {manifest.accessoryAttachesTo?.includes("ai_model") && (
+          <Badge className="text-[8px] font-semibold tracking-widest uppercase px-1.5 py-0 h-3.5 pointer-events-none bg-sky-500/15 text-sky-600 border-sky-500/30">
+            provider
+          </Badge>
+        )}
       </div>
     </div>
   );
@@ -205,6 +218,9 @@ export function GenericNodeRenderer({
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
         color={NODE_COLOR_CLASS_REGISTRY[manifest.colorToken] || "bg-zinc-600"}
         handleSlot={headerHandleSlot}
+        category={manifest.category}
+        accessory={manifest.accessory}
+        accessoryAttachesTo={manifest.accessoryAttachesTo}
       />
 
       {!isCollapsed ? (
