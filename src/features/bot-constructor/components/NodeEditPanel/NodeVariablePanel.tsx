@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { GLOBAL_CONTEXT_VARIABLE_GROUPS } from "@/features/bot-constructor/data/global-context-variables";
 import { useVariableInsertion } from "@/features/bot-constructor/components/NodeEditPanel/variable-insertion";
 import { cn } from "@/lib/utils";
-import { Braces, Globe, GripVertical, MousePointer2 } from "lucide-react";
-import { DragEvent } from "react";
+import { Braces, ChevronDown, Globe, GripVertical, MousePointer2 } from "lucide-react";
+import { DragEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 
 interface NodeVariablePanelProps {
@@ -28,6 +28,8 @@ function t_safe(
 export function NodeVariablePanel({ stateKeys }: NodeVariablePanelProps) {
   const { insertVariable } = useVariableInsertion();
   const t = useTranslations("variablePanel");
+  // Collapsed by default — user opens it on demand.
+  const [open, setOpen] = useState(false);
 
   const handleDragStart = (event: DragEvent<HTMLButtonElement>, key: string) => {
     const token = `{{${key}}}`;
@@ -45,21 +47,36 @@ export function NodeVariablePanel({ stateKeys }: NodeVariablePanelProps) {
   const sectionGlobal = t_safe(t, "sectionGlobal", "Global / auto context");
 
   return (
-    <aside className="hidden max-h-[40%] min-h-0 shrink-0 flex-col border-t border-white/10 bg-zinc-950/80 lg:flex">
-      {/* Header */}
-      <div className="shrink-0 border-b border-white/10 p-4">
-        <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-400/10 text-cyan-200">
-            <Braces className="h-4 w-4" />
-          </span>
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-white">{title}</h3>
-            <p className="text-xs text-zinc-400">{subtitle}</p>
-          </div>
+    <aside
+      className={cn(
+        "hidden min-h-0 shrink-0 flex-col border-t border-white/10 bg-zinc-950/80 lg:flex",
+        open && "max-h-[40%]",
+      )}
+    >
+      {/* Header — click to expand/collapse (collapsed by default) */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full shrink-0 items-center gap-2 border-b border-white/10 p-4 text-left transition-colors hover:bg-white/[0.03]"
+        aria-expanded={open}
+      >
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-400/10 text-cyan-200">
+          <Braces className="h-4 w-4" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-sm font-semibold text-white">{title}</h3>
+          <p className="text-xs text-zinc-400">{subtitle}</p>
         </div>
-      </div>
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 shrink-0 text-zinc-400 transition-transform",
+            open && "rotate-180",
+          )}
+        />
+      </button>
 
-      {/* Scrollable body */}
+      {/* Scrollable body — only when expanded */}
+      {open && (
       <div className="min-h-0 flex-1 overflow-y-auto p-4 space-y-5">
 
         {/* ── Flow state section ── */}
@@ -131,13 +148,16 @@ export function NodeVariablePanel({ stateKeys }: NodeVariablePanelProps) {
           </div>
         </section>
       </div>
+      )}
 
-      {/* Footer */}
+      {/* Footer — only when expanded */}
+      {open && (
       <div className="shrink-0 border-t border-white/10 p-4">
         <Badge variant="outline" className="border-white/10 text-[11px] text-zinc-400">
           Format: {`{{variable}}`}
         </Badge>
       </div>
+      )}
     </aside>
   );
 }
