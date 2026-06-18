@@ -24,6 +24,7 @@ import { ToolParamsField } from "@/features/bot-constructor/nodes/widgets/generi
 import { CollectionSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CollectionSelectField";
 import { CredentialSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CredentialSelectField";
 import { DynamicSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/DynamicSelectField";
+import { DynamicInputsField } from "@/features/bot-constructor/nodes/widgets/generic-fields/DynamicInputsField";
 import { StateTypeSelectField } from "@/features/bot-constructor/nodes/widgets/generic-fields/StateTypeSelectField";
 import { ConditionListField } from "@/features/bot-constructor/nodes/widgets/generic-fields/ConditionListField";
 import { CronEditorField } from "@/features/bot-constructor/nodes/widgets/generic-fields/CronEditorField";
@@ -298,6 +299,20 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         dependsOn={field.dependsOn}
         label={field.label}
         placeholder={field.placeholder}
+      />
+    );
+  }
+
+  if (field.type === "dynamic_inputs" && field.resource) {
+    return (
+      <DynamicInputsField
+        nodeId={nodeId}
+        data={data}
+        dataKey={field.key || "values"}
+        resource={field.resource}
+        credentialKey={field.credentialKey}
+        dependsOn={field.dependsOn}
+        label={field.label}
       />
     );
   }

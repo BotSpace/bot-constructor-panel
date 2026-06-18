@@ -6112,19 +6112,6 @@
 				]
 			},
 			{
-				"type": "dynamic_select",
-				"key": "column",
-				"label": "Ustun (Field)",
-				"resource": "google_sheet_columns",
-				"credentialKey": "credential_id",
-				"dependsOn": [
-					"spreadsheet_id",
-					"sheet"
-				],
-				"optional": true,
-				"helpText": "Sheet ustunlari — qiymat berishda {{column}} sifatida ishlatishingiz mumkin"
-			},
-			{
 				"type": "text",
 				"key": "range",
 				"label": "Range (ixtiyoriy)",
@@ -6132,10 +6119,15 @@
 				"optional": true
 			},
 			{
-				"type": "textarea",
+				"type": "dynamic_inputs",
 				"key": "values",
-				"label": "Values (JSON 2D)",
-				"placeholder": "[[\"a\",\"b\"]]",
+				"label": "Qator qiymatlari (ustunlar bo'yicha)",
+				"resource": "google_sheet_columns",
+				"credentialKey": "credential_id",
+				"dependsOn": [
+					"spreadsheet_id",
+					"sheet"
+				],
 				"optional": true,
 				"visibleWhen": {
 					"key": "operation",

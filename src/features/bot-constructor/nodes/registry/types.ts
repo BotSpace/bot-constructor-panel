@@ -101,6 +101,7 @@ export interface NodeFieldManifest {
     | "collection-binding"
     // Credential selector — shows only credentials matching `credentialType`
     | "credential"
+    | "dynamic_inputs"
     // Dynamic (load-options) select — loads options from backend via credential
     | "dynamic_select";
   key?: string;
