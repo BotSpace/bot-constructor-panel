@@ -66,6 +66,10 @@ function isFieldVisible(data: Record<string, unknown>, field: NodeFieldManifest)
     return currentValue !== field.visibleWhen.notEquals;
   }
 
+  if (Array.isArray(field.visibleWhen.oneOf)) {
+    return field.visibleWhen.oneOf.includes(currentValue);
+  }
+
   return true;
 }
 
@@ -197,18 +201,41 @@ export function ModalNodeFormRenderer({
     return optionalFieldConfigured(f, data, manifest.defaults?.[fieldKey(f)]);
   });
 
+  // Auto-revealed optional fields: an optional field with a `visibleWhen` rule is
+  // condition-driven. `allFields` is already filtered by isFieldVisible above, so any
+  // optional+visibleWhen field present here means its condition currently matches — show
+  // it automatically (no manual "add"). When the trigger value changes and the condition
+  // stops matching, the field drops out of `allFields` and disappears on its own.
+  const autoRevealedFields = allFields.filter(
+    (f) => f.optional && f.visibleWhen && !addedOptionalKeys.includes(fieldKey(f))
+  );
+  const autoRevealedKeys = new Set(autoRevealedFields.map(fieldKey));
+
   // Manually added this session — in the ORDER the user added them so each
   // new field always appears at the very bottom of the list.
   const manuallyAddedFields = addedOptionalKeys
     .map((key) => allFields.find((f) => fieldKey(f) === key))
     .filter((f): f is NodeFieldManifest => Boolean(f));
 
-  const addedOptionalFields = [...configuredOptionalFields, ...manuallyAddedFields];
+  // Dedupe across the three sources (a configured value + matching condition can overlap).
+  const seenOptional = new Set<string>();
+  const addedOptionalFields = [
+    ...autoRevealedFields,
+    ...configuredOptionalFields,
+    ...manuallyAddedFields,
+  ].filter((f) => {
+    const k = fieldKey(f);
+    if (seenOptional.has(k)) return false;
+    seenOptional.add(k);
+    return true;
+  });
 
   const shownOptionalKeys = new Set(addedOptionalFields.map(fieldKey));
 
+  // Condition-driven fields (visibleWhen) are auto-managed — keep them out of the
+  // manual "add optional field" list.
   const availableOptionalFields = allFields.filter(
-    (f) => f.optional && !shownOptionalKeys.has(fieldKey(f))
+    (f) => f.optional && !f.visibleWhen && !shownOptionalKeys.has(fieldKey(f))
   );
 
   const shownFields = [...requiredFields, ...addedOptionalFields];
@@ -219,7 +246,9 @@ export function ModalNodeFormRenderer({
         {shownFields.length ? (
           <div className="space-y-5">
             {shownFields.map((field, index) =>
-              field.optional ? (
+              // Auto-revealed (condition-driven) optional fields render like required
+              // fields — no manual remove control.
+              field.optional && !autoRevealedKeys.has(fieldKey(field)) ? (
                 <div
                   key={`${manifest.type}-${fieldKey(field)}-${index}`}
                   className="flex items-start gap-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-200"

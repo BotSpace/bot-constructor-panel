@@ -45,6 +45,8 @@ export interface NodeHandleManifest {
 }
 
 export interface NodeVisibilityRule {
+  /** Show when the watched field's value is one of these. */
+  oneOf?: unknown[];
   key: string;
   equals?: unknown;
   notEquals?: unknown;
