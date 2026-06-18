@@ -276,11 +276,7 @@
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"helpText": "Yoqilsa, foydalanuvchidagi reply keyboard o'chiriladi",
-				"optional": true,
-				"visibleWhen": {
-					"key": "keyboard_kind",
-					"notEquals": "reply"
-				}
+				"optional": true
 			},
 			{
 				"type": "select",
@@ -459,11 +455,7 @@
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"helpText": "Yoqilsa, foydalanuvchidagi reply keyboard o'chiriladi",
-				"optional": true,
-				"visibleWhen": {
-					"key": "keyboard_kind",
-					"notEquals": "reply"
-				}
+				"optional": true
 			}
 		],
 		"footer": [
@@ -621,11 +613,7 @@
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"helpText": "Yoqilsa, foydalanuvchidagi reply keyboard o'chiriladi",
-				"optional": true,
-				"visibleWhen": {
-					"key": "keyboard_kind",
-					"notEquals": "reply"
-				}
+				"optional": true
 			}
 		],
 		"footer": [
@@ -783,11 +771,7 @@
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"helpText": "Yoqilsa, foydalanuvchidagi reply keyboard o'chiriladi",
-				"optional": true,
-				"visibleWhen": {
-					"key": "keyboard_kind",
-					"notEquals": "reply"
-				}
+				"optional": true
 			}
 		],
 		"footer": [
@@ -947,11 +931,7 @@
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"helpText": "Yoqilsa, foydalanuvchidagi reply keyboard o'chiriladi",
-				"optional": true,
-				"visibleWhen": {
-					"key": "keyboard_kind",
-					"notEquals": "reply"
-				}
+				"optional": true
 			}
 		],
 		"footer": [
@@ -1264,11 +1244,7 @@
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"helpText": "Yoqilsa, foydalanuvchidagi reply keyboard o'chiriladi",
-				"optional": true,
-				"visibleWhen": {
-					"key": "keyboard_kind",
-					"notEquals": "reply"
-				}
+				"optional": true
 			}
 		],
 		"footer": [
@@ -1444,11 +1420,7 @@
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"helpText": "Yoqilsa, foydalanuvchidagi reply keyboard o'chiriladi",
-				"optional": true,
-				"visibleWhen": {
-					"key": "keyboard_kind",
-					"notEquals": "reply"
-				}
+				"optional": true
 			}
 		],
 		"footer": [
@@ -1682,11 +1654,7 @@
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"helpText": "Yoqilsa, foydalanuvchidagi reply keyboard o'chiriladi",
-				"optional": true,
-				"visibleWhen": {
-					"key": "keyboard_kind",
-					"notEquals": "reply"
-				}
+				"optional": true
 			}
 		],
 		"footer": [
@@ -1982,11 +1950,7 @@
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"helpText": "Yoqilsa, foydalanuvchidagi reply keyboard o'chiriladi",
-				"optional": true,
-				"visibleWhen": {
-					"key": "keyboard_kind",
-					"notEquals": "reply"
-				}
+				"optional": true
 			}
 		],
 		"footer": [
@@ -2403,11 +2367,7 @@
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"helpText": "Yoqilsa, foydalanuvchidagi reply keyboard o'chiriladi (faqat yangi xabar yuborilganda ishlaydi)",
-				"optional": true,
-				"visibleWhen": {
-					"key": "keyboard_kind",
-					"notEquals": "reply"
-				}
+				"optional": true
 			},
 			{
 				"type": "select",
@@ -4311,12 +4271,6 @@
 				"placeholder": "gpt-4o-mini"
 			},
 			{
-				"type": "text",
-				"key": "baseURL",
-				"label": "Base URL",
-				"placeholder": "https://api.openai.com/v1"
-			},
-			{
 				"type": "number",
 				"key": "temperature",
 				"label": "Temperature",
@@ -4336,7 +4290,6 @@
 			"provider": "openai",
 			"apiKey": "",
 			"model": "gpt-4o-mini",
-			"baseURL": "https://api.openai.com/v1",
 			"temperature": 0.7,
 			"maxTokens": null,
 			"extraHeaders": {},
@@ -4386,12 +4339,6 @@
 				"placeholder": "gpt-oss:120b"
 			},
 			{
-				"type": "text",
-				"key": "baseURL",
-				"label": "Base URL",
-				"placeholder": "https://ollama.com/v1"
-			},
-			{
 				"type": "number",
 				"key": "temperature",
 				"label": "Temperature",
@@ -4411,7 +4358,6 @@
 			"provider": "ollama",
 			"apiKey": "",
 			"model": "llama3.1",
-			"baseURL": "https://ollama.com/v1",
 			"temperature": 0.7,
 			"maxTokens": null,
 			"extraHeaders": {},
@@ -4535,12 +4481,6 @@
 				"placeholder": "claude-3-5-haiku-latest"
 			},
 			{
-				"type": "text",
-				"key": "baseURL",
-				"label": "Base URL",
-				"placeholder": "https://api.anthropic.com/v1"
-			},
-			{
 				"type": "number",
 				"key": "temperature",
 				"label": "Temperature",
@@ -4560,7 +4500,6 @@
 			"provider": "anthropic",
 			"apiKey": "",
 			"model": "claude-3-5-haiku-latest",
-			"baseURL": "https://api.anthropic.com/v1",
 			"temperature": 0.7,
 			"maxTokens": null,
 			"extraHeaders": {},

@@ -346,7 +346,7 @@ export function NodeSelectionDialog({
                 <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
                     {isSearching ? (
                         /* ---- SEARCH RESULTS (flat, grouped by category) ---- */
-                        <ScrollArea className="flex-1">
+                        <ScrollArea className="h-0 flex-1">
                             {searchResults.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-16 text-sm text-zinc-500 gap-2">
                                     <Search className="h-8 w-8 opacity-30" />
@@ -370,7 +370,7 @@ export function NodeSelectionDialog({
                         </ScrollArea>
                     ) : activeCategoryId && activeDrillGroup ? (
                         /* ---- DRILLED-IN NODE LIST ---- */
-                        <ScrollArea className="flex-1">
+                        <ScrollArea className="h-0 flex-1">
                             <div className="p-3 flex flex-col gap-1">
                                 {activeDrillGroup.elements?.map((element, idx) => (
                                     <NodeCard
@@ -389,7 +389,7 @@ export function NodeSelectionDialog({
                         </ScrollArea>
                     ) : (
                         /* ---- CATEGORY LIST ---- */
-                        <ScrollArea className="flex-1">
+                        <ScrollArea className="h-0 flex-1">
                             <div className="py-3 flex flex-col gap-1 px-3">
                                 {filteredGroups.map((group, index) => {
                                     const isActive = index === activeCategoryIndexNav;
