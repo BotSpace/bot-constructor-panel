@@ -6131,7 +6131,9 @@
 				"label": "Varaq (Sheet)",
 				"resource": "google_sheet_tabs",
 				"credentialKey": "credential_id",
-				"dependsOn": ["spreadsheet_id"]
+				"dependsOn": [
+					"spreadsheet_id"
+				]
 			},
 			{
 				"type": "dynamic_select",
@@ -6139,7 +6141,10 @@
 				"label": "Ustun (Field)",
 				"resource": "google_sheet_columns",
 				"credentialKey": "credential_id",
-				"dependsOn": ["spreadsheet_id", "sheet"],
+				"dependsOn": [
+					"spreadsheet_id",
+					"sheet"
+				],
 				"optional": true,
 				"helpText": "Sheet ustunlari — qiymat berishda {{column}} sifatida ishlatishingiz mumkin"
 			},
@@ -6249,10 +6254,12 @@
 				"optional": true
 			},
 			{
-				"type": "text",
+				"type": "dynamic_select",
 				"key": "folder_id",
-				"label": "Papka ID (parent)",
-				"optional": true
+				"label": "Papka (Folder)",
+				"optional": true,
+				"resource": "google_drive_folders",
+				"credentialKey": "credential_id"
 			},
 			{
 				"type": "textarea",
@@ -6261,10 +6268,12 @@
 				"optional": true
 			},
 			{
-				"type": "text",
+				"type": "dynamic_select",
 				"key": "file_id",
-				"label": "Fayl ID (delete)",
-				"optional": true
+				"label": "Fayl (delete)",
+				"optional": true,
+				"resource": "google_drive_files",
+				"credentialKey": "credential_id"
 			},
 			{
 				"type": "text",
