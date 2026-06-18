@@ -53,6 +53,13 @@ export const createFlowSlice: StateCreator<
 
     const newNodes = applyNodeChanges(changes, get().nodes);
 
+    // Ephemeral (mazmunsiz) o'zgarishlar: faqat tanlash/o'lcham — bo'sh joyga bosganda
+    // React Flow node'larni deselect qiladi va `selected` maydoni o'zgaradi. Bu flow'ni
+    // o'zgartirmaydi, shuning uchun isDirty/history'ga ta'sir qilmasligi kerak.
+    const hasContentChange = changes.some(
+      (change) => change.type !== "select" && change.type !== "dimensions",
+    );
+
     // Haqiqiy o'zgarishlarni tekshirish
     const hasRealChanges =
       !initialState ||
@@ -67,7 +74,7 @@ export const createFlowSlice: StateCreator<
       return change.dragging === false || change.dragging === undefined;
     });
 
-    if (hasSignificantChange && hasRealChanges) {
+    if (hasContentChange && hasSignificantChange && hasRealChanges) {
       // History ga saqlash (undo/redo flag tekshiriladi ichida)
       saveToHistory();
     }
@@ -75,7 +82,8 @@ export const createFlowSlice: StateCreator<
     set({
       // Yangilangan o'zgarishlarni qo'llaymiz
       nodes: newNodes,
-      isDirty: hasRealChanges,
+      // Tanlash/o'lcham o'zgarishlari isDirty'ni o'zgartirmaydi (mavjud holatni saqlaymiz).
+      isDirty: hasContentChange ? hasRealChanges : get().isDirty,
     });
 
     // ── Collab: broadcast LOCAL node moves + removals ──────────────────────
@@ -107,19 +115,24 @@ export const createFlowSlice: StateCreator<
 
     const newEdges = applyEdgeChanges(changes, get().edges);
 
+    // Ephemeral (mazmunsiz) o'zgarishlar: faqat tanlash — bo'sh joyga bosganda edge'lar
+    // deselect bo'ladi. Bu flow'ni o'zgartirmaydi.
+    const hasContentChange = changes.some((change) => change.type !== "select");
+
     // Haqiqiy o'zgarishlarni tekshirish
     const hasRealChanges =
       !initialState ||
       JSON.stringify(newEdges) !== JSON.stringify(initialState.edges);
 
     // History ga saqlash (undo/redo flag tekshiriladi ichida)
-    if (hasRealChanges) {
+    if (hasContentChange && hasRealChanges) {
       saveToHistory();
     }
 
     set({
       edges: newEdges,
-      isDirty: hasRealChanges,
+      // Tanlash o'zgarishi isDirty'ni o'zgartirmaydi.
+      isDirty: hasContentChange ? hasRealChanges : get().isDirty,
     });
 
     // ── Collab: broadcast LOCAL edge add/remove ────────────────────────────
