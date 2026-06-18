@@ -126,6 +126,10 @@ function FieldRenderer({ field, value, isEdit, onChange }: FieldRendererProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={3}
+        autoComplete="off"
+        data-1p-ignore="true"
+        data-lpignore="true"
+        data-bwignore="true"
       />
     );
   }
@@ -139,6 +143,10 @@ function FieldRenderer({ field, value, isEdit, onChange }: FieldRendererProps) {
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="pr-9"
+          autoComplete="off"
+          data-1p-ignore="true"
+          data-lpignore="true"
+          data-bwignore="true"
         />
         <button
           type="button"
@@ -158,6 +166,10 @@ function FieldRenderer({ field, value, isEdit, onChange }: FieldRendererProps) {
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      autoComplete="off"
+      data-1p-ignore="true"
+      data-lpignore="true"
+      data-bwignore="true"
     />
   );
 }
@@ -183,10 +195,16 @@ function TypePicker({
   return (
     <div className="space-y-3">
       <Input
+        type="text"
+        name="credential-type-search"
         placeholder="Credential turi qidirish..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         autoFocus
+        autoComplete="off"
+        data-1p-ignore="true"
+        data-lpignore="true"
+        data-bwignore="true"
       />
       <div className="max-h-[320px] overflow-y-auto pr-0.5">
         {filtered.length === 0 ? (
@@ -254,10 +272,15 @@ function DataForm({
       <div className="space-y-1.5">
         <Label className="text-xs text-muted-foreground">Credential nomi</Label>
         <Input
+          name="credential-name"
           placeholder={`Masalan: My ${type.label}`}
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
           autoFocus
+          autoComplete="off"
+          data-1p-ignore="true"
+          data-lpignore="true"
+          data-bwignore="true"
         />
       </div>
 
