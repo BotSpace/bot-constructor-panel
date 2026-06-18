@@ -33,6 +33,7 @@ export async function getEnvList(
 export async function createEnv(payload: {
   key: string;
   value: string;
+  secret: boolean;
   project: number | string;
 }): Promise<Env> {
   const { data } = await instanceAuth.post<ApiResponse<Env>>(
@@ -44,7 +45,7 @@ export async function createEnv(payload: {
 
 export async function updateEnv(
   id: number,
-  payload: { key?: string; value?: string }
+  payload: { key?: string; value?: string; secret?: boolean }
 ): Promise<Env> {
   const { data } = await instanceAuth.patch<ApiResponse<Env>>(
     `/enviroment/${id}/`,
