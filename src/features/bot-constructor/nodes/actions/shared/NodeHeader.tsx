@@ -1,8 +1,7 @@
-import { ReactNode, useCallback, useState } from "react";
+import { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
-import { useFlowStore } from "@/features/bot-constructor/store";
 
 // ---------------------------------------------------------------------------
 // Category badge helpers — maps manifest `category` to a short label + style.
@@ -60,8 +59,6 @@ function getCategoryBadge(
 interface NodeHeaderProps {
   icon: ReactNode;
   title: string;
-  /** Node id — required for inline name editing. */
-  nodeId: string;
   buttonCount?: number;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
@@ -81,96 +78,9 @@ interface NodeHeaderProps {
   handleSlot?: ReactNode;
 }
 
-// ---------------------------------------------------------------------------
-// InlineNodeTitle — double-click to edit the node name inline on the canvas.
-// Saves to data.node_label via updateNodeData; Esc reverts, Enter/blur saves.
-// ---------------------------------------------------------------------------
-
-interface InlineNodeTitleProps {
-  nodeId: string;
-  /** Displayed title (already resolved: custom label or manifest default). */
-  title: string;
-  /** Default/fallback title to restore when user clears the input. */
-  defaultTitle: string;
-  className?: string;
-}
-
-function InlineNodeTitle({ nodeId, title, defaultTitle, className }: InlineNodeTitleProps) {
-  const updateNodeData = useFlowStore((s) => s.updateNodeData);
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState("");
-  const startEdit = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation(); // don't trigger onToggleCollapse
-    setDraft(title);
-    setEditing(true);
-    // Focus is set via the autoFocus attribute on the input element
-  }, [title]);
-
-  const commit = useCallback(() => {
-    const trimmed = draft.trim();
-    // Empty → revert to default (clear node_label so manifest title shows)
-    const next = trimmed === "" || trimmed === defaultTitle ? "" : trimmed;
-    updateNodeData(nodeId, { node_label: next || null });
-    setEditing(false);
-  }, [draft, defaultTitle, nodeId, updateNodeData]);
-
-  const cancel = useCallback(() => {
-    setEditing(false);
-  }, []);
-
-  if (editing) {
-    return (
-      <input
-        // nodrag prevents React Flow from starting a node drag while the input is focused
-        className={cn(
-          "nodrag",
-          "w-full bg-transparent text-center text-sm font-semibold tracking-wide uppercase",
-          "text-foreground/80 outline-none border-b border-primary/60 focus:border-primary",
-          "pb-0.5 leading-tight",
-          className
-        )}
-        value={draft}
-        autoFocus
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={commit}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            commit();
-          } else if (e.key === "Escape") {
-            e.preventDefault();
-            cancel();
-          }
-          // Prevent React Flow keyboard shortcuts while typing
-          e.stopPropagation();
-        }}
-        onMouseDown={(e) => e.stopPropagation()}
-        onClick={(e) => e.stopPropagation()}
-        // Allow text selection inside input without triggering drag
-        style={{ minWidth: 0, maxWidth: "100%" }}
-      />
-    );
-  }
-
-  return (
-    <h3
-      className={cn(
-        "text-sm font-semibold tracking-wide uppercase text-foreground/80 cursor-text select-none",
-        "hover:text-foreground transition-colors",
-        className
-      )}
-      onDoubleClick={startEdit}
-      title="Double-click to rename"
-    >
-      {title}
-    </h3>
-  );
-}
-
 export const NodeHeader = ({
   icon,
   title,
-  nodeId,
   buttonCount = 0,
   isCollapsed = false,
   onToggleCollapse,
@@ -187,14 +97,6 @@ export const NodeHeader = ({
     ? getCategoryBadge(category, accessory, accessoryAttachesTo)
     : null;
 
-  // We need the manifest default title to know when to clear node_label.
-  // The `title` prop is already resolved (node_label takes priority in
-  // GenericNodeRenderer), so we pass `title` as defaultTitle too — the
-  // InlineNodeTitle will only clear node_label when the trimmed value equals
-  // the current displayed title or is empty, which is the correct heuristic
-  // (the user is effectively "resetting" to the manifest name by clearing).
-  const defaultTitle = title;
-
   return (
     <div
       onClick={onToggleCollapse}
@@ -208,7 +110,6 @@ export const NodeHeader = ({
       <div
         className={cn(
           "w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105",
-          // Bu yerda icon ichidagi svg o'lchamini kattalashtirdik (w-8 h-8)
           "[&_svg]:w-8 [&_svg]:h-8 [&_svg]:text-white [&_svg]:stroke-[2.5px]",
           color
         )}
@@ -220,13 +121,11 @@ export const NodeHeader = ({
         )}
       </div>
 
-      {/* Pastdagi Title — inline editable */}
+      {/* Pastdagi Title — read-only on canvas; edit via detail panel */}
       <div className="text-center flex flex-col items-center gap-1.5 w-full px-2">
-        <InlineNodeTitle
-          nodeId={nodeId}
-          title={title}
-          defaultTitle={defaultTitle}
-        />
+        <h3 className="text-sm font-semibold tracking-wide uppercase text-foreground/80 select-none">
+          {title}
+        </h3>
         {badgeConfig && (
           <Badge
             className={cn(
