@@ -4,6 +4,7 @@ import useProjectStore from "@/features/bot-constructor/store/project";
 import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
+import { useDebugContextStore } from "@/components/layout/components/debug-console/debug-context-store";
 import { getSession, useSession } from "@/lib/session-client";
 import { useEffect } from "react";
 import { wsHub } from "./ws-hub";
@@ -50,6 +51,16 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         case "debug_status":
           if (project.id === data.project) store.changeDebug(data as never);
           break;
+        case "context": {
+          // Variable inspector snapshot — backend: {project, chat_id, variables, ts}
+          if (String(data.project) === String(project.id)) {
+            const chatId = String(data.chat_id ?? "unknown");
+            const variables = (data.variables as Record<string, unknown>) ?? {};
+            const ts = data.ts ? String(data.ts) : new Date().toISOString();
+            useDebugContextStore.getState().setSnapshot(chatId, { variables, ts });
+          }
+          break;
+        }
         case "node_execution": {
           // project may be int (backend) — compare loosely against current project
           if (String(data.project) === String(project.id) && data.node_id) {
