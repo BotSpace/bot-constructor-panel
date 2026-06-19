@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 export interface ContextSnapshot {
   variables: Record<string, unknown>;
-  ts: string; // ISO string or raw ts from event
+  ts: number | string; // Unix ms (number) or ISO string from event
 }
 
 interface DebugContextState {

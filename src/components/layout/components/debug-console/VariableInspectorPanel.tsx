@@ -36,6 +36,22 @@ function highlightJson(raw: string): string {
   );
 }
 
+// ── timestamp formatter ───────────────────────────────────────────────────────
+
+function formatTs(ts: number | string | undefined | null): string {
+  if (ts === undefined || ts === null || ts === "") return "";
+  // number yoki raqam-string → Unix ms deb qabul qilamiz
+  const ms =
+    typeof ts === "number"
+      ? ts
+      : /^\d+$/.test(String(ts).trim())
+      ? Number(ts)
+      : NaN;
+  const date = isNaN(ms) ? new Date(ts) : new Date(ms);
+  if (isNaN(date.getTime())) return "";
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 type ValueKind = "object" | "array" | "string" | "number" | "boolean" | "null" | "undefined";
@@ -117,7 +133,7 @@ function JsonValueView({ value }: { value: unknown }) {
     const html = highlightJson(rawText);
     return (
       <pre
-        className="font-mono text-xs leading-relaxed whitespace-pre break-words overflow-x-auto json-highlighted"
+        className="font-mono text-xs leading-relaxed whitespace-pre overflow-x-auto json-highlighted"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: html }}
       />
@@ -386,11 +402,9 @@ export function VariableInspectorPanel({ debugActive }: VariableInspectorPanelPr
                 <span className="font-mono text-xs text-foreground font-medium truncate flex-1">
                   {effectiveKey}
                 </span>
-                {snapshot && (
+                {snapshot && formatTs(snapshot.ts) && (
                   <span className="shrink-0 text-[10px] text-muted-foreground/60 font-mono">
-                    {snapshot.ts
-                      ? new Date(snapshot.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-                      : ""}
+                    {formatTs(snapshot.ts)}
                   </span>
                 )}
                 <CopyButton text={copyText} />

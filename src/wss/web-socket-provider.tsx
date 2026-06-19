@@ -56,7 +56,18 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
           if (String(data.project) === String(project.id)) {
             const chatId = String(data.chat_id ?? "unknown");
             const variables = (data.variables as Record<string, unknown>) ?? {};
-            const ts = data.ts ? String(data.ts) : new Date().toISOString();
+            // ts: backend yuborsa — UnixMilli raqam yoki ISO string.
+            // Raqam string sifatida kelsa new Date() ishlamaydi, shuning uchun
+            // raqam ekanligini tekshirib number sifatida saqlaymiz.
+            const rawTs = data.ts;
+            const ts: number | string =
+              typeof rawTs === "number"
+                ? rawTs
+                : typeof rawTs === "string" && /^\d+$/.test(rawTs.trim())
+                ? Number(rawTs)
+                : typeof rawTs === "string" && rawTs.length > 0
+                ? rawTs
+                : Date.now();
             useDebugContextStore.getState().setSnapshot(chatId, { variables, ts });
           }
           break;
