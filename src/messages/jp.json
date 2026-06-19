@@ -603,7 +603,11 @@
       "shortcuts": "キーボードショートカット",
       "more": "もっと見る",
       "credentials": "クレデンシャル",
-      "variables": "変数"
+      "variables": "変数",
+      "errors": "エラー",
+      "errorsEmpty": "エラーなし",
+      "errorsClear": "クリア",
+      "errorsDetail": "詳細"
     },
     "saveStatus": {
       "saving": "保存中...",

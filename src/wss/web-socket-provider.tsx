@@ -5,9 +5,11 @@ import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-stat
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
 import { useDebugContextStore } from "@/components/layout/components/debug-console/debug-context-store";
+import { useDebugErrorsStore } from "@/features/bot-constructor/store/debug-errors";
 import { getSession, useSession } from "@/lib/session-client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { wsHub } from "./ws-hub";
+import toast from "react-hot-toast";
 
 /**
  * Yupqa provider — butun ulanish hayoti endi `wsHub`da (yagona singleton):
@@ -16,9 +18,13 @@ import { wsHub } from "./ws-hub";
  * har (qayta)ulanishda YANGI access token oladi. Bu komponent faqat hub'ni
  * yoqadi va kelgan eventlarni store'larga tarqatadi.
  */
+// Debounce toast spam: show at most one error toast every 3 seconds.
+const ERROR_TOAST_DEBOUNCE_MS = 3_000;
+
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const session = useSession();
   const authed = session.status === "authenticated";
+  const lastErrorToastRef = useRef<number>(0);
 
   // Hub lifecycle — login bo'lganda yoqamiz. Token har ulanishda yangidan
   // so'raladi (eskirgan token bilan reconnect urinish muammosi yo'q).
@@ -128,6 +134,37 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
               .map((e) => e.source);
             for (const accId of accessorySourceIds) {
               debugStore.setNodeStatus(accId, status, ts, error, runId, seq);
+            }
+          }
+          break;
+        }
+        case "error": {
+          // Flow execution error — {project, chat_id, node_id, node_type, message, detail, ts}
+          if (String(data.project) === String(project.id)) {
+            const raw = {
+              project: data.project as string | number,
+              chat_id: data.chat_id as string | number | undefined,
+              node_id: data.node_id as string | undefined,
+              node_type: data.node_type as string | undefined,
+              message: (data.message as string) || "Unknown error",
+              detail: data.detail as string | undefined,
+              ts: (data.ts as number | string) ?? Date.now(),
+            };
+            useDebugErrorsStore.getState().addError(raw);
+
+            // Debounced toast so rapid errors don't spam
+            const now = Date.now();
+            if (now - lastErrorToastRef.current >= ERROR_TOAST_DEBOUNCE_MS) {
+              lastErrorToastRef.current = now;
+              const nodeLabel = raw.node_type
+                ? `[${raw.node_type}]`
+                : raw.node_id
+                ? `[${raw.node_id}]`
+                : "";
+              toast.error(
+                `${nodeLabel ? nodeLabel + " " : ""}${raw.message}`.trim(),
+                { duration: 4000, id: "flow-error-toast" }
+              );
             }
           }
           break;
