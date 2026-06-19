@@ -41,7 +41,8 @@
 			{
 				"type": "checkbox",
 				"key": "global",
-				"label": "Global"
+				"label": "Global",
+				"optional": true
 			},
 			{
 				"type": "stateConfig",
@@ -5581,7 +5582,8 @@
 			{
 				"type": "checkbox",
 				"key": "global",
-				"label": "Global"
+				"label": "Global",
+				"optional": true
 			}
 		],
 		"footer": [
@@ -5667,7 +5669,8 @@
 			{
 				"type": "checkbox",
 				"key": "global",
-				"label": "Global"
+				"label": "Global",
+				"optional": true
 			}
 		],
 		"defaults": {
@@ -5757,7 +5760,8 @@
 			{
 				"type": "checkbox",
 				"key": "global",
-				"label": "Global"
+				"label": "Global",
+				"optional": true
 			}
 		],
 		"defaults": {
@@ -5810,7 +5814,8 @@
 			{
 				"type": "checkbox",
 				"key": "global",
-				"label": "Global"
+				"label": "Global",
+				"optional": true
 			}
 		],
 		"defaults": {
