@@ -203,7 +203,7 @@ export function DynamicSelectField({
                 role="combobox"
                 aria-expanded={open}
                 disabled={loading}
-                className="h-10 w-full justify-between border-white/10 bg-zinc-950/60 text-sm font-normal hover:bg-zinc-900/60"
+                className="h-10 min-w-0 flex-1 justify-between border-white/10 bg-zinc-950/60 text-sm font-normal hover:bg-zinc-900/60"
               >
                 <span className="truncate">
                   {loading ? (
