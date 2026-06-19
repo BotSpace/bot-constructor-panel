@@ -406,21 +406,34 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
       );
     }
 
+    // Radix Select.Item rejects value="" — map empty-string option values to the
+    // sentinel "__empty__" internally so Radix doesn't throw, then convert back
+    // to "" when persisting so the engine receives the expected empty value.
+    const EMPTY_SENTINEL = "__empty__";
+    const toSelectValue = (v: string) => (v === "" ? EMPTY_SENTINEL : v);
+    const fromSelectValue = (v: string) => (v === EMPTY_SENTINEL ? "" : v);
+    const currentSelectValue = toSelectValue(typeof value === "string" ? value : "");
+
     return (
       <FieldShell label={field.label} helpText={field.helpText}>
         <Select
-          value={typeof value === "string" ? value : ""}
-          onValueChange={(nextValue) => updateNodeData(nodeId, { [fieldKey]: nextValue })}
+          value={currentSelectValue}
+          onValueChange={(nextValue) =>
+            updateNodeData(nodeId, { [fieldKey]: fromSelectValue(nextValue) })
+          }
         >
           <SelectTrigger className="h-10 border-white/10 bg-zinc-950/60">
             <SelectValue placeholder={field.placeholder || "Tanlang"} />
           </SelectTrigger>
           <SelectContent>
-            {field.options?.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
+            {field.options?.map((option) => {
+              const itemValue = toSelectValue(option.value);
+              return (
+                <SelectItem key={itemValue} value={itemValue}>
+                  {option.label}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </FieldShell>
