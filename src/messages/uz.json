@@ -377,6 +377,9 @@
         }
       }
     },
+    "aiTools": {
+      "title": "🛠️ AI Asboblar"
+    },
     "customLogic": {
       "title": "🧩 Maxsus Mantiq",
       "code": {

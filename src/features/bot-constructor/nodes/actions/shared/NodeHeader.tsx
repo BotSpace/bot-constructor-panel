@@ -37,6 +37,10 @@ const CATEGORY_BADGE_CONFIG: Record<string, { label: string; className: string }
     label: "ai",
     className: "bg-violet-600/15 text-violet-600 border-violet-600/30",
   },
+  ai_tools: {
+    label: "tool",
+    className: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30",
+  },
 };
 
 /** Returns badge config based on `category` and, for accessory nodes, `accessoryAttachesTo`. */

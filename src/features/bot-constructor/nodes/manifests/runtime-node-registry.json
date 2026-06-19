@@ -4519,7 +4519,7 @@
 		},
 		"sidebar": {
 			"enabled": true,
-			"groupId": "ai",
+			"groupId": "ai_tools",
 			"sortOrder": 30,
 			"elementType": "ai_tool_http"
 		},
@@ -4635,7 +4635,7 @@
 		},
 		"sidebar": {
 			"enabled": true,
-			"groupId": "ai",
+			"groupId": "ai_tools",
 			"sortOrder": 31,
 			"elementType": "ai_tool_collection"
 		},
@@ -4716,7 +4716,7 @@
 		},
 		"sidebar": {
 			"enabled": true,
-			"groupId": "ai",
+			"groupId": "ai_tools",
 			"sortOrder": 32,
 			"elementType": "ai_tool_custom_code"
 		},
@@ -4781,7 +4781,7 @@
 		},
 		"sidebar": {
 			"enabled": true,
-			"groupId": "ai",
+			"groupId": "ai_tools",
 			"sortOrder": 33,
 			"elementType": "ai_tool_knowledge"
 		},
@@ -6375,7 +6375,7 @@
 		},
 		"sidebar": {
 			"enabled": true,
-			"groupId": "ai",
+			"groupId": "ai_tools",
 			"sortOrder": 34,
 			"elementType": "ai_tool_datetime"
 		},
@@ -6425,7 +6425,7 @@
 		},
 		"sidebar": {
 			"enabled": true,
-			"groupId": "ai",
+			"groupId": "ai_tools",
 			"sortOrder": 35,
 			"elementType": "ai_tool_google_sheets"
 		},
@@ -6499,7 +6499,7 @@
 		},
 		"sidebar": {
 			"enabled": true,
-			"groupId": "ai",
+			"groupId": "ai_tools",
 			"sortOrder": 36,
 			"elementType": "ai_tool_payment_link"
 		},
