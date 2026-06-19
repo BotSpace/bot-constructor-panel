@@ -34,12 +34,12 @@
 				"placeholder": "/start"
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "withArgs",
 				"label": "Argumentlarni ushlash"
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "global",
 				"label": "Global",
 				"optional": true
@@ -261,19 +261,19 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"optional": true
@@ -439,19 +439,19 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"optional": true
@@ -596,19 +596,19 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"optional": true
@@ -753,19 +753,19 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"optional": true
@@ -912,19 +912,19 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"optional": true
@@ -1224,19 +1224,19 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"optional": true
@@ -1399,19 +1399,19 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"optional": true
@@ -1521,12 +1521,12 @@
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "isAnonymous",
 				"label": "Anonim"
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "allowsMultipleAnswers",
 				"label": "Bir nechta javob",
 				"visibleWhen": {
@@ -1632,19 +1632,19 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"optional": true
@@ -1927,19 +1927,19 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"optional": true
@@ -2172,13 +2172,13 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
@@ -2343,19 +2343,19 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "remove_keyboard",
 				"label": "Reply keyboardni olib tashlash",
 				"optional": true
@@ -2660,7 +2660,7 @@
 		],
 		"content": [
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "deleteFromContext",
 				"label": "Contextdan xabarni o'chirish"
 			},
@@ -3347,13 +3347,13 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
@@ -3618,7 +3618,7 @@
 					},
 					{
 						"key": "required",
-						"type": "checkbox",
+						"type": "switch",
 						"label": "Majburiy"
 					}
 				]
@@ -3819,7 +3819,7 @@
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "storeHeaders",
 				"label": "Response headerlarni saqlash",
 				"optional": true
@@ -3955,13 +3955,13 @@
 				"allowDynamicColumns": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "disableNotification",
 				"label": "Ovozsiz yuborish",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "protectContent",
 				"label": "Yuklab olishni taqiqlash",
 				"optional": true
@@ -4146,7 +4146,7 @@
 				"is_state": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "structuredOutput",
 				"labelKey": "constructor.ai.agent.fields.structuredOutput",
 				"label": "Structured Output (JSON Schema)",
@@ -5472,25 +5472,25 @@
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "needName",
 				"label": "Ism talab qilinsin",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "needPhone",
 				"label": "Telefon raqam talab qilinsin",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "needEmail",
 				"label": "Email talab qilinsin",
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "needShippingAddress",
 				"label": "Yetkazib berish manzili talab qilinsin",
 				"optional": true
@@ -5574,13 +5574,13 @@
 				}
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "autoAnswer",
 				"label": "Avtomatik tasdiqlash",
 				"helpText": "Avtomatik tasdiqlash (10 soniya ichida javob bermasa to'lov bekor bo'ladi)"
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "global",
 				"label": "Global",
 				"optional": true
@@ -5667,7 +5667,7 @@
 				}
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "global",
 				"label": "Global",
 				"optional": true
@@ -5758,7 +5758,7 @@
 				]
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "global",
 				"label": "Global",
 				"optional": true
@@ -5812,7 +5812,7 @@
 		],
 		"content": [
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "global",
 				"label": "Global",
 				"optional": true
@@ -6054,7 +6054,7 @@
 				"optional": true
 			},
 			{
-				"type": "checkbox",
+				"type": "switch",
 				"key": "createsJoinRequest",
 				"label": "Qo'shilish so'rovini talab qilish",
 				"optional": true
