@@ -2039,56 +2039,42 @@ function AIAgentAdvancedWidget({ nodeId, data }: WidgetProps) {
   );
 }
 
-const ALL_CRUD_OPS = ["create", "read", "update", "delete"] as const;
-type CrudOp = (typeof ALL_CRUD_OPS)[number];
+// ── AICollectionToolConfigWidget — engine kontrakt: collection / operations / searchFields ──
 
-// ── AICollectionToolConfigWidget types ──────────────────────────────────────
-
-type CollectionAction = "create" | "read" | "update" | "delete" | "list";
-
-type AiFieldEntry = {
+/** Engine internal/llm/tool.go parseSearchFields() formatiga mos */
+type SearchFieldEntry = {
   field: string;
-  value: string;
-  aiMode: boolean;
-  aiDescription: string;
+  description: string;
 };
 
-const emptyEntry = (): AiFieldEntry => ({
-  field: "",
-  value: "",
-  aiMode: false,
-  aiDescription: "",
-});
+const emptySearchField = (): SearchFieldEntry => ({ field: "", description: "" });
 
-const COLL_ACTIONS: { value: CollectionAction; label: string }[] = [
+/** Ruxsat etilgan CRUD operatsiyalar (engine defaultOps bilan mos) */
+const CRUD_OPS: { value: string; label: string }[] = [
   { value: "create", label: "Create" },
   { value: "read", label: "Read" },
   { value: "update", label: "Update" },
   { value: "delete", label: "Delete" },
-  { value: "list", label: "List" },
 ];
 
-// Sub-component: one field row with AI toggle
-function AiFieldRow({
+/**
+ * Bitta searchField qatori: field dropdown + description input + o'chirish tugmasi.
+ * Engine parseSearchFields() [{field, description}] massivini kutadi.
+ */
+function SearchFieldRow({
   entry,
   fieldOptions,
-  valuePlaceholder,
   onChange,
   onRemove,
 }: {
-  entry: AiFieldEntry;
+  entry: SearchFieldEntry;
   fieldOptions: string[];
-  valuePlaceholder?: string;
-  onChange: (next: AiFieldEntry) => void;
-  onRemove?: () => void;
+  onChange: (next: SearchFieldEntry) => void;
+  onRemove: () => void;
 }) {
-  const val = entry.aiMode ? entry.aiDescription : entry.value;
-  const setVal = (v: string) =>
-    onChange(entry.aiMode ? { ...entry, aiDescription: v } : { ...entry, value: v });
-
   return (
     <div className="flex items-center gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.02] px-2 py-1.5">
-      {/* Field name */}
+      {/* Field nomi */}
       {fieldOptions.length > 0 ? (
         <Select value={entry.field} onValueChange={(v) => onChange({ ...entry, field: v })}>
           <SelectTrigger className="h-7 w-28 shrink-0 text-[11px] font-mono">
@@ -2111,42 +2097,22 @@ function AiFieldRow({
         />
       )}
 
-      {/* Value / AI description */}
+      {/* AI uchun tavsif */}
       <Input
-        className={cn(
-          "h-7 min-w-0 flex-1 text-[11px]",
-          entry.aiMode &&
-            "border-blue-500/40 bg-blue-500/5 text-blue-200 placeholder:text-blue-400/40"
-        )}
-        placeholder={entry.aiMode ? "AI uchun tavsif..." : valuePlaceholder ?? "Qiymat..."}
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
+        className="h-7 min-w-0 flex-1 text-[11px]"
+        placeholder="AI uchun tavsif (ixtiyoriy)"
+        value={entry.description}
+        onChange={(e) => onChange({ ...entry, description: e.target.value })}
       />
 
-      {/* AI toggle */}
+      {/* O'chirish */}
       <button
         type="button"
-        title={entry.aiMode ? "AI mode yoqilgan — o'chirish" : "AI mode yoqish"}
-        className={cn(
-          "flex h-7 w-7 shrink-0 items-center justify-center rounded transition-colors",
-          entry.aiMode
-            ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
-            : "text-zinc-500 hover:text-zinc-300"
-        )}
-        onClick={() => onChange({ ...entry, aiMode: !entry.aiMode })}
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-zinc-500 hover:text-red-400"
+        onClick={onRemove}
       >
-        <Bot className="h-3.5 w-3.5" />
+        <X className="h-3.5 w-3.5" />
       </button>
-
-      {onRemove ? (
-        <button
-          type="button"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-zinc-500 hover:text-red-400"
-          onClick={onRemove}
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
-      ) : null}
     </div>
   );
 }
@@ -2155,34 +2121,50 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const { data: collections } = useCollectionStore();
 
+  // ── collection ───────────────────────────────────────────────────────────
   const collection = typeof data.collection === "string" ? data.collection : "";
-  const action: CollectionAction = (data.action as CollectionAction) || "create";
 
+  // ── operations: string[] — engine parseAllowedOps() kutadi ───────────────
+  // Eski node'larda `action` (bitta string) bo'lishi mumkin — migratsiya qilinadi
+  const rawOps = Array.isArray(data.operations)
+    ? (data.operations as string[])
+    : data.action && typeof data.action === "string"
+    ? [data.action as string]
+    : [];
+  // "list" eski panel-ga xos, engine bilmaydi — olib tashlanadi
+  const operations = rawOps.filter((op) => ["create", "read", "update", "delete"].includes(op));
+
+  // ── searchFields: [{field, description}][] — engine parseSearchFields() ──
+  const searchFields: SearchFieldEntry[] = Array.isArray(data.searchFields)
+    ? (data.searchFields as SearchFieldEntry[]).map((e) => ({
+        field: typeof e?.field === "string" ? e.field : "",
+        description: typeof e?.description === "string" ? e.description : "",
+      }))
+    : [];
+
+  // ── collection field'lari (dropdown uchun) ───────────────────────────────
   const { data: collectionDetail } = useReactQueryAction<CollectionDetail>({
     url: collection ? `cms/projects/[id]/collections/${collection}/` : undefined,
     enabled: Boolean(collection),
   });
   const fieldOptions = (collectionDetail?.fields ?? []).map((f) => f.name);
 
-  // Action-specific data
-  const toEntries = (raw: unknown): AiFieldEntry[] =>
-    Array.isArray(raw)
-      ? (raw as AiFieldEntry[]).map((e) => ({ ...emptyEntry(), ...e }))
-      : [];
-  const toEntry = (raw: unknown): AiFieldEntry =>
-    raw && typeof raw === "object" ? { ...emptyEntry(), ...(raw as AiFieldEntry) } : emptyEntry();
-
-  const createFields = toEntries(data.createFields);
-  const readFilter = toEntry(data.readFilter);
-  const readContextKey = typeof data.readContextKey === "string" ? data.readContextKey : "";
-  const updateFilter = toEntry(data.updateFilter);
-  const updateFields = toEntries(data.updateFields);
-  const deleteFilter = toEntry(data.deleteFilter);
-  const listFilters = toEntries(data.listFilters);
-  const listLimit = typeof data.listLimit === "number" ? data.listLimit : 10;
-  const listContextKey = typeof data.listContextKey === "string" ? data.listContextKey : "";
-
   const upd = (patch: Record<string, unknown>) => updateNodeData(nodeId, patch);
+
+  // Operations toggle
+  const toggleOp = (op: string) => {
+    const next = operations.includes(op)
+      ? operations.filter((o) => o !== op)
+      : [...operations, op];
+    upd({ operations: next });
+  };
+
+  // searchFields helpers
+  const addSearchField = () => upd({ searchFields: [...searchFields, emptySearchField()] });
+  const updateSearchField = (i: number, next: SearchFieldEntry) =>
+    upd({ searchFields: searchFields.map((e, j) => (j === i ? next : e)) });
+  const removeSearchField = (i: number) =>
+    upd({ searchFields: searchFields.filter((_, j) => j !== i) });
 
   return (
     <div className="grid gap-3">
@@ -2203,182 +2185,71 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
         </Select>
       </div>
 
-      {/* Action tabs */}
+      {/* Operations — CRUD multi-select (engine data.operations: string[]) */}
       <div className="grid gap-1.5">
-        <Label className="text-xs text-muted-foreground">Amal</Label>
-        <div className="flex gap-1 rounded-lg border border-white/[0.08] bg-white/[0.02] p-1">
-          {COLL_ACTIONS.map((a) => (
-            <button
-              key={a.value}
-              type="button"
-              className={cn(
-                "flex-1 rounded-md py-1 text-[11px] font-medium transition-colors",
-                action === a.value
-                  ? "bg-white/10 text-white"
-                  : "text-zinc-500 hover:text-zinc-300"
-              )}
-              onClick={() => upd({ action: a.value })}
-            >
-              {a.label}
-            </button>
-          ))}
+        <Label className="text-xs text-muted-foreground">Ruxsat etilgan amallar</Label>
+        <div className="flex flex-wrap gap-1">
+          {CRUD_OPS.map((op) => {
+            const active = operations.includes(op.value);
+            return (
+              <button
+                key={op.value}
+                type="button"
+                onClick={() => toggleOp(op.value)}
+                className={cn(
+                  "rounded-md border px-2.5 py-1 text-[11px] font-medium transition-colors",
+                  active
+                    ? "border-blue-500/50 bg-blue-500/15 text-blue-300"
+                    : "border-white/[0.08] bg-white/[0.02] text-zinc-500 hover:text-zinc-300"
+                )}
+              >
+                {op.label}
+              </button>
+            );
+          })}
         </div>
+        {operations.length === 0 && (
+          <p className="text-[10px] text-zinc-500">
+            Hech biri tanlanmagan — engine barcha 4 amalni ruxsat beradi.
+          </p>
+        )}
       </div>
 
-      {/* CREATE — fields to set */}
-      {action === "create" && (
-        <div className="grid gap-1.5">
-          <div className="flex items-center justify-between">
-            <Label className="text-xs text-muted-foreground">Fieldlar</Label>
-            <button
-              type="button"
-              className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-0.5 text-[10px] text-zinc-500 hover:text-zinc-300"
-              onClick={() => upd({ createFields: [...createFields, emptyEntry()] })}
-            >
-              <PlusIcon className="h-3 w-3" /> Field
-            </button>
-          </div>
-          {createFields.length === 0 && (
-            <p className="text-[10px] italic text-zinc-500">Qo'shiladigan fieldlar yo'q.</p>
-          )}
-          {createFields.map((e, i) => (
-            <AiFieldRow
-              key={i}
-              entry={e}
-              fieldOptions={fieldOptions}
-              valuePlaceholder="Qiymat yoki {{var}}"
-              onChange={(next) => upd({ createFields: createFields.map((x, j) => (j === i ? next : x)) })}
-              onRemove={() => upd({ createFields: createFields.filter((_, j) => j !== i) })}
-            />
-          ))}
+      {/* Search fields — [{field, description}] (engine data.searchFields) */}
+      <div className="grid gap-1.5">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs text-muted-foreground">Qidiruv maydonlari</Label>
+          <button
+            type="button"
+            className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-0.5 text-[10px] text-zinc-500 hover:text-zinc-300"
+            onClick={addSearchField}
+          >
+            <PlusIcon className="h-3 w-3" /> Maydon qo&apos;shish
+          </button>
         </div>
-      )}
 
-      {/* READ — single filter + context key */}
-      {action === "read" && (
-        <>
-          <div className="grid gap-1.5">
-            <Label className="text-xs text-muted-foreground">Filter (topish sharti)</Label>
-            <AiFieldRow
-              entry={readFilter}
-              fieldOptions={fieldOptions}
-              valuePlaceholder="Qiymat yoki {{var}}"
-              onChange={(next) => upd({ readFilter: next })}
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label className="text-xs text-muted-foreground">Context key</Label>
-            <Input
-              className="h-7 text-xs font-mono"
-              placeholder="masalan: found_user"
-              value={readContextKey}
-              onChange={(e) => upd({ readContextKey: e.target.value })}
-            />
-          </div>
-        </>
-      )}
+        {/* Izoh: AI filter quradi, foydalanuvchi emas */}
+        <p className="text-[10px] leading-relaxed text-zinc-500">
+          AI shu maydonlar bo&apos;yicha filtr quradi (AND/OR, taqqoslash). Filterning o&apos;zini
+          bu yerda yozmaysiz — AI runtime&apos;da quradi.
+        </p>
 
-      {/* UPDATE — filter + fields to update */}
-      {action === "update" && (
-        <>
-          <div className="grid gap-1.5">
-            <Label className="text-xs text-muted-foreground">Filter (yangilanadigan yozuv)</Label>
-            <AiFieldRow
-              entry={updateFilter}
-              fieldOptions={fieldOptions}
-              valuePlaceholder="Qiymat yoki {{var}}"
-              onChange={(next) => upd({ updateFilter: next })}
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs text-muted-foreground">Yangilanadigan fieldlar</Label>
-              <button
-                type="button"
-                className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-0.5 text-[10px] text-zinc-500 hover:text-zinc-300"
-                onClick={() => upd({ updateFields: [...updateFields, emptyEntry()] })}
-              >
-                <PlusIcon className="h-3 w-3" /> Field
-              </button>
-            </div>
-            {updateFields.length === 0 && (
-              <p className="text-[10px] italic text-zinc-500">Yangilanadigan fieldlar yo'q.</p>
-            )}
-            {updateFields.map((e, i) => (
-              <AiFieldRow
-                key={i}
-                entry={e}
-                fieldOptions={fieldOptions}
-                valuePlaceholder="Yangi qiymat"
-                onChange={(next) => upd({ updateFields: updateFields.map((x, j) => (j === i ? next : x)) })}
-                onRemove={() => upd({ updateFields: updateFields.filter((_, j) => j !== i) })}
-              />
-            ))}
-          </div>
-        </>
-      )}
+        {searchFields.length === 0 && (
+          <p className="text-[10px] italic text-zinc-500">
+            Hech qanday maydon yo&apos;q — AI barcha fieldlarni ishlatishi mumkin.
+          </p>
+        )}
 
-      {/* DELETE — single filter */}
-      {action === "delete" && (
-        <div className="grid gap-1.5">
-          <Label className="text-xs text-muted-foreground">Filter (o'chiriladigan yozuv)</Label>
-          <AiFieldRow
-            entry={deleteFilter}
+        {searchFields.map((entry, i) => (
+          <SearchFieldRow
+            key={i}
+            entry={entry}
             fieldOptions={fieldOptions}
-            valuePlaceholder="Qiymat yoki {{var}}"
-            onChange={(next) => upd({ deleteFilter: next })}
+            onChange={(next) => updateSearchField(i, next)}
+            onRemove={() => removeSearchField(i)}
           />
-        </div>
-      )}
-
-      {/* LIST — filters + limit + context key */}
-      {action === "list" && (
-        <>
-          <div className="grid gap-1.5">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs text-muted-foreground">Filterlar (ixtiyoriy)</Label>
-              <button
-                type="button"
-                className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-0.5 text-[10px] text-zinc-500 hover:text-zinc-300"
-                onClick={() => upd({ listFilters: [...listFilters, emptyEntry()] })}
-              >
-                <PlusIcon className="h-3 w-3" /> Filter
-              </button>
-            </div>
-            {listFilters.map((e, i) => (
-              <AiFieldRow
-                key={i}
-                entry={e}
-                fieldOptions={fieldOptions}
-                valuePlaceholder="Qiymat yoki {{var}}"
-                onChange={(next) => upd({ listFilters: listFilters.map((x, j) => (j === i ? next : x)) })}
-                onRemove={() => upd({ listFilters: listFilters.filter((_, j) => j !== i) })}
-              />
-            ))}
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="grid gap-1.5">
-              <Label className="text-xs text-muted-foreground">Limit</Label>
-              <Input
-                type="number"
-                className="h-7 text-xs"
-                value={listLimit}
-                min={1}
-                onChange={(e) => upd({ listLimit: Number(e.target.value) || 10 })}
-              />
-            </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs text-muted-foreground">Context key</Label>
-              <Input
-                className="h-7 text-xs font-mono"
-                placeholder="masalan: items"
-                value={listContextKey}
-                onChange={(e) => upd({ listContextKey: e.target.value })}
-              />
-            </div>
-          </div>
-        </>
-      )}
+        ))}
+      </div>
     </div>
   );
 }
