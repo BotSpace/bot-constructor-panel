@@ -596,7 +596,11 @@
       "shortcuts": "Tezkor tugmalar",
       "more": "Ko'proq",
       "credentials": "Credential'lar",
-      "variables": "O'zgaruvchilar"
+      "variables": "O'zgaruvchilar",
+      "errors": "Xatolar",
+      "errorsEmpty": "Xato yo'q",
+      "errorsClear": "Tozalash",
+      "errorsDetail": "Tafsilot"
     },
     "saveStatus": {
       "saving": "Saqlanmoqda...",

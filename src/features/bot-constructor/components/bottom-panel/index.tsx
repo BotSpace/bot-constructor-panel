@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from './components/button'
-import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff, Shield, Braces } from 'lucide-react'
+import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff, Shield, Braces, AlertTriangle } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -38,6 +38,8 @@ import { useTranslations } from 'next-intl'
 import { useDebugContextStore } from '@/components/layout/components/debug-console/debug-context-store'
 import { VariableInspectorPanel } from '@/components/layout/components/debug-console/VariableInspectorPanel'
 import useProjectStore from '../../store/project'
+import { useDebugErrorsStore } from '../../store/debug-errors'
+import { ErrorsPanel } from '../ErrorsPanel'
 
 interface Props {
     addNodeOpen?: boolean;
@@ -51,7 +53,7 @@ interface Props {
 const FIXED_W = 227
 const SLOT = 48
 const MORE_W = 48
-const ALL_COUNT = 8
+const ALL_COUNT = 9
 
 function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const t = useTranslations('editor.toolbar')
@@ -69,7 +71,9 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const [collectionOpen, setCollectionOpen] = useState(false)
     const [credentialOpen, setCredentialOpen] = useState(false)
     const [variablesOpen, setVariablesOpen] = useState(false)
+    const [errorsOpen, setErrorsOpen] = useState(false)
     const { snapshots } = useDebugContextStore()
+    const { unreadCount: errorsUnread, markAllRead } = useDebugErrorsStore()
     const { project } = useProjectStore()
     const debugActive = project?.debug?.status === 'running'
     const hasSnapshots = snapshots.size > 0
@@ -232,6 +236,42 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 </DropdownMenuItem>
             ),
         },
+        {
+            key: 'errors',
+            inline: (
+                <BottomPanelButton
+                    onClick={() => { setErrorsOpen(true); markAllRead(); }}
+                    title={t('errors')}
+                    aria-label={t('errors')}
+                    className={errorsUnread > 0 ? 'text-destructive border-destructive/40' : ''}
+                >
+                    <span className="relative">
+                        <AlertTriangle size={20} />
+                        {errorsUnread > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] flex items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground px-0.5 leading-none pointer-events-none select-none">
+                                {errorsUnread > 99 ? '99+' : errorsUnread}
+                            </span>
+                        )}
+                    </span>
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="errors" onClick={() => { setErrorsOpen(true); markAllRead(); }}>
+                    <span className="relative mr-2">
+                        <AlertTriangle size={16} />
+                        {errorsUnread > 0 && (
+                            <span className="absolute -top-1 -right-1 min-w-[12px] h-[12px] flex items-center justify-center rounded-full bg-destructive text-[8px] font-bold text-destructive-foreground px-0.5 leading-none">
+                                {errorsUnread > 9 ? '9+' : errorsUnread}
+                            </span>
+                        )}
+                    </span>
+                    {t('errors')}
+                    {errorsUnread > 0 && (
+                        <span className="ml-auto text-xs font-semibold text-destructive">{errorsUnread}</span>
+                    )}
+                </DropdownMenuItem>
+            ),
+        },
     ]
 
     const visible = items.slice(0, visibleCount)
@@ -321,6 +361,24 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                     </DialogHeader>
                     <div className="flex-1 min-h-0">
                         <VariableInspectorPanel debugActive={debugActive} />
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Errors panel dialog */}
+            <Dialog open={errorsOpen} onOpenChange={(v) => { setErrorsOpen(v); if (v) markAllRead(); }}>
+                <DialogContent
+                    className="w-[92vw] max-w-[720px] sm:max-w-[720px] p-0 h-[70vh] flex flex-col overflow-hidden gap-0"
+                    showCloseButton
+                >
+                    <DialogHeader className="flex-row items-center gap-2 px-4 py-3 border-b border-border shrink-0 space-y-0">
+                        <AlertTriangle className="w-4 h-4 text-destructive shrink-0" />
+                        <DialogTitle className="text-sm font-semibold leading-none">
+                            {t('errors')}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="flex-1 min-h-0">
+                        <ErrorsPanel />
                     </div>
                 </DialogContent>
             </Dialog>

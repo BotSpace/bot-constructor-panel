@@ -596,7 +596,11 @@
       "shortcuts": "Keyboard shortcuts",
       "more": "More",
       "credentials": "Credentials",
-      "variables": "Variables"
+      "variables": "Variables",
+      "errors": "Errors",
+      "errorsEmpty": "No errors",
+      "errorsClear": "Clear",
+      "errorsDetail": "Detail"
     },
     "saveStatus": {
       "saving": "Saving...",

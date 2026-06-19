@@ -603,7 +603,11 @@
       "shortcuts": "Горячие клавиши",
       "more": "Ещё",
       "credentials": "Учетные данные",
-      "variables": "Переменные"
+      "variables": "Переменные",
+      "errors": "Ошибки",
+      "errorsEmpty": "Ошибок нет",
+      "errorsClear": "Очистить",
+      "errorsDetail": "Подробнее"
     },
     "saveStatus": {
       "saving": "Сохранение...",
