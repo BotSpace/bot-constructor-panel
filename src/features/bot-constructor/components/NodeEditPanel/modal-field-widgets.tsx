@@ -449,13 +449,13 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
   if (field.type === "switch") {
     return (
       <div className="space-y-1">
-        <FieldShell compact>
-          {field.label ? <Label className="cursor-pointer text-sm text-zinc-200">{field.label}</Label> : null}
+        <div className="flex items-center gap-2">
           <Switch
             checked={Boolean(value)}
             onCheckedChange={(checked) => updateNodeData(nodeId, { [fieldKey]: checked })}
           />
-        </FieldShell>
+          {field.label ? <Label className="cursor-pointer text-sm text-zinc-200">{field.label}</Label> : null}
+        </div>
         {field.helpText ? (
           <p className="text-xs leading-relaxed text-zinc-500">{field.helpText}</p>
         ) : null}
