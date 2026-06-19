@@ -95,7 +95,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             const seq = typeof data.seq === "number" ? (data.seq as number) : undefined;
 
             const debugStore = useDebugStatusStore.getState();
-            const { nodes, edges } = useFlowStore.getState();
+            const { nodes } = useFlowStore.getState();
 
             // LEGACY (run_id'siz eski engine): trigger running kelganda reset.
             // run_id bor bo'lsa bu shart emas — store o'zi boshqaradi va bu
@@ -122,19 +122,10 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
             // Trigger ishlaganda u ham yashil bo'lib QOLADI (avval 1.5s dan
             // keyin sariqqa qaytarilardi) — keyingi run kelganda reset bo'ladi.
-
-            // Propagate status to accessory nodes (e.g. LLM node connected to AI agent)
-            const accessorySourceIds = edges
-              .filter(
-                (e) =>
-                  e.target === nodeId &&
-                  typeof e.targetHandle === "string" &&
-                  e.targetHandle.startsWith("acc:")
-              )
-              .map((e) => e.source);
-            for (const accId of accessorySourceIds) {
-              debugStore.setNodeStatus(accId, status, ts, error, runId, seq);
-            }
+            // NOTE: accessory (tool/provider) node statuslari endi engine
+            // tomonidan aniq per-node event sifatida yuboriladi. Blind
+            // propagation olib tashlandi — har bir accessory o'z node_execution
+            // eventidan status oladi.
           }
           break;
         }
