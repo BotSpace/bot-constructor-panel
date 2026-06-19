@@ -23,15 +23,21 @@ import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-stat
 // status colour must be applied there too (see globals.css).
 
 // ---------------------------------------------------------------------------
-// AccessoryNodeCard — circular compact card for AI provider / tool nodes.
-// All accessory nodes share the same fixed 96 × 110 footprint so they line up
-// uniformly regardless of title length or type (provider vs tool).
+// AccessoryNodeCard — teardrop-shaped compact card for AI provider / tool nodes.
+// Bottom half is fully rounded (wide circle), top tapers to a pointed oval tip
+// where the incoming (target) handle connects. Icon + label + badge fit without
+// clipping. Both provider and tool nodes share the same footprint.
 // ---------------------------------------------------------------------------
 
-// Fixed dimensions applied to every accessory node so they are all identical.
-// Square footprint so rounded-[48px] produces a clean circle/pill appearance.
-const ACCESSORY_W = 96;
-const ACCESSORY_H = 96;
+// Fixed dimensions. Height > width so the teardrop proportion looks natural.
+const ACCESSORY_W = 120;
+const ACCESSORY_H = 150;
+
+// Asymmetric border-radius that produces a teardrop / water-drop shape.
+// Syntax: tl tr br bl / tl-vertical tr-vertical br-vertical bl-vertical
+// Top corners: 50% horizontal, 35% vertical → narrow/pointed oval tip.
+// Bottom corners: 50% horizontal, 65% vertical → wide, fully rounded belly.
+const TEARDROP_RADIUS = "50% 50% 50% 50% / 35% 35% 65% 65%";
 
 interface AccessoryNodeCardProps {
   id: string;
@@ -52,50 +58,57 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
   return (
     <div
       className={cn(
-        // Fully rounded card — pill/circle shape for every accessory node.
-        "relative flex flex-col items-center justify-center select-none",
-        "rounded-[48px]",
+        // Teardrop card: bottom is a wide circle, top tapers to a pointed oval tip.
+        // The target (incoming) handle sits at the narrow top tip; source at the bottom.
+        "relative flex flex-col items-center select-none",
         "border border-border/60 bg-card shadow-md",
         "transition-shadow duration-150",
         selected && "ring-2 ring-primary shadow-lg",
       )}
       data-debug-status={debugStatus || undefined}
-      style={{ width: ACCESSORY_W, height: ACCESSORY_H }}
+      style={{
+        width: ACCESSORY_W,
+        height: ACCESSORY_H,
+        borderRadius: TEARDROP_RADIUS,
+      }}
     >
-      {/* Handles rendered at the node level (React Flow needs them in the DOM) */}
+      {/* Handles rendered from manifest — preserves edge connections (source-handler at top). */}
       {manifest.handles?.map((handle, index) =>
         renderHandleFromManifest(handle, id, `${manifest.type}-${index}`, manifest.accessoryPorts)
       )}
 
-      {/* Icon + label body */}
-      <div className="flex flex-col items-center justify-center gap-1 px-2 py-1 w-full h-full overflow-hidden">
-        {/* Circular icon — the defining visual of an accessory node */}
+      {/* Icon + label body.
+          pt-8 pushes content below the narrow tip so text never crowds the handle area.
+          pb-3 adds a small bottom breath above the source handle. */}
+      <div className="flex flex-col items-center justify-center gap-1.5 px-3 pt-8 pb-3 w-full h-full overflow-hidden">
+        {/* Circular coloured icon — the defining visual of an accessory node */}
         <div
           className={cn(
-            "w-11 h-11 rounded-full flex items-center justify-center shadow-sm shrink-0",
-            "[&_svg]:w-5 [&_svg]:h-5 [&_svg]:text-white [&_svg]:stroke-[2.5px]",
+            "w-12 h-12 rounded-full flex items-center justify-center shadow-sm shrink-0",
+            "[&_svg]:w-6 [&_svg]:h-6 [&_svg]:text-white [&_svg]:stroke-[2px]",
             colorClass,
           )}
         >
           {typeof icon === "string" ? (
-            <span className="text-base">{icon}</span>
+            <span className="text-lg leading-none">{icon}</span>
           ) : (
             icon
           )}
         </div>
 
-        <span className="text-[10px] font-semibold tracking-wide text-center leading-tight text-foreground/75 w-full line-clamp-2 px-1">
+        {/* Node name — up to 2 lines, never clips outside the card */}
+        <span className="text-[10px] font-semibold tracking-wide text-center leading-tight text-foreground/80 w-full line-clamp-2">
           {title}
         </span>
 
         {/* Type badge — tool (emerald) vs provider (sky) */}
         {isTool && (
-          <Badge className="text-[8px] font-semibold tracking-widest uppercase px-1.5 py-0 h-3.5 pointer-events-none bg-emerald-500/15 text-emerald-600 border-emerald-500/30">
+          <Badge className="text-[8px] font-semibold tracking-widest uppercase px-1.5 py-0 h-3.5 pointer-events-none bg-emerald-500/15 text-emerald-600 border-emerald-500/30 shrink-0">
             tool
           </Badge>
         )}
         {isProvider && (
-          <Badge className="text-[8px] font-semibold tracking-widest uppercase px-1.5 py-0 h-3.5 pointer-events-none bg-sky-500/15 text-sky-600 border-sky-500/30">
+          <Badge className="text-[8px] font-semibold tracking-widest uppercase px-1.5 py-0 h-3.5 pointer-events-none bg-sky-500/15 text-sky-600 border-sky-500/30 shrink-0">
             provider
           </Badge>
         )}
