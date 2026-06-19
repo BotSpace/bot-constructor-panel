@@ -2039,110 +2039,234 @@ function AIAgentAdvancedWidget({ nodeId, data }: WidgetProps) {
   );
 }
 
-// ── AICollectionToolConfigWidget — engine kontrakt: collection / operations / searchFields ──
+// ── AICollectionToolConfigWidget — TEMPLATE GIBRID model ──────────────────
+// Engine kontrakt: collection / operation / filterMatch /
+//   filterConditions / documentFields / changeFields
 
-/** Engine internal/llm/tool.go parseSearchFields() formatiga mos */
-type SearchFieldEntry = {
+type TemplateOp = "create" | "read" | "update" | "delete";
+
+/** Filter/document/change qatoridagi yagona entry */
+type TemplateFieldEntry = {
+  /** Collection field nomi */
   field: string;
-  description: string;
+  /** Faqat filterConditions: taqqoslash operatori */
+  op: string;
+  /** "fixed" — foydalanuvchi yozadi; "ai" — AI runtime'da to'ldiradi */
+  source: "fixed" | "ai";
+  /** source=="fixed" da ko'rsatiladi */
+  value: string;
+  /** source=="ai" da ko'rsatiladi */
+  aiDescription: string;
 };
 
-const emptySearchField = (): SearchFieldEntry => ({ field: "", description: "" });
+const FILTER_OPS: { value: string; label: string }[] = [
+  { value: "eq",       label: "=" },
+  { value: "ne",       label: "≠" },
+  { value: "gt",       label: ">" },
+  { value: "gte",      label: "≥" },
+  { value: "lt",       label: "<" },
+  { value: "lte",      label: "≤" },
+  { value: "in",       label: "ichida (in)" },
+  { value: "nin",      label: "ichida emas" },
+  { value: "contains", label: "oʻz ichiga" },
+  { value: "exists",   label: "mavjud" },
+];
 
-/** Ruxsat etilgan CRUD operatsiyalar (engine defaultOps bilan mos) */
-const CRUD_OPS: { value: string; label: string }[] = [
+const CRUD_OPS_SINGLE: { value: TemplateOp; label: string }[] = [
   { value: "create", label: "Create" },
-  { value: "read", label: "Read" },
+  { value: "read",   label: "Read" },
   { value: "update", label: "Update" },
   { value: "delete", label: "Delete" },
 ];
 
-/**
- * Bitta searchField qatori: field dropdown + description input + o'chirish tugmasi.
- * Engine parseSearchFields() [{field, description}] massivini kutadi.
- */
-function SearchFieldRow({
+function emptyFilterEntry(): TemplateFieldEntry {
+  return { field: "", op: "eq", source: "ai", value: "", aiDescription: "" };
+}
+
+function emptyDocEntry(): TemplateFieldEntry {
+  return { field: "", op: "eq", source: "ai", value: "", aiDescription: "" };
+}
+
+/** Bitta template qatori: field + (op) + source-toggle + value/aiDescription + trash */
+function TemplateFieldRow({
   entry,
   fieldOptions,
+  showOp,
   onChange,
   onRemove,
 }: {
-  entry: SearchFieldEntry;
+  entry: TemplateFieldEntry;
   fieldOptions: string[];
-  onChange: (next: SearchFieldEntry) => void;
+  /** true — filterConditions'da (op ko'rsatilsin) */
+  showOp: boolean;
+  onChange: (next: TemplateFieldEntry) => void;
   onRemove: () => void;
 }) {
   return (
-    <div className="flex items-center gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.02] px-2 py-1.5">
-      {/* Field nomi */}
-      {fieldOptions.length > 0 ? (
-        <Select value={entry.field} onValueChange={(v) => onChange({ ...entry, field: v })}>
-          <SelectTrigger className="h-7 w-28 shrink-0 text-[11px] font-mono">
-            <SelectValue placeholder="field" />
-          </SelectTrigger>
-          <SelectContent>
-            {fieldOptions.map((f) => (
-              <SelectItem key={f} value={f} className="text-[11px] font-mono">
-                {f}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="grid gap-1 rounded-md border border-white/[0.07] bg-white/[0.02] px-2 py-1.5">
+      {/* Qator 1: field + op (agar showOp) + trash */}
+      <div className="flex items-center gap-1.5">
+        {/* Field dropdown yoki input */}
+        {fieldOptions.length > 0 ? (
+          <Select value={entry.field} onValueChange={(v) => onChange({ ...entry, field: v })}>
+            <SelectTrigger className="h-7 w-28 shrink-0 text-[11px] font-mono">
+              <SelectValue placeholder="field" />
+            </SelectTrigger>
+            <SelectContent>
+              {fieldOptions.map((f) => (
+                <SelectItem key={f} value={f} className="text-[11px] font-mono">
+                  {f}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <Input
+            className="h-7 w-28 shrink-0 text-[11px] font-mono"
+            placeholder="field"
+            value={entry.field}
+            onChange={(e) => onChange({ ...entry, field: e.target.value })}
+          />
+        )}
+
+        {/* Op dropdown — faqat filter qatorida */}
+        {showOp && (
+          <Select value={entry.op} onValueChange={(v) => onChange({ ...entry, op: v })}>
+            <SelectTrigger className="h-7 w-[88px] shrink-0 text-[11px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {FILTER_OPS.map((o) => (
+                <SelectItem key={o.value} value={o.value} className="text-[11px]">
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {/* Source toggle: Fixed / AI */}
+        <div className="ml-auto flex shrink-0 overflow-hidden rounded border border-white/[0.08]">
+          <button
+            type="button"
+            onClick={() => onChange({ ...entry, source: "fixed" })}
+            className={cn(
+              "px-2 py-0.5 text-[10px] font-medium transition-colors",
+              entry.source === "fixed"
+                ? "bg-amber-500/20 text-amber-300"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            Qiymat
+          </button>
+          <button
+            type="button"
+            onClick={() => onChange({ ...entry, source: "ai" })}
+            className={cn(
+              "px-2 py-0.5 text-[10px] font-medium transition-colors",
+              entry.source === "ai"
+                ? "bg-blue-500/20 text-blue-300"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            AI
+          </button>
+        </div>
+
+        {/* Trash */}
+        <button
+          type="button"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-zinc-600 hover:text-red-400"
+          onClick={onRemove}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
+      {/* Qator 2: value yoki aiDescription (source ga qarab) */}
+      {entry.source === "fixed" ? (
+        <Input
+          className="h-7 text-[11px]"
+          placeholder="Qiymat yoki {{chat_id}}"
+          value={entry.value}
+          onChange={(e) => onChange({ ...entry, value: e.target.value })}
+        />
       ) : (
         <Input
-          className="h-7 w-28 shrink-0 text-[11px] font-mono"
-          placeholder="field"
-          value={entry.field}
-          onChange={(e) => onChange({ ...entry, field: e.target.value })}
+          className="h-7 text-[11px]"
+          placeholder="AI uchun tavsif: bu qiymat nima"
+          value={entry.aiDescription}
+          onChange={(e) => onChange({ ...entry, aiDescription: e.target.value })}
         />
       )}
-
-      {/* AI uchun tavsif */}
-      <Input
-        className="h-7 min-w-0 flex-1 text-[11px]"
-        placeholder="AI uchun tavsif (ixtiyoriy)"
-        value={entry.description}
-        onChange={(e) => onChange({ ...entry, description: e.target.value })}
-      />
-
-      {/* O'chirish */}
-      <button
-        type="button"
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-zinc-500 hover:text-red-400"
-        onClick={onRemove}
-      >
-        <X className="h-3.5 w-3.5" />
-      </button>
     </div>
   );
+}
+
+/** Yengil migratsiya: eski searchFields → filterConditions (source:"ai", op:"eq") */
+function migrateSearchFields(raw: unknown): TemplateFieldEntry[] {
+  if (!Array.isArray(raw)) return [];
+  return (raw as Array<{ field?: unknown; description?: unknown }>).map((e) => ({
+    field: typeof e?.field === "string" ? e.field : "",
+    op: "eq",
+    source: "ai",
+    value: "",
+    aiDescription: typeof e?.description === "string" ? e.description : "",
+  }));
+}
+
+function parseTemplateEntries(raw: unknown): TemplateFieldEntry[] {
+  if (!Array.isArray(raw)) return [];
+  return (raw as Array<Partial<TemplateFieldEntry>>).map((e) => ({
+    field:         typeof e?.field === "string" ? e.field : "",
+    op:            typeof e?.op === "string" ? e.op : "eq",
+    source:        e?.source === "fixed" ? "fixed" : "ai",
+    value:         typeof e?.value === "string" ? e.value : "",
+    aiDescription: typeof e?.aiDescription === "string" ? e.aiDescription : "",
+  }));
 }
 
 function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const { data: collections } = useCollectionStore();
 
-  // ── collection ───────────────────────────────────────────────────────────
+  // ── collection ──────────────────────────────────────────────────────────
   const collection = typeof data.collection === "string" ? data.collection : "";
 
-  // ── operations: string[] — engine parseAllowedOps() kutadi ───────────────
-  // Eski node'larda `action` (bitta string) bo'lishi mumkin — migratsiya qilinadi
-  const rawOps = Array.isArray(data.operations)
-    ? (data.operations as string[])
-    : data.action && typeof data.action === "string"
-    ? [data.action as string]
-    : [];
-  // "list" eski panel-ga xos, engine bilmaydi — olib tashlanadi
-  const operations = rawOps.filter((op) => ["create", "read", "update", "delete"].includes(op));
+  // ── operation: bitta tanlash — yengil migratsiya eski `operations[0]`/`action` ──
+  const rawOperation: unknown = data.operation
+    ?? (Array.isArray(data.operations) && (data.operations as string[]).length > 0
+        ? (data.operations as string[])[0]
+        : undefined)
+    ?? data.action;
+  const VALID_OPS: TemplateOp[] = ["create", "read", "update", "delete"];
+  const operation: TemplateOp =
+    typeof rawOperation === "string" && VALID_OPS.includes(rawOperation as TemplateOp)
+      ? (rawOperation as TemplateOp)
+      : "read";
 
-  // ── searchFields: [{field, description}][] — engine parseSearchFields() ──
-  const searchFields: SearchFieldEntry[] = Array.isArray(data.searchFields)
-    ? (data.searchFields as SearchFieldEntry[]).map((e) => ({
-        field: typeof e?.field === "string" ? e.field : "",
-        description: typeof e?.description === "string" ? e.description : "",
-      }))
+  // ── filterMatch ──────────────────────────────────────────────────────────
+  const filterMatch: "and" | "or" =
+    data.filterMatch === "or" ? "or" : "and";
+
+  // ── filterConditions — yengil migratsiya eski searchFields ──────────────
+  const filterConditions: TemplateFieldEntry[] = Array.isArray(data.filterConditions)
+    ? parseTemplateEntries(data.filterConditions)
+    : Array.isArray(data.searchFields)
+    ? migrateSearchFields(data.searchFields)
     : [];
 
-  // ── collection field'lari (dropdown uchun) ───────────────────────────────
+  // ── documentFields (create) ──────────────────────────────────────────────
+  const documentFields: TemplateFieldEntry[] = Array.isArray(data.documentFields)
+    ? parseTemplateEntries(data.documentFields)
+    : [];
+
+  // ── changeFields (update) ────────────────────────────────────────────────
+  const changeFields: TemplateFieldEntry[] = Array.isArray(data.changeFields)
+    ? parseTemplateEntries(data.changeFields)
+    : [];
+
+  // ── collection field'lari (dropdown uchun) ──────────────────────────────
   const { data: collectionDetail } = useReactQueryAction<CollectionDetail>({
     url: collection ? `cms/projects/[id]/collections/${collection}/` : undefined,
     enabled: Boolean(collection),
@@ -2151,24 +2275,34 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
 
   const upd = (patch: Record<string, unknown>) => updateNodeData(nodeId, patch);
 
-  // Operations toggle
-  const toggleOp = (op: string) => {
-    const next = operations.includes(op)
-      ? operations.filter((o) => o !== op)
-      : [...operations, op];
-    upd({ operations: next });
-  };
+  // filterConditions helpers
+  const addFilter = () => upd({ filterConditions: [...filterConditions, emptyFilterEntry()] });
+  const updateFilter = (i: number, next: TemplateFieldEntry) =>
+    upd({ filterConditions: filterConditions.map((e, j) => (j === i ? next : e)) });
+  const removeFilter = (i: number) =>
+    upd({ filterConditions: filterConditions.filter((_, j) => j !== i) });
 
-  // searchFields helpers
-  const addSearchField = () => upd({ searchFields: [...searchFields, emptySearchField()] });
-  const updateSearchField = (i: number, next: SearchFieldEntry) =>
-    upd({ searchFields: searchFields.map((e, j) => (j === i ? next : e)) });
-  const removeSearchField = (i: number) =>
-    upd({ searchFields: searchFields.filter((_, j) => j !== i) });
+  // documentFields helpers
+  const addDocField = () => upd({ documentFields: [...documentFields, emptyDocEntry()] });
+  const updateDocField = (i: number, next: TemplateFieldEntry) =>
+    upd({ documentFields: documentFields.map((e, j) => (j === i ? next : e)) });
+  const removeDocField = (i: number) =>
+    upd({ documentFields: documentFields.filter((_, j) => j !== i) });
+
+  // changeFields helpers
+  const addChangeField = () => upd({ changeFields: [...changeFields, emptyDocEntry()] });
+  const updateChangeField = (i: number, next: TemplateFieldEntry) =>
+    upd({ changeFields: changeFields.map((e, j) => (j === i ? next : e)) });
+  const removeChangeField = (i: number) =>
+    upd({ changeFields: changeFields.filter((_, j) => j !== i) });
+
+  const showFilter = operation === "read" || operation === "update" || operation === "delete";
+  const showDocFields = operation === "create";
+  const showChangeFields = operation === "update";
 
   return (
     <div className="grid gap-3">
-      {/* Collection selector */}
+      {/* 1. Collection selector */}
       <div className="grid gap-1.5">
         <Label className="text-xs text-muted-foreground">Collection</Label>
         <Select value={collection} onValueChange={(v) => upd({ collection: v })}>
@@ -2185,71 +2319,133 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
         </Select>
       </div>
 
-      {/* Operations — CRUD multi-select (engine data.operations: string[]) */}
+      {/* 2. Operation — bitta segment tanlash */}
       <div className="grid gap-1.5">
-        <Label className="text-xs text-muted-foreground">Ruxsat etilgan amallar</Label>
-        <div className="flex flex-wrap gap-1">
-          {CRUD_OPS.map((op) => {
-            const active = operations.includes(op.value);
-            return (
-              <button
-                key={op.value}
-                type="button"
-                onClick={() => toggleOp(op.value)}
-                className={cn(
-                  "rounded-md border px-2.5 py-1 text-[11px] font-medium transition-colors",
-                  active
-                    ? "border-blue-500/50 bg-blue-500/15 text-blue-300"
-                    : "border-white/[0.08] bg-white/[0.02] text-zinc-500 hover:text-zinc-300"
-                )}
-              >
-                {op.label}
-              </button>
-            );
-          })}
+        <Label className="text-xs text-muted-foreground">Amal</Label>
+        <div className="flex overflow-hidden rounded-md border border-white/[0.08]">
+          {CRUD_OPS_SINGLE.map((op) => (
+            <button
+              key={op.value}
+              type="button"
+              onClick={() => upd({ operation: op.value })}
+              className={cn(
+                "flex-1 py-1 text-[11px] font-medium transition-colors",
+                operation === op.value
+                  ? "bg-blue-500/20 text-blue-300"
+                  : "text-zinc-500 hover:text-zinc-300"
+              )}
+            >
+              {op.label}
+            </button>
+          ))}
         </div>
-        {operations.length === 0 && (
-          <p className="text-[10px] text-zinc-500">
-            Hech biri tanlanmagan — engine barcha 4 amalni ruxsat beradi.
-          </p>
-        )}
       </div>
 
-      {/* Search fields — [{field, description}] (engine data.searchFields) */}
-      <div className="grid gap-1.5">
-        <div className="flex items-center justify-between">
-          <Label className="text-xs text-muted-foreground">Qidiruv maydonlari</Label>
+      {/* 3. Filter (read / update / delete) */}
+      {showFilter && (
+        <div className="grid gap-1.5">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs text-muted-foreground">Filter (topish sharti)</Label>
+            {/* AND/OR mini-toggle */}
+            <div className="flex overflow-hidden rounded border border-white/[0.08]">
+              {(["and", "or"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => upd({ filterMatch: m })}
+                  className={cn(
+                    "px-2 py-0.5 text-[10px] font-medium uppercase transition-colors",
+                    filterMatch === m
+                      ? "bg-white/10 text-zinc-200"
+                      : "text-zinc-600 hover:text-zinc-400"
+                  )}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {filterConditions.map((entry, i) => (
+            <TemplateFieldRow
+              key={i}
+              entry={entry}
+              fieldOptions={fieldOptions}
+              showOp
+              onChange={(next) => updateFilter(i, next)}
+              onRemove={() => removeFilter(i)}
+            />
+          ))}
+
           <button
             type="button"
-            className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-0.5 text-[10px] text-zinc-500 hover:text-zinc-300"
-            onClick={addSearchField}
+            className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-1 text-[10px] text-zinc-500 hover:text-zinc-300"
+            onClick={addFilter}
           >
-            <PlusIcon className="h-3 w-3" /> Maydon qo&apos;shish
+            <PlusIcon className="h-3 w-3" /> Shart qo&apos;shish
           </button>
         </div>
+      )}
 
-        {/* Izoh: AI filter quradi, foydalanuvchi emas */}
-        <p className="text-[10px] leading-relaxed text-zinc-500">
-          AI shu maydonlar bo&apos;yicha filtr quradi (AND/OR, taqqoslash). Filterning o&apos;zini
-          bu yerda yozmaysiz — AI runtime&apos;da quradi.
-        </p>
+      {/* 4. changeFields (update) */}
+      {showChangeFields && (
+        <div className="grid gap-1.5">
+          <Label className="text-xs text-muted-foreground">Yangilanadigan qiymatlar</Label>
 
-        {searchFields.length === 0 && (
-          <p className="text-[10px] italic text-zinc-500">
-            Hech qanday maydon yo&apos;q — AI barcha fieldlarni ishlatishi mumkin.
-          </p>
-        )}
+          {changeFields.map((entry, i) => (
+            <TemplateFieldRow
+              key={i}
+              entry={entry}
+              fieldOptions={fieldOptions}
+              showOp={false}
+              onChange={(next) => updateChangeField(i, next)}
+              onRemove={() => removeChangeField(i)}
+            />
+          ))}
 
-        {searchFields.map((entry, i) => (
-          <SearchFieldRow
-            key={i}
-            entry={entry}
-            fieldOptions={fieldOptions}
-            onChange={(next) => updateSearchField(i, next)}
-            onRemove={() => removeSearchField(i)}
-          />
-        ))}
-      </div>
+          <button
+            type="button"
+            className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-1 text-[10px] text-zinc-500 hover:text-zinc-300"
+            onClick={addChangeField}
+          >
+            <PlusIcon className="h-3 w-3" /> Field qo&apos;shish
+          </button>
+        </div>
+      )}
+
+      {/* 5. documentFields (create) */}
+      {showDocFields && (
+        <div className="grid gap-1.5">
+          <Label className="text-xs text-muted-foreground">Yozuv fieldlari</Label>
+
+          {documentFields.map((entry, i) => (
+            <TemplateFieldRow
+              key={i}
+              entry={entry}
+              fieldOptions={fieldOptions}
+              showOp={false}
+              onChange={(next) => updateDocField(i, next)}
+              onRemove={() => removeDocField(i)}
+            />
+          ))}
+
+          <button
+            type="button"
+            className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-1 text-[10px] text-zinc-500 hover:text-zinc-300"
+            onClick={addDocField}
+          >
+            <PlusIcon className="h-3 w-3" /> Field qo&apos;shish
+          </button>
+        </div>
+      )}
+
+      {/* 6. Qisqa izoh */}
+      <p className="text-[10px] leading-relaxed text-zinc-500">
+        <span className="font-medium text-amber-400/80">Qiymat</span> — siz yozasiz (
+        <span className="font-mono">&#123;&#123;chat_id&#125;&#125;</span> ishlatish mumkin).{" "}
+        <span className="font-medium text-blue-400/80">AI to&apos;ldiradi</span> — AI runtime&apos;da
+        tavsifga qarab kiritadi.
+      </p>
     </div>
   );
 }
