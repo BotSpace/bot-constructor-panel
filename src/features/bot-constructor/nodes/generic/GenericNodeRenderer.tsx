@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useState } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
@@ -15,11 +16,73 @@ import { FieldWidget, getContentClassName, isFieldVisible } from "../registry/fi
 import { NodeManifest } from "../registry/types";
 import { NODE_COLOR_CLASS_REGISTRY } from "../registry/colorRegistry";
 import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
+import { useFlowStore } from "@/features/bot-constructor/store";
 
 // Debug status is surfaced via a `data-debug-status` attribute. The visible
 // node border/shadow is controlled by !important rules in globals.css
 // (.react-flow__node > *), which override Tailwind ring classes — so the
 // status colour must be applied there too (see globals.css).
+
+// ---------------------------------------------------------------------------
+// InlineAccessoryTitle — inline-editable title for AccessoryNodeCard.
+// ---------------------------------------------------------------------------
+
+interface InlineAccessoryTitleProps {
+  nodeId: string;
+  title: string;
+}
+
+function InlineAccessoryTitle({ nodeId, title }: InlineAccessoryTitleProps) {
+  const updateNodeData = useFlowStore((s) => s.updateNodeData);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+
+  const startEdit = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDraft(title);
+    setEditing(true);
+  }, [title]);
+
+  const commit = useCallback(() => {
+    const trimmed = draft.trim();
+    updateNodeData(nodeId, { node_label: trimmed || null });
+    setEditing(false);
+  }, [draft, nodeId, updateNodeData]);
+
+  const cancel = useCallback(() => {
+    setEditing(false);
+  }, []);
+
+  if (editing) {
+    return (
+      <input
+        className="nodrag w-full bg-transparent text-center text-[10px] font-semibold tracking-wide uppercase leading-tight text-foreground/75 outline-none border-b border-primary/60 focus:border-primary"
+        value={draft}
+        autoFocus
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") { e.preventDefault(); commit(); }
+          else if (e.key === "Escape") { e.preventDefault(); cancel(); }
+          e.stopPropagation();
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+        style={{ minWidth: 0, maxWidth: "100%" }}
+      />
+    );
+  }
+
+  return (
+    <span
+      className="text-[10px] font-semibold tracking-wide uppercase text-center leading-tight text-foreground/75 max-w-[110px] line-clamp-2 cursor-text"
+      onDoubleClick={startEdit}
+      title="Double-click to rename"
+    >
+      {title}
+    </span>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // AccessoryNodeCard — compact n8n-style pill card for AI provider / tool nodes
@@ -85,9 +148,7 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
           )}
         </div>
 
-        <span className="text-[10px] font-semibold tracking-wide uppercase text-center leading-tight text-foreground/75 max-w-[110px] line-clamp-2">
-          {title}
-        </span>
+        <InlineAccessoryTitle nodeId={id} title={title} />
 
         {/* Category badge for accessory nodes */}
         {manifest.accessoryAttachesTo?.includes("ai_tool") && (
@@ -122,6 +183,12 @@ function resolveTitle(
   data: Record<string, unknown>,
   translatedTitle: string
 ) {
+  // User-defined inline label takes priority over everything.
+  const customLabel = data.node_label;
+  if (typeof customLabel === "string" && customLabel.trim() !== "") {
+    return customLabel.trim();
+  }
+
   if (!manifest.titleTemplate) {
     return translatedTitle;
   }
@@ -212,6 +279,7 @@ export function GenericNodeRenderer({
       )}
 
       <NodeHeader
+        nodeId={id}
         icon={resolveNodeIcon(manifest.iconName)}
         title={title}
         isCollapsed={isCollapsed}
