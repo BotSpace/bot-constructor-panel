@@ -294,21 +294,17 @@ export function ModalNodeFormRenderer({
               field.optional && !autoRevealedKeys.has(fieldKey(field)) ? (
                 <div
                   key={`${manifest.type}-${fieldKey(field)}-${index}`}
-                  className="flex items-start gap-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-200"
+                  className="relative animate-in fade-in-0 slide-in-from-bottom-2 duration-200"
                 >
-                  {/* Persistent remove control on the left, separated by a divider.
-                      mt-7 drops it to the input's vertical center (past the
-                      text-xs label + space-y-1.5 gap) instead of centering on the
-                      whole label+input block. */}
                   <button
                     type="button"
-                    className="mt-7 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-r border-white/10 pr-3 text-zinc-500 hover:text-red-400"
+                    className="absolute right-0 top-0 z-10 flex h-5 w-5 items-center justify-center rounded text-zinc-500 hover:text-red-400 transition-colors"
                     title="Maydonni olib tashlash"
                     onClick={() => handleRemoveOptional(field)}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
-                  <div className="min-w-0 flex-1">
+                  <div className="w-full pr-6">
                     <ModalFieldWidget nodeId={nodeId} data={data} field={field} />
                   </div>
                 </div>
