@@ -109,8 +109,19 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
             };
 
         // Bir node ichida seq bo'yicha: eski seq yangisini yenga olmaydi.
+        // ISTISNO: terminal status (success/error) kelsa, oldingi non-terminal
+        // (waiting/running) holatini seq tartibidan qat'i nazar yengadi.
+        // Sabab: emitWaiting (yuqori seq, "waiting") async HTTP tufayli
+        // success (past seq) dan OLDIN yetib kelsa, seq guard success'ni
+        // noto'g'ri bloklab, node "waiting" holatida qolib ketadi.
         const prevSeq = base.seqs[nodeId];
+        const prevStatusForSeq = base.statuses[nodeId];
+        const incomingTerminal = TERMINAL.includes(status);
+        const prevNonTerminal =
+          prevStatusForSeq === undefined || !TERMINAL.includes(prevStatusForSeq);
+        const terminalOverridesNonTerminal = incomingTerminal && prevNonTerminal;
         if (
+          !terminalOverridesNonTerminal &&
           typeof seq === "number" &&
           prevSeq !== undefined &&
           seq <= prevSeq
