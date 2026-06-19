@@ -29,10 +29,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@/components/ui/popover'
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
 import { useTranslations } from 'next-intl'
 import { useDebugContextStore } from '@/components/layout/components/debug-console/debug-context-store'
 import { VariableInspectorPanel } from '@/components/layout/components/debug-console/VariableInspectorPanel'
@@ -214,31 +215,15 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
         {
             key: 'variables',
             inline: (
-                <Popover open={variablesOpen} onOpenChange={setVariablesOpen}>
-                    <PopoverTrigger asChild>
-                        <BottomPanelButton
-                            title={t('variables')}
-                            aria-label={t('variables')}
-                            disabled={!debugActive && !hasSnapshots}
-                            className={hasSnapshots ? 'text-primary border-primary/40' : ''}
-                        >
-                            <Braces size={20} />
-                        </BottomPanelButton>
-                    </PopoverTrigger>
-                    <PopoverContent
-                        side="top"
-                        align="center"
-                        className="w-[420px] p-0 h-[440px] flex flex-col overflow-hidden"
-                    >
-                        <div className="flex items-center gap-2 px-3 py-2 border-b border-border shrink-0">
-                            <Braces className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">{t('variables')}</span>
-                        </div>
-                        <div className="flex-1 min-h-0">
-                            <VariableInspectorPanel debugActive={debugActive} />
-                        </div>
-                    </PopoverContent>
-                </Popover>
+                <BottomPanelButton
+                    onClick={() => setVariablesOpen(true)}
+                    title={t('variables')}
+                    aria-label={t('variables')}
+                    disabled={!debugActive && !hasSnapshots}
+                    className={hasSnapshots ? 'text-primary border-primary/40' : ''}
+                >
+                    <Braces size={20} />
+                </BottomPanelButton>
             ),
             overflow: (
                 <DropdownMenuItem key="variables" onClick={() => setVariablesOpen(true)} disabled={!debugActive && !hasSnapshots}>
@@ -321,6 +306,24 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 open={credentialOpen}
                 onOpenChange={setCredentialOpen}
             />
+
+            {/* Variable Inspector — large 3-column dialog */}
+            <Dialog open={variablesOpen} onOpenChange={setVariablesOpen}>
+                <DialogContent
+                    className="max-w-4xl p-0 h-[70vh] flex flex-col overflow-hidden gap-0"
+                    showCloseButton
+                >
+                    <DialogHeader className="flex-row items-center gap-2 px-4 py-3 border-b border-border shrink-0 space-y-0">
+                        <Braces className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <DialogTitle className="text-sm font-semibold leading-none">
+                            {t('variables')}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="flex-1 min-h-0">
+                        <VariableInspectorPanel debugActive={debugActive} />
+                    </div>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }
