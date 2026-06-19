@@ -68,7 +68,7 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
       )}
 
       {/* Icon + label body */}
-      <div className="flex flex-col items-center gap-1 px-2 py-2 w-full">
+      <div className="flex flex-col items-center justify-center gap-1 px-2 py-1 w-full h-full overflow-hidden">
         {/* Circular icon — the defining visual of an accessory node */}
         <div
           className={cn(
