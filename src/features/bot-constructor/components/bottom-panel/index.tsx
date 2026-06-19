@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from './components/button'
-import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff, Shield } from 'lucide-react'
+import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff, Shield, Braces } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/components/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -28,7 +28,15 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover'
 import { useTranslations } from 'next-intl'
+import { useDebugContextStore } from '@/components/layout/components/debug-console/debug-context-store'
+import { VariableInspectorPanel } from '@/components/layout/components/debug-console/VariableInspectorPanel'
+import useProjectStore from '../../store/project'
 
 interface Props {
     addNodeOpen?: boolean;
@@ -42,7 +50,7 @@ interface Props {
 const FIXED_W = 227
 const SLOT = 48
 const MORE_W = 48
-const ALL_COUNT = 7
+const ALL_COUNT = 8
 
 function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const t = useTranslations('editor.toolbar')
@@ -59,6 +67,11 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const [envManageOpen, setEnvManageOpen] = useState(false)
     const [collectionOpen, setCollectionOpen] = useState(false)
     const [credentialOpen, setCredentialOpen] = useState(false)
+    const [variablesOpen, setVariablesOpen] = useState(false)
+    const { snapshots } = useDebugContextStore()
+    const { project } = useProjectStore()
+    const debugActive = project?.debug?.status === 'running'
+    const hasSnapshots = snapshots.size > 0
     const { addNode, edgesVisible, toggleEdgesVisibility } = useFlowStore()
     const { getViewport } = useReactFlow()
     const { id } = useParams()
@@ -195,6 +208,42 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 <DropdownMenuItem key="shortcuts" onClick={() => setShortcutsOpen(true)}>
                     <Keyboard size={16} className="mr-2" />
                     {t('shortcuts')}
+                </DropdownMenuItem>
+            ),
+        },
+        {
+            key: 'variables',
+            inline: (
+                <Popover open={variablesOpen} onOpenChange={setVariablesOpen}>
+                    <PopoverTrigger asChild>
+                        <BottomPanelButton
+                            title={t('variables')}
+                            aria-label={t('variables')}
+                            disabled={!debugActive && !hasSnapshots}
+                            className={hasSnapshots ? 'text-primary border-primary/40' : ''}
+                        >
+                            <Braces size={20} />
+                        </BottomPanelButton>
+                    </PopoverTrigger>
+                    <PopoverContent
+                        side="top"
+                        align="center"
+                        className="w-[420px] p-0 h-[440px] flex flex-col overflow-hidden"
+                    >
+                        <div className="flex items-center gap-2 px-3 py-2 border-b border-border shrink-0">
+                            <Braces className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">{t('variables')}</span>
+                        </div>
+                        <div className="flex-1 min-h-0">
+                            <VariableInspectorPanel debugActive={debugActive} />
+                        </div>
+                    </PopoverContent>
+                </Popover>
+            ),
+            overflow: (
+                <DropdownMenuItem key="variables" onClick={() => setVariablesOpen(true)} disabled={!debugActive && !hasSnapshots}>
+                    <Braces size={16} className="mr-2" />
+                    {t('variables')}
                 </DropdownMenuItem>
             ),
         },

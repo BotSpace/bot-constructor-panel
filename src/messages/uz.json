@@ -595,7 +595,8 @@
       "collections": "Kolleksiyalar",
       "shortcuts": "Tezkor tugmalar",
       "more": "Ko'proq",
-      "credentials": "Credential'lar"
+      "credentials": "Credential'lar",
+      "variables": "O'zgaruvchilar"
     },
     "saveStatus": {
       "saving": "Saqlanmoqda...",
