@@ -595,7 +595,8 @@
       "collections": "Collections",
       "shortcuts": "Keyboard shortcuts",
       "more": "More",
-      "credentials": "Credentials"
+      "credentials": "Credentials",
+      "variables": "Variables"
     },
     "saveStatus": {
       "saving": "Saving...",

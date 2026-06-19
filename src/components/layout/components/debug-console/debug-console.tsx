@@ -5,6 +5,7 @@ import { X, Terminal, Trash2, Copy, TerminalIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { debugConsoleStore } from "./store";
+import { useDebugContextStore } from "./debug-context-store";
 
 interface LogEntry {
   id: string;
@@ -18,6 +19,7 @@ type BotType = "debug" | "release";
 export function DebugConsole() {
   const { project } = useProjectStore();
   const { isOpen, open, close, toggle, height, setHeight } = debugConsoleStore();
+  const { setSnapshot } = useDebugContextStore();
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [selectedBot, setSelectedBot] = useState<BotType>("debug");
   const [isConnected, setIsConnected] = useState(false);
@@ -176,6 +178,17 @@ export function DebugConsole() {
       }
       try {
         const data = JSON.parse(event.data);
+
+        // type:"context" events → context variable inspector (do NOT log as text)
+        if (data.type === "context") {
+          const chatId = String(data.chat_id ?? "unknown");
+          setSnapshot(chatId, {
+            variables: (data.variables as Record<string, unknown>) ?? {},
+            ts: data.ts ? String(data.ts) : new Date().toISOString(),
+          });
+          return;
+        }
+
         const level = data.level || "info";
         const message = data.message || event.data;
         addLog(level, message);
