@@ -29,8 +29,9 @@ import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-stat
 // ---------------------------------------------------------------------------
 
 // Fixed dimensions applied to every accessory node so they are all identical.
+// Square footprint so rounded-[48px] produces a clean circle/pill appearance.
 const ACCESSORY_W = 96;
-const ACCESSORY_H = 110;
+const ACCESSORY_H = 96;
 
 interface AccessoryNodeCardProps {
   id: string;
@@ -51,9 +52,9 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
   return (
     <div
       className={cn(
-        // Fully rounded card — same shape for every accessory node.
+        // Fully rounded card — pill/circle shape for every accessory node.
         "relative flex flex-col items-center justify-center select-none",
-        "rounded-2xl",
+        "rounded-[48px]",
         "border border-border/60 bg-card shadow-md",
         "transition-shadow duration-150",
         selected && "ring-2 ring-primary shadow-lg",
@@ -67,7 +68,7 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
       )}
 
       {/* Icon + label body */}
-      <div className="flex flex-col items-center gap-1.5 px-2 py-3 w-full">
+      <div className="flex flex-col items-center gap-1 px-2 py-2 w-full">
         {/* Circular icon — the defining visual of an accessory node */}
         <div
           className={cn(
@@ -214,7 +215,7 @@ export function GenericNodeRenderer({
       className={cn(
         "shadow-lg transition-shadow",
         selected && "ring-2 ring-primary",
-        isTrigger && "rounded-tl-3xl rounded-bl-3xl rounded-tr-xl rounded-br-xl",
+        isTrigger && "rounded-tl-[2.5rem] rounded-bl-[2.5rem] rounded-tr-xl rounded-br-xl",
       )}
       data-debug-status={debugStatus || undefined}
       style={sizeStyle}
