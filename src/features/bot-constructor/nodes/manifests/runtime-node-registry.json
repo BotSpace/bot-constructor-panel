@@ -6178,6 +6178,18 @@
 				"label": "Natija o'zgaruvchisi",
 				"placeholder": "sheets_response",
 				"optional": true
+			},
+			{
+				"type": "text",
+				"key": "rowsVariable",
+				"label": "Qatorlar o'zgaruvchisi (rows)",
+				"placeholder": "sheets_response_rows",
+				"helpText": "Toza qatorlar (array-of-objects) shu context kalitiga saqlanadi. Default: <responseVariable>_rows. Xabarda {{#each shu_kalit}}{{ustun_nomi}}{{/each}} bilan ishlatiladi.",
+				"optional": true,
+				"visibleWhen": {
+					"key": "operation",
+					"equals": "read"
+				}
 			}
 		],
 		"defaults": {
@@ -6187,10 +6199,12 @@
 			"column": "",
 			"range": "",
 			"values": "",
-			"responseVariable": "sheets_response"
+			"responseVariable": "sheets_response",
+			"rowsVariable": ""
 		},
 		"producesState": [
 			"sheets_response",
+			"sheets_response_rows",
 			"sheets_success"
 		]
 	},
