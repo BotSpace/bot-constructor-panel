@@ -160,6 +160,14 @@ export interface NodeFieldManifest {
   // condition-list
   operatorKey?: string;
   conditionsKey?: string;
+  /** Sub-field key for the column/variable name inside each condition item. Default: "variable" */
+  conditionFieldKey?: string;
+  /** Sub-field key for the operator inside each condition item. Default: "operator" */
+  conditionOpKey?: string;
+  /** Operator value set variant. "default" = internal flow ops; "engine" = eq/ne/gt/… */
+  operatorSet?: "default" | "engine";
+  /** Placeholder for the field/variable name input inside each condition row. */
+  fieldPlaceholder?: string;
   // cron-editor (key reused)
   // trigger-config
   kind?: "message" | "callback" | "reply";

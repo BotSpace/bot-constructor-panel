@@ -6190,6 +6190,21 @@
 					"key": "operation",
 					"equals": "read"
 				}
+			},
+			{
+				"type": "condition-list",
+				"label": "Filter shartlari (ixtiyoriy)",
+				"operatorKey": "filterMatch",
+				"conditionsKey": "filterConditions",
+				"conditionFieldKey": "field",
+				"conditionOpKey": "op",
+				"operatorSet": "engine",
+				"fieldPlaceholder": "Ustun nomi (masalan: price, status)",
+				"optional": true,
+				"visibleWhen": {
+					"key": "operation",
+					"equals": "read"
+				}
 			}
 		],
 		"defaults": {
@@ -6200,7 +6215,9 @@
 			"range": "",
 			"values": "",
 			"responseVariable": "sheets_response",
-			"rowsVariable": ""
+			"rowsVariable": "",
+			"filterMatch": "and",
+			"filterConditions": []
 		},
 		"producesState": [
 			"sheets_response",
