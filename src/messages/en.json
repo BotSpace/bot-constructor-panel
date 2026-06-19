@@ -377,6 +377,9 @@
         }
       }
     },
+    "aiTools": {
+      "title": "🛠️ AI Tools"
+    },
     "customLogic": {
       "title": "🧩 Custom Logic",
       "code": {

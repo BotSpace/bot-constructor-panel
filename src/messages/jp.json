@@ -385,6 +385,9 @@
         }
       }
     },
+    "aiTools": {
+      "title": "🛠️ AIツール"
+    },
     "customLogic": {
       "title": "🧩 カスタムロジック",
       "code": {

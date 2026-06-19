@@ -23,8 +23,14 @@ import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-stat
 // status colour must be applied there too (see globals.css).
 
 // ---------------------------------------------------------------------------
-// AccessoryNodeCard — compact n8n-style pill card for AI provider / tool nodes
+// AccessoryNodeCard — circular compact card for AI provider / tool nodes.
+// All accessory nodes share the same fixed 96 × 110 footprint so they line up
+// uniformly regardless of title length or type (provider vs tool).
 // ---------------------------------------------------------------------------
+
+// Fixed dimensions applied to every accessory node so they are all identical.
+const ACCESSORY_W = 96;
+const ACCESSORY_H = 110;
 
 interface AccessoryNodeCardProps {
   id: string;
@@ -39,42 +45,33 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
   const icon = resolveNodeIcon(manifest.iconName);
   const debugStatus = useDebugStatusStore((s) => s.statuses[id]);
 
+  const isTool = manifest.accessoryAttachesTo?.includes("ai_tool");
+  const isProvider = manifest.accessoryAttachesTo?.includes("ai_model");
+
   return (
     <div
       className={cn(
-        // Base pill shape — narrower top rounded corners create the n8n sub-node taper.
-        // We use a asymmetric border-radius: full roundness on bottom, tighter on top.
-        "relative flex flex-col items-center select-none",
-        "rounded-[18px_18px_14px_14px]",
+        // Fully rounded card — same shape for every accessory node.
+        "relative flex flex-col items-center justify-center select-none",
+        "rounded-2xl",
         "border border-border/60 bg-card shadow-md",
         "transition-shadow duration-150",
         selected && "ring-2 ring-primary shadow-lg",
       )}
       data-debug-status={debugStatus || undefined}
-      style={{
-        width: Math.min(manifest.size.width, 140),
-        minHeight: manifest.size.minHeight ?? 80,
-      }}
+      style={{ width: ACCESSORY_W, height: ACCESSORY_H }}
     >
       {/* Handles rendered at the node level (React Flow needs them in the DOM) */}
       {manifest.handles?.map((handle, index) =>
         renderHandleFromManifest(handle, id, `${manifest.type}-${index}`, manifest.accessoryPorts)
       )}
 
-      {/* Colour bar accent at the top — narrow tapering stripe */}
-      <div
-        className={cn(
-          "w-full rounded-[18px_18px_0_0]",
-          colorClass,
-        )}
-        style={{ height: 6 }}
-      />
-
       {/* Icon + label body */}
-      <div className="flex flex-col items-center gap-1.5 px-3 py-3">
+      <div className="flex flex-col items-center gap-1.5 px-2 py-3 w-full">
+        {/* Circular icon — the defining visual of an accessory node */}
         <div
           className={cn(
-            "w-10 h-10 rounded-xl flex items-center justify-center shadow-sm",
+            "w-11 h-11 rounded-full flex items-center justify-center shadow-sm shrink-0",
             "[&_svg]:w-5 [&_svg]:h-5 [&_svg]:text-white [&_svg]:stroke-[2.5px]",
             colorClass,
           )}
@@ -86,17 +83,17 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
           )}
         </div>
 
-        <span className="text-[10px] font-semibold tracking-wide uppercase text-center leading-tight text-foreground/75 max-w-[110px] line-clamp-2">
+        <span className="text-[10px] font-semibold tracking-wide text-center leading-tight text-foreground/75 w-full line-clamp-2 px-1">
           {title}
         </span>
 
-        {/* Category badge for accessory nodes */}
-        {manifest.accessoryAttachesTo?.includes("ai_tool") && (
+        {/* Type badge — tool (emerald) vs provider (sky) */}
+        {isTool && (
           <Badge className="text-[8px] font-semibold tracking-widest uppercase px-1.5 py-0 h-3.5 pointer-events-none bg-emerald-500/15 text-emerald-600 border-emerald-500/30">
             tool
           </Badge>
         )}
-        {manifest.accessoryAttachesTo?.includes("ai_model") && (
+        {isProvider && (
           <Badge className="text-[8px] font-semibold tracking-widest uppercase px-1.5 py-0 h-3.5 pointer-events-none bg-sky-500/15 text-sky-600 border-sky-500/30">
             provider
           </Badge>
@@ -208,9 +205,17 @@ export function GenericNodeRenderer({
       </>
     ) : undefined;
 
+  // Trigger nodes get an asymmetric border-radius so they stand out visually
+  // on the canvas: the left side (entry side) is more rounded than the right.
+  const isTrigger = manifest.category === "triggers";
+
   return (
     <Card
-      className={cn("shadow-lg transition-shadow", selected && "ring-2 ring-primary")}
+      className={cn(
+        "shadow-lg transition-shadow",
+        selected && "ring-2 ring-primary",
+        isTrigger && "rounded-tl-3xl rounded-bl-3xl rounded-tr-xl rounded-br-xl",
+      )}
       data-debug-status={debugStatus || undefined}
       style={sizeStyle}
     >

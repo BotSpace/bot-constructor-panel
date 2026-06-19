@@ -35,6 +35,10 @@ const SIDEBAR_GROUP_META = {
     titleKey: "constructor.ai.title",
     titleFallback: "🤖 AI",
   },
+  ai_tools: {
+    titleKey: "constructor.aiTools.title",
+    titleFallback: "🛠️ AI Tools",
+  },
 } as const;
 
 function translate(

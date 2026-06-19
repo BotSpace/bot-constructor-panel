@@ -31,6 +31,7 @@ import {
     ChevronRight,
     Layers,
     Pencil,
+    Wrench,
 } from "lucide-react";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -41,8 +42,36 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
     "sidebar-integrations": <Globe className="h-4 w-4" />,
     "sidebar-customLogic": <Code2 className="h-4 w-4" />,
     "sidebar-ai": <BrainCircuit className="h-4 w-4" />,
+    "sidebar-ai_tools": <Wrench className="h-4 w-4" />,
     "must-have": <Star className="h-4 w-4 text-amber-500" />,
 };
+
+/** Returns a short role label ("Trigger", "Action", "Tool", "Provider", "Logic", …) from the group id. */
+function getRoleLabel(groupId: string | undefined): string | null {
+    if (!groupId) return null;
+    if (groupId === "sidebar-triggers") return "Trigger";
+    if (groupId === "sidebar-actions") return "Action";
+    if (groupId === "sidebar-messageOperations") return "Action";
+    if (groupId === "sidebar-flowControl") return "Logic";
+    if (groupId === "sidebar-customLogic") return "Logic";
+    if (groupId === "sidebar-integrations") return "Integration";
+    if (groupId === "sidebar-ai") return "AI";
+    if (groupId === "sidebar-ai_tools") return "Tool";
+    return null;
+}
+
+/** Returns Tailwind classes for the role badge. */
+function getRoleBadgeClass(role: string): string {
+    switch (role) {
+        case "Trigger": return "bg-blue-500/15 text-blue-400 border-blue-500/25";
+        case "Action": return "bg-amber-500/15 text-amber-400 border-amber-500/25";
+        case "Logic": return "bg-violet-500/15 text-violet-400 border-violet-500/25";
+        case "Integration": return "bg-indigo-500/15 text-indigo-400 border-indigo-500/25";
+        case "AI": return "bg-purple-500/15 text-purple-400 border-purple-500/25";
+        case "Tool": return "bg-emerald-500/15 text-emerald-400 border-emerald-500/25";
+        default: return "bg-zinc-500/15 text-zinc-400 border-zinc-500/25";
+    }
+}
 
 // Fallbacks for plugin categories (indexed by position)
 const FALLBACK_ICONS = [
@@ -268,14 +297,14 @@ export function NodeSelectionDialog({
     const searchResults = useMemo(() => {
         if (!isSearching) return [];
         const query = searchQuery.trim().toLowerCase();
-        const results: Array<{ element: ElementItemType; groupTitle: string }> = [];
+        const results: Array<{ element: ElementItemType; groupTitle: string; groupId: string | undefined }> = [];
         for (const group of filteredGroups) {
             for (const el of group.elements || []) {
                 if (
                     el.name.toLowerCase().includes(query) ||
                     el.description.toLowerCase().includes(query)
                 ) {
-                    results.push({ element: el, groupTitle: group.title });
+                    results.push({ element: el, groupTitle: group.title, groupId: group.id });
                 }
             }
         }
@@ -354,12 +383,13 @@ export function NodeSelectionDialog({
                                 </div>
                             ) : (
                                 <div className="p-3 flex flex-col gap-1">
-                                    {searchResults.map(({ element, groupTitle }, idx) => (
+                                    {searchResults.map(({ element, groupTitle, groupId }, idx) => (
                                         <NodeCard
                                             key={`${element.triggerId}-${idx}`}
                                             element={element}
                                             isActive={false}
                                             groupLabel={groupTitle}
+                                            groupId={groupId}
                                             onClick={() => handleSelect(element)}
                                             onMouseEnter={() => {}}
                                             refCallback={() => {}}
@@ -377,6 +407,7 @@ export function NodeSelectionDialog({
                                         key={`${element.triggerId}-${idx}`}
                                         element={element}
                                         isActive={idx === activeElementIndex}
+                                        groupId={activeDrillGroup.id}
                                         onClick={() => handleSelect(element)}
                                         onMouseEnter={() => setActiveElementIndex(idx)}
                                         refCallback={(el) => {
@@ -447,12 +478,15 @@ interface NodeCardProps {
     element: ElementItemType;
     isActive: boolean;
     groupLabel?: string;
+    /** The sidebar group id (e.g. "sidebar-triggers") — used to derive the role badge. */
+    groupId?: string;
     onClick: () => void;
     onMouseEnter: () => void;
     refCallback: (el: HTMLButtonElement | null) => void;
 }
 
-function NodeCard({ element, isActive, groupLabel, onClick, onMouseEnter, refCallback }: NodeCardProps) {
+function NodeCard({ element, isActive, groupLabel, groupId, onClick, onMouseEnter, refCallback }: NodeCardProps) {
+    const role = getRoleLabel(groupId);
     return (
         <button
             ref={refCallback}
@@ -473,9 +507,19 @@ function NodeCard({ element, isActive, groupLabel, onClick, onMouseEnter, refCal
                 {element.icon}
             </div>
             <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                <span className="text-sm font-medium leading-tight text-white">
-                    {element.name}
-                </span>
+                <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-sm font-medium leading-tight text-white truncate">
+                        {element.name}
+                    </span>
+                    {role && (
+                        <span className={cn(
+                            "shrink-0 inline-flex items-center rounded px-1 py-0 text-[9px] font-semibold tracking-widest uppercase border leading-none h-3.5",
+                            getRoleBadgeClass(role)
+                        )}>
+                            {role}
+                        </span>
+                    )}
+                </div>
                 <span className="text-xs leading-snug text-zinc-500 line-clamp-2">
                     {element.description}
                 </span>
