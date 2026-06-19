@@ -310,7 +310,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
             {/* Variable Inspector — large 3-column dialog */}
             <Dialog open={variablesOpen} onOpenChange={setVariablesOpen}>
                 <DialogContent
-                    className="max-w-4xl p-0 h-[70vh] flex flex-col overflow-hidden gap-0"
+                    className="w-[92vw] max-w-[1400px] p-0 h-[82vh] flex flex-col overflow-hidden gap-0"
                     showCloseButton
                 >
                     <DialogHeader className="flex-row items-center gap-2 px-4 py-3 border-b border-border shrink-0 space-y-0">

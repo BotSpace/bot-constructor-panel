@@ -6185,11 +6185,7 @@
 				"label": "Qatorlar o'zgaruvchisi (rows)",
 				"placeholder": "sheets_response_rows",
 				"helpText": "Toza qatorlar (array-of-objects) shu context kalitiga saqlanadi. Default: <responseVariable>_rows. Xabarda {{#each shu_kalit}}{{ustun_nomi}}{{/each}} bilan ishlatiladi.",
-				"optional": true,
-				"visibleWhen": {
-					"key": "operation",
-					"equals": "read"
-				}
+				"optional": true
 			},
 			{
 				"type": "condition-list",
@@ -6200,11 +6196,7 @@
 				"conditionOpKey": "op",
 				"operatorSet": "engine",
 				"fieldPlaceholder": "Ustun nomi (masalan: price, status)",
-				"optional": true,
-				"visibleWhen": {
-					"key": "operation",
-					"equals": "read"
-				}
+				"optional": true
 			}
 		],
 		"defaults": {
