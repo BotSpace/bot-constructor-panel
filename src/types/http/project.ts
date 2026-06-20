@@ -35,4 +35,6 @@ export interface ProjectRetrive {
     edges: Edge[];
     nodes: Node[];
   };
+  /** Compressed flow: base64(gzip(JSON.stringify(flow))). Present when ?compress=1 used. */
+  flow_gz?: string;
 }

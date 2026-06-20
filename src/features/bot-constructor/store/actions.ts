@@ -4,6 +4,7 @@ import type { Edge, Node } from "reactflow";
 import { FlowStoreState, Actions } from "./types";
 import { ElementItemType } from "@/types/element-types";
 import { instanceAuth } from "@/services/instance";
+import { compressFlow } from "@/lib/flow-compress";
 import {
   CallbackAnswerNodeData,
   CustomCodeNodeData,
@@ -301,12 +302,18 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     set({ isLoading: true });
 
     try {
-      const response = await instanceAuth.patch(`/project/${project_id}/`, {
-        flow: {
-          nodes: nodes,
-          edges: edges,
-        },
-      });
+      // flow_gz: gzip + base64 (backend kontrakt: PATCH flow_gz → backend ochib saqlaydi).
+      // Compress xato bersa — plain flow bilan fallback (flow yo'qotilmasin).
+      let payload: Record<string, unknown>;
+      try {
+        const flow_gz = compressFlow({ nodes, edges });
+        payload = { flow_gz };
+      } catch (compressErr) {
+        console.warn("[saveFlow] compress xatolik, plain flow yuboriladi:", compressErr);
+        payload = { flow: { nodes, edges } };
+      }
+
+      const response = await instanceAuth.patch(`/project/${project_id}/`, payload);
       if (response.status !== 200) {
         throw new Error("Serverda saqlashda xatolik.");
       }
