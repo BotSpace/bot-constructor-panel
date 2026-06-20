@@ -2,16 +2,16 @@ import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelC
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { ReactNode, useMemo } from "react";
 import { Position } from "reactflow";
-import { SourceHandles, TargetHandles } from "../components";
-import { DeleteMessageSource } from "../components/shared/ReactFlowHandles/DeleteMessageSource";
-import { EditMessageSource } from "../components/shared/ReactFlowHandles/EditMessageSource";
-import { ElseMessageSource } from "../components/shared/ReactFlowHandles/ElseMessageSource";
-import { SelectedMessageTarget } from "../components/shared/ReactFlowHandles/SelectedMessageTarget";
+import { SourceHandles, TargetHandles } from "@/features/bot-constructor/nodes/components";
+import { DeleteMessageSource } from "@/features/bot-constructor/nodes/components/shared/ReactFlowHandles/DeleteMessageSource";
+import { EditMessageSource } from "@/features/bot-constructor/nodes/components/shared/ReactFlowHandles/EditMessageSource";
+import { ElseMessageSource } from "@/features/bot-constructor/nodes/components/shared/ReactFlowHandles/ElseMessageSource";
+import { SelectedMessageTarget } from "@/features/bot-constructor/nodes/components/shared/ReactFlowHandles/SelectedMessageTarget";
 import {
   PillHandle,
   PillHandleTone,
-} from "../components/shared/ReactFlowHandles/PillHandle";
-import { NodeHandleManifest, NodeAccessoryPortManifest } from "./types";
+} from "@/features/bot-constructor/nodes/components/shared/ReactFlowHandles/PillHandle";
+import { NodeHandleManifest, NodeAccessoryPortManifest } from "@/features/bot-constructor/nodes/registry/types";
 
 const HANDLE_SIDE_TO_POSITION: Record<string, Position> = {
   left: Position.Left,

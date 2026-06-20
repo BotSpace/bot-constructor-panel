@@ -1,5 +1,5 @@
-import registryJson from "../manifests/runtime-node-registry.json";
-import { NodeManifest } from "./types";
+import registryJson from "@/features/bot-constructor/nodes/manifests/runtime-node-registry.json";
+import { NodeManifest } from "@/features/bot-constructor/nodes/registry/types";
 
 export const runtimeNodeRegistry = registryJson as NodeManifest[];
 

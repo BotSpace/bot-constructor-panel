@@ -1,1 +1,1 @@
-export { ErrorsPanel } from "./ErrorsPanel";
+export { ErrorsPanel } from "@/features/bot-constructor/components/ErrorsPanel/ErrorsPanel";

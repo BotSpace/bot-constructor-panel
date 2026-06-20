@@ -21,7 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Plus, X } from "lucide-react";
 import { memo } from "react";
-import { NodeFieldManifest } from "./types";
+import { NodeFieldManifest } from "@/features/bot-constructor/nodes/registry/types";
 import { renderCustomWidget } from "@/features/bot-constructor/nodes/widgets/widgetRegistry";
 import {
   RichTextMessageField,

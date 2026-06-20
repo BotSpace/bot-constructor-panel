@@ -1,1 +1,1 @@
-export * from "./button"
+export * from "@/features/bot-constructor/components/bottom-panel/components/button"

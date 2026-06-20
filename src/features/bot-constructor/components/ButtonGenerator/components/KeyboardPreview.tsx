@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Plus, LayoutGrid } from "lucide-react";
-import { ButtonConfig } from "../types";
-import { ButtonRow } from "./ButtonRow";
+import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { ButtonRow } from "@/features/bot-constructor/components/ButtonGenerator/components/ButtonRow";
 import {
   DndContext,
   KeyboardSensor,
@@ -26,7 +26,7 @@ import {
 } from "@dnd-kit/sortable";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { PreviewButton } from "./PreviewButton";
+import { PreviewButton } from "@/features/bot-constructor/components/ButtonGenerator/components/PreviewButton";
 
 interface KeyboardPreviewProps {
   buttons: ButtonConfig[][];

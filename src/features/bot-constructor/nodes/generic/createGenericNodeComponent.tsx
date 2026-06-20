@@ -2,8 +2,8 @@
 
 import { memo } from "react";
 import { NodeProps } from "reactflow";
-import { getNodeManifestByType } from "../registry/manifestStore";
-import { GenericNodeRenderer } from "./GenericNodeRenderer";
+import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
+import { GenericNodeRenderer } from "@/features/bot-constructor/nodes/generic/GenericNodeRenderer";
 
 export function createGenericNodeComponent(type: string) {
   const Component = (props: NodeProps) => {

@@ -1,6 +1,6 @@
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
-import { useFlowStore } from "../store";
-import { useIsInNodePanel } from "../contexts/NodePanelContext";
+import { useFlowStore } from "@/features/bot-constructor/store";
+import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 
 /**
  * Canvas mode  → always returns [true, noop]  (node stays compact)

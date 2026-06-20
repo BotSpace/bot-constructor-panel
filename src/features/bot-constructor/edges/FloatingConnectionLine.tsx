@@ -4,8 +4,8 @@ import {
   type ConnectionLineComponentProps,
   getBezierPath,
 } from "reactflow";
-import { getEdgeParams } from "./utils";
-import { useEdgeColor } from "./useEdgeColor";
+import { getEdgeParams } from "@/features/bot-constructor/edges/utils";
+import { useEdgeColor } from "@/features/bot-constructor/edges/useEdgeColor";
 
 /**
  * FloatingConnectionLine - Custom connection line component

@@ -9,7 +9,7 @@ import {
   Repeat,
   BarChart3,
 } from "lucide-react";
-import { ButtonConfig, KeyboardConfig } from "./types";
+import { ButtonConfig, KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 
 export const getIconForButton = (button: ButtonConfig): ReactNode => {
   const commonClasses = "mr-2 h-4 w-4";

@@ -1,7 +1,7 @@
 import React from "react";
 import { Position } from "reactflow";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
-import { PillHandle, PillHandleTone } from "./PillHandle";
+import { PillHandle, PillHandleTone } from "@/features/bot-constructor/nodes/components/shared/ReactFlowHandles/PillHandle";
 
 interface SourceHandlerProps {
   id?: string;

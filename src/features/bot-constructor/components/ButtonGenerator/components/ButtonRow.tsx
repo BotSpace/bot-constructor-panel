@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { AlertCircle, CornerDownLeft, GripVertical, Trash2 } from "lucide-react";
-import { ButtonConfig } from "../types";
-import { PreviewButton } from "./PreviewButton";
+import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { PreviewButton } from "@/features/bot-constructor/components/ButtonGenerator/components/PreviewButton";
 import {
   SortableContext,
   horizontalListSortingStrategy,

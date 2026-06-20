@@ -1,5 +1,5 @@
 import { StateCreator } from "zustand";
-import { FlowStoreState, ClipboardSlice } from "./types";
+import { FlowStoreState, ClipboardSlice } from "@/features/bot-constructor/store/types";
 
 let idOffset = 0;
 const getId = () => `dndnode_${Date.now()}_${idOffset++}`;

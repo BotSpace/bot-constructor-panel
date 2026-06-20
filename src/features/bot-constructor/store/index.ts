@@ -1,12 +1,12 @@
 // constructor/store/index.ts
 
 import { create } from "zustand";
-import { FlowStoreState } from "./types";
-import { createFlowSlice } from "./flowSlice";
-import { createClipboardSlice } from "./clipboardSlice";
-import { createHistorySlice } from "./historySlice";
-import { createCollabSlice } from "./collabSlice";
-import { createActions } from "./actions";
+import { FlowStoreState } from "@/features/bot-constructor/store/types";
+import { createFlowSlice } from "@/features/bot-constructor/store/flowSlice";
+import { createClipboardSlice } from "@/features/bot-constructor/store/clipboardSlice";
+import { createHistorySlice } from "@/features/bot-constructor/store/historySlice";
+import { createCollabSlice } from "@/features/bot-constructor/store/collabSlice";
+import { createActions } from "@/features/bot-constructor/store/actions";
 import { Connection, addEdge } from "reactflow";
 import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
 import { KeyboardConfig } from "@/features/bot-constructor/components";

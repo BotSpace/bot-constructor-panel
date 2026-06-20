@@ -1,7 +1,7 @@
 // FAYL: constructor/components/ButtonGenerator/hooks/useButtonGeneratorState.ts (YANGI HOOK)
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ButtonConfig, KeyboardConfig, ReplyKeyboardOptions, DEFAULT_REPLY_KEYBOARD_OPTIONS } from "../types";
+import { ButtonConfig, KeyboardConfig, ReplyKeyboardOptions, DEFAULT_REPLY_KEYBOARD_OPTIONS } from "@/features/bot-constructor/components/ButtonGenerator/types";
 
 const MAX_BUTTONS_PER_ROW = 10;
 

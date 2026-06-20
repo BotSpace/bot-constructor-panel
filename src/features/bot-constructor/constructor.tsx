@@ -12,13 +12,13 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { ElementItemType } from "@/types/element-types";
-import { useFlowStore } from "./store";
-import { CustomNodes } from "./nodes";
-import { CustomEdge, FloatingConnectionLine } from "./edges";
-import { useFlowKeyboardShortcuts } from "./hooks/useFlowKeyboardShortcuts";
-import { useMousePosition } from "./hooks/useMousePosition";
+import { useFlowStore } from "@/features/bot-constructor/store";
+import { CustomNodes } from "@/features/bot-constructor/nodes";
+import { CustomEdge, FloatingConnectionLine } from "@/features/bot-constructor/edges";
+import { useFlowKeyboardShortcuts } from "@/features/bot-constructor/hooks/useFlowKeyboardShortcuts";
+import { useMousePosition } from "@/features/bot-constructor/hooks/useMousePosition";
 import { useParams } from "next/navigation";
-import useProjectStore from "./store/project";
+import useProjectStore from "@/features/bot-constructor/store/project";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -29,13 +29,13 @@ import {
 import { Text } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
-import { useSearchStore } from "./search/search-store";
+import { useSearchStore } from "@/features/bot-constructor/search/search-store";
 import { debugConsoleStore } from "@/components/layout/components/debug-console/store";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { instanceAuth } from "@/services/instance";
 import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry";
 import { useTheme } from "next-themes";
-import { NodeSelectionDialog } from "./components/NodeSelectionDialog";
+import { NodeSelectionDialog } from "@/features/bot-constructor/components/NodeSelectionDialog";
 import { Connection, Node } from "reactflow";
 import { useCollab } from "@/wss/collab/use-collab";
 import { useDebugContextStore } from "@/components/layout/components/debug-console/debug-context-store";

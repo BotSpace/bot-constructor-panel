@@ -13,10 +13,10 @@ import {
   Search,
   MessageSquare,
 } from "lucide-react";
-import { ButtonConfig, LoginUrlConfig } from "../types";
-import { WebAppForm } from "./WebAppForm";
-import { LoginUrlForm } from "./LoginUrlForm";
-import { CollectionButtonForm } from "./CollectionButtonForm";
+import { ButtonConfig, LoginUrlConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { WebAppForm } from "@/features/bot-constructor/components/ButtonGenerator/components/WebAppForm";
+import { LoginUrlForm } from "@/features/bot-constructor/components/ButtonGenerator/components/LoginUrlForm";
+import { CollectionButtonForm } from "@/features/bot-constructor/components/ButtonGenerator/components/CollectionButtonForm";
 import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";

@@ -8,7 +8,7 @@ import {
     useNodes,
     EdgeLabelRenderer,
 } from "reactflow";
-import { useEdgeColor } from "./useEdgeColor";
+import { useEdgeColor } from "@/features/bot-constructor/edges/useEdgeColor";
 
 /**
  * FloatingEdge - Enhanced edge with dynamic routing, colors and animations

@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { useButtonGeneratorState } from "./hook/useButtonGeneratorState";
-import { KeyboardPreview } from "./components/KeyboardPreview";
-import { EditButtonDialog } from "./components/EditButtonDialog";
-import { ButtonConfig, KeyboardConfig } from "./types";
+import { useButtonGeneratorState } from "@/features/bot-constructor/components/ButtonGenerator/hook/useButtonGeneratorState";
+import { KeyboardPreview } from "@/features/bot-constructor/components/ButtonGenerator/components/KeyboardPreview";
+import { EditButtonDialog } from "@/features/bot-constructor/components/ButtonGenerator/components/EditButtonDialog";
+import { ButtonConfig, KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 import { Button } from "@/components/ui/button";
 import {
   LayoutGrid,
@@ -19,12 +19,12 @@ import {
   Rows3,
   Settings2,
 } from "lucide-react";
-import { useFlowStore } from "../../store";
+import { useFlowStore } from "@/features/bot-constructor/store";
 import { Badge } from "@/components/ui/badge";
-import { calculateActiveButtonCount } from "./utils";
+import { calculateActiveButtonCount } from "@/features/bot-constructor/components/ButtonGenerator/utils";
 import { cn } from "@/lib/utils";
-import { InlineForm } from "./components/InlineForm";
-import { ReplyForm } from "./components/ReplyForm";
+import { InlineForm } from "@/features/bot-constructor/components/ButtonGenerator/components/InlineForm";
+import { ReplyForm } from "@/features/bot-constructor/components/ButtonGenerator/components/ReplyForm";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
