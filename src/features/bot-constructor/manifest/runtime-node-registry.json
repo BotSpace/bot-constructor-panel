@@ -4420,8 +4420,7 @@
     ],
     "defaults": {
       "systemPrompt": "",
-      "userInputSource": "message.text",
-      "userInputText": "",
+      "userInputText": "{{message.text}}",
       "outputKey": "agent_output",
       "maxIterations": 5,
       "temperature": null,

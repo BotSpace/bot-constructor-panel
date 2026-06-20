@@ -1934,16 +1934,6 @@ function AIAgentAdvancedWidget({ nodeId, data }: WidgetProps) {
       {open ? (
         <div className="grid gap-3 border-t border-muted/40 px-3 pb-3 pt-2">
           <div className="grid gap-1.5">
-            <Label className="text-xs text-muted-foreground">User Input Source</Label>
-            <Input
-              className="h-8 text-xs"
-              placeholder="message.text"
-              value={typeof data.userInputSource === "string" ? data.userInputSource : "message.text"}
-              onChange={(e) => updateNodeData(nodeId, { userInputSource: e.target.value })}
-            />
-            <p className="text-[10px] text-muted-foreground">Context path used when User Input is empty.</p>
-          </div>
-          <div className="grid gap-1.5">
             <Label className="text-xs text-muted-foreground">Max Iterations</Label>
             <Input
               type="number"
