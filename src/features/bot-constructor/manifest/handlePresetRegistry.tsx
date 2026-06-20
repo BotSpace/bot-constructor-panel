@@ -1,7 +1,7 @@
 import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { ReactNode, useMemo } from "react";
-import { Position } from "reactflow";
+import { ReactNode, useEffect, useMemo } from "react";
+import { Position, useUpdateNodeInternals } from "reactflow";
 import { SourceHandles, TargetHandles } from "@/features/bot-constructor/canvas/handles";
 import { DeleteMessageSource } from "@/features/bot-constructor/canvas/handles/DeleteMessageSource";
 import { EditMessageSource } from "@/features/bot-constructor/canvas/handles/EditMessageSource";
@@ -169,12 +169,22 @@ function AccessoryPortHandles({ ports }: { ports: NodeAccessoryPortManifest[] })
 
 function DynamicOutputsSources({ nodeId }: { nodeId: string }) {
   const nodes = useFlowStore((state) => state.nodes);
+  const updateNodeInternals = useUpdateNodeInternals();
   const outputs = useMemo(() => {
     const node = nodes.find((item) => item.id === nodeId);
     return Array.isArray(node?.data?.outputs)
       ? (node.data.outputs as Array<{ name: string }>)
       : [];
   }, [nodeId, nodes]);
+
+  // React Flow caches handle DOM positions internally. When outputs change
+  // (added/removed/reordered), the handle `top` percentages change but
+  // React Flow doesn't re-measure them automatically. Calling
+  // updateNodeInternals forces a re-scan of all handles for this node so
+  // that new edges draw from the correct position instead of the node center.
+  useEffect(() => {
+    updateNodeInternals(nodeId);
+  }, [nodeId, outputs, updateNodeInternals]);
 
   if (outputs.length > 0) {
     return (
