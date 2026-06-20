@@ -2,8 +2,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CountdownItem } from "./count-down-item";
-import { useNotificationContext } from "../notification-provider";
+import { CountdownItem } from "@/components/common/count-down/count-down-item";
+import { useNotificationContext } from "@/components/common/notification-provider";
 import { createSimpleNotification } from "@/lib/notification-utils";
 
 export default function CountdownComponent({ updated_at }: { updated_at: Date }) {

@@ -6,8 +6,8 @@ import { ThemeProvider } from "@/components/common/theme-provider";
 
 import { NextIntlClientProvider } from "next-intl";
 
-import AuthProvider from "./AuthProvider";
-import ReactQueryProvider from "./ReactQueryProvider";
+import AuthProvider from "@/app/[lang]/AuthProvider";
+import ReactQueryProvider from "@/app/[lang]/ReactQueryProvider";
 import { Toaster } from "react-hot-toast";
 import { WebSocketProvider } from "@/wss/web-socket-provider";
 import { routing } from "@/i18n/routing";

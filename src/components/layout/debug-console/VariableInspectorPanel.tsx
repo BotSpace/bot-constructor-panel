@@ -3,7 +3,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Braces, Copy, Check, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useDebugContextStore } from "./debug-context-store";
+import { useDebugContextStore } from "@/components/layout/debug-console/debug-context-store";
 
 // ── JSON syntax highlighter (lightweight, no extra deps) ─────────────────────
 // Converts a pretty-printed JSON string into HTML with <span> tokens.

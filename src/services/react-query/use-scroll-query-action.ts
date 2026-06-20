@@ -1,7 +1,7 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { instance } from "../instance";
+import { instance } from "@/services/instance";
 import { ScrollAPIResponse } from "@/types/http/response";
 
 export const useReactQueryScrollLoadingAction = <T>(

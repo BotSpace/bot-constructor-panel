@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { X, Terminal, Trash2, Copy, TerminalIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useProjectStore from "@/features/bot-constructor/store/project";
-import { debugConsoleStore } from "./store";
+import { debugConsoleStore } from "@/components/layout/debug-console/store";
 
 interface LogEntry {
   id: string;

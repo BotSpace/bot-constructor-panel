@@ -8,7 +8,7 @@ import { useDebugContextStore } from "@/components/layout/debug-console/debug-co
 import { useDebugErrorsStore } from "@/features/bot-constructor/store/debug-errors";
 import { getSession, useSession } from "@/lib/session-client";
 import { useEffect, useRef } from "react";
-import { wsHub } from "./ws-hub";
+import { wsHub } from "@/wss/ws-hub";
 import toast from "react-hot-toast";
 
 /**

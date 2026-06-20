@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { instanceAuth } from "../instance";
+import { instanceAuth } from "@/services/instance";
 import { useDebounces } from "@/hooks/use-debounces";
 import { handleApiError } from "@/lib/error-handler";
 import { queryGenerator } from "@/lib/query-generator";

@@ -1,8 +1,8 @@
 import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { SignJWT, jwtVerify } from "jose";
-import { routing } from "./i18n/routing";
-import env from "./lib/env";
+import { routing } from "@/i18n/routing";
+import env from "@/lib/env";
 
 const intlMiddleware = createMiddleware(routing);
 const sessionSecret = () => new TextEncoder().encode(env.SESSION_SECRET);
