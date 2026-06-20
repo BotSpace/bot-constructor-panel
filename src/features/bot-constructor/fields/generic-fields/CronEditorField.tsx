@@ -16,17 +16,11 @@ import { useEffect, useState } from "react";
 // Types
 // ---------------------------------------------------------------------------
 
-type CronType =
-  | "minutely"
-  | "hourly"
-  | "daily"
-  | "weekly"
-  | "monthly"
-  | "yearly";
+type CronType = "minutes" | "hours" | "days" | "weekly" | "monthly" | "yearly";
 
 export interface CronEditorFieldConfig {
   type: "cron-editor";
-  key?: string;   // default "schedule"
+  key?: string; // default "schedule"
   label?: string;
 }
 
@@ -37,22 +31,27 @@ export interface CronEditorFieldProps {
 }
 
 // ---------------------------------------------------------------------------
-// Helper — derive initial CronType from a cron string
+// Helpers — derive type / interval from a cron string
 // ---------------------------------------------------------------------------
+
+function parseInterval(part: string): string {
+  if (part.startsWith("*/")) return part.slice(2);
+  return "1"; // "*" → har biri (interval 1)
+}
 
 function deriveType(
   minute: string,
   hour: string,
-  month: string,
   dayOfMonth: string,
+  month: string,
   dayOfWeek: string
 ): CronType {
-  if (minute === "*" || minute.startsWith("*/")) return "minutely";
-  if (hour === "*") return "hourly";
+  if (minute === "*" || minute.startsWith("*/")) return "minutes";
+  if (hour === "*" || hour.startsWith("*/")) return "hours";
   if (month !== "*") return "yearly";
-  if (dayOfMonth !== "*") return "monthly";
   if (dayOfWeek !== "*") return "weekly";
-  return "daily";
+  if (dayOfMonth !== "*" && !dayOfMonth.startsWith("*/")) return "monthly";
+  return "days";
 }
 
 // ---------------------------------------------------------------------------
@@ -63,63 +62,101 @@ export function CronEditorField({ nodeId, data, field }: CronEditorFieldProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const scheduleKey = field.key ?? "schedule";
 
-  const schedule = typeof data[scheduleKey] === "string"
-    ? (data[scheduleKey] as string)
-    : "0 9 * * *";
+  const schedule =
+    typeof data[scheduleKey] === "string"
+      ? (data[scheduleKey] as string)
+      : "0 9 * * *";
 
   const parts = schedule.split(" ");
-  const [minute, hour, dayOfMonth, month, dayOfWeek] =
+  const [pMin, pHour, pDom, pMonth, pDow] =
     parts.length === 5 ? parts : ["0", "9", "*", "*", "*"];
 
-  const [type, setType] = useState<CronType>(() =>
-    deriveType(minute, hour, month, dayOfMonth, dayOfWeek)
-  );
+  const initialType = deriveType(pMin, pHour, pDom, pMonth, pDow);
+  const [type, setType] = useState<CronType>(initialType);
+
+  // Interval N (minutes/hours/days uchun)
+  const [intervalN, setIntervalN] = useState(() => {
+    if (initialType === "minutes") return parseInterval(pMin);
+    if (initialType === "hours") return parseInterval(pHour);
+    if (initialType === "days") return parseInterval(pDom);
+    return "1";
+  });
+
   const [localMinute, setLocalMinute] = useState(
-    minute.startsWith("*/") ? minute.slice(2) : minute === "*" ? "1" : minute
+    pMin === "*" || pMin.startsWith("*/") ? "0" : pMin
   );
-  const [localHour, setLocalHour] = useState(hour === "*" ? "9" : hour);
+  const [localHour, setLocalHour] = useState(
+    pHour === "*" || pHour.startsWith("*/") ? "9" : pHour
+  );
   const [localDayOfMonth, setLocalDayOfMonth] = useState(
-    dayOfMonth === "*" ? "1" : dayOfMonth
+    pDom === "*" || pDom.startsWith("*/") ? "1" : pDom
   );
-  const [localMonth, setLocalMonth] = useState(month === "*" ? "1" : month);
+  const [localMonth, setLocalMonth] = useState(pMonth === "*" ? "1" : pMonth);
   const [localDayOfWeek, setLocalDayOfWeek] = useState(
-    dayOfWeek === "*" ? "1" : dayOfWeek
+    pDow === "*" ? "1" : pDow
   );
 
   useEffect(() => {
-    let cronMinute = localMinute || "0";
-    let cronHour = localHour || "0";
-    let cronDayOfMonth = "*";
-    let cronMonth = "*";
-    let cronDayOfWeek = "*";
+    const n = intervalN || "1";
+    const every = n === "1" ? "*" : `*/${n}`;
 
-    if (type === "minutely") {
-      cronMinute = `*/${localMinute || "1"}`;
+    let cronMin = localMinute || "0";
+    let cronHour = localHour || "0";
+    let cronDom = "*";
+    let cronMonth = "*";
+    let cronDow = "*";
+
+    if (type === "minutes") {
+      cronMin = every;
       cronHour = "*";
-    } else if (type === "hourly") {
-      cronHour = "*";
+    } else if (type === "hours") {
+      cronHour = every;
+    } else if (type === "days") {
+      cronDom = every;
+    } else if (type === "weekly") {
+      cronDow = localDayOfWeek;
+    } else if (type === "monthly") {
+      cronDom = localDayOfMonth;
+    } else if (type === "yearly") {
+      cronDom = localDayOfMonth;
+      cronMonth = localMonth;
     }
 
-    if (type === "weekly") cronDayOfWeek = localDayOfWeek;
-    if (type === "monthly" || type === "yearly") cronDayOfMonth = localDayOfMonth;
-    if (type === "yearly") cronMonth = localMonth;
-
-    const nextSchedule = `${cronMinute} ${cronHour} ${cronDayOfMonth} ${cronMonth} ${cronDayOfWeek}`;
-    if (nextSchedule !== data[scheduleKey]) {
-      updateNodeData(nodeId, { [scheduleKey]: nextSchedule });
+    const next = `${cronMin} ${cronHour} ${cronDom} ${cronMonth} ${cronDow}`;
+    if (next !== data[scheduleKey]) {
+      updateNodeData(nodeId, { [scheduleKey]: next });
     }
   }, [
-    data,
-    localDayOfMonth,
-    localDayOfWeek,
-    localHour,
+    type,
+    intervalN,
     localMinute,
+    localHour,
+    localDayOfMonth,
     localMonth,
+    localDayOfWeek,
+    data,
     nodeId,
     scheduleKey,
-    type,
     updateNodeData,
   ]);
+
+  const showMinute = type !== "minutes";
+  const showHour =
+    type === "days" ||
+    type === "weekly" ||
+    type === "monthly" ||
+    type === "yearly";
+
+  const intervalUnit =
+    type === "minutes" ? "daqiqa" : type === "hours" ? "soat" : "kun";
+  const intervalUnitIn =
+    type === "minutes" ? "daqiqada" : type === "hours" ? "soatda" : "kunda";
+  const intervalLabel =
+    type === "minutes"
+      ? "Har necha daqiqada"
+      : type === "hours"
+        ? "Har necha soatda"
+        : "Har necha kunda";
 
   return (
     <div className="space-y-3">
@@ -133,14 +170,17 @@ export function CronEditorField({ nodeId, data, field }: CronEditorFieldProps) {
         <Label className="text-[11px] font-bold uppercase text-white/40">
           Takrorlanish
         </Label>
-        <Select value={type} onValueChange={(value) => setType(value as CronType)}>
+        <Select
+          value={type}
+          onValueChange={(value) => setType(value as CronType)}
+        >
           <SelectTrigger className="h-9 border-white/10 bg-zinc-950/60 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="minutely">Daqiqa</SelectItem>
-            <SelectItem value="hourly">Har soatda</SelectItem>
-            <SelectItem value="daily">Har kuni</SelectItem>
+            <SelectItem value="minutes">Daqiqa (har N daqiqada)</SelectItem>
+            <SelectItem value="hours">Soat (har N soatda)</SelectItem>
+            <SelectItem value="days">Kun (har N kunda)</SelectItem>
             <SelectItem value="weekly">Har hafta</SelectItem>
             <SelectItem value="monthly">Har oy</SelectItem>
             <SelectItem value="yearly">Har yili</SelectItem>
@@ -148,31 +188,31 @@ export function CronEditorField({ nodeId, data, field }: CronEditorFieldProps) {
         </Select>
       </div>
 
-      {type === "minutely" ? (
+      {type === "minutes" || type === "hours" || type === "days" ? (
         <div className="space-y-1.5">
-          <Label className="text-[11px] text-white/40">Necha daqiqada bir</Label>
+          <Label className="text-[11px] text-white/40">{intervalLabel}</Label>
           <Input
             type="number"
             min="1"
-            value={localMinute}
+            value={intervalN}
             className="border-white/10 bg-zinc-950/60 text-xs"
-            onChange={(e) => setLocalMinute(e.target.value)}
+            onChange={(e) => setIntervalN(e.target.value)}
           />
           <p className="text-[10px] text-white/30">
-            Masalan: 1 → har daqiqa, 2 → har 2 daqiqada
+            Masalan: 1 → har {intervalUnit}, 4 → har 4 {intervalUnitIn}
           </p>
         </div>
-      ) : (
-        <div
-          className={
-            type === "hourly" ? "space-y-1.5" : "grid grid-cols-2 gap-3"
-          }
-        >
-          {type !== "hourly" ? (
+      ) : null}
+
+      {showMinute ? (
+        <div className={showHour ? "grid grid-cols-2 gap-3" : "space-y-1.5"}>
+          {showHour ? (
             <div className="space-y-1.5">
               <Label className="text-[11px] text-white/40">Soat</Label>
               <Input
                 type="number"
+                min="0"
+                max="23"
                 value={localHour}
                 className="border-white/10 bg-zinc-950/60 text-xs"
                 onChange={(e) => setLocalHour(e.target.value)}
@@ -183,13 +223,15 @@ export function CronEditorField({ nodeId, data, field }: CronEditorFieldProps) {
             <Label className="text-[11px] text-white/40">Daqiqa</Label>
             <Input
               type="number"
+              min="0"
+              max="59"
               value={localMinute}
               className="border-white/10 bg-zinc-950/60 text-xs"
               onChange={(e) => setLocalMinute(e.target.value)}
             />
           </div>
         </div>
-      )}
+      ) : null}
 
       {type === "weekly" ? (
         <div className="space-y-1.5">
@@ -216,6 +258,8 @@ export function CronEditorField({ nodeId, data, field }: CronEditorFieldProps) {
           <Label className="text-[11px] text-white/40">Oyning sanasi</Label>
           <Input
             type="number"
+            min="1"
+            max="31"
             value={localDayOfMonth}
             className="border-white/10 bg-zinc-950/60 text-xs"
             onChange={(e) => setLocalDayOfMonth(e.target.value)}
@@ -228,6 +272,8 @@ export function CronEditorField({ nodeId, data, field }: CronEditorFieldProps) {
           <Label className="text-[11px] text-white/40">Oy</Label>
           <Input
             type="number"
+            min="1"
+            max="12"
             value={localMonth}
             className="border-white/10 bg-zinc-950/60 text-xs"
             onChange={(e) => setLocalMonth(e.target.value)}
