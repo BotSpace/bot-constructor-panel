@@ -5,7 +5,7 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import {
   findNearestTriggerNode,
   getDynamicFilters,
-} from "@/features/bot-constructor/nodes/custom/StateNode/getDynamicFilters";
+} from "@/features/bot-constructor/nodes/bespoke/StateNode/getDynamicFilters";
 import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

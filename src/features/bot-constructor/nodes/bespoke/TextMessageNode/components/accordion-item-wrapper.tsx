@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
-import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
+import { FilterBuilder } from "@/features/bot-constructor/nodes/shared/filter/filter";
 import { useReactQueryAction } from "@/services/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFlowStore } from "@/features/bot-constructor/store";

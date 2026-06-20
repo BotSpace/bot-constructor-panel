@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PlusIcon, X } from "lucide-react";
-import { CodeEditorDialog } from "@/features/bot-constructor/nodes/custom/CustomCodeNode/components/CodeEditorDialog";
+import { CodeEditorDialog } from "@/features/bot-constructor/nodes/bespoke/CustomCodeNode/components/CodeEditorDialog";
 
 const BOT_GLOBALS = ["message", "user", "context", "state"];
 

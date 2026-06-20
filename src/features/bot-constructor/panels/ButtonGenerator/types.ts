@@ -1,6 +1,6 @@
 // FAYL: constructor/components/ButtonGenerator/types.ts (YANGILANGAN)
 
-import { Filter } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
+import { Filter } from "@/features/bot-constructor/nodes/shared/filter/types";
 
 // Login URL uchun maxsus konfiguratsiya
 export interface LoginUrlConfig {

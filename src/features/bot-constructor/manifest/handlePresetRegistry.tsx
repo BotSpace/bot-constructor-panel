@@ -2,7 +2,7 @@ import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelC
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { ReactNode, useMemo } from "react";
 import { Position } from "reactflow";
-import { SourceHandles, TargetHandles } from "@/features/bot-constructor/nodes/components";
+import { SourceHandles, TargetHandles } from "@/features/bot-constructor/canvas/handles";
 import { DeleteMessageSource } from "@/features/bot-constructor/canvas/handles/DeleteMessageSource";
 import { EditMessageSource } from "@/features/bot-constructor/canvas/handles/EditMessageSource";
 import { ElseMessageSource } from "@/features/bot-constructor/canvas/handles/ElseMessageSource";

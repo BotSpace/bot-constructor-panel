@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FilterRow } from "@/features/bot-constructor/nodes/actions/shared/filter/filter-row";
-import type { Filter, FilterBuilderProps, FilterField } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
+import { FilterRow } from "@/features/bot-constructor/nodes/shared/filter/filter-row";
+import type { Filter, FilterBuilderProps, FilterField } from "@/features/bot-constructor/nodes/shared/filter/types";
 import { generateId } from "@/lib/utils";
 
 export function FilterBuilder({

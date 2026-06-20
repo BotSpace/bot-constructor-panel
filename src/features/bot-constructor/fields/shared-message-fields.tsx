@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { DynamicMessageConstructor } from "@/features/bot-constructor/nodes/actions/TextMessageNode/components/dynamic-message-constructor-modal";
+import { DynamicMessageConstructor } from "@/features/bot-constructor/nodes/bespoke/TextMessageNode/components/dynamic-message-constructor-modal";
 import TelegramRichTextEditor from "@/features/bot-constructor/panels/TelegramRichTextEditor/TelegramRichTextEditor";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import useProjectStore from "@/features/bot-constructor/store/project";
