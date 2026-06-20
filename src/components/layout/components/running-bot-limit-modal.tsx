@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { LoaderCircle, Bug, Radio } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 
 import { instanceAuth } from "@/services/instance";
 import {

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { PlusIcon, X } from "lucide-react";
 import { CodeEditorDialog } from "@/features/bot-constructor/nodes/custom/CustomCodeNode/components/CodeEditorDialog";
 
-const BOT_GLOBALS = ["message", "user", "state"];
+const BOT_GLOBALS = ["message", "user", "context", "state"];
 
 interface OutputItem {
   name: string;

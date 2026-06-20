@@ -18,10 +18,49 @@ import { Code2, AlertCircle } from "lucide-react";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 
 // Custom code uchun state/context yordamchi funksiyalari (autocomplete).
-// state_* helper'lar prefiksni AVTOMATIK qo'shadi — foydalanuvchi toza nom beradi
-// (masalan "name"), keyin node maydonlarida {{name}} yoki {{state.name}} ishlaydi.
-// set_context esa prefiks qo'shmaydi (kalitni o'zi qanday bo'lsa shunday saqlaydi).
+//
+// YANGI (tavsiya etilgan) — to'g'ridan-to'g'ri obyekt-access:
+//   context.var_name   — context o'zgaruvchisini o'qish (masalan: context.first_name)
+//   state.var_name     — state o'zgaruvchisini o'qish; 'state_' prefiksi AVTOMATIK
+//                        (masalan: state.count → state_count kalit ostida saqlangan)
+//
+// ESKI (hali ham ishlaydi) — funksiya orqali:
+//   get_context("key") / set_context("key", value)
+//   get_state("name")  / set_state("name", value)  — 'state_' avtomatik qo'shiladi
+
 const HELPER_COMPLETIONS = [
+  // --- Obyekt-access (yangi, tavsiya etilgan) ---
+  {
+    label: "context",
+    type: "variable",
+    boost: 100,
+    detail: "Context obyekti — barcha context o'zgaruvchilar",
+    info: "context.var_name — to'g'ridan-to'g'ri o'qish. Masalan: context.first_name, context.sheets_response",
+  },
+  {
+    label: "context.",
+    type: "variable",
+    boost: 100,
+    apply: "context.",
+    detail: "context.var_name — context o'zgaruvchisini o'qish",
+    info: "Masalan: context.first_name, context.user_input, context.sheets_response",
+  },
+  {
+    label: "state",
+    type: "variable",
+    boost: 100,
+    detail: "State obyekti — barcha state o'zgaruvchilar (state_ prefikssiz)",
+    info: "state.var_name — to'g'ridan-to'g'ri o'qish. Masalan: state.count, state.step",
+  },
+  {
+    label: "state.",
+    type: "variable",
+    boost: 100,
+    apply: "state.",
+    detail: "state.var_name — state o'zgaruvchisini o'qish",
+    info: "Masalan: state.count, state.step, state.user_choice. 'state_' prefiksi avtomatik.",
+  },
+  // --- Funksiyalar (eski, hali ham ishlaydi) ---
   {
     label: "set_state",
     type: "function",
@@ -125,6 +164,7 @@ export const CodeEditorDialog = ({ code, onChange, globals }: Props) => {
   if (inPanel) {
     return (
       <div className="space-y-2">
+        {/* Globals badges */}
         {globals.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {globals.map((g) => (
@@ -137,6 +177,15 @@ export const CodeEditorDialog = ({ code, onChange, globals }: Props) => {
             ))}
           </div>
         )}
+
+        {/* Variable access help */}
+        <div className="rounded-md border border-blue-500/20 bg-blue-500/5 px-2.5 py-1.5 text-[10px] text-blue-400 leading-relaxed">
+          <span className="font-semibold">O&apos;qish:</span>{" "}
+          <code className="font-mono">context.var_name</code> · <code className="font-mono">state.var_name</code>
+          <span className="mx-1 text-blue-500/50">|</span>
+          <span className="font-semibold">Yozish:</span>{" "}
+          <code className="font-mono">set_context(&quot;key&quot;, val)</code> · <code className="font-mono">set_state(&quot;name&quot;, val)</code>
+        </div>
 
         <div className="border border-border rounded-md overflow-hidden">
           <CodeMirror
@@ -182,6 +231,7 @@ export const CodeEditorDialog = ({ code, onChange, globals }: Props) => {
               <Code2 className="w-5 h-5" /> JS Bot Engine
             </span>
           </DialogTitle>
+          {/* Globals badges */}
           <div className="flex flex-wrap gap-2 mt-2">
             {globals.map((g) => (
               <span
@@ -191,6 +241,19 @@ export const CodeEditorDialog = ({ code, onChange, globals }: Props) => {
                 {g}
               </span>
             ))}
+          </div>
+          {/* Variable access help banner */}
+          <div className="mt-2 rounded-md border border-blue-500/20 bg-blue-500/8 px-3 py-2 text-[11px] text-blue-300 leading-relaxed">
+            <span className="font-semibold text-blue-200">O&apos;qish (tavsiya):</span>{" "}
+            <code className="font-mono text-emerald-300">context.var_name</code>
+            <span className="mx-1.5 text-slate-600">·</span>
+            <code className="font-mono text-emerald-300">state.var_name</code>
+            <span className="mx-2 text-slate-600">|</span>
+            <span className="font-semibold text-blue-200">Yozish:</span>{" "}
+            <code className="font-mono text-yellow-300">set_context(&quot;key&quot;, val)</code>
+            <span className="mx-1.5 text-slate-600">·</span>
+            <code className="font-mono text-yellow-300">set_state(&quot;name&quot;, val)</code>
+            <span className="ml-2 text-[10px] text-slate-500">(get_context/get_state ham ishlaydi)</span>
           </div>
         </DialogHeader>
 
