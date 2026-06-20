@@ -433,13 +433,3 @@ function EmptyState({ title, desc }: { title: string; desc: string }) {
     </div>
   );
 }
-
-// ── keep old export for any existing imports ──────────────────────────────────
-export function formatVariableValue(v: unknown): { text: string; isComplex: boolean } {
-  if (v === null) return { text: "null", isComplex: false };
-  if (v === undefined) return { text: "undefined", isComplex: false };
-  if (typeof v === "object" || Array.isArray(v)) {
-    return { text: JSON.stringify(v, null, 2), isComplex: true };
-  }
-  return { text: String(v), isComplex: false };
-}

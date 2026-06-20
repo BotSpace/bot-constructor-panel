@@ -12,7 +12,6 @@ export type HandlerData = MessageTriggerNodeData;
 export type AudioSourceType = "file_id" | "url" | "upload";
 export type FileSourceType = "file_id" | "url" | "upload";
 export type PhotoSourceType = "file_id" | "url" | "upload";
-export type VideoSourceType = "file_id" | "url" | "upload";
 export type MessageIdSource = "this_message" | "connected_node" | "message_id";
 
 export interface SendTextMessageNodeData {
@@ -41,26 +40,6 @@ export interface SendPhotoNodeData {
   handlers?: HandlerData[];
 }
 
-export interface SendVideoNodeData {
-  recipients?: RecipientConfig;
-  videoSourceType?: VideoSourceType;
-  videoFileId?: string;
-  videoUrl?: string;
-  uploadedFileUuid?: string;
-  caption: string;
-  duration?: string;
-  width?: string;
-  height?: string;
-  supportsStreaming?: boolean;
-  hasCustomThumbnail?: boolean;
-  thumbnailFileId?: string;
-  disableNotification: boolean;
-  protectContent?: boolean;
-  remove_keyboard?: boolean;
-  parseMode: ParseMode;
-  keyboard: KeyboardConfig;
-  handlers?: HandlerData[];
-}
 
 export interface SendAudioNodeData {
   recipients?: RecipientConfig;
@@ -97,61 +76,11 @@ export interface SendFileNodeData {
   handlers?: HandlerData[];
 }
 
-export interface SendContactNodeData {
-  recipients?: RecipientConfig;
-  phoneNumber?: string;
-  firstName?: string;
-  lastName?: string;
-  vcard?: string;
-  remove_keyboard?: boolean;
-  keyboard: KeyboardConfig;
-  handlers?: HandlerData[];
-}
 
-export interface SendLocationNodeData {
-  recipients?: RecipientConfig;
-  latitude?: number;
-  longitude?: number;
-  remove_keyboard?: boolean;
-  keyboard: KeyboardConfig;
-  handlers?: HandlerData[];
-}
 
-export interface PollOption {
-  text: string;
-}
 
-export interface SendPollNodeData {
-  recipients?: RecipientConfig;
-  question?: string;
-  options?: PollOption[];
-  isAnonymous?: boolean;
-  type?: "regular" | "quiz";
-  allowsMultipleAnswers?: boolean;
-  correctOptionId?: number;
-  explanation?: string;
-  openPeriod?: number;
-  closeDate?: string;
-  remove_keyboard?: boolean;
-  keyboard?: KeyboardConfig;
-  handlers?: HandlerData[];
-}
 
-export interface MediaItem {
-  type: "photo" | "video" | "audio" | "document";
-  sourceType: "file_id" | "url";
-  fileId?: string;
-  url?: string;
-  caption?: string;
-}
 
-export interface MediaGroupNodeData {
-  mediaItems?: MediaItem[];
-  disableNotification?: boolean;
-  remove_keyboard?: boolean;
-  keyboard: KeyboardConfig;
-  handlers?: HandlerData[];
-}
 
 export interface EditMessageNodeData {
   messageIdSource: MessageIdSource;
@@ -164,36 +93,7 @@ export interface EditMessageNodeData {
   handlers?: HandlerData[];
 }
 
-export interface EditOrSendMessageNodeData {
-  recipients: RecipientConfig;
-  messageText: string;
-  parseMode: ParseMode;
-  disableNotification: boolean;
-  disableWebPagePreview: boolean;
-  remove_keyboard?: boolean;
-  keyboard: KeyboardConfig;
-  dynamicMessages?: DynamicMessage[];
-  handlers?: HandlerData[];
-}
 
 export type { RecipientType };
 
-export interface InvoicePrice {
-  label: string;
-  amount: number;
-}
 
-export interface SendInvoiceNodeData {
-  recipients?: RecipientConfig;
-  title: string;
-  description: string;
-  payload: string;
-  providerToken?: string;
-  currency: string;
-  prices: InvoicePrice[];
-  photoUrl?: string;
-  needName?: boolean;
-  needPhone?: boolean;
-  needEmail?: boolean;
-  needShippingAddress?: boolean;
-}
