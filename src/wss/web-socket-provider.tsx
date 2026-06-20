@@ -168,6 +168,3 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>;
 }
-
-/** @deprecated Hub'ga to'g'ridan-to'g'ri obuna uchun `wsHub.subscribe` ishlating. */
-export const useWebSocket = () => null;

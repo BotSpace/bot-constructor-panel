@@ -257,6 +257,3 @@ export interface NodeManifest {
   configFields?: NodeFieldManifest[];
 }
 
-export interface NodeRegistryEntry extends NodeManifest {
-  componentStatus: NodeRegistryStatus;
-}

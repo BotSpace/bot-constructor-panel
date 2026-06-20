@@ -47,22 +47,9 @@ export interface CredentialListItem {
   data: Record<string, string | null>;
 }
 
-export interface CredentialDetail extends CredentialListItem {
-  // same shape; backend returns full item
-}
 
 // Paginated list response from backend
-export interface CredentialListResponse {
-  results: CredentialListItem[];
-  count: number;
-  next: string | null;
-  previous: string | null;
-}
 
-export interface CredentialTypesResponse {
-  results: CredentialType[];
-  count: number;
-}
 
 // Request bodies
 export interface CreateCredentialPayload {

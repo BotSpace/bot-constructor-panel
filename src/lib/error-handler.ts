@@ -1,5 +1,4 @@
 import { AxiosError } from "axios";
-import toast from "react-hot-toast";
 
 export interface ApiError {
   message: string;
@@ -102,27 +101,5 @@ export function handleApiError(error: unknown): ApiError {
   };
 }
 
-export function showApiError(error: unknown, customMessage?: string) {
-  const apiError = handleApiError(error);
-  const message = customMessage || apiError.message;
 
-  toast.error(message);
 
-  // Development'da to'liq error ma'lumotini console'ga chiqarish
-  if (process.env.NODE_ENV === "development") {
-    console.error("API Error:", {
-      originalError: error,
-      processedError: apiError,
-    });
-  }
-
-  return apiError;
-}
-
-export function showApiSuccess(message: string) {
-  toast.success(message);
-}
-
-export function showApiLoading(message: string) {
-  return toast.loading(message);
-}
