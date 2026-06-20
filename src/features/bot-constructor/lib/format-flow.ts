@@ -288,11 +288,17 @@ export const getFormatFlow = (
         )
       : -Infinity;
 
-  const resolvedNormalNodes = layoutedNormalNodes.map((node) => {
+  // Separate overlapping nodes from non-overlapping ones.
+  // Overlapping nodes must be stacked vertically (not all placed at the same Y),
+  // otherwise siblings from the same source (e.g. CustomCode dynamic outputs)
+  // end up on top of each other.
+  const overlappingNodes: typeof layoutedNormalNodes = [];
+  const nonOverlappingNodes: typeof layoutedNormalNodes = [];
+
+  layoutedNormalNodes.forEach((node) => {
     const nodeBottom = node.position.y + (node.height ?? DEFAULT_NODE_HEIGHT);
     const nodeRight = node.position.x + (node.width ?? DEFAULT_NODE_WIDTH);
 
-    // Check if this node overlaps any accessory node
     const overlaps = layoutedAccessoryNodes.some((acc) => {
       const accRight = acc.position.x + (acc.width ?? DEFAULT_NODE_WIDTH);
       const accBottom = acc.position.y + (acc.height ?? DEFAULT_NODE_HEIGHT);
@@ -304,16 +310,28 @@ export const getFormatFlow = (
       );
     });
 
-    if (!overlaps) return node;
-
-    return {
-      ...node,
-      position: {
-        ...node.position,
-        y: accessoryBottom + ACCESSORY_VERTICAL_OFFSET,
-      },
-    };
+    if (overlaps) {
+      overlappingNodes.push(node);
+    } else {
+      nonOverlappingNodes.push(node);
+    }
   });
+
+  // Stack overlapping nodes vertically below the accessory area, preserving
+  // their relative X positions and original Y order so siblings don't collide.
+  overlappingNodes.sort((a, b) => a.position.y - b.position.y);
+  let nextY = accessoryBottom + ACCESSORY_VERTICAL_OFFSET;
+  const repositionedNodes = overlappingNodes.map((node) => {
+    const h = node.height ?? DEFAULT_NODE_HEIGHT;
+    const positioned = {
+      ...node,
+      position: { ...node.position, y: nextY },
+    };
+    nextY += h + ACCESSORY_VERTICAL_OFFSET;
+    return positioned;
+  });
+
+  const resolvedNormalNodes = [...nonOverlappingNodes, ...repositionedNodes];
 
   return { nodes: [...resolvedNormalNodes, ...layoutedAccessoryNodes], edges };
 };
