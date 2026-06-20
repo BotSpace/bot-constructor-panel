@@ -30,7 +30,7 @@ import CountdownComponent from "@/components/common/count-down/count-down";
 import {
   RunningBotLimitModal,
   RunningBotLimitError,
-} from "@/components/layout/components/running-bot-limit-modal";
+} from "@/components/layout/running-bot-limit-modal";
 
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugingButtons() {

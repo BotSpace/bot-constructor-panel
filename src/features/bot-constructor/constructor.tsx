@@ -30,7 +30,7 @@ import { Text } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
 import { useSearchStore } from "@/features/bot-constructor/panels/search/search-store";
-import { debugConsoleStore } from "@/components/layout/components/debug-console/store";
+import { debugConsoleStore } from "@/components/layout/debug-console/store";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { instanceAuth } from "@/services/instance";
 import { getNodeManifestByType } from "@/features/bot-constructor/manifest";
@@ -38,7 +38,7 @@ import { useTheme } from "next-themes";
 import { NodeSelectionDialog } from "@/features/bot-constructor/panels/NodeSelectionDialog";
 import { Connection, Node } from "reactflow";
 import { useCollab } from "@/wss/collab/use-collab";
-import { useDebugContextStore } from "@/components/layout/components/debug-console/debug-context-store";
+import { useDebugContextStore } from "@/components/layout/debug-console/debug-context-store";
 import { useDebugErrorsStore } from "@/features/bot-constructor/store/debug-errors";
 
 export default function Constructor() {
