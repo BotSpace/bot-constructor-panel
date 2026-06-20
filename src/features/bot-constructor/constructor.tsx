@@ -38,6 +38,8 @@ import { useTheme } from "next-themes";
 import { NodeSelectionDialog } from "./components/NodeSelectionDialog";
 import { Connection, Node } from "reactflow";
 import { useCollab } from "@/wss/collab/use-collab";
+import { useDebugContextStore } from "@/components/layout/components/debug-console/debug-context-store";
+import { useDebugErrorsStore } from "@/features/bot-constructor/store/debug-errors";
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
@@ -89,6 +91,8 @@ export default function Constructor() {
   // project object reference, re-triggering the effect and overwriting
   // unsaved editor state with the server-saved flow (Bug 2 root cause).
   const hasLoadedFlowRef = useRef(false);
+  // Guards one-time debug seed (variables + errors) on mount.
+  const hasSeedDebugRef = useRef(false);
 
   // Loyiha yuklanib bo'lsa undagi ma'lumotlarni
   // Constructorga yozib qo'yadi loading status true bo'lganda
@@ -114,6 +118,78 @@ export default function Constructor() {
       toast.error(message);
     });
   }, [loading, project, loadFlow]);
+
+  // Seed debug stores from backend on mount (once per project session).
+  // This ensures that after a page refresh the Variable Inspector and Errors
+  // panel are populated immediately without waiting for a new WS event.
+  // WS real-time events still win: setSnapshot/addError always overwrite.
+  useEffect(() => {
+    if (loading) return;
+    if (!project) return;
+    if (hasSeedDebugRef.current) return;
+    hasSeedDebugRef.current = true;
+
+    const projectId = String(project.id);
+
+    // Seed variable snapshots — GET /api/debug/context/?project_id=<id>
+    // Expected response: { chats: [{ chat_id, variables, ts }, ...] }
+    instanceAuth
+      .get<{ chats: Array<{ chat_id: string | number; variables: Record<string, unknown>; ts: number | string }> }>(
+        `/debug/context/`,
+        { params: { project_id: projectId } }
+      )
+      .then(({ data }) => {
+        const chats = data?.chats;
+        if (!Array.isArray(chats) || chats.length === 0) return;
+        const entries = chats.map((c) => ({
+          chat_id: String(c.chat_id),
+          snapshot: {
+            variables: c.variables ?? {},
+            ts: c.ts ?? Date.now(),
+          },
+        }));
+        useDebugContextStore.getState().seedSnapshots(entries);
+      })
+      .catch(() => {
+        // Silent — 404 or empty is fine on first run / no debug sessions yet
+      });
+
+    // Seed errors — GET /api/debug/errors/?project_id=<id>
+    // Expected response: [{ chat_id, node_id, node_type, message, detail, ts }, ...]
+    // or { results: [...] } — handle both shapes.
+    type RawError = {
+      chat_id?: string | number;
+      node_id?: string;
+      node_type?: string;
+      message: string;
+      detail?: string;
+      ts: number | string;
+    };
+    instanceAuth
+      .get<Array<RawError> | { results: Array<RawError> }>(
+        `/debug/errors/`,
+        { params: { project_id: projectId } }
+      )
+      .then(({ data }) => {
+        const raw: Array<RawError> = Array.isArray(data)
+          ? data
+          : (data as { results: Array<RawError> })?.results ?? [];
+        if (raw.length === 0) return;
+        const raws = raw.map((e) => ({
+          project: projectId,
+          chat_id: e.chat_id,
+          node_id: e.node_id,
+          node_type: e.node_type,
+          message: e.message || "Unknown error",
+          detail: e.detail,
+          ts: e.ts ?? Date.now(),
+        }));
+        useDebugErrorsStore.getState().seedErrors(raws);
+      })
+      .catch(() => {
+        // Silent — 404 or empty is expected when no errors recorded yet
+      });
+  }, [loading, project]);
 
   useFlowKeyboardShortcuts({
     containerRef: reactFlowWrapper,
