@@ -4,11 +4,11 @@ import {
     type BillingPeriodKey,
     BILLING_PERIODS,
     type Plan,
-} from "./components/types";
+} from "./types";
 import { APIListResponse } from "@/types/http/response";
 import { Loader2 } from "lucide-react";
-import { PlanCard } from "./components/plan-card";
-import SaleForLongTime from "./components/sale-for-long-time";
+import { PlanCard } from "./plan-card";
+import SaleForLongTime from "./sale-for-long-time";
 
 type Props = {
     onSelectPlan: (plan_id: number, months: number) => void;

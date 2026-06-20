@@ -35,11 +35,11 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { useLinkToParent } from "@/components/common/link-to-parrent";
 import Link from "next/link";
 import StatusBadge from "@/components/common/status-badge";
-import SelectPlan from "./components/select-plan/select-plan";
+import SelectPlan from "./select-plan/select-plan";
 import {
   RunningBotLimitModal,
   RunningBotLimitError,
-} from "@/components/layout/components/running-bot-limit-modal";
+} from "@/components/layout/running-bot-limit-modal";
 
 function ReleasePanel() {
   const { id, lang }: { id: string; lang: string } = useParams();
