@@ -20,7 +20,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -183,7 +182,7 @@ export function CredentialManageDialog({
                   : "Hozircha credential yo'q"}
               </p>
             ) : (
-              <ScrollArea className="max-h-[380px]">
+              <div className="max-h-[380px] overflow-y-auto pr-1">
                 <div className="space-y-1.5">
                   {credentials.map((item) => (
                     <div
@@ -244,7 +243,7 @@ export function CredentialManageDialog({
                     </div>
                   ))}
                 </div>
-              </ScrollArea>
+              </div>
             )}
           </div>
 
