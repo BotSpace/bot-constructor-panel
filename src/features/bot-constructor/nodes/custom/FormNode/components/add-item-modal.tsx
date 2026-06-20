@@ -16,16 +16,29 @@ import { Plus } from "lucide-react";
 import { ButtonGenerator } from "@/features/bot-constructor/components";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { FormNodeData } from "@/features/bot-constructor/nodes/types";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
 import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 import { Input } from "@/components/ui/input";
 import { varibulNameValidator } from "@/lib/input-validators";
 
+interface FormItem {
+  question: string;
+  order: number;
+  type: MessageTriggerValueTypes;
+  filter: string;
+  key: string;
+  context: {
+    value?: string;
+    radius?: { lat?: string; lng?: string; km?: string };
+    size?: { min?: string; max?: string };
+  };
+  keyboard?: KeyboardConfig;
+}
+
 type Props = {
-  onAddItem: (item: FormNodeData["items"][0]) => void;
-  onEditItem?: (item: FormNodeData["items"][0]) => void;
-  editingItem?: FormNodeData["items"][0] | null;
+  onAddItem: (item: FormItem) => void;
+  onEditItem?: (item: FormItem) => void;
+  editingItem?: FormItem | null;
   trigger?: React.ReactNode;
   onClose?: () => void;
 };
@@ -43,7 +56,7 @@ function AddItemModal({
   const [stateKeyError, setStateKeyError] = useState<string>("");
 
   const [filter, setFilter] = useState<string>("any");
-  const [context, setContext] = useState<FormNodeData["items"][0]["context"]>({
+  const [context, setContext] = useState<FormItem["context"]>({
     value: undefined,
     radius: undefined,
     size: undefined,
@@ -114,7 +127,7 @@ function AddItemModal({
   };
 
   const handleContextUpdate = (
-    newContext: FormNodeData["items"][0]["context"] | undefined
+    newContext: FormItem["context"] | undefined
   ) => {
     setContext(
       newContext || { value: undefined, radius: undefined, size: undefined }
@@ -133,7 +146,7 @@ function AddItemModal({
       return;
     }
 
-    const item: FormNodeData["items"][0] = {
+    const item: FormItem = {
       key: stateKey,
       question: messageText,
       type,

@@ -13,7 +13,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import ActionNodeSettings from "../../../actions/shared/ActionNodeSettings"
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { ParseMode } from "@/features/bot-constructor/nodes/types";
+import { ParseMode } from "@/features/bot-constructor/types/shared-ui-types";
 import { ButtonGenerator, KeyboardConfig } from "@/features/bot-constructor/components";
 import { RecipientsManager } from "../../../actions/shared/RecipientSelector";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";

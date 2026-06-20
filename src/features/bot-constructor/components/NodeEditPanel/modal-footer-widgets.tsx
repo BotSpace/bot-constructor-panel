@@ -3,7 +3,7 @@
 import { ButtonGenerator, KeyboardConfig } from "@/features/bot-constructor/components";
 import ActionNodeSettings from "@/features/bot-constructor/nodes/actions/shared/ActionNodeSettings";
 import { RecipientsManager } from "@/features/bot-constructor/nodes/actions/shared/RecipientSelector";
-import { ParseMode } from "@/features/bot-constructor/nodes/types";
+import { ParseMode } from "@/features/bot-constructor/types/shared-ui-types";
 import { useFlowStore } from "@/features/bot-constructor/store";
 
 interface ModalActionPanelProps {

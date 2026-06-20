@@ -15,13 +15,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import React from "react";
-import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/types";
 
 type Props = {
   notificationDisabled?: boolean;
   contentProtected?: boolean;
   parseMode?: "None" | "HTML";
-  handleUpdate: (update: Partial<SendTextMessageNodeData>) => void;
+  handleUpdate: (update: Record<string, unknown>) => void;
 };
 
 function ActionNodeSettings({

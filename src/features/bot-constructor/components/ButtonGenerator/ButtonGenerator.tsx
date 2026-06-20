@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/types";
 import { useButtonGeneratorState } from "./hook/useButtonGeneratorState";
 import { KeyboardPreview } from "./components/KeyboardPreview";
 import { EditButtonDialog } from "./components/EditButtonDialog";
@@ -72,7 +71,7 @@ export function ButtonGenerator({
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
-  const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
+  const handleUpdate = (update: Record<string, unknown>) => {
     if (node_id) {
       updateNodeData(node_id, update);
     }
