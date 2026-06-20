@@ -7,26 +7,6 @@
 import { Node, Edge } from "reactflow";
 import { getNodeManifestByType } from "@/features/bot-constructor/manifest/manifestStore";
 
-interface RadiusContext {
-  lat?: string;
-  lng?: string;
-  km?: string;
-}
-
-interface SizeContext {
-  min?: string;
-  max?: string;
-}
-
-interface StateConfig {
-  key: string;
-  [key: string]: unknown;
-}
-
-interface TriggerNodeWithStateBase {
-  state?: StateConfig;
-}
-
 interface StateNodeDataLocal {
   key: string;
   [key: string]: unknown;
@@ -66,40 +46,16 @@ function getManifestStateKeys(node: Node): string[] {
   return keys;
 }
 
-type TriggerNodeWithState = TriggerNodeWithStateBase;
-
 /**
- * Type for trigger node with required state
- */
-type TriggerNodeWithRequiredState = TriggerNodeWithState & {
-  state: NonNullable<TriggerNodeWithState["state"]>;
-};
-
-/**
- * Node types that support state configuration
+ * Node types that support flat state configuration (save_state / state_key / state_type)
  */
 const TRIGGER_TYPES_WITH_STATE = [
   "MessageTriggerNode",
   "CallbackQueryTriggerNode",
+  "CallbackButtonTriggerNode",
   "CommandTriggerNode",
   "ReplyButtonTriggerNode",
 ] as const;
-
-/**
- * Type guard to check if node data has state configuration
- */
-function hasStateConfig(data: unknown): data is TriggerNodeWithRequiredState {
-  if (typeof data !== "object" || data === null || !("state" in data)) {
-    return false;
-  }
-
-  const triggerData = data as TriggerNodeWithState;
-  return (
-    triggerData.state !== null &&
-    triggerData.state !== undefined &&
-    typeof triggerData.state === "object"
-  );
-}
 
 /**
  * Type guard to check if a node type is a trigger type with state support
@@ -108,6 +64,28 @@ function isTriggerTypeWithState(
   nodeType: string,
 ): nodeType is (typeof TRIGGER_TYPES_WITH_STATE)[number] {
   return (TRIGGER_TYPES_WITH_STATE as readonly string[]).includes(nodeType);
+}
+
+/**
+ * Extract the state key from a trigger node.
+ * Supports both new flat format (save_state + state_key) and
+ * legacy nested format (data.state.key) as fallback.
+ */
+function getTriggerStateKey(data: Record<string, unknown>): string | null {
+  // New flat format
+  if (data.save_state === true && typeof data.state_key === "string") {
+    const key = data.state_key.trim();
+    return key !== "" ? key : null;
+  }
+
+  // Legacy nested format fallback
+  const legacy = data.state as Record<string, unknown> | undefined;
+  if (legacy && typeof legacy === "object" && typeof legacy.key === "string") {
+    const key = legacy.key.trim();
+    return key !== "" ? key : null;
+  }
+
+  return null;
 }
 
 /**
@@ -168,11 +146,9 @@ export function getAvailableStateKeys(
         stateKeys.add(nodeData.key);
       }
     } else if (isTriggerTypeWithState(node.type)) {
-      if (hasStateConfig(node.data)) {
-        const stateKey = node.data.state.key;
-        if (stateKey && stateKey.trim() !== "") {
-          stateKeys.add(stateKey);
-        }
+      const key = getTriggerStateKey(node.data as Record<string, unknown>);
+      if (key) {
+        stateKeys.add(key);
       }
     }
   });

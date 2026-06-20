@@ -26,12 +26,6 @@ import { FilterSelector } from "@/features/bot-constructor/nodes/bespoke/Message
 import { ParameterInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput";
 import { ValueInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput/ValueInput";
 import { TypeSelector } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/TypeSelector";
-import {
-  StateConfigUI,
-  getStateTypesForCallbackQueryTrigger,
-  getStateTypesForMessageTrigger,
-  getStateTypesForReplyButtonTrigger,
-} from "@/features/bot-constructor/nodes/shared";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
 import { AlertCircle, ArrowRight, Bot, GripVertical, Key, ListPlus, PlusIcon, Trash2, X } from "lucide-react";
@@ -78,15 +72,10 @@ function MessageTriggerWidget({ nodeId, data }: WidgetProps) {
     filter?: string;
     global?: boolean;
     context?: Record<string, unknown>;
-    state?: unknown;
   };
 
   const filtersForType = useMemo(
     () => getFiltersForType(typedData.type),
-    [typedData.type]
-  );
-  const availableStateTypes = useMemo(
-    () => getStateTypesForMessageTrigger(typedData.type || "any"),
     [typedData.type]
   );
 
@@ -138,15 +127,6 @@ function MessageTriggerWidget({ nodeId, data }: WidgetProps) {
         />
         Global
       </Label>
-
-      {typedData.type ? (
-        <StateConfigUI
-          state={typedData.state as never}
-          onStateChange={(state) => updateNodeData(nodeId, { state })}
-          availableTypes={availableStateTypes}
-          nodeId={nodeId}
-        />
-      ) : null}
     </div>
   );
 }
@@ -159,7 +139,6 @@ function CallbackQueryTriggerWidget({ nodeId, data }: WidgetProps) {
     filter?: string;
     global?: boolean;
     context?: { value?: string };
-    state?: unknown;
   };
 
   const availableCallbacks = useMemo(() => {
@@ -201,13 +180,6 @@ function CallbackQueryTriggerWidget({ nodeId, data }: WidgetProps) {
   const showCollectionSelector =
     availableCallbacks.some((item: any) => item.isCollection) &&
     typedData.filter === "collection";
-  const availableStateTypes = useMemo(
-    () =>
-      getStateTypesForCallbackQueryTrigger(
-        (typedData.context?.value || "").startsWith("collection:")
-      ),
-    [typedData.context?.value]
-  );
 
   return (
     <div className="space-y-4">
@@ -292,13 +264,6 @@ function CallbackQueryTriggerWidget({ nodeId, data }: WidgetProps) {
           Global
         </Label>
       </div>
-
-      <StateConfigUI
-        state={typedData.state as never}
-        onStateChange={(state) => updateNodeData(nodeId, { state })}
-        availableTypes={availableStateTypes}
-        nodeId={nodeId}
-      />
     </div>
   );
 }
@@ -311,7 +276,6 @@ function ReplyButtonTriggerWidget({ nodeId, data }: WidgetProps) {
     selectedButtons?: Array<{ id: string; text: string }>;
     catchNoButton?: boolean;
     global?: boolean;
-    state?: unknown;
   };
 
   const availableReplyButtons = useMemo(() => {
@@ -403,13 +367,6 @@ function ReplyButtonTriggerWidget({ nodeId, data }: WidgetProps) {
           Global
         </Label>
       </div>
-
-      <StateConfigUI
-        state={typedData.state as never}
-        onStateChange={(state) => updateNodeData(nodeId, { state })}
-        availableTypes={getStateTypesForReplyButtonTrigger()}
-        nodeId={nodeId}
-      />
     </div>
   );
 }

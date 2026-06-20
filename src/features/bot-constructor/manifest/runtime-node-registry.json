@@ -45,11 +45,31 @@
         "optional": true
       },
       {
-        "type": "stateConfig",
-        "key": "state",
-        "variant": "commandTrigger",
-        "optional": true,
+        "type": "switch",
+        "key": "save_state",
         "label": "Ma'lumotni saqlash"
+      },
+      {
+        "type": "text",
+        "key": "state_key",
+        "label": "State Key",
+        "placeholder": "Masalan: user_message, phone, etc.",
+        "helpText": "Ma'lumot shu kalitga saqlanadi",
+        "visibleWhen": { "key": "save_state", "equals": true }
+      },
+      {
+        "type": "select",
+        "key": "state_type",
+        "label": "Ma'lumot Turi",
+        "options": [
+          {"value": "text", "label": "text"},
+          {"value": "number", "label": "number"},
+          {"value": "photo", "label": "photo"},
+          {"value": "video", "label": "video"},
+          {"value": "document", "label": "document"},
+          {"value": "any", "label": "any"}
+        ],
+        "visibleWhen": { "key": "save_state", "equals": true }
       }
     ],
     "defaults": {
@@ -127,9 +147,141 @@
     ],
     "content": [
       {
-        "type": "trigger-config",
-        "kind": "message",
-        "stateOptional": true
+        "type": "select",
+        "key": "type",
+        "label": "Xabar turi",
+        "options": [
+          {"value": "any",      "label": "Har qanday xabar"},
+          {"value": "text",     "label": "Matn"},
+          {"value": "location", "label": "Joylashuv"},
+          {"value": "contact",  "label": "Kontakt"},
+          {"value": "phone",    "label": "Telefon"},
+          {"value": "document", "label": "Hujjat"},
+          {"value": "photo",    "label": "Rasm"},
+          {"value": "video",    "label": "Video"},
+          {"value": "audio",    "label": "Audio"},
+          {"value": "sticker",  "label": "Stiker"}
+        ]
+      },
+      {
+        "type": "select",
+        "key": "filter",
+        "label": "Filter",
+        "options": [
+          {"value": "any",         "label": "Har qanday"},
+          {"value": "equals",      "label": "Teng"},
+          {"value": "contains",    "label": "Ichida"},
+          {"value": "not-contains","label": "Ichida emas"},
+          {"value": "starts_with", "label": "Boshlanadi"},
+          {"value": "regex",       "label": "Regex"},
+          {"value": "command",     "label": "Buyruq"}
+        ],
+        "visibleWhen": {"key": "type", "oneOf": ["text", "phone", "contact"]}
+      },
+      {
+        "type": "select",
+        "key": "filter",
+        "label": "Filter",
+        "options": [
+          {"value": "any",       "label": "Har qanday"},
+          {"value": "size",      "label": "Hajm (MB)"}
+        ],
+        "visibleWhen": {"key": "type", "oneOf": ["photo", "video", "audio"]}
+      },
+      {
+        "type": "select",
+        "key": "filter",
+        "label": "Filter",
+        "options": [
+          {"value": "any",       "label": "Har qanday"},
+          {"value": "size",      "label": "Hajm (MB)"},
+          {"value": "extension", "label": "Kengaytmasi"}
+        ],
+        "visibleWhen": {"key": "type", "oneOf": ["document"]}
+      },
+      {
+        "type": "select",
+        "key": "filter",
+        "label": "Filter",
+        "options": [
+          {"value": "any",    "label": "Har qanday"},
+          {"value": "radius", "label": "Radius (ichida)"}
+        ],
+        "visibleWhen": {"key": "type", "oneOf": ["location"]}
+      },
+      {
+        "type": "text",
+        "key": "context.value",
+        "label": "Parametr qiymati",
+        "placeholder": "Masalan: /start, salom, .pdf ...",
+        "visibleWhen": {"key": "filter", "oneOf": ["equals", "contains", "not-contains", "starts_with", "regex", "command", "extension"]}
+      },
+      {
+        "type": "number",
+        "key": "context.radius.lat",
+        "label": "Radius — Kenglik (lat)",
+        "placeholder": "41.2995",
+        "visibleWhen": {"key": "filter", "oneOf": ["radius"]}
+      },
+      {
+        "type": "number",
+        "key": "context.radius.lng",
+        "label": "Radius — Uzunlik (lng)",
+        "placeholder": "69.2401",
+        "visibleWhen": {"key": "filter", "oneOf": ["radius"]}
+      },
+      {
+        "type": "number",
+        "key": "context.radius.km",
+        "label": "Radius — Masofa (km)",
+        "placeholder": "5",
+        "visibleWhen": {"key": "filter", "oneOf": ["radius"]}
+      },
+      {
+        "type": "number",
+        "key": "context.size.min",
+        "label": "Hajm — Minimum (MB)",
+        "placeholder": "0",
+        "visibleWhen": {"key": "filter", "oneOf": ["size"]}
+      },
+      {
+        "type": "number",
+        "key": "context.size.max",
+        "label": "Hajm — Maksimum (MB)",
+        "placeholder": "50",
+        "visibleWhen": {"key": "filter", "oneOf": ["size"]}
+      },
+      {
+        "type": "switch",
+        "key": "global",
+        "label": "Global"
+      },
+      {
+        "type": "switch",
+        "key": "save_state",
+        "label": "Ma'lumotni saqlash"
+      },
+      {
+        "type": "text",
+        "key": "state_key",
+        "label": "State Key",
+        "placeholder": "Masalan: user_message, phone, etc.",
+        "helpText": "Ma'lumot shu kalitga saqlanadi",
+        "visibleWhen": { "key": "save_state", "equals": true }
+      },
+      {
+        "type": "select",
+        "key": "state_type",
+        "label": "Ma'lumot Turi",
+        "options": [
+          {"value": "text", "label": "text"},
+          {"value": "number", "label": "number"},
+          {"value": "photo", "label": "photo"},
+          {"value": "video", "label": "video"},
+          {"value": "document", "label": "document"},
+          {"value": "any", "label": "any"}
+        ],
+        "visibleWhen": { "key": "save_state", "equals": true }
       }
     ],
     "defaults": {
@@ -4004,6 +4156,38 @@
         "type": "trigger-config",
         "kind": "callback",
         "stateOptional": true
+      },
+      {
+        "type": "switch",
+        "key": "global",
+        "label": "Global"
+      },
+      {
+        "type": "switch",
+        "key": "save_state",
+        "label": "Ma'lumotni saqlash"
+      },
+      {
+        "type": "text",
+        "key": "state_key",
+        "label": "State Key",
+        "placeholder": "Masalan: user_message, phone, etc.",
+        "helpText": "Ma'lumot shu kalitga saqlanadi",
+        "visibleWhen": { "key": "save_state", "equals": true }
+      },
+      {
+        "type": "select",
+        "key": "state_type",
+        "label": "Ma'lumot Turi",
+        "options": [
+          {"value": "text", "label": "text"},
+          {"value": "number", "label": "number"},
+          {"value": "photo", "label": "photo"},
+          {"value": "video", "label": "video"},
+          {"value": "document", "label": "document"},
+          {"value": "any", "label": "any"}
+        ],
+        "visibleWhen": { "key": "save_state", "equals": true }
       }
     ],
     "defaults": {
@@ -4046,6 +4230,38 @@
         "type": "trigger-config",
         "kind": "reply",
         "stateOptional": true
+      },
+      {
+        "type": "switch",
+        "key": "global",
+        "label": "Global"
+      },
+      {
+        "type": "switch",
+        "key": "save_state",
+        "label": "Ma'lumotni saqlash"
+      },
+      {
+        "type": "text",
+        "key": "state_key",
+        "label": "State Key",
+        "placeholder": "Masalan: user_message, phone, etc.",
+        "helpText": "Ma'lumot shu kalitga saqlanadi",
+        "visibleWhen": { "key": "save_state", "equals": true }
+      },
+      {
+        "type": "select",
+        "key": "state_type",
+        "label": "Ma'lumot Turi",
+        "options": [
+          {"value": "text", "label": "text"},
+          {"value": "number", "label": "number"},
+          {"value": "photo", "label": "photo"},
+          {"value": "video", "label": "video"},
+          {"value": "document", "label": "document"},
+          {"value": "any", "label": "any"}
+        ],
+        "visibleWhen": { "key": "save_state", "equals": true }
       }
     ],
     "defaults": {
@@ -4844,6 +5060,38 @@
         "type": "trigger-config",
         "kind": "callback",
         "stateOptional": true
+      },
+      {
+        "type": "switch",
+        "key": "global",
+        "label": "Global"
+      },
+      {
+        "type": "switch",
+        "key": "save_state",
+        "label": "Ma'lumotni saqlash"
+      },
+      {
+        "type": "text",
+        "key": "state_key",
+        "label": "State Key",
+        "placeholder": "Masalan: user_message, phone, etc.",
+        "helpText": "Ma'lumot shu kalitga saqlanadi",
+        "visibleWhen": { "key": "save_state", "equals": true }
+      },
+      {
+        "type": "select",
+        "key": "state_type",
+        "label": "Ma'lumot Turi",
+        "options": [
+          {"value": "text", "label": "text"},
+          {"value": "number", "label": "number"},
+          {"value": "photo", "label": "photo"},
+          {"value": "video", "label": "video"},
+          {"value": "document", "label": "document"},
+          {"value": "any", "label": "any"}
+        ],
+        "visibleWhen": { "key": "save_state", "equals": true }
       }
     ],
     "defaults": {

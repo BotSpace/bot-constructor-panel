@@ -51,12 +51,24 @@ function resolveTranslation(
   return typeof t.has === "function" && t.has(key) ? t(key) : fallback;
 }
 
+/** Read a value from data by a possibly-dotted key path ("context.value", "a.b.c"). */
+function getNestedValue(data: Record<string, unknown>, key: string): unknown {
+  if (!key.includes(".")) return data[key];
+  const parts = key.split(".");
+  let current: unknown = data;
+  for (const part of parts) {
+    if (current === null || current === undefined || typeof current !== "object") return undefined;
+    current = (current as Record<string, unknown>)[part];
+  }
+  return current;
+}
+
 function isFieldVisible(data: Record<string, unknown>, field: NodeFieldManifest) {
   if (!field.visibleWhen) {
     return true;
   }
 
-  const currentValue = data[field.visibleWhen.key];
+  const currentValue = getNestedValue(data, field.visibleWhen.key);
 
   if (Object.prototype.hasOwnProperty.call(field.visibleWhen, "equals")) {
     return currentValue === field.visibleWhen.equals;

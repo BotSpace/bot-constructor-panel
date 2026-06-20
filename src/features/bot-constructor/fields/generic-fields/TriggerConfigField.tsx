@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { AlertCircle, Plus } from "lucide-react";
+import { useMemo } from "react";
+import { AlertCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
@@ -12,19 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ConstructorData } from "@/features/bot-constructor/lib";
-import { MessageTriggerValueTypes } from "@/features/bot-constructor/lib/messages";
-import { getFiltersForType } from "@/features/bot-constructor/nodes/shared/HandlerBuilder/utils";
 import { FilterSelector } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/FilterSelector";
-import { ParameterInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput";
 import { ValueInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput/ValueInput";
-import { TypeSelector } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/TypeSelector";
-import {
-  StateConfigUI,
-  getStateTypesForCallbackQueryTrigger,
-  getStateTypesForMessageTrigger,
-  getStateTypesForReplyButtonTrigger,
-} from "@/features/bot-constructor/nodes/shared";
-import { StateConfig } from "@/features/bot-constructor/nodes/shared/state-config-types";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { getNodeKeyboard } from "@/features/bot-constructor/lib/keyboard-compat";
 
@@ -37,139 +26,11 @@ export interface TriggerConfigFieldProps {
   data: Record<string, unknown>;
   field: {
     type: "trigger-config";
-    kind: "message" | "callback" | "reply";
+    // "message" is now fully manifest-driven; this widget handles "callback" and "reply" only.
+    kind: "callback" | "reply";
     label?: string;
     stateOptional?: boolean;
   };
-}
-
-// ---------------------------------------------------------------------------
-// kind="message"
-// ---------------------------------------------------------------------------
-
-interface MessageData {
-  type?: MessageTriggerValueTypes;
-  filter?: string;
-  global?: boolean;
-  context?: {
-    value?: string;
-    radius?: Record<string, string>;
-    size?: Record<string, string>;
-  };
-  state?: StateConfig;
-}
-
-function MessageTriggerConfig({
-  nodeId,
-  data,
-  stateOptional,
-}: {
-  nodeId: string;
-  data: Record<string, unknown>;
-  stateOptional?: boolean;
-}) {
-  const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [showState, setShowState] = useState(Boolean((data as MessageData).state));
-
-  const typedData = data as MessageData;
-
-  const filtersForType = useMemo(
-    () => getFiltersForType(typedData.type),
-    [typedData.type]
-  );
-
-  const availableStateTypes = useMemo(
-    () => getStateTypesForMessageTrigger(typedData.type || "any"),
-    [typedData.type]
-  );
-
-  const showFilterSection = Boolean(typedData.type && typedData.type !== "any");
-  const showParameterInput =
-    showFilterSection &&
-    Boolean(typedData.filter) &&
-    typedData.filter !== "any";
-
-  return (
-    <div className="space-y-4">
-      <div className="space-y-1.5">
-        <Label className="text-xs text-white/50">Xabar turi</Label>
-        <TypeSelector
-          value={typedData.type || ""}
-          onValueChange={(newType) =>
-            updateNodeData(nodeId, { type: newType, filter: "any" })
-          }
-        />
-      </div>
-
-      {showFilterSection ? (
-        <div className="space-y-1.5">
-          <Label className="text-xs text-white/50">Filter</Label>
-          <FilterSelector
-            value={typedData.filter || ""}
-            onValueChange={(filter) => updateNodeData(nodeId, { filter })}
-            options={filtersForType}
-          />
-        </div>
-      ) : null}
-
-      {showParameterInput ? (
-        <div className="space-y-1.5">
-          <Label className="text-xs text-white/50">Parametr</Label>
-          <ParameterInput
-            filter={typedData.filter}
-            context={typedData.context}
-            onContextUpdate={(context) => updateNodeData(nodeId, { context })}
-          />
-        </div>
-      ) : null}
-
-      <Label className="mt-2 flex cursor-pointer items-center gap-2 text-sm">
-        <Checkbox
-          checked={Boolean(typedData.global)}
-          onCheckedChange={(checked) =>
-            updateNodeData(nodeId, { global: Boolean(checked) })
-          }
-        />
-        Global
-      </Label>
-
-      {typedData.type ? (
-        stateOptional && !showState ? (
-          <button
-            type="button"
-            onClick={() => {
-              setShowState(true);
-              if (!typedData.state) {
-                updateNodeData(nodeId, {
-                  state: { key: "", type: availableStateTypes[0] || "text" },
-                });
-              }
-            }}
-            className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-          >
-            <Plus className="h-3 w-3" />
-            Ma&apos;lumotni saqlash
-          </button>
-        ) : (
-          <StateConfigUI
-            state={typedData.state}
-            onStateChange={(state) => updateNodeData(nodeId, { state })}
-            availableTypes={availableStateTypes}
-            nodeId={nodeId}
-            hideToggle={stateOptional}
-            onRemove={
-              stateOptional
-                ? () => {
-                    setShowState(false);
-                    updateNodeData(nodeId, { state: undefined });
-                  }
-                : undefined
-            }
-          />
-        )
-      ) : null}
-    </div>
-  );
 }
 
 // ---------------------------------------------------------------------------
@@ -189,20 +50,16 @@ interface CallbackData {
   filter?: string;
   global?: boolean;
   context?: { value?: string };
-  state?: StateConfig;
 }
 
 function CallbackQueryTriggerConfig({
   nodeId,
   data,
-  stateOptional,
 }: {
   nodeId: string;
   data: Record<string, unknown>;
-  stateOptional?: boolean;
 }) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [showState, setShowState] = useState(Boolean((data as CallbackData).state));
   const nodes = useFlowStore((state) => state.nodes);
   const edges = useFlowStore((state) => state.edges);
 
@@ -259,14 +116,6 @@ function CallbackQueryTriggerConfig({
   const showCollectionSelector =
     availableCallbacks.some((item) => item.isCollection) &&
     typedData.filter === "collection";
-
-  const availableStateTypes = useMemo(
-    () =>
-      getStateTypesForCallbackQueryTrigger(
-        (typedData.context?.value || "").startsWith("collection:")
-      ),
-    [typedData.context?.value]
-  );
 
   return (
     <div className="space-y-4">
@@ -335,56 +184,6 @@ function CallbackQueryTriggerConfig({
           )}
         </div>
       ) : null}
-
-      <div className="flex items-center gap-2">
-        <Checkbox
-          id={`tcf-global-cb-${nodeId}`}
-          checked={Boolean(typedData.global)}
-          onCheckedChange={(checked) =>
-            updateNodeData(nodeId, { global: Boolean(checked) })
-          }
-        />
-        <Label
-          htmlFor={`tcf-global-cb-${nodeId}`}
-          className="cursor-pointer text-sm"
-        >
-          Global
-        </Label>
-      </div>
-
-      {stateOptional && !showState ? (
-        <button
-          type="button"
-          onClick={() => {
-            setShowState(true);
-            if (!typedData.state) {
-              updateNodeData(nodeId, {
-                state: { key: "", type: availableStateTypes[0] || "text" },
-              });
-            }
-          }}
-          className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-        >
-          <Plus className="h-3 w-3" />
-          Ma&apos;lumotni saqlash
-        </button>
-      ) : (
-        <StateConfigUI
-          state={typedData.state}
-          onStateChange={(state) => updateNodeData(nodeId, { state })}
-          availableTypes={availableStateTypes}
-          nodeId={nodeId}
-          hideToggle={stateOptional}
-          onRemove={
-            stateOptional
-              ? () => {
-                  setShowState(false);
-                  updateNodeData(nodeId, { state: undefined });
-                }
-              : undefined
-          }
-        />
-      )}
     </div>
   );
 }
@@ -403,20 +202,16 @@ interface ReplyData {
   selectedButtons?: Array<{ id: string; text: string }>;
   catchNoButton?: boolean;
   global?: boolean;
-  state?: StateConfig;
 }
 
 function ReplyButtonTriggerConfig({
   nodeId,
   data,
-  stateOptional,
 }: {
   nodeId: string;
   data: Record<string, unknown>;
-  stateOptional?: boolean;
 }) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const [showState, setShowState] = useState(Boolean((data as ReplyData).state));
   const nodes = useFlowStore((state) => state.nodes);
   const edges = useFlowStore((state) => state.edges);
 
@@ -506,51 +301,7 @@ function ReplyButtonTriggerConfig({
           />
           <span>Hech qanday tugma bosilmasa ham tutib ol</span>
         </Label>
-
-        <Label className="flex cursor-pointer items-center gap-2 text-sm">
-          <Checkbox
-            checked={Boolean(typedData.global)}
-            onCheckedChange={(checked) =>
-              updateNodeData(nodeId, { global: Boolean(checked) })
-            }
-          />
-          Global
-        </Label>
       </div>
-
-      {stateOptional && !showState ? (
-        <button
-          type="button"
-          onClick={() => {
-            setShowState(true);
-            if (!typedData.state) {
-              updateNodeData(nodeId, {
-                state: { key: "", type: getStateTypesForReplyButtonTrigger()[0] || "text" },
-              });
-            }
-          }}
-          className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-        >
-          <Plus className="h-3 w-3" />
-          Ma&apos;lumotni saqlash
-        </button>
-      ) : (
-        <StateConfigUI
-          state={typedData.state}
-          onStateChange={(state) => updateNodeData(nodeId, { state })}
-          availableTypes={getStateTypesForReplyButtonTrigger()}
-          nodeId={nodeId}
-          hideToggle={stateOptional}
-          onRemove={
-            stateOptional
-              ? () => {
-                  setShowState(false);
-                  updateNodeData(nodeId, { state: undefined });
-                }
-              : undefined
-          }
-        />
-      )}
     </div>
   );
 }
@@ -565,18 +316,16 @@ export function TriggerConfigField({
   field,
 }: TriggerConfigFieldProps) {
   return (
-    <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-3">
+    <>
       {field.label ? (
         <p className="mb-3 text-xs font-medium text-white/50">{field.label}</p>
       ) : null}
 
-      {field.kind === "message" ? (
-        <MessageTriggerConfig nodeId={nodeId} data={data} stateOptional={field.stateOptional} />
-      ) : field.kind === "callback" ? (
-        <CallbackQueryTriggerConfig nodeId={nodeId} data={data} stateOptional={field.stateOptional} />
+      {field.kind === "callback" ? (
+        <CallbackQueryTriggerConfig nodeId={nodeId} data={data} />
       ) : (
-        <ReplyButtonTriggerConfig nodeId={nodeId} data={data} stateOptional={field.stateOptional} />
+        <ReplyButtonTriggerConfig nodeId={nodeId} data={data} />
       )}
-    </div>
+    </>
   );
 }

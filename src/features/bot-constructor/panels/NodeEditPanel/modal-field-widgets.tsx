@@ -13,10 +13,6 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  StateConfigUI,
-  getStateTypesForCommandTrigger,
-} from "@/features/bot-constructor/nodes/shared";
 import { NodeFieldManifest } from "@/features/bot-constructor/manifest/types";
 import { renderCustomWidget } from "@/features/bot-constructor/fields/widgetRegistry";
 import { ArrayEditorField } from "@/features/bot-constructor/fields/generic-fields/ArrayEditorField";
@@ -26,7 +22,6 @@ import { CollectionSelectField } from "@/features/bot-constructor/fields/generic
 import { CredentialSelectField } from "@/features/bot-constructor/fields/generic-fields/CredentialSelectField";
 import { DynamicSelectField } from "@/features/bot-constructor/fields/generic-fields/DynamicSelectField";
 import { DynamicInputsField } from "@/features/bot-constructor/fields/generic-fields/DynamicInputsField";
-import { StateTypeSelectField } from "@/features/bot-constructor/fields/generic-fields/StateTypeSelectField";
 import { ConditionListField } from "@/features/bot-constructor/fields/generic-fields/ConditionListField";
 import { CronEditorField } from "@/features/bot-constructor/fields/generic-fields/CronEditorField";
 import { TriggerConfigField } from "@/features/bot-constructor/fields/generic-fields/TriggerConfigField";
@@ -137,29 +132,54 @@ function StringArrayField({ nodeId, data, field }: ModalFieldWidgetProps) {
   );
 }
 
-function StateConfigField({ nodeId, data, field }: ModalFieldWidgetProps) {
-  if (field.variant !== "commandTrigger") {
-    return null;
+/** Read a value from data by a possibly-dotted key ("context.value", "a.b.c"). */
+function getNestedValue(data: Record<string, unknown>, key: string): unknown {
+  if (!key.includes(".")) return data[key];
+  const parts = key.split(".");
+  let current: unknown = data;
+  for (const part of parts) {
+    if (current === null || current === undefined || typeof current !== "object") return undefined;
+    current = (current as Record<string, unknown>)[part];
   }
+  return current;
+}
 
-  return (
-    <FieldShell label="State sozlamasi">
-      <StateConfigUI
-        state={data.state as never}
-        nodeId={nodeId}
-        availableTypes={getStateTypesForCommandTrigger()}
-        onStateChange={(state) => {
-          useFlowStore.getState().updateNodeData(nodeId, { state });
-        }}
-      />
-    </FieldShell>
-  );
+/**
+ * Immutably set a value at a dotted path inside data and return a shallow-
+ * merge patch suitable for updateNodeData. Only the top-level key changes.
+ * E.g. key="context.value", value="hello" produces { context: { ...data.context, value: "hello" } }
+ */
+function buildNestedPatch(
+  data: Record<string, unknown>,
+  key: string,
+  value: unknown
+): Record<string, unknown> {
+  if (!key.includes(".")) return { [key]: value };
+  const parts = key.split(".");
+  const topKey = parts[0];
+  // Build from the inside out.
+  let patch: unknown = value;
+  for (let i = parts.length - 1; i >= 1; i--) {
+    const parentPath = parts.slice(0, i);
+    // Read current nested parent to preserve sibling keys.
+    let currentParent: Record<string, unknown> = {};
+    let cursor: unknown = data;
+    for (const p of parentPath) {
+      if (cursor === null || cursor === undefined || typeof cursor !== "object") { cursor = undefined; break; }
+      cursor = (cursor as Record<string, unknown>)[p];
+    }
+    if (cursor !== null && cursor !== undefined && typeof cursor === "object") {
+      currentParent = cursor as Record<string, unknown>;
+    }
+    patch = { ...currentParent, [parts[i]]: patch };
+  }
+  return { [topKey]: patch };
 }
 
 export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const fieldKey = field.key || "";
-  const value = data[fieldKey];
+  const value = getNestedValue(data, fieldKey);
 
   if (field.type === "description") {
     return (
@@ -226,16 +246,6 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
     );
   }
 
-  if (field.type === "state-type-select") {
-    return (
-      <StateTypeSelectField
-        nodeId={nodeId}
-        data={data}
-        field={field as Parameters<typeof StateTypeSelectField>[0]["field"]}
-      />
-    );
-  }
-
   if (field.type === "condition-list") {
     return (
       <ConditionListField
@@ -256,7 +266,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
     );
   }
 
-  if (field.type === "trigger-config" && field.kind) {
+  if (field.type === "trigger-config" && field.kind && field.kind !== "message") {
     return (
       <TriggerConfigField
         nodeId={nodeId}
@@ -371,10 +381,6 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
     );
   }
 
-  if (field.type === "stateConfig") {
-    return <StateConfigField nodeId={nodeId} data={data} field={field} />;
-  }
-
   if (field.type === "stringArray") {
     return <StringArrayField nodeId={nodeId} data={data} field={field} />;
   }
@@ -390,7 +396,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
               <button
                 key={option.value}
                 type="button"
-                onClick={() => updateNodeData(nodeId, { [fieldKey]: option.value })}
+                onClick={() => updateNodeData(nodeId, buildNestedPatch(data, fieldKey, option.value))}
                 className={cn(
                   "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
                   current === option.value
@@ -419,7 +425,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         <Select
           value={currentSelectValue}
           onValueChange={(nextValue) =>
-            updateNodeData(nodeId, { [fieldKey]: fromSelectValue(nextValue) })
+            updateNodeData(nodeId, buildNestedPatch(data, fieldKey, fromSelectValue(nextValue)))
           }
         >
           <SelectTrigger className="h-10 border-white/10 bg-zinc-950/60">
@@ -447,7 +453,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
           <Checkbox
             checked={Boolean(value)}
             onCheckedChange={(checked) =>
-              updateNodeData(nodeId, { [fieldKey]: checked === true })
+              updateNodeData(nodeId, buildNestedPatch(data, fieldKey, checked === true))
             }
           />
           {field.label}
@@ -465,7 +471,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         <div className="flex items-center gap-2">
           <Switch
             checked={Boolean(value)}
-            onCheckedChange={(checked) => updateNodeData(nodeId, { [fieldKey]: checked })}
+            onCheckedChange={(checked) => updateNodeData(nodeId, buildNestedPatch(data, fieldKey, checked))}
           />
           {field.label ? <Label className="cursor-pointer text-sm text-zinc-200">{field.label}</Label> : null}
         </div>
@@ -483,7 +489,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
           placeholder={field.placeholder}
           rows={field.rows}
           value={typeof value === "string" ? value : ""}
-          onChange={(event) => updateNodeData(nodeId, { [fieldKey]: event.target.value })}
+          onChange={(event) => updateNodeData(nodeId, buildNestedPatch(data, fieldKey, event.target.value))}
           className="min-h-28 border-white/10 bg-zinc-950/60"
         />
       </FieldShell>
@@ -518,13 +524,11 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         onChange={(event) => {
           if (field.type === "number") {
             const rawValue = event.target.value;
-            updateNodeData(nodeId, {
-              [fieldKey]: rawValue === "" ? undefined : Number(rawValue),
-            });
+            updateNodeData(nodeId, buildNestedPatch(data, fieldKey, rawValue === "" ? undefined : Number(rawValue)));
             return;
           }
 
-          updateNodeData(nodeId, { [fieldKey]: event.target.value });
+          updateNodeData(nodeId, buildNestedPatch(data, fieldKey, event.target.value));
         }}
         className="h-10 border-white/10 bg-zinc-950/60"
       />

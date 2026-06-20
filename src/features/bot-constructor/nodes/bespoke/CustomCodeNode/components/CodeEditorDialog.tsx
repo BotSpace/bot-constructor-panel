@@ -178,15 +178,6 @@ export const CodeEditorDialog = ({ code, onChange, globals }: Props) => {
           </div>
         )}
 
-        {/* Variable access help */}
-        <div className="rounded-md border border-blue-500/20 bg-blue-500/5 px-2.5 py-1.5 text-[10px] text-blue-400 leading-relaxed">
-          <span className="font-semibold">O&apos;qish:</span>{" "}
-          <code className="font-mono">context.var_name</code> · <code className="font-mono">state.var_name</code>
-          <span className="mx-1 text-blue-500/50">|</span>
-          <span className="font-semibold">Yozish:</span>{" "}
-          <code className="font-mono">set_context(&quot;key&quot;, val)</code> · <code className="font-mono">set_state(&quot;name&quot;, val)</code>
-        </div>
-
         <div className="border border-border rounded-md overflow-hidden">
           <CodeMirror
             value={code}
@@ -207,11 +198,6 @@ export const CodeEditorDialog = ({ code, onChange, globals }: Props) => {
             }}
           />
         </div>
-
-        <p className="flex items-center gap-1 text-xs text-muted-foreground italic">
-          <AlertCircle className="w-3 h-3" />
-          Kod faqat serverda ishga tushadi.
-        </p>
       </div>
     );
   }
@@ -241,19 +227,6 @@ export const CodeEditorDialog = ({ code, onChange, globals }: Props) => {
                 {g}
               </span>
             ))}
-          </div>
-          {/* Variable access help banner */}
-          <div className="mt-2 rounded-md border border-blue-500/20 bg-blue-500/8 px-3 py-2 text-[11px] text-blue-300 leading-relaxed">
-            <span className="font-semibold text-blue-200">O&apos;qish (tavsiya):</span>{" "}
-            <code className="font-mono text-emerald-300">context.var_name</code>
-            <span className="mx-1.5 text-slate-600">·</span>
-            <code className="font-mono text-emerald-300">state.var_name</code>
-            <span className="mx-2 text-slate-600">|</span>
-            <span className="font-semibold text-blue-200">Yozish:</span>{" "}
-            <code className="font-mono text-yellow-300">set_context(&quot;key&quot;, val)</code>
-            <span className="mx-1.5 text-slate-600">·</span>
-            <code className="font-mono text-yellow-300">set_state(&quot;name&quot;, val)</code>
-            <span className="ml-2 text-[10px] text-slate-500">(get_context/get_state ham ishlaydi)</span>
           </div>
         </DialogHeader>
 
@@ -311,10 +284,6 @@ export const CodeEditorDialog = ({ code, onChange, globals }: Props) => {
         </div>
 
         <div className="flex justify-between items-center mt-4 text-xs text-muted-foreground">
-          <p className="flex items-center gap-1 italic">
-            <AlertCircle className="w-3 h-3" />
-            Eslatma: Kod faqat serverda ishga tushadi.
-          </p>
           <DialogTrigger asChild>
             <Button className="bg-yellow-600 hover:bg-yellow-700 text-white px-8">
               Saqlash

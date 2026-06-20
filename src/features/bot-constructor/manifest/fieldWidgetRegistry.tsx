@@ -14,10 +14,6 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import {
-  StateConfigUI,
-  getStateTypesForCommandTrigger,
-} from "@/features/bot-constructor/nodes/shared";
 import { cn } from "@/lib/utils";
 import { Plus, X } from "lucide-react";
 import { memo } from "react";
@@ -103,23 +99,6 @@ function StringArrayField({ nodeId, data, field }: FieldWidgetProps) {
   );
 }
 
-function StateConfigField({ nodeId, data, field }: FieldWidgetProps) {
-  if (field.variant !== "commandTrigger") {
-    return null;
-  }
-
-  return (
-    <StateConfigUI
-      state={data.state as never}
-      nodeId={nodeId}
-      availableTypes={getStateTypesForCommandTrigger()}
-      onStateChange={(state) => {
-        useFlowStore.getState().updateNodeData(nodeId, { state });
-      }}
-    />
-  );
-}
-
 // Field types that are only meaningful in the side panel — never rendered on
 // the compact canvas node body.
 const PANEL_ONLY_FIELD_TYPES = new Set([
@@ -133,7 +112,6 @@ const PANEL_ONLY_FIELD_TYPES = new Set([
   "trigger-config",
   "dynamic-params",
   "array-editor",
-  "state-type-select",
   "collection-binding",
   "credential",
   "dynamic_select",
@@ -178,10 +156,6 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
   if (field.type === "mediaMessage") {
     const kind = field.mediaKind || "photo";
     return <MediaMessageField nodeId={nodeId} data={data} kind={kind} />;
-  }
-
-  if (field.type === "stateConfig") {
-    return <StateConfigField nodeId={nodeId} data={data} field={field} />;
   }
 
   if (field.type === "stringArray") {

@@ -8,9 +8,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Database, Key, Type, X } from "lucide-react";
 import { StateConfig, StateType } from "@/features/bot-constructor/nodes/shared/state-config-types";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface StateConfigComponentProps {
   state?: StateConfig;
@@ -166,12 +166,7 @@ const StateConfigComponent = ({
 
   return (
     <div className="space-y-3 pt-2 border-t border-border">
-      <div className="flex items-center gap-2">
-        <Checkbox
-          id={`state-enabled-${nodeId}`}
-          checked={enabled}
-          onCheckedChange={handleEnabledChange}
-        />
+      <div className="flex items-center justify-between gap-2">
         <Label
           htmlFor={`state-enabled-${nodeId}`}
           className="text-sm font-medium cursor-pointer flex items-center gap-1.5"
@@ -179,6 +174,11 @@ const StateConfigComponent = ({
           <Database className="h-3.5 w-3.5 text-purple-400" />
           Ma'lumotni saqlash
         </Label>
+        <Switch
+          id={`state-enabled-${nodeId}`}
+          checked={enabled}
+          onCheckedChange={handleEnabledChange}
+        />
       </div>
 
       {enabled && fields}
