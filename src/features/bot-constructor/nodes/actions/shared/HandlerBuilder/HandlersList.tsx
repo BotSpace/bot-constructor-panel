@@ -5,8 +5,8 @@ import { Position } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 import { Button } from "@/components/ui/button";
-import { KeyboardConfig } from "@/features/bot-constructor/components";
-import { PillHandle } from "@/features/bot-constructor/nodes/components/shared/ReactFlowHandles/PillHandle";
+import { KeyboardConfig } from "@/features/bot-constructor/panels";
+import { PillHandle } from "@/features/bot-constructor/canvas/handles/PillHandle";
 import { getNodeKeyboard } from "@/features/bot-constructor/utils/keyboard-compat";
 
 interface HandlersListProps {

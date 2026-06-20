@@ -3,7 +3,7 @@
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
+import { getNodeManifestByType } from "@/features/bot-constructor/manifest/manifestStore";
 import { useDebugContextStore } from "@/components/layout/components/debug-console/debug-context-store";
 import { useDebugErrorsStore } from "@/features/bot-constructor/store/debug-errors";
 import { getSession, useSession } from "@/lib/session-client";

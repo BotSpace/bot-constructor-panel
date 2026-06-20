@@ -1,4 +1,4 @@
-import { getRuntimeNodeRegistry, runtimeNodeComponents } from "@/features/bot-constructor/nodes/registry";
+import { getRuntimeNodeRegistry, runtimeNodeComponents } from "@/features/bot-constructor/manifest";
 import { ComponentType } from "react";
 import { NodeProps } from "reactflow";
 

@@ -1,5 +1,5 @@
 import { Edge, Node } from "reactflow";
-import { runtimeNodeRegistry } from "@/features/bot-constructor/nodes/registry/manifestStore";
+import { runtimeNodeRegistry } from "@/features/bot-constructor/manifest/manifestStore";
 
 const ACTION_NODE_TYPES = new Set(
   runtimeNodeRegistry

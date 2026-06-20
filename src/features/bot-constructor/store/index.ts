@@ -8,8 +8,8 @@ import { createHistorySlice } from "@/features/bot-constructor/store/historySlic
 import { createCollabSlice } from "@/features/bot-constructor/store/collabSlice";
 import { createActions } from "@/features/bot-constructor/store/actions";
 import { Connection, addEdge } from "reactflow";
-import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
-import { KeyboardConfig } from "@/features/bot-constructor/components";
+import { getNodeManifestByType } from "@/features/bot-constructor/manifest/manifestStore";
+import { KeyboardConfig } from "@/features/bot-constructor/panels";
 import { DynamicMessage, ParseMode } from "@/features/bot-constructor/types/shared-ui-types";
 
 // EditMessage node uchun ma'lumotlarni nusxalash uchun interface

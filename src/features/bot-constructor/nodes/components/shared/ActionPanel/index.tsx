@@ -14,7 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import ActionNodeSettings from "@/features/bot-constructor/nodes/actions/shared/ActionNodeSettings"
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { ParseMode } from "@/features/bot-constructor/types/shared-ui-types";
-import { ButtonGenerator, KeyboardConfig } from "@/features/bot-constructor/components";
+import { ButtonGenerator, KeyboardConfig } from "@/features/bot-constructor/panels";
 import { RecipientsManager } from "@/features/bot-constructor/nodes/actions/shared/RecipientSelector";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
 import {
