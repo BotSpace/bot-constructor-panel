@@ -10,7 +10,7 @@ import {
 import { NodeManifest, NodeFieldManifest } from "@/features/bot-constructor/manifest/types";
 import { ModalFieldWidget } from "@/features/bot-constructor/panels/NodeEditPanel/modal-field-widgets";
 import { ModalActionPanel } from "@/features/bot-constructor/panels/NodeEditPanel/modal-footer-widgets";
-import { NodePanelProvider } from "@/features/bot-constructor/contexts/NodePanelContext";
+import { NodePanelProvider } from "@/features/bot-constructor/hooks/NodePanelContext";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useTranslations } from "next-intl";
 import { ChevronDown, Trash2 } from "lucide-react";

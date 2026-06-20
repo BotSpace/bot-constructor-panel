@@ -16,7 +16,7 @@ import { Plus } from "lucide-react";
 import { ButtonGenerator } from "@/features/bot-constructor/panels";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
+import { MessageTriggerValueTypes } from "@/features/bot-constructor/lib/messages";
 import { KeyboardConfig } from "@/features/bot-constructor/panels/ButtonGenerator/types";
 import { Input } from "@/components/ui/input";
 import { varibulNameValidator } from "@/lib/input-validators";

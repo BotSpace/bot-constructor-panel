@@ -1,4 +1,4 @@
-import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
+import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { ReactNode, useMemo } from "react";
 import { Position } from "reactflow";

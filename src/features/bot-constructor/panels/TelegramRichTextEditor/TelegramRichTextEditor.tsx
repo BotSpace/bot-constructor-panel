@@ -4,7 +4,7 @@ import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import { useCallback, useRef } from "react";
-import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
+import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 import {
     Bold,
     Italic,

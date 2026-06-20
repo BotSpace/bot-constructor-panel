@@ -19,7 +19,7 @@ import { LoginUrlForm } from "@/features/bot-constructor/panels/ButtonGenerator/
 import { CollectionButtonForm } from "@/features/bot-constructor/panels/ButtonGenerator/components/CollectionButtonForm";
 import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
+import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 import { Separator } from "@/components/ui/separator";
 
 interface InlineFormProps {

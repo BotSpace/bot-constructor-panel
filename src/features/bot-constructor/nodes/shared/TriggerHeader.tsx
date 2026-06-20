@@ -1,8 +1,8 @@
 import React, { useMemo, ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
-import { ConstructorData } from "@/features/bot-constructor/data";
+import { ConstructorData } from "@/features/bot-constructor/lib";
 import { cn } from "@/lib/utils";
-import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
+import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 
 interface TriggerHeaderProps {
   /** Trigger icon (React component or emoji string) */

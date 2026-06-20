@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { useElements } from "@/features/bot-constructor/data/useElements";
+import { useElements } from "@/features/bot-constructor/hooks/useElements";
 import { ElementItemType, ElementTypes } from "@/types/element-types";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";

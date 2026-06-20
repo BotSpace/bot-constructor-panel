@@ -13,8 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ConstructorData } from "@/features/bot-constructor/data";
-import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
+import { ConstructorData } from "@/features/bot-constructor/lib";
+import { MessageTriggerValueTypes } from "@/features/bot-constructor/lib/messages";
 import { ButtonGenerator } from "@/features/bot-constructor/panels/ButtonGenerator/ButtonGenerator";
 import { Combobox } from "@/components/ui/combobox";
 import { FilterBuilder } from "@/features/bot-constructor/nodes/shared/filter/filter";
@@ -40,7 +40,7 @@ import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { CodeEditorDialog } from "@/features/bot-constructor/nodes/bespoke/CustomCodeNode/components/CodeEditorDialog";
 import AddItemModal from "@/features/bot-constructor/nodes/bespoke/FormNode/components/add-item-modal";
 import { FormItem } from "@/features/bot-constructor/nodes/bespoke/FormNode/components/form-item";
-import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
+import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
 import { NodeFieldManifest } from "@/features/bot-constructor/manifest/types";
 import {

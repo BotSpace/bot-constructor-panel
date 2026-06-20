@@ -1,4 +1,4 @@
-import { ConstructorData } from "@/features/bot-constructor/data";
+import { ConstructorData } from "@/features/bot-constructor/lib";
 
 /**
  * Berilgan xabar turiga mos keladigan filtrlar ro'yxatini qaytaradi.

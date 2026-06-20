@@ -10,7 +10,7 @@ import { createActions } from "@/features/bot-constructor/store/actions";
 import { Connection, addEdge } from "reactflow";
 import { getNodeManifestByType } from "@/features/bot-constructor/manifest/manifestStore";
 import { KeyboardConfig } from "@/features/bot-constructor/panels";
-import { DynamicMessage, ParseMode } from "@/features/bot-constructor/types/shared-ui-types";
+import { DynamicMessage, ParseMode } from "@/features/bot-constructor/lib/shared-ui-types";
 
 // EditMessage node uchun ma'lumotlarni nusxalash uchun interface
 interface EditMessageDataUpdate {

@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
+import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 
 // ---------------------------------------------------------------------------
 // Category badge helpers — maps manifest `category` to a short label + style.
