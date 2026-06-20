@@ -32,7 +32,7 @@ import { Loader2, Shield, Pencil, Trash2, Plus, FlaskConical } from "lucide-reac
 import toast from "react-hot-toast";
 import { useCredentialStore, useCredentialTypesStore } from "@/features/credentials/store";
 import { CredentialListItem } from "@/types/http/credential";
-import { CredentialFormModal } from "./CredentialFormModal";
+import { CredentialFormModal } from "@/features/credentials/components/CredentialFormModal";
 import { cn } from "@/lib/utils";
 
 interface CredentialManageDialogProps {

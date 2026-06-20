@@ -14,7 +14,7 @@
 
 import { instanceAuth } from "@/services/instance";
 import { WS_URL } from "@/wss/ws-hub";
-import { decodeOp, encodeOp, type CollabOp } from "./ops";
+import { decodeOp, encodeOp, type CollabOp } from "@/wss/collab/ops";
 
 const WATCHDOG_INTERVAL_MS = 500;
 const IDLE_PING_AFTER_MS = 25_000;

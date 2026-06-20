@@ -1,4 +1,4 @@
-import { APIDetailCreateResponse } from "./response";
+import { APIDetailCreateResponse } from "@/types/http/response";
 
 export type FileType = "file" | "photo" | "video" | "audio";
 

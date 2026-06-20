@@ -1,1 +1,1 @@
-export { useCredentialStore, useCredentialTypesStore } from "./credential-store";
+export { useCredentialStore, useCredentialTypesStore } from "@/features/credentials/store/credential-store";

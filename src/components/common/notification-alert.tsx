@@ -5,7 +5,7 @@ import { Bell, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useNotificationContext } from "./notification-provider";
+import { useNotificationContext } from "@/components/common/notification-provider";
 
 interface NotificationAlertProps {
   onAllow?: () => void;

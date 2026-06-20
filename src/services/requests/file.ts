@@ -1,4 +1,4 @@
-import { instanceAuth } from "../instance";
+import { instanceAuth } from "@/services/instance";
 import {
   CreateFileResponse,
   CreateFileRequest,

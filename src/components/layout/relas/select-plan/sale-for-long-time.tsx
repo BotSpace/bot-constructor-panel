@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Flame, TrendingDown, Zap } from "lucide-react";
-import { type BillingPeriodKey, BILLING_PERIODS } from "./types";
+import { type BillingPeriodKey, BILLING_PERIODS } from "@/components/layout/relas/select-plan/types";
 
 type Props = {
     value: BillingPeriodKey;

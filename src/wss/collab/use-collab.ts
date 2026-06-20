@@ -8,7 +8,7 @@
 
 import { useEffect } from "react";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { CollabClient } from "./collab-client";
+import { CollabClient } from "@/wss/collab/collab-client";
 
 export function useCollab(projectId: string | null | undefined) {
   useEffect(() => {

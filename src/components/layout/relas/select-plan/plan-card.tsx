@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/format-currency";
 import { Check, Loader2, Star } from "lucide-react";
-import { type BillingPeriod, type Plan } from "./types";
+import { type BillingPeriod, type Plan } from "@/components/layout/relas/select-plan/types";
 
 type PlanCardProps = {
     plan: Plan;

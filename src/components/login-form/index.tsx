@@ -1,6 +1,6 @@
 'use client'
 
-import TelegramAuth from "./telegram-auth-widget";
+import TelegramAuth from "@/components/login-form/telegram-auth-widget";
 import { cn } from "@/lib/utils";
 
 /**

@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
-import env from "./env";
+import env from "@/lib/env";
 
 export type SessionUser = {
   id: string | number;

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
-import { AddEditEnvDialog } from "../add-env";
+import { AddEditEnvDialog } from "@/components/layout/add-env";
 import {
   Bot,
   ChevronRight,
@@ -35,7 +35,7 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { useLinkToParent } from "@/components/common/link-to-parrent";
 import Link from "next/link";
 import StatusBadge from "@/components/common/status-badge";
-import SelectPlan from "./select-plan/select-plan";
+import SelectPlan from "@/components/layout/relas/select-plan/select-plan";
 import {
   RunningBotLimitModal,
   RunningBotLimitError,
