@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ConstructorData } from "@/features/bot-constructor/data";
-import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { KeyboardConfig } from "@/features/bot-constructor/panels/ButtonGenerator/types";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
 
 interface FormItem {

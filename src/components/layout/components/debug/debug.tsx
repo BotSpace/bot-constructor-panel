@@ -23,8 +23,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import BottomButtonGroup from "@/features/bot-constructor/components/bottom-panel/components/button-group";
-import { BottomPanelButton } from "@/features/bot-constructor/components/bottom-panel/components/button";
+import BottomButtonGroup from "@/features/bot-constructor/panels/bottom-panel/components/button-group";
+import { BottomPanelButton } from "@/features/bot-constructor/panels/bottom-panel/components/button";
 import { PlayIcon } from "@/components/icons/play";
 import CountdownComponent from "@/components/common/count-down/count-down";
 import {

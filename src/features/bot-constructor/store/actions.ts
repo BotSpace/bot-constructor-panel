@@ -7,7 +7,7 @@ import { instanceAuth } from "@/services/instance";
 import { compressFlow } from "@/lib/flow-compress";
 import { getFormatFlow } from "@/features/bot-constructor/lib/format-flow";
 import { generateId } from "@/lib/utils";
-import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry";
+import { getNodeManifestByType } from "@/features/bot-constructor/manifest";
 
 interface DownloadFileNodeData {
   messageType?: string;

@@ -1,6 +1,6 @@
 import dagre from "dagre";
 import { Node, Edge, Position } from "reactflow";
-import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
+import { getNodeManifestByType } from "@/features/bot-constructor/manifest/manifestStore";
 
 type Direction = "TB" | "LR";
 

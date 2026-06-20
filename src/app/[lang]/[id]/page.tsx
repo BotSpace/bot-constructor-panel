@@ -10,16 +10,16 @@ import { useCollectionStore } from "@/features/collections/store/collection-list
 import { ReactFlowProvider } from "reactflow";
 import SearchPanel from "@/features/bot-constructor/search/search-panel";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import BottomPanel from "@/features/bot-constructor/components/bottom-panel";
+import BottomPanel from "@/features/bot-constructor/panels/bottom-panel";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Key } from "lucide-react";
 import { useLinkToParent } from "@/components/common/link-to-parrent";
 import { ReleasePanel } from "@/components/layout/components/relas/relas";
-import { EnvManageDialog } from "@/features/bot-constructor/components/EnvManageDialog/EnvManageDialog";
+import { EnvManageDialog } from "@/features/bot-constructor/panels/EnvManageDialog/EnvManageDialog";
 import DebugingButtons from "@/components/layout/components/debug/debug";
-import { SaveStatusBadge } from "@/features/bot-constructor/components/save-status-badge";
+import { SaveStatusBadge } from "@/features/bot-constructor/panels/save-status-badge";
 import { Separator } from "@/components/ui/separator";
-import { NodeEditDialog } from "@/features/bot-constructor/components/NodeEditPanel";
+import { NodeEditDialog } from "@/features/bot-constructor/panels/NodeEditPanel";
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 

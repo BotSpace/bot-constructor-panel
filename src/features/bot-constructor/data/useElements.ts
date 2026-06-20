@@ -2,9 +2,9 @@ import { useTranslations } from "next-intl";
 import { ElementItemType, ElementTypes } from "@/types/element-types";
 import { useQuery } from "@tanstack/react-query";
 import { getActiveSubFlows, getPluginCategories } from "@/services/requests/plugin";
-import { getRuntimeNodeRegistry } from "@/features/bot-constructor/nodes/registry";
-import { SIDEBAR_COLOR_CLASS_REGISTRY } from "@/features/bot-constructor/nodes/registry/colorRegistry";
-import { resolveNodeIcon } from "@/features/bot-constructor/nodes/registry/iconRegistry";
+import { getRuntimeNodeRegistry } from "@/features/bot-constructor/manifest";
+import { SIDEBAR_COLOR_CLASS_REGISTRY } from "@/features/bot-constructor/manifest/colorRegistry";
+import { resolveNodeIcon } from "@/features/bot-constructor/manifest/iconRegistry";
 
 const SIDEBAR_GROUP_META = {
   triggers: {
