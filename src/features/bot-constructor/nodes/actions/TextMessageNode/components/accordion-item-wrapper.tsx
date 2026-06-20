@@ -4,12 +4,11 @@ import { FilterBuilder } from "../../shared/filter/filter";
 import { useReactQueryAction } from "@/services/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { SendTextMessageNodeData } from "@/features/bot-constructor/nodes/types";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
-import { DynamicMessage } from "@/features/bot-constructor/nodes/types";
+import { DynamicMessage } from "@/features/bot-constructor/types/shared-ui-types";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 
 type Props = {
@@ -21,7 +20,7 @@ type Props = {
 function AccordionItemWrapper({ collection, id, dynamicMessages }: Props) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   // Ma'lumotlarni global store'da yangilash uchun markaziy funksiya
-  const handleUpdate = (update: Partial<SendTextMessageNodeData>) => {
+  const handleUpdate = (update: Record<string, unknown>) => {
     updateNodeData(id, update);
   };
 

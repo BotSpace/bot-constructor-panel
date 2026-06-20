@@ -2,13 +2,28 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GripVertical, Trash2, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { FormNodeData } from "@/features/bot-constructor/nodes/types";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ConstructorData } from "@/features/bot-constructor/data";
+import { KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
+
+interface FormItem {
+  question: string;
+  order: number;
+  type: MessageTriggerValueTypes;
+  filter: string;
+  key: string;
+  context: {
+    value?: string;
+    radius?: { lat?: string; lng?: string; km?: string };
+    size?: { min?: string; max?: string };
+  };
+  keyboard?: KeyboardConfig;
+}
 
 interface FormItemProps {
-  item: FormNodeData["items"][0];
+  item: FormItem;
   index: number;
   onRemove: () => void;
   onEdit?: () => void;

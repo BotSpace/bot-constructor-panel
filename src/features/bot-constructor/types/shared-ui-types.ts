@@ -22,5 +22,3 @@ export interface RecipientConfig {
 }
 
 export type RecipientType = "sender" | "custom_id";
-
-

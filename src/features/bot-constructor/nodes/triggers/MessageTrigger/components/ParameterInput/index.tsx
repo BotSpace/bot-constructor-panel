@@ -1,12 +1,17 @@
-import { MessageTriggerNodeData } from "@/features/bot-constructor/nodes/types";
 import { ValueInput } from "./ValueInput";
 import { RadiusInput } from "./RadiusInput";
 import { SizeInput } from "./SizeInput"; // <-- YANGI IMPORT
 
+interface TriggerContext {
+  value?: string;
+  radius?: { lat?: string; lng?: string; km?: string };
+  size?: { min?: string; max?: string };
+}
+
 interface ParameterInputProps {
     filter?: string;
-    context: MessageTriggerNodeData["context"];
-    onContextUpdate: (newContext: MessageTriggerNodeData["context"]) => void;
+    context: TriggerContext | undefined;
+    onContextUpdate: (newContext: TriggerContext) => void;
 }
 
 export const ParameterInput = ({

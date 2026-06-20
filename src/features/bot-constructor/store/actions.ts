@@ -5,18 +5,6 @@ import { FlowStoreState, Actions } from "./types";
 import { ElementItemType } from "@/types/element-types";
 import { instanceAuth } from "@/services/instance";
 import { compressFlow } from "@/lib/flow-compress";
-import {
-  CallbackAnswerNodeData,
-  CustomCodeNodeData,
-  EditMessageNodeData,
-  FormNodeData,
-  SendAudioNodeData,
-  SendFileNodeData,
-  SendPhotoNodeData,
-  SendTextMessageNodeData,
-  StateNodeData,
-  SubFlowNodeData,
-} from "../nodes/types";
 import { getFormatFlow } from "../lib/format-flow";
 import { generateId } from "@/lib/utils";
 import { getNodeManifestByType } from "../nodes/registry";
@@ -61,31 +49,31 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         parseMode: "HTML",
         disableNotification: false,
         protectContent: false,
-      } as SendTextMessageNodeData;
+      };
     case "SendPhotoNode":
       return {
         ...baseMessageData,
         photoSourceType: "url",
         caption: "",
-      } as SendPhotoNodeData;
+      };
     case "SendVideoNode":
       return {
         ...baseMessageData,
         videoSourceType: "url",
         caption: "",
-      } as SendPhotoNodeData;
+      };
     case "SendAudioNode":
       return {
         ...baseMessageData,
         audioSourceType: "url",
         caption: "",
-      } as SendAudioNodeData;
+      };
     case "SendFileNode":
       return {
         ...baseMessageData,
         fileSourceType: "url",
         caption: "",
-      } as SendFileNodeData;
+      };
     case "EditMessageNode":
       return {
         ...baseMessageData,
@@ -94,7 +82,7 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         newText: "",
         parseMode: "HTML",
         newCaption: "",
-      } as EditMessageNodeData;
+      };
     case "DeleteMessageNode":
       return {
         deleteFromContext: false,
@@ -110,14 +98,14 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         jsCode: "// Your code here",
         label: "custom_code_node",
         language: "javascript",
-      } as CustomCodeNodeData; // Custom code uchun alohida sozlamalar
+      }; // Custom code uchun alohida sozlamalar
     case "CallbackQueryAnswerNode":
       return {
         ...baseMessageData,
-      } as CallbackAnswerNodeData;
+      };
 
     case "FormNode":
-      return { items: [] } as FormNodeData;
+      return { items: [] };
 
     case "SubFlowNode":
       return {
@@ -127,7 +115,7 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         params: {},
         paramsSchema: {},
         outputs: [],
-      } as SubFlowNodeData;
+      };
 
     // Custom Nodes
     case "StateNode":
@@ -135,7 +123,7 @@ const getDefaultNodeData = (nodeType: ElementItemType["triggerId"]) => {
         key: "state_key",
         type: "user_id",
         node_type: nodeType,
-      } as StateNodeData;
+      };
 
     default:
       return {};

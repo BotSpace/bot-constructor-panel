@@ -5,14 +5,32 @@
  */
 
 import { Node, Edge } from "reactflow";
-import {
-  CallbackQueryTriggerData,
-  CommandTriggerNodeData,
-  MessageTriggerNodeData,
-  ReplyButtonTriggerData,
-  StateNodeData,
-} from "../nodes/types";
 import { getNodeManifestByType } from "../nodes/registry/manifestStore";
+
+interface RadiusContext {
+  lat?: string;
+  lng?: string;
+  km?: string;
+}
+
+interface SizeContext {
+  min?: string;
+  max?: string;
+}
+
+interface StateConfig {
+  key: string;
+  [key: string]: unknown;
+}
+
+interface TriggerNodeWithStateBase {
+  state?: StateConfig;
+}
+
+interface StateNodeDataLocal {
+  key: string;
+  [key: string]: unknown;
+}
 
 /**
  * Collect state keys produced by manifest fields flagged `is_state: true`.
@@ -48,11 +66,7 @@ function getManifestStateKeys(node: Node): string[] {
   return keys;
 }
 
-type TriggerNodeWithState =
-  | MessageTriggerNodeData
-  | CallbackQueryTriggerData
-  | CommandTriggerNodeData
-  | ReplyButtonTriggerData;
+type TriggerNodeWithState = TriggerNodeWithStateBase;
 
 /**
  * Type for trigger node with required state
@@ -149,8 +163,8 @@ export function getAvailableStateKeys(
     if (!ancestorIds.has(node.id)) return;
 
     if (node.type === "StateNode") {
-      const nodeData = node.data as StateNodeData;
-      if (nodeData.key && nodeData.key.trim() !== "") {
+      const nodeData = node.data as StateNodeDataLocal;
+      if (nodeData.key && typeof nodeData.key === "string" && nodeData.key.trim() !== "") {
         stateKeys.add(nodeData.key);
       }
     } else if (isTriggerTypeWithState(node.type)) {
