@@ -21,33 +21,64 @@
 
 /* ── N8n-style node appearance ─────────────────────────────────────────── */
 
-/* Subtle shadow on all node cards (override Tailwind shadow-lg) */
+/* Subtle shadow on all node cards (override Tailwind shadow-lg).
+   .acc-node-wrapper is the transparent bounding box for accessory (circle) nodes —
+   it must stay shadow-free; the shadow lives on .acc-node-circle instead. */
 .react-flow__node > * {
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.06) !important;
   transition: box-shadow 0.15s ease !important;
 }
+.react-flow__node > .acc-node-wrapper {
+  box-shadow: none !important;
+}
 .dark .react-flow__node > * {
   box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
 }
+.dark .react-flow__node > .acc-node-wrapper {
+  box-shadow: none !important;
+}
 
-/* Selected node — n8n blue ring */
-.react-flow__node.selected > * {
+/* Selected node — n8n blue ring (regular card nodes only) */
+.react-flow__node.selected > *:not(.acc-node-wrapper) {
   box-shadow: 0 0 0 2px #0da2e7 !important;
 }
 
-/* ── Debug execution status (overrides base + selected; placed after them) ── */
-.react-flow__node > [data-debug-status="waiting"] {
+/* ── Accessory (circle) node — selected ring on the inner circle ── */
+/* [data-accessory-selected] is set on .acc-node-wrapper; ring goes on .acc-node-circle */
+.acc-node-wrapper[data-accessory-selected] .acc-node-circle {
+  box-shadow: 0 0 0 3px #0da2e7, 0 0 10px 0 rgba(13, 162, 231, 0.4) !important;
+}
+
+/* ── Accessory node status rings — applied to .acc-node-circle ── */
+/* [data-debug-status] lives on .acc-node-wrapper; ring is drawn on .acc-node-circle */
+.acc-node-wrapper[data-debug-status="waiting"] .acc-node-circle {
+  box-shadow: 0 0 0 3px #f59e0b, 0 0 14px 0 rgba(245, 158, 11, 0.4) !important;
+  animation: acc-status-wait 1.4s linear infinite !important;
+}
+.acc-node-wrapper[data-debug-status="running"] .acc-node-circle {
+  box-shadow: 0 0 0 3px #3b82f6, 0 0 16px 0 rgba(59, 130, 246, 0.5) !important;
+  animation: acc-status-running 0.7s ease-in-out infinite !important;
+}
+.acc-node-wrapper[data-debug-status="success"] .acc-node-circle {
+  box-shadow: 0 0 0 3px #10b981, 0 0 12px 0 rgba(16, 185, 129, 0.4) !important;
+}
+.acc-node-wrapper[data-debug-status="error"] .acc-node-circle {
+  box-shadow: 0 0 0 3px #ef4444, 0 0 12px 0 rgba(239, 68, 68, 0.45) !important;
+}
+
+/* ── Debug execution status — regular card nodes ── */
+.react-flow__node > [data-debug-status="waiting"]:not(.acc-node-wrapper) {
   box-shadow: 0 0 0 3px #f59e0b, 0 0 14px 0 rgba(245, 158, 11, 0.4) !important;
   animation: debug-status-wait 1.4s linear infinite !important;
 }
-.react-flow__node > [data-debug-status="running"] {
+.react-flow__node > [data-debug-status="running"]:not(.acc-node-wrapper) {
   box-shadow: 0 0 0 3px #3b82f6, 0 0 16px 0 rgba(59, 130, 246, 0.5) !important;
   animation: debug-status-running 0.7s ease-in-out infinite !important;
 }
-.react-flow__node > [data-debug-status="success"] {
+.react-flow__node > [data-debug-status="success"]:not(.acc-node-wrapper) {
   box-shadow: 0 0 0 3px #10b981, 0 0 12px 0 rgba(16, 185, 129, 0.4) !important;
 }
-.react-flow__node > [data-debug-status="error"] {
+.react-flow__node > [data-debug-status="error"]:not(.acc-node-wrapper) {
   box-shadow: 0 0 0 3px #ef4444, 0 0 12px 0 rgba(239, 68, 68, 0.45) !important;
 }
 
@@ -64,6 +95,26 @@
 
 /* Waiting: a slow "breathing" glow distinct from the faster running pulse. */
 @keyframes debug-status-wait {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px #f59e0b, 0 0 8px 0 rgba(245, 158, 11, 0.25) !important;
+  }
+  50% {
+    box-shadow: 0 0 0 4px #fbbf24, 0 0 18px 2px rgba(245, 158, 11, 0.6) !important;
+  }
+}
+
+/* Accessory circle node animation keyframes */
+@keyframes acc-status-running {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px #3b82f6, 0 0 8px 0 rgba(59, 130, 246, 0.3) !important;
+  }
+  50% {
+    box-shadow: 0 0 0 4px #60a5fa, 0 0 20px 4px rgba(59, 130, 246, 0.65) !important;
+  }
+}
+@keyframes acc-status-wait {
   0%,
   100% {
     box-shadow: 0 0 0 2px #f59e0b, 0 0 8px 0 rgba(245, 158, 11, 0.25) !important;
