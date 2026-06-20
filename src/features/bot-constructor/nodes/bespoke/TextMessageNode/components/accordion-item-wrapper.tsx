@@ -8,8 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
-import { DynamicMessage } from "@/features/bot-constructor/types/shared-ui-types";
-import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
+import { DynamicMessage } from "@/features/bot-constructor/lib/shared-ui-types";
+import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 
 type Props = {
   collection: CollectionListItem;

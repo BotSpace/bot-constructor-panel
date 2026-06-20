@@ -5,7 +5,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { ConstructorData } from "@/features/bot-constructor/data";
+import { ConstructorData } from "@/features/bot-constructor/lib";
 
 interface TypeSelectorProps {
     value: string;

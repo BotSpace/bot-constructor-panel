@@ -3,11 +3,11 @@
 import React, { useCallback, useMemo } from "react";
 import { Position } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
+import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 import { Button } from "@/components/ui/button";
 import { KeyboardConfig } from "@/features/bot-constructor/panels";
 import { PillHandle } from "@/features/bot-constructor/canvas/handles/PillHandle";
-import { getNodeKeyboard } from "@/features/bot-constructor/utils/keyboard-compat";
+import { getNodeKeyboard } from "@/features/bot-constructor/lib/keyboard-compat";
 
 interface HandlersListProps {
   /** Node ID to get handlers from */

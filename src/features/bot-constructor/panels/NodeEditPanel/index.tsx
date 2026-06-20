@@ -12,11 +12,11 @@ import {
 import { ModalNodeFormRenderer } from "@/features/bot-constructor/panels/NodeEditPanel/ModalNodeFormRenderer";
 import { NodeVariablePanel } from "@/features/bot-constructor/panels/NodeEditPanel/NodeVariablePanel";
 import { VariableInsertionProvider } from "@/features/bot-constructor/panels/NodeEditPanel/variable-insertion";
-import { NodePanelProvider } from "@/features/bot-constructor/contexts/NodePanelContext";
+import { NodePanelProvider } from "@/features/bot-constructor/hooks/NodePanelContext";
 import { getNodeManifestByType } from "@/features/bot-constructor/manifest";
 import { SIDEBAR_COLOR_CLASS_REGISTRY } from "@/features/bot-constructor/manifest/colorRegistry";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
+import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 import { cn } from "@/lib/utils";
 import { Pencil, Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";

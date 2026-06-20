@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DebugConsole } from "@/components/layout/components/debug-console/debug-console";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
 import { ReactFlowProvider } from "reactflow";
-import SearchPanel from "@/features/bot-constructor/search/search-panel";
+import SearchPanel from "@/features/bot-constructor/panels/search/search-panel";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import BottomPanel from "@/features/bot-constructor/panels/bottom-panel";
 import { Button } from "@/components/ui/button";

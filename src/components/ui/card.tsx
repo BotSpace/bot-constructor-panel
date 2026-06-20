@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext"
+import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext"
 
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (

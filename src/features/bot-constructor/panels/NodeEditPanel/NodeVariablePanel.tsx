@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { GLOBAL_CONTEXT_VARIABLE_GROUPS } from "@/features/bot-constructor/data/global-context-variables";
+import { GLOBAL_CONTEXT_VARIABLE_GROUPS } from "@/features/bot-constructor/lib/global-context-variables";
 import { useVariableInsertion } from "@/features/bot-constructor/panels/NodeEditPanel/variable-insertion";
 import { cn } from "@/lib/utils";
 import { Braces, ChevronDown, Globe, GripVertical, MousePointer2 } from "lucide-react";

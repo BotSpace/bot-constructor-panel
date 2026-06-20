@@ -29,7 +29,7 @@ import {
 import { Text } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
-import { useSearchStore } from "@/features/bot-constructor/search/search-store";
+import { useSearchStore } from "@/features/bot-constructor/panels/search/search-store";
 import { debugConsoleStore } from "@/components/layout/components/debug-console/store";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { instanceAuth } from "@/services/instance";

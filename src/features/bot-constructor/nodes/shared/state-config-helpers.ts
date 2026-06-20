@@ -1,5 +1,5 @@
 import { StateType } from "@/features/bot-constructor/nodes/shared/state-config-types";
-import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
+import { MessageTriggerValueTypes } from "@/features/bot-constructor/lib/messages";
 
 /**
  * Get available state types for MessageTrigger based on message type

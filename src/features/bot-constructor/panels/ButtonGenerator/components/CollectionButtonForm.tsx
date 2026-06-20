@@ -35,7 +35,7 @@ import { generateId } from "@/lib/utils";
 import { FilterBuilder } from "@/features/bot-constructor/nodes/shared/filter/filter";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { Filter } from "@/features/bot-constructor/nodes/shared/filter/types";
-import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
+import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 
 interface Props {
   onAdd: (button: ButtonConfig) => void;

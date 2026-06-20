@@ -11,8 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ConstructorData } from "@/features/bot-constructor/data";
-import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
+import { ConstructorData } from "@/features/bot-constructor/lib";
+import { MessageTriggerValueTypes } from "@/features/bot-constructor/lib/messages";
 import { getFiltersForType } from "@/features/bot-constructor/nodes/shared/HandlerBuilder/utils";
 import { FilterSelector } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/FilterSelector";
 import { ParameterInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput";
@@ -26,7 +26,7 @@ import {
 } from "@/features/bot-constructor/nodes/shared";
 import { StateConfig } from "@/features/bot-constructor/nodes/shared/state-config-types";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { getNodeKeyboard } from "@/features/bot-constructor/utils/keyboard-compat";
+import { getNodeKeyboard } from "@/features/bot-constructor/lib/keyboard-compat";
 
 // ---------------------------------------------------------------------------
 // Public interface

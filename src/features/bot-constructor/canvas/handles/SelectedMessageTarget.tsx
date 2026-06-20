@@ -1,6 +1,6 @@
 import React from "react";
 import { Position } from "reactflow";
-import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
+import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 import { PillHandle } from "@/features/bot-constructor/canvas/handles/PillHandle";
 
 export function SelectedMessageTarget() {
