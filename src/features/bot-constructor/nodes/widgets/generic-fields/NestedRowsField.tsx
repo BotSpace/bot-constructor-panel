@@ -24,7 +24,7 @@ import {
   DynamicButtonForm,
   CollectionButtonData,
   DEFAULT_COLLECTION_BUTTON,
-} from "./DynamicButtonForm";
+} from "@/features/bot-constructor/nodes/widgets/generic-fields/DynamicButtonForm";
 
 // ---------------------------------------------------------------------------
 // Types

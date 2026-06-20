@@ -6,9 +6,9 @@ import {
 } from "@/components/ui/input-group";
 import { SearchIcon } from "lucide-react";
 import React, { useMemo, useState } from "react";
-import { useFlowStore } from "../store";
+import { useFlowStore } from "@/features/bot-constructor/store";
 import { useReactFlow } from "reactflow";
-import { useSearchStore } from "./search-store";
+import { useSearchStore } from "@/features/bot-constructor/search/search-store";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";

@@ -1,7 +1,7 @@
 import React from "react";
 import { Position } from "reactflow";
 import { useIsInNodePanel } from "@/features/bot-constructor/contexts/NodePanelContext";
-import { PillHandle } from "./PillHandle";
+import { PillHandle } from "@/features/bot-constructor/nodes/components/shared/ReactFlowHandles/PillHandle";
 
 export function EditMessageSource() {
   const inPanel = useIsInNodePanel();

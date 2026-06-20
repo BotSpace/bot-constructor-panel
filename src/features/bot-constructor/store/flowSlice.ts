@@ -7,7 +7,7 @@ import {
   addEdge,
   NodeChange,
 } from "reactflow";
-import { FlowStoreState, FlowSlice } from "./types";
+import { FlowStoreState, FlowSlice } from "@/features/bot-constructor/store/types";
 
 // Per-node debounce timers for broadcasting "nu" (node data update) ops, so a
 // stream of keystrokes on one node coalesces into a single op (~300ms) while

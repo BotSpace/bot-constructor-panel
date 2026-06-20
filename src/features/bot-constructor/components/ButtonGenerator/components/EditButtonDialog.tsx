@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ButtonConfig } from "../types";
+import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 import { cn } from "@/lib/utils";
 
 interface EditButtonDialogProps {

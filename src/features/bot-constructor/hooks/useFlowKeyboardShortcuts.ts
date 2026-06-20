@@ -1,6 +1,6 @@
 import { useEffect, RefObject } from "react";
 import { useReactFlow } from "reactflow";
-import { useFlowStore } from "../store";
+import { useFlowStore } from "@/features/bot-constructor/store";
 
 type UseFlowKeyboardShortcutsProps = {
   containerRef: React.RefObject<HTMLDivElement | null>;

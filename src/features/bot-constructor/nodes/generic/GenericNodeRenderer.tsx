@@ -10,11 +10,11 @@ import { HandlersList } from "@/features/bot-constructor/nodes/actions/shared/Ha
 import { useTranslations } from "next-intl";
 import { NodeProps } from "reactflow";
 import { cn } from "@/lib/utils";
-import { resolveNodeIcon } from "../registry/iconRegistry";
-import { renderHandleFromManifest } from "../registry/handlePresetRegistry";
-import { FieldWidget, getContentClassName, isFieldVisible } from "../registry/fieldWidgetRegistry";
-import { NodeManifest } from "../registry/types";
-import { NODE_COLOR_CLASS_REGISTRY } from "../registry/colorRegistry";
+import { resolveNodeIcon } from "@/features/bot-constructor/nodes/registry/iconRegistry";
+import { renderHandleFromManifest } from "@/features/bot-constructor/nodes/registry/handlePresetRegistry";
+import { FieldWidget, getContentClassName, isFieldVisible } from "@/features/bot-constructor/nodes/registry/fieldWidgetRegistry";
+import { NodeManifest } from "@/features/bot-constructor/nodes/registry/types";
+import { NODE_COLOR_CLASS_REGISTRY } from "@/features/bot-constructor/nodes/registry/colorRegistry";
 import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
 
 // Debug status is surfaced via a `data-debug-status` attribute on the wrapper.

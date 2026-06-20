@@ -2,8 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Trash2, Database, Edit2, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ButtonConfig } from "../types";
-import { getIconForButton } from "../utils";
+import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { getIconForButton } from "@/features/bot-constructor/components/ButtonGenerator/utils";
 import { Badge } from "@/components/ui/badge";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";

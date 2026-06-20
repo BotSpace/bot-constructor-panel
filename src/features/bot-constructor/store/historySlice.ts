@@ -1,5 +1,5 @@
 import { StateCreator } from "zustand";
-import { FlowStoreState, HistorySlice } from "./types";
+import { FlowStoreState, HistorySlice } from "@/features/bot-constructor/store/types";
 import type { Node, Edge } from "reactflow";
 
 // History state snapshot

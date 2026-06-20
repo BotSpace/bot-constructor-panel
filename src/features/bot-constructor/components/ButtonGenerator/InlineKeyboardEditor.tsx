@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useButtonGeneratorState } from "./hook/useButtonGeneratorState";
-import { KeyboardPreview } from "./components/KeyboardPreview";
-import { EditButtonDialog } from "./components/EditButtonDialog";
-import { ButtonConfig, KeyboardConfig } from "./types";
+import { useButtonGeneratorState } from "@/features/bot-constructor/components/ButtonGenerator/hook/useButtonGeneratorState";
+import { KeyboardPreview } from "@/features/bot-constructor/components/ButtonGenerator/components/KeyboardPreview";
+import { EditButtonDialog } from "@/features/bot-constructor/components/ButtonGenerator/components/EditButtonDialog";
+import { ButtonConfig, KeyboardConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
 import { MessageSquare, Rows3, Settings2 } from "lucide-react";
-import { useFlowStore } from "../../store";
+import { useFlowStore } from "@/features/bot-constructor/store";
 import { cn } from "@/lib/utils";
-import { InlineForm } from "./components/InlineForm";
-import { ReplyForm } from "./components/ReplyForm";
+import { InlineForm } from "@/features/bot-constructor/components/ButtonGenerator/components/InlineForm";
+import { ReplyForm } from "@/features/bot-constructor/components/ButtonGenerator/components/ReplyForm";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 

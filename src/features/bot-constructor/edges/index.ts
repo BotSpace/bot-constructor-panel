@@ -1,6 +1,6 @@
-import SelectableEdge from "./SelectableEdge";
-import FloatingEdge from "./FloatingEdge";
-import FloatingConnectionLine from "./FloatingConnectionLine";
+import SelectableEdge from "@/features/bot-constructor/edges/SelectableEdge";
+import FloatingEdge from "@/features/bot-constructor/edges/FloatingEdge";
+import FloatingConnectionLine from "@/features/bot-constructor/edges/FloatingConnectionLine";
 
 // Custom edge with selected state visual feedback.
 // Both "floating" (legacy constructor-created) and "smart-edge" (AI-generated)

@@ -1,7 +1,7 @@
 "use client";
 import { memo } from "react";
 import { BaseEdge, type EdgeProps, getSmoothStepPath, EdgeLabelRenderer, useNodes } from "reactflow";
-import { useEdgeColor } from "./useEdgeColor";
+import { useEdgeColor } from "@/features/bot-constructor/edges/useEdgeColor";
 
 /**
  * SelectableEdge - Enhanced custom edge with animations and labels

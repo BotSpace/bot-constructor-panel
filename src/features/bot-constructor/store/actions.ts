@@ -1,13 +1,13 @@
 import type { CSSProperties } from "react";
 import { StateCreator } from "zustand";
 import type { Edge, Node } from "reactflow";
-import { FlowStoreState, Actions } from "./types";
+import { FlowStoreState, Actions } from "@/features/bot-constructor/store/types";
 import { ElementItemType } from "@/types/element-types";
 import { instanceAuth } from "@/services/instance";
 import { compressFlow } from "@/lib/flow-compress";
-import { getFormatFlow } from "../lib/format-flow";
+import { getFormatFlow } from "@/features/bot-constructor/lib/format-flow";
 import { generateId } from "@/lib/utils";
-import { getNodeManifestByType } from "../nodes/registry";
+import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry";
 
 interface DownloadFileNodeData {
   messageType?: string;

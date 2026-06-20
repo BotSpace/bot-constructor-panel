@@ -1,5 +1,5 @@
-import { createGenericNodeComponent } from "../generic/createGenericNodeComponent";
-import { getNodeManifestByType, runtimeNodeRegistry } from "./manifestStore";
+import { createGenericNodeComponent } from "@/features/bot-constructor/nodes/generic/createGenericNodeComponent";
+import { getNodeManifestByType, runtimeNodeRegistry } from "@/features/bot-constructor/nodes/registry/manifestStore";
 
 export const genericNodeTypes = runtimeNodeRegistry
   .filter((entry) => entry.status === "runtime")

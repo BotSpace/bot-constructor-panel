@@ -3,7 +3,7 @@
 import { Check, AlertCircle, Loader2 } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { useFlowStore } from "../store";
+import { useFlowStore } from "@/features/bot-constructor/store";
 import { cn } from "@/lib/utils";
 
 interface SaveStatusBadgeProps {

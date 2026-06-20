@@ -5,7 +5,7 @@
  */
 
 import { Node, Edge } from "reactflow";
-import { getNodeManifestByType } from "../nodes/registry/manifestStore";
+import { getNodeManifestByType } from "@/features/bot-constructor/nodes/registry/manifestStore";
 
 interface RadiusContext {
   lat?: string;

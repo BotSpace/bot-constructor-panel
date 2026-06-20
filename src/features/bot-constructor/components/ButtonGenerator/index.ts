@@ -1,2 +1,2 @@
-export * from "./ButtonGenerator";
-export * from "./types";
+export * from "@/features/bot-constructor/components/ButtonGenerator/ButtonGenerator";
+export * from "@/features/bot-constructor/components/ButtonGenerator/types";

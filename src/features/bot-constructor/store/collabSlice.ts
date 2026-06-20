@@ -14,7 +14,7 @@
 import { StateCreator } from "zustand";
 import { addEdge } from "reactflow";
 import type { Edge, Node } from "reactflow";
-import { FlowStoreState, CollabSlice } from "./types";
+import { FlowStoreState, CollabSlice } from "@/features/bot-constructor/store/types";
 import type { CollabOp } from "@/wss/collab/ops";
 
 export const createCollabSlice: StateCreator<

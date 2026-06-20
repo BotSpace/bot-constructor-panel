@@ -20,9 +20,9 @@ import {
   BarChart3,
   MessageSquare,
 } from "lucide-react";
-import { ButtonConfig } from "../types";
-import { WebAppForm } from "./WebAppForm";
-import { CollectionButtonForm } from "./CollectionButtonForm";
+import { ButtonConfig } from "@/features/bot-constructor/components/ButtonGenerator/types";
+import { WebAppForm } from "@/features/bot-constructor/components/ButtonGenerator/components/WebAppForm";
+import { CollectionButtonForm } from "@/features/bot-constructor/components/ButtonGenerator/components/CollectionButtonForm";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 

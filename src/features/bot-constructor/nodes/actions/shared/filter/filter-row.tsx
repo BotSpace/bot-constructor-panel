@@ -20,7 +20,7 @@ import {
 import { format } from "date-fns";
 import { CalendarIcon, Key } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Filter, FilterField, FilterOperator } from "./types";
+import type { Filter, FilterField, FilterOperator } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
 
 interface FilterRowProps {
   filter: Filter;
