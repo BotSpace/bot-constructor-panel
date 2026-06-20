@@ -132,7 +132,7 @@ export function CredentialManageDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
@@ -144,7 +144,7 @@ export function CredentialManageDialog({
           </DialogHeader>
 
           {/* Toolbar: filter + actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pr-6">
             <Select
               value={typeFilter || "all"}
               onValueChange={handleFilterChange}
@@ -171,7 +171,7 @@ export function CredentialManageDialog({
           </div>
 
           {/* List */}
-          <div className="min-h-[160px]">
+          <div className="min-h-[160px] min-w-0 overflow-hidden">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -207,7 +207,7 @@ export function CredentialManageDialog({
                       </span>
 
                       {/* Actions — shown on hover */}
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           size="icon"
                           variant="ghost"
