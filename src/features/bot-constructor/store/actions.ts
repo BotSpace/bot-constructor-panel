@@ -225,6 +225,32 @@ const migrateNodeKeyboard = (node: Node): Node => {
   return { ...node, data: nextData };
 };
 
+/**
+ * Eski format (data.state = {key, type}) bo'lsa, flat formatga o'tkaz.
+ * Yangi format: save_state=true, state_key, state_type flat fieldlar.
+ */
+const migrateTriggerState = (node: Node): Node => {
+  const data = node.data as Record<string, unknown> | undefined;
+  if (!data || typeof data !== "object") return node;
+
+  const state = data.state as Record<string, unknown> | undefined;
+  if (
+    state &&
+    typeof state === "object" &&
+    typeof state.key === "string" &&
+    data.save_state === undefined
+  ) {
+    const nextData = { ...data };
+    nextData.save_state = true;
+    nextData.state_key = state.key;
+    nextData.state_type = typeof state.type === "string" ? state.type : "text";
+    delete nextData.state;
+    return { ...node, data: nextData };
+  }
+
+  return node;
+};
+
 const normalizeFlow = (flow: unknown) => {
   const parsedFlow = parseFlowInput(flow);
   const issues: string[] = [];
@@ -252,7 +278,7 @@ const normalizeFlow = (flow: unknown) => {
 
   return {
     nodes: Array.isArray(flowObject.nodes)
-      ? (flowObject.nodes as Node[]).map(migrateNodeKeyboard)
+      ? (flowObject.nodes as Node[]).map(migrateNodeKeyboard).map(migrateTriggerState)
       : [],
     // Normalize every edge on load so legacy flows look identical to new flows
     edges: rawEdges.map(normalizeEdge),

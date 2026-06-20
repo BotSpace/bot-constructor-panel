@@ -68,24 +68,11 @@ export function CodeEditorField({ nodeId, data, field }: CodeEditorFieldProps) {
     });
   };
 
-  const previewText =
-    codeValue.trim()
-      ? codeValue.slice(0, 80)
-      : field.language === "python"
-        ? "# Kod yozilmagan"
-        : "// Kod yozilmagan";
-
   return (
     <div className="grid gap-3">
       {field.label && (
         <Label className="text-xs font-medium">{field.label}</Label>
       )}
-
-      <div className="rounded-md border border-dashed border-white/10 bg-zinc-950/60 p-2">
-        <pre className="w-full overflow-hidden truncate text-[10px] opacity-70">
-          {previewText}
-        </pre>
-      </div>
 
       <CodeEditorDialog
         code={codeValue}
@@ -98,7 +85,8 @@ export function CodeEditorField({ nodeId, data, field }: CodeEditorFieldProps) {
           <Label className="text-xs">
             Chiqishlar (exit nomlar)
             <span className="ml-1 text-[10px] text-muted-foreground font-normal">
-              — kod ichida exit("nom") ishlatilganda shu nom orqali yo&apos;naltirish
+              — kod ichida exit("nom") ishlatilganda shu nom orqali
+              yo&apos;naltirish
             </span>
           </Label>
 
