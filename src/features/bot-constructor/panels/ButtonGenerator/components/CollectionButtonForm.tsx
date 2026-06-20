@@ -32,9 +32,9 @@ import { useReactQueryAction } from "@/services/react-query";
 import { ButtonConfig } from "@/features/bot-constructor/panels/ButtonGenerator/types";
 import { CollectionDetail } from "@/types/http/collection";
 import { generateId } from "@/lib/utils";
-import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
+import { FilterBuilder } from "@/features/bot-constructor/nodes/shared/filter/filter";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { Filter } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
+import { Filter } from "@/features/bot-constructor/nodes/shared/filter/types";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 
 interface Props {

@@ -17,29 +17,29 @@ import { ConstructorData } from "@/features/bot-constructor/data";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
 import { ButtonGenerator } from "@/features/bot-constructor/panels/ButtonGenerator/ButtonGenerator";
 import { Combobox } from "@/components/ui/combobox";
-import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
+import { FilterBuilder } from "@/features/bot-constructor/nodes/shared/filter/filter";
 import { useReactQueryAction } from "@/services/react-query/use-react-query-action";
 import { findNearestParentAction } from "@/features/bot-constructor/lib/findNearestParentAction";
-import { findNearestTriggerNode, getDynamicFilters } from "@/features/bot-constructor/nodes/custom/StateNode/getDynamicFilters";
-import { getFiltersForType } from "@/features/bot-constructor/nodes/actions/shared/HandlerBuilder/utils";
-import { FilterSelector } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/FilterSelector";
-import { ParameterInput } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/ParameterInput";
-import { ValueInput } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/ParameterInput/ValueInput";
-import { TypeSelector } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/TypeSelector";
+import { findNearestTriggerNode, getDynamicFilters } from "@/features/bot-constructor/nodes/bespoke/StateNode/getDynamicFilters";
+import { getFiltersForType } from "@/features/bot-constructor/nodes/shared/HandlerBuilder/utils";
+import { FilterSelector } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/FilterSelector";
+import { ParameterInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput";
+import { ValueInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput/ValueInput";
+import { TypeSelector } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/TypeSelector";
 import {
   StateConfigUI,
   getStateTypesForCallbackQueryTrigger,
   getStateTypesForMessageTrigger,
   getStateTypesForReplyButtonTrigger,
-} from "@/features/bot-constructor/nodes/triggers/shared";
+} from "@/features/bot-constructor/nodes/shared";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
 import { AlertCircle, ArrowRight, Bot, GripVertical, Key, ListPlus, PlusIcon, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import { CodeEditorDialog } from "@/features/bot-constructor/nodes/custom/CustomCodeNode/components/CodeEditorDialog";
-import AddItemModal from "@/features/bot-constructor/nodes/custom/FormNode/components/add-item-modal";
-import { FormItem } from "@/features/bot-constructor/nodes/custom/FormNode/components/form-item";
+import { CodeEditorDialog } from "@/features/bot-constructor/nodes/bespoke/CustomCodeNode/components/CodeEditorDialog";
+import AddItemModal from "@/features/bot-constructor/nodes/bespoke/FormNode/components/add-item-modal";
+import { FormItem } from "@/features/bot-constructor/nodes/bespoke/FormNode/components/form-item";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
 import { NodeFieldManifest } from "@/features/bot-constructor/manifest/types";

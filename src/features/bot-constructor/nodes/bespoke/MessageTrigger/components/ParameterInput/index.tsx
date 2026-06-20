@@ -1,6 +1,6 @@
-import { ValueInput } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/ParameterInput/ValueInput";
-import { RadiusInput } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/ParameterInput/RadiusInput";
-import { SizeInput } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/ParameterInput/SizeInput"; // <-- YANGI IMPORT
+import { ValueInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput/ValueInput";
+import { RadiusInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput/RadiusInput";
+import { SizeInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput/SizeInput"; // <-- YANGI IMPORT
 
 interface TriggerContext {
   value?: string;

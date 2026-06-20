@@ -17,7 +17,7 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import {
   StateConfigUI,
   getStateTypesForCommandTrigger,
-} from "@/features/bot-constructor/nodes/triggers/shared";
+} from "@/features/bot-constructor/nodes/shared";
 import { cn } from "@/lib/utils";
 import { Plus, X } from "lucide-react";
 import { memo } from "react";

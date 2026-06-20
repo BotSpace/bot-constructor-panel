@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Database, Key, Type, X } from "lucide-react";
-import { StateConfig, StateType } from "@/features/bot-constructor/nodes/triggers/shared/state-config-types";
+import { StateConfig, StateType } from "@/features/bot-constructor/nodes/shared/state-config-types";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface StateConfigComponentProps {

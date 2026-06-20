@@ -1,5 +1,5 @@
 import { CollectionListItem } from "@/types/http/collection";
-import { Filter } from "@/features/bot-constructor/nodes/actions/shared/filter/types";
+import { Filter } from "@/features/bot-constructor/nodes/shared/filter/types";
 
 export type ParseMode = "HTML" | "None";
 

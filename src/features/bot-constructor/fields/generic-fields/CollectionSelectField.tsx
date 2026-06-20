@@ -5,7 +5,7 @@ import { useCollectionStore } from "@/features/collections/store/collection-list
 import { useReactQueryAction } from "@/services/react-query";
 import { CollectionDetail } from "@/types/http/collection";
 import { getAvailableStateKeys } from "@/features/bot-constructor/utils";
-import { FilterBuilder } from "@/features/bot-constructor/nodes/actions/shared/filter/filter";
+import { FilterBuilder } from "@/features/bot-constructor/nodes/shared/filter/filter";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import {
   Select,

@@ -1,4 +1,4 @@
-import { StateType } from "@/features/bot-constructor/nodes/triggers/shared/state-config-types";
+import { StateType } from "@/features/bot-constructor/nodes/shared/state-config-types";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
 
 /**

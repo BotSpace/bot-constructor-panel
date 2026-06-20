@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   StateConfigUI,
   getStateTypesForCommandTrigger,
-} from "@/features/bot-constructor/nodes/triggers/shared";
+} from "@/features/bot-constructor/nodes/shared";
 import { NodeFieldManifest } from "@/features/bot-constructor/manifest/types";
 import { renderCustomWidget } from "@/features/bot-constructor/fields/widgetRegistry";
 import { ArrayEditorField } from "@/features/bot-constructor/fields/generic-fields/ArrayEditorField";
@@ -41,7 +41,7 @@ import {
   RichTextMessageField,
   MediaMessageField,
 } from "@/features/bot-constructor/fields/shared-message-fields";
-import { RecipientsManager } from "@/features/bot-constructor/nodes/actions/shared/RecipientSelector";
+import { RecipientsManager } from "@/features/bot-constructor/nodes/shared/RecipientSelector";
 import { KeyboardConfig } from "@/features/bot-constructor/panels";
 import { ButtonConfig } from "@/features/bot-constructor/panels/ButtonGenerator/types";
 import { InlineKeyboardEditor } from "@/features/bot-constructor/panels/ButtonGenerator/InlineKeyboardEditor";

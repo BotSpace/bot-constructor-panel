@@ -13,18 +13,18 @@ import {
 } from "@/components/ui/select";
 import { ConstructorData } from "@/features/bot-constructor/data";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/data/messages";
-import { getFiltersForType } from "@/features/bot-constructor/nodes/actions/shared/HandlerBuilder/utils";
-import { FilterSelector } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/FilterSelector";
-import { ParameterInput } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/ParameterInput";
-import { ValueInput } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/ParameterInput/ValueInput";
-import { TypeSelector } from "@/features/bot-constructor/nodes/triggers/MessageTrigger/components/TypeSelector";
+import { getFiltersForType } from "@/features/bot-constructor/nodes/shared/HandlerBuilder/utils";
+import { FilterSelector } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/FilterSelector";
+import { ParameterInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput";
+import { ValueInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput/ValueInput";
+import { TypeSelector } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/TypeSelector";
 import {
   StateConfigUI,
   getStateTypesForCallbackQueryTrigger,
   getStateTypesForMessageTrigger,
   getStateTypesForReplyButtonTrigger,
-} from "@/features/bot-constructor/nodes/triggers/shared";
-import { StateConfig } from "@/features/bot-constructor/nodes/triggers/shared/state-config-types";
+} from "@/features/bot-constructor/nodes/shared";
+import { StateConfig } from "@/features/bot-constructor/nodes/shared/state-config-types";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { getNodeKeyboard } from "@/features/bot-constructor/utils/keyboard-compat";
 
