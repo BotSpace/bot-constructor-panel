@@ -17,27 +17,27 @@ import { NodeManifest } from "../registry/types";
 import { NODE_COLOR_CLASS_REGISTRY } from "../registry/colorRegistry";
 import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
 
-// Debug status is surfaced via a `data-debug-status` attribute. The visible
-// node border/shadow is controlled by !important rules in globals.css
-// (.react-flow__node > *), which override Tailwind ring classes — so the
-// status colour must be applied there too (see globals.css).
+// Debug status is surfaced via a `data-debug-status` attribute on the wrapper.
+// For accessory (circle) nodes the visible status ring is applied to the inner
+// `.acc-node-circle` div via CSS rules in globals.css (not to the wrapper, which
+// is transparent). Selected ring is also CSS-driven via globals.css.
 
 // ---------------------------------------------------------------------------
-// AccessoryNodeCard — teardrop-shaped compact card for AI provider / tool nodes.
-// Bottom half is fully rounded (wide circle), top tapers to a pointed oval tip
-// where the incoming (target) handle connects. Icon + label + badge fit without
-// clipping. Both provider and tool nodes share the same footprint.
+// AccessoryNodeCard — n8n-style circle node for AI provider / tool nodes.
+// Layout: transparent bounding-box wrapper → circle (icon inside) → title below
+// (outside the circle) → badge. Handle connects at the top of the wrapper.
 // ---------------------------------------------------------------------------
 
-// Fixed dimensions. Height > width so the teardrop proportion looks natural.
-const ACCESSORY_W = 120;
-const ACCESSORY_H = 150;
+// Circle diameter. Both provider and tool nodes share the same size.
+const CIRCLE_SIZE = 76;
 
-// Asymmetric border-radius that produces a teardrop / water-drop shape.
-// Syntax: tl tr br bl / tl-vertical tr-vertical br-vertical bl-vertical
-// Top corners: 50% horizontal, 35% vertical → narrow/pointed oval tip.
-// Bottom corners: 50% horizontal, 65% vertical → wide, fully rounded belly.
-const TEARDROP_RADIUS = "50% 50% 50% 50% / 35% 35% 65% 65%";
+// Extra space below the circle for the title (2 lines) + badge.
+// title: 2 × 13px line-height ≈ 28px, gap 6px, badge 16px, gap 4px + padding 8px
+const LABEL_AREA_H = 64;
+
+// Total bounding-box dimensions fed to React Flow.
+const ACCESSORY_W = CIRCLE_SIZE + 24; // 24px horizontal padding keeps the circle centred with room for the handle overhang
+const ACCESSORY_H = CIRCLE_SIZE + LABEL_AREA_H;
 
 interface AccessoryNodeCardProps {
   id: string;
@@ -56,48 +56,46 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
   const isProvider = manifest.accessoryAttachesTo?.includes("ai_model");
 
   return (
+    // Outer wrapper: transparent bounding box. React Flow measures this for
+    // canvas layout. Handles are positioned relative to this element.
+    // .acc-node-wrapper class + data-debug-status/data-accessory-selected drive
+    // CSS status ring on the inner .acc-node-circle (see globals.css).
     <div
-      className={cn(
-        // Teardrop card: bottom is a wide circle, top tapers to a pointed oval tip.
-        // The target (incoming) handle sits at the narrow top tip; source at the bottom.
-        "relative flex flex-col items-center select-none",
-        "border border-border/60 bg-card shadow-md",
-        "transition-shadow duration-150",
-        selected && "ring-2 ring-primary shadow-lg",
-      )}
+      className="acc-node-wrapper relative flex flex-col items-center select-none"
       data-debug-status={debugStatus || undefined}
-      style={{
-        width: ACCESSORY_W,
-        height: ACCESSORY_H,
-        borderRadius: TEARDROP_RADIUS,
-      }}
+      data-accessory-selected={selected || undefined}
+      style={{ width: ACCESSORY_W, height: ACCESSORY_H }}
     >
-      {/* Handles rendered from manifest — preserves edge connections (source-handler at top). */}
+      {/* Handles rendered from manifest — id/preset UNCHANGED so edges survive. */}
       {manifest.handles?.map((handle, index) =>
         renderHandleFromManifest(handle, id, `${manifest.type}-${index}`, manifest.accessoryPorts)
       )}
 
-      {/* Icon + label body.
-          pt-8 pushes content below the narrow tip so text never crowds the handle area.
-          pb-3 adds a small bottom breath above the source handle. */}
-      <div className="flex flex-col items-center justify-center gap-1.5 px-3 pt-8 pb-3 w-full h-full overflow-hidden">
-        {/* Circular coloured icon — the defining visual of an accessory node */}
-        <div
-          className={cn(
-            "w-12 h-12 rounded-full flex items-center justify-center shadow-sm shrink-0",
-            "[&_svg]:w-6 [&_svg]:h-6 [&_svg]:text-white [&_svg]:stroke-[2px]",
-            colorClass,
-          )}
-        >
-          {typeof icon === "string" ? (
-            <span className="text-lg leading-none">{icon}</span>
-          ) : (
-            icon
-          )}
-        </div>
+      {/* Circle — the primary visual. Icon centred inside.
+          Status ring + selected ring applied via CSS on .acc-node-circle
+          using [data-debug-status] and [data-accessory-selected] on parent. */}
+      <div
+        className={cn(
+          "acc-node-circle",
+          "rounded-full flex items-center justify-center shrink-0",
+          "border-2 border-white/20",
+          "transition-shadow duration-150",
+          "[&_svg]:text-white [&_svg]:stroke-[2px]",
+          colorClass,
+        )}
+        style={{ width: CIRCLE_SIZE, height: CIRCLE_SIZE }}
+      >
+        {typeof icon === "string" ? (
+          <span style={{ fontSize: 28, lineHeight: 1 }}>{icon}</span>
+        ) : (
+          <span className="[&_svg]:w-8 [&_svg]:h-8">{icon}</span>
+        )}
+      </div>
 
-        {/* Node name — up to 2 lines, never clips outside the card */}
-        <span className="text-[10px] font-semibold tracking-wide text-center leading-tight text-foreground/80 w-full line-clamp-2">
+      {/* Label area — sits below the circle, outside it, centred. */}
+      <div className="flex flex-col items-center gap-1 pt-1.5 w-full px-1">
+        {/* Node name — up to 2 lines */}
+        <span className="text-[10px] font-semibold tracking-wide text-center leading-[13px] text-foreground/90 w-full line-clamp-2">
           {title}
         </span>
 
