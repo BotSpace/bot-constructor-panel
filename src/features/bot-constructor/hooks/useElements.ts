@@ -5,6 +5,7 @@ import { getActiveSubFlows, getPluginCategories } from "@/services/requests/plug
 import { getRuntimeNodeRegistry } from "@/features/bot-constructor/manifest";
 import { SIDEBAR_COLOR_CLASS_REGISTRY } from "@/features/bot-constructor/manifest/colorRegistry";
 import { resolveNodeIcon } from "@/features/bot-constructor/manifest/iconRegistry";
+import { useModuleManifestStore } from "@/features/bot-constructor/manifest/moduleManifestStore";
 
 const SIDEBAR_GROUP_META = {
   triggers: {
@@ -52,6 +53,7 @@ function translate(
 export function useElements(): ElementTypes[] {
   const t = useTranslations();
   const runtimeNodeRegistry = getRuntimeNodeRegistry();
+  const moduleManifests = useModuleManifestStore((s) => s.manifests);
 
   const { data: pluginsData } = useQuery({
     queryKey: ["active-subflows"],
@@ -138,5 +140,37 @@ export function useElements(): ElementTypes[] {
     }
   }
 
-  return [...manifestGroups, ...pluginGroups];
+  // Module groups — grouped by moduleSlug; each unique slug = one sidebar section.
+  const moduleGroups: ElementTypes[] = [];
+  if (moduleManifests.length > 0) {
+    const bySlug = new Map<string, typeof moduleManifests>();
+    for (const entry of moduleManifests) {
+      if (!entry.sidebar?.enabled) continue;
+      const slug = entry.moduleSlug ?? "module-unknown";
+      if (!bySlug.has(slug)) bySlug.set(slug, []);
+      bySlug.get(slug)!.push(entry);
+    }
+
+    for (const [slug, entries] of bySlug) {
+      const moduleName = entries[0]?.moduleName ?? slug;
+      const sorted = [...entries].sort(
+        (a, b) => (a.sidebar?.sortOrder ?? 0) - (b.sidebar?.sortOrder ?? 0)
+      );
+      moduleGroups.push({
+        title: moduleName,
+        id: `module-${slug}`,
+        elements: sorted.map((entry) => ({
+          type: entry.sidebar?.elementType ?? entry.type,
+          name: translate(t, entry.titleKey, entry.titleFallback),
+          description: translate(t, entry.descriptionKey, entry.descriptionFallback),
+          icon: resolveNodeIcon(entry.iconName),
+          color: SIDEBAR_COLOR_CLASS_REGISTRY[entry.colorToken] || "",
+          triggerId: entry.type,
+          defaultData: entry.defaults,
+        })) as ElementItemType[],
+      });
+    }
+  }
+
+  return [...manifestGroups, ...pluginGroups, ...moduleGroups];
 }

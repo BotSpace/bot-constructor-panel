@@ -17,12 +17,17 @@ export function getRuntimeNodeRegistry() {
 
 export { getNodeManifestByType };
 
+/**
+ * Validates that every static runtime manifest entry has a corresponding
+ * component and manifest entry.  Module (runtime-loaded) types are intentionally
+ * excluded — they are registered dynamically and must not cause a dev-time throw.
+ */
 function validateNodeRegistryCoverage() {
-  const runtimeTypes = runtimeNodeRegistry
+  const staticTypes = runtimeNodeRegistry
     .filter((entry) => entry.status === "runtime")
     .map((entry) => entry.type);
 
-  const statusConflicts = runtimeTypes.filter((type) => {
+  const statusConflicts = staticTypes.filter((type) => {
     const manifest = getNodeManifestByType(type);
     if (!manifest) {
       return true;

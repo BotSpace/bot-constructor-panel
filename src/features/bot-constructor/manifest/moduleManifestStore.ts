@@ -1,0 +1,28 @@
+import { create } from "zustand";
+import { NodeManifest } from "@/features/bot-constructor/manifest/types";
+import {
+  registerModuleManifests,
+  clearModuleManifests,
+} from "@/features/bot-constructor/manifest/manifestStore";
+
+interface ModuleManifestState {
+  /** Currently registered module manifests (triggers React re-renders). */
+  manifests: NodeManifest[];
+  /**
+   * Set the full list of module manifests.
+   * Updates both the fast synchronous Map (for render-time lookups) and
+   * this Zustand store (for React re-renders / nodeTypes diffing).
+   */
+  setManifests: (manifests: NodeManifest[]) => void;
+}
+
+export const useModuleManifestStore = create<ModuleManifestState>((set) => ({
+  manifests: [],
+  setManifests: (manifests) => {
+    // Keep the synchronous Map in sync so getNodeManifestByType() works
+    // without waiting for a render cycle.
+    clearModuleManifests();
+    registerModuleManifests(manifests);
+    set({ manifests });
+  },
+}));

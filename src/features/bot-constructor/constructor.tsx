@@ -1,6 +1,6 @@
 "use client";
 
-import React, { SVGProps, useCallback, useEffect, useRef, useState } from "react";
+import React, { SVGProps, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSession } from "@/lib/session-client";
 import ReactFlow, {
   Background,
@@ -13,7 +13,8 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { ElementItemType } from "@/types/element-types";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { CustomNodes } from "@/features/bot-constructor/nodes";
+import { CustomNodes, buildModuleNodeTypes } from "@/features/bot-constructor/nodes";
+import { useModuleManifestStore } from "@/features/bot-constructor/manifest/moduleManifestStore";
 import { CustomEdge, FloatingConnectionLine } from "@/features/bot-constructor/canvas/edges";
 import { useFlowKeyboardShortcuts } from "@/features/bot-constructor/hooks/useFlowKeyboardShortcuts";
 import { useMousePosition } from "@/features/bot-constructor/hooks/useMousePosition";
@@ -40,6 +41,9 @@ import { Connection, Node } from "reactflow";
 import { useCollab } from "@/wss/collab/use-collab";
 import { useDebugContextStore } from "@/components/layout/debug-console/debug-context-store";
 import { useDebugErrorsStore } from "@/features/bot-constructor/store/debug-errors";
+import { useQuery } from "@tanstack/react-query";
+import { getProjectModuleManifests } from "@/services/requests/module";
+import { clearModuleManifests } from "@/features/bot-constructor/manifest/manifestStore";
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
@@ -64,6 +68,53 @@ export default function Constructor() {
   const { searchPanelIsOpen } = useSearchStore();
   const { toggleSearchPanel } = useSearchStore();
   const debugToggle = debugConsoleStore.getState().toggle;
+
+  // Module manifest store — triggers re-render when module list changes.
+  const moduleManifests = useModuleManifestStore((s) => s.manifests);
+  const setManifests = useModuleManifestStore((s) => s.setManifests);
+
+  // Fetch module manifests from backend.
+  // Runs as soon as `id` is available (parallel to loadFlow below).
+  // If the backend returns 404 / empty, gracefully shows an empty list.
+  // On project change, clear stale manifests immediately (clearModuleManifests)
+  // so old module nodes from the previous project never render on the new canvas.
+  const prevProjectIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (prevProjectIdRef.current !== null && prevProjectIdRef.current !== id) {
+      // Project switched — wipe stale module manifests immediately so the
+      // canvas nodeTypes map never contains types from a different project.
+      clearModuleManifests();
+      setManifests([]);
+    }
+    prevProjectIdRef.current = id;
+  }, [id, setManifests]);
+
+  const { data: fetchedManifests } = useQuery({
+    queryKey: ["module-manifests", id],
+    queryFn: () => getProjectModuleManifests(id),
+    enabled: !!id,
+    // Stale time: 30s — avoids hammering the backend on every re-mount while
+    // still reflecting newly enabled modules within a reasonable window.
+    staleTime: 30_000,
+    // Silent failure: 404 / network error → treat as empty list (no toast).
+    retry: false,
+  });
+
+  // Sync fetched manifests into the Zustand store (and the fast Map).
+  // Runs whenever the query result changes (including the initial undefined→data transition).
+  useEffect(() => {
+    if (fetchedManifests !== undefined) {
+      setManifests(fetchedManifests);
+    }
+  }, [fetchedManifests, setManifests]);
+
+  // Merge static node types with module node types.
+  // Only recomputes when moduleManifests list reference changes —
+  // prevents ReactFlow from re-mounting the entire canvas on unrelated renders.
+  const nodeTypes = useMemo(
+    () => ({ ...CustomNodes, ...buildModuleNodeTypes(moduleManifests) }),
+    [moduleManifests]
+  );
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
@@ -640,7 +691,7 @@ export default function Constructor() {
             <ReactFlow
               isValidConnection={isValidConnection}
               id="canvas-area"
-              nodeTypes={CustomNodes}
+              nodeTypes={nodeTypes}
               edgeTypes={CustomEdge}
               nodes={nodes}
               edges={edgesVisible ? edges : []}

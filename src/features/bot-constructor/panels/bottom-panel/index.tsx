@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from '@/features/bot-constructor/panels/bottom-panel/components/button'
-import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff, Shield, Braces, AlertTriangle } from 'lucide-react'
+import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff, Shield, Braces, AlertTriangle, Puzzle } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -22,6 +22,7 @@ import { ElementItemType } from '@/types/element-types'
 import { CollectionManageDialog } from '@/features/bot-constructor/panels/CollectionIframe/CollectionManageDialog'
 import { EnvManageDialog } from '@/features/bot-constructor/panels/EnvManageDialog/EnvManageDialog'
 import { CredentialManageDialog } from '@/features/credentials/components/CredentialManageDialog'
+import { ModuleManageDialog } from '@/features/bot-constructor/panels/ModuleManageDialog/ModuleManageDialog'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -53,7 +54,7 @@ interface Props {
 const FIXED_W = 227
 const SLOT = 48
 const MORE_W = 48
-const ALL_COUNT = 9
+const ALL_COUNT = 10
 
 function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const t = useTranslations('editor.toolbar')
@@ -70,6 +71,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const [envManageOpen, setEnvManageOpen] = useState(false)
     const [collectionOpen, setCollectionOpen] = useState(false)
     const [credentialOpen, setCredentialOpen] = useState(false)
+    const [moduleOpen, setModuleOpen] = useState(false)
     const [variablesOpen, setVariablesOpen] = useState(false)
     const [errorsOpen, setErrorsOpen] = useState(false)
     const { snapshots } = useDebugContextStore()
@@ -199,6 +201,20 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 <DropdownMenuItem key="credentials" onClick={() => setCredentialOpen(true)}>
                     <Shield size={16} className="mr-2" />
                     {t('credentials')}
+                </DropdownMenuItem>
+            ),
+        },
+        {
+            key: 'modules',
+            inline: (
+                <BottomPanelButton onClick={() => setModuleOpen(true)} title={t('modules')} aria-label={t('modules')}>
+                    <Puzzle size={20} />
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="modules" onClick={() => setModuleOpen(true)}>
+                    <Puzzle size={16} className="mr-2" />
+                    {t('modules')}
                 </DropdownMenuItem>
             ),
         },
@@ -345,6 +361,12 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
             <CredentialManageDialog
                 open={credentialOpen}
                 onOpenChange={setCredentialOpen}
+            />
+
+            <ModuleManageDialog
+                open={moduleOpen}
+                onOpenChange={setModuleOpen}
+                projectId={id as string}
             />
 
             {/* Variable Inspector — large 3-column dialog */}
