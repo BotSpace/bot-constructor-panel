@@ -34,3 +34,23 @@ export interface AvailableModule {
 export interface ProjectModuleManifestsResponse {
   data: import("@/features/bot-constructor/manifest/types").NodeManifest[];
 }
+
+/** A node provided by a module (returned in detail endpoint) */
+export interface ModuleNode {
+  type: string;
+  title: string;
+  category: string;
+  trigger: boolean;
+}
+
+/** Full module detail: GET /api/modules/{id}/ */
+export interface ModuleDetail {
+  id: number;
+  slug: string;
+  name: string;
+  description: string;
+  icon: string;
+  image: string;
+  docs: string;
+  nodes: ModuleNode[];
+}
