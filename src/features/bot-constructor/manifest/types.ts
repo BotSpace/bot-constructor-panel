@@ -255,5 +255,10 @@ export interface NodeManifest {
   /** Dynamic field groups for provider/tool config rendered in the side panel.
    *  Reuses NodeFieldManifest. Optional — most nodes use `content`. */
   configFields?: NodeFieldManifest[];
+
+  /** Module identifier — set only on runtime-loaded module manifests. */
+  moduleSlug?: string;
+  /** Human-readable module name used as the sidebar group title. */
+  moduleName?: string;
 }
 

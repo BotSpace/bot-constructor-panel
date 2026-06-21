@@ -1,4 +1,6 @@
 import { getRuntimeNodeRegistry, runtimeNodeComponents } from "@/features/bot-constructor/manifest";
+import { createGenericNodeComponent } from "@/features/bot-constructor/canvas/createGenericNodeComponent";
+import { NodeManifest } from "@/features/bot-constructor/manifest/types";
 import { ComponentType } from "react";
 import { NodeProps } from "reactflow";
 
@@ -42,3 +44,20 @@ export const CustomNodes = {
   ...CustomIntegration,
   ...CustomAI,
 };
+
+/**
+ * Build a nodeTypes map for the given module manifests.
+ * Each module manifest gets a generic component created via createGenericNodeComponent.
+ * The result is meant to be merged into the static CustomNodes inside a useMemo.
+ */
+export function buildModuleNodeTypes(
+  manifests: NodeManifest[]
+): Record<string, ComponentType<NodeProps>> {
+  return manifests.reduce<Record<string, ComponentType<NodeProps>>>(
+    (acc, entry) => {
+      acc[entry.type] = createGenericNodeComponent(entry.type) as ComponentType<NodeProps>;
+      return acc;
+    },
+    {}
+  );
+}
