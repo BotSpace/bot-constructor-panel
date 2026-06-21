@@ -19,10 +19,11 @@ interface ModuleManifestState {
 export const useModuleManifestStore = create<ModuleManifestState>((set) => ({
   manifests: [],
   setManifests: (manifests) => {
-    // Keep the synchronous Map in sync so getNodeManifestByType() works
-    // without waiting for a render cycle.
+    // React Query data is undefined while loading — coerce so the store always
+    // holds an array (buildModuleNodeTypes does .reduce on it).
+    const safe = Array.isArray(manifests) ? manifests : [];
     clearModuleManifests();
-    registerModuleManifests(manifests);
-    set({ manifests });
+    registerModuleManifests(safe);
+    set({ manifests: safe });
   },
 }));
