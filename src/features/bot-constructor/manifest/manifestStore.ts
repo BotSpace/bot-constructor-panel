@@ -14,6 +14,8 @@ const moduleManifestMap = new Map<string, NodeManifest>();
 
 /** Register runtime module manifests (called on mount / backend fetch). */
 export function registerModuleManifests(manifests: NodeManifest[]): void {
+  // Defensive: React Query data is undefined while loading / on error.
+  if (!Array.isArray(manifests)) return;
   for (const manifest of manifests) {
     // Do not allow modules to shadow built-in static node types.
     if (!nodeManifestMap.has(manifest.type)) {

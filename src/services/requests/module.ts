@@ -10,10 +10,12 @@ import { ProjectModule, AvailableModule } from "@/types/http/module";
 export async function getProjectModuleManifests(
   projectId: string | number
 ): Promise<NodeManifest[]> {
-  const { data } = await instanceAuth.get<{ data: NodeManifest[] }>(
-    `/project/${projectId}/module-manifests/`
-  );
-  return data?.data ?? [];
+  const { data } = await instanceAuth.get<{
+    manifests?: NodeManifest[];
+    data?: NodeManifest[];
+  }>(`/project/${projectId}/module-manifests/`);
+  // Backend returns { manifests: [...] }; tolerate { data: [...] } too.
+  return data?.manifests ?? data?.data ?? [];
 }
 
 // ---------------------------------------------------------------------------
