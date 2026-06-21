@@ -62,6 +62,10 @@ export async function disableModule(
 // Returns the global catalog of all available modules.
 // ---------------------------------------------------------------------------
 export async function listAvailableModules(): Promise<AvailableModule[]> {
-  const { data } = await instanceAuth.get<AvailableModule[]>(`/modules/`);
-  return Array.isArray(data) ? data : [];
+  // Backend paginates: { results: [...] }; tolerate a plain array too.
+  const { data } = await instanceAuth.get<
+    AvailableModule[] | { results: AvailableModule[] }
+  >(`/modules/`);
+  if (Array.isArray(data)) return data;
+  return Array.isArray(data?.results) ? data.results : [];
 }
