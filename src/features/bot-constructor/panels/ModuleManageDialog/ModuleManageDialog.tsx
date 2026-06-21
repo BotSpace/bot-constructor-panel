@@ -241,13 +241,19 @@ export function ModuleManageDialog({
           </div>
 
           {/* ── Available catalog ─────────────────────────────────────────── */}
-          {addableModules.length > 0 && (
-            <>
+          <>
               <Separator />
               <div className="space-y-1">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">
                   Qo&apos;shish mumkin
                 </p>
+                {catalogLoading ? (
+                  <p className="text-center text-xs text-muted-foreground py-4">Yuklanmoqda…</p>
+                ) : addableModules.length === 0 ? (
+                  <p className="text-center text-xs text-muted-foreground py-4">
+                    Hozircha mavjud modul yo&apos;q
+                  </p>
+                ) : (
                 <div className="max-h-[200px] overflow-y-auto pr-1">
                   <div className="space-y-1.5">
                     {addableModules.map((m) => (
@@ -286,9 +292,10 @@ export function ModuleManageDialog({
                     ))}
                   </div>
                 </div>
+                )}
               </div>
             </>
-          )}
+
 
           <DialogFooter className="flex-row items-center gap-2 sm:justify-between">
             <Button
