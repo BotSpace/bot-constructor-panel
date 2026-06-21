@@ -26,7 +26,7 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Text } from "lucide-react";
+import { Plus, Text } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
 import { useSearchStore } from "@/features/bot-constructor/panels/search/search-store";
@@ -79,6 +79,10 @@ export default function Constructor() {
 
   // Node selection dialog state
   const [showNodeDialog, setShowNodeDialog] = useState(false);
+  // Flow position of the last right-click; lets a node added via the canvas
+  // context menu land exactly where the user right-clicked.
+  const lastRightClickFlowPosRef = useRef<{ x: number; y: number } | null>(null);
+  const contextMenuAddPosRef = useRef<{ x: number; y: number } | null>(null);
   const pendingConnectionRef = useRef<{
     source: string;
     sourceHandle: string | null | undefined;
@@ -586,6 +590,10 @@ export default function Constructor() {
           }
           pendingConnectionRef.current = null;
         }, 50);
+      } else if (contextMenuAddPosRef.current) {
+        // Canvas o'ng-click menyusidan qo'shilganda — aynan shu joyga
+        addNode(element, contextMenuAddPosRef.current);
+        contextMenuAddPosRef.current = null;
       } else {
         // Ctrl+N yoki boshqa usulda ochilganda — markazga qo'shish
         const { x, y, zoom } = getViewport();
@@ -622,6 +630,12 @@ export default function Constructor() {
             onDrop={onDrop}
             onDragOver={onDragOver}
             onMouseDown={handleContainerClick}
+            onContextMenu={(e) => {
+              lastRightClickFlowPosRef.current = screenToFlowPosition({
+                x: e.clientX,
+                y: e.clientY,
+              });
+            }}
           >
             <ReactFlow
               isValidConnection={isValidConnection}
@@ -677,6 +691,15 @@ export default function Constructor() {
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>
+          <ContextMenuItem
+            onClick={() => {
+              contextMenuAddPosRef.current = lastRightClickFlowPosRef.current;
+              setShowNodeDialog(true);
+            }}
+          >
+            <Plus />
+            Yangi node qo&apos;shish
+          </ContextMenuItem>
           {/* Format */}
           <ContextMenuItem onClick={handleFormating}>
             <Text />
