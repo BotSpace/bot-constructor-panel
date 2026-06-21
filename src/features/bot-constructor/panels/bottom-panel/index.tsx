@@ -22,7 +22,7 @@ import { ElementItemType } from '@/types/element-types'
 import { CollectionManageDialog } from '@/features/bot-constructor/panels/CollectionIframe/CollectionManageDialog'
 import { EnvManageDialog } from '@/features/bot-constructor/panels/EnvManageDialog/EnvManageDialog'
 import { CredentialManageDialog } from '@/features/credentials/components/CredentialManageDialog'
-import { ModuleManageDialog } from '@/features/bot-constructor/panels/ModuleManageDialog/ModuleManageDialog'
+import { ModulePanel } from '@/features/bot-constructor/panels/ModuleManageDialog/ModulePanel'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -363,7 +363,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 onOpenChange={setCredentialOpen}
             />
 
-            <ModuleManageDialog
+            <ModulePanel
                 open={moduleOpen}
                 onOpenChange={setModuleOpen}
                 projectId={id as string}

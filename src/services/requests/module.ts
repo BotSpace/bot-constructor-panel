@@ -1,6 +1,6 @@
 import { instanceAuth } from "@/services/instance";
 import { NodeManifest } from "@/features/bot-constructor/manifest/types";
-import { ProjectModule, AvailableModule } from "@/types/http/module";
+import { ProjectModule, AvailableModule, ModuleDetail } from "@/types/http/module";
 
 // ---------------------------------------------------------------------------
 // GET /api/project/{id}/module-manifests/
@@ -68,4 +68,15 @@ export async function listAvailableModules(): Promise<AvailableModule[]> {
   >(`/modules/`);
   if (Array.isArray(data)) return data;
   return Array.isArray(data?.results) ? data.results : [];
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/modules/{id}/
+// Returns the full detail for one module (docs, nodes, etc.)
+// ---------------------------------------------------------------------------
+export async function getModuleDetail(
+  moduleId: number | string
+): Promise<ModuleDetail> {
+  const { data } = await instanceAuth.get<ModuleDetail>(`/modules/${moduleId}/`);
+  return data;
 }
