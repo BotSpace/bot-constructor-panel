@@ -690,11 +690,20 @@ export default function Constructor() {
             </ReactFlow>
           </div>
         </ContextMenuTrigger>
-        <ContextMenuContent>
+        <ContextMenuContent
+          onCloseAutoFocus={(e) => {
+            // When opening the node sidebar, suppress the menu's focus-return
+            // to the canvas — that async focus event fires onInteractOutside on
+            // the (non-modal) sheet and would close it immediately.
+            if (contextMenuAddPosRef.current) e.preventDefault();
+          }}
+        >
           <ContextMenuItem
-            onClick={() => {
+            onSelect={() => {
               contextMenuAddPosRef.current = lastRightClickFlowPosRef.current;
-              setShowNodeDialog(true);
+              // Defer so the closing context menu's outside-interaction event
+              // doesn't immediately dismiss the (non-modal) node sidebar.
+              setTimeout(() => setShowNodeDialog(true), 0);
             }}
           >
             <Plus />
