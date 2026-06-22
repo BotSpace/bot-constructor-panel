@@ -74,6 +74,8 @@ export default function Constructor() {
   // Module manifest store — triggers re-render when module list changes.
   const moduleManifests = useModuleManifestStore((s) => s.manifests);
   const setManifests = useModuleManifestStore((s) => s.setManifests);
+  const pendingPoll = useModuleManifestStore((s) => s.pendingPoll);
+  const stopPoll = useModuleManifestStore((s) => s.stopPoll);
 
   // Fetch module manifests from backend.
   // Runs as soon as `id` is available (parallel to loadFlow below).
@@ -81,12 +83,17 @@ export default function Constructor() {
   // On project change, clear stale manifests immediately (clearModuleManifests)
   // so old module nodes from the previous project never render on the new canvas.
   const prevProjectIdRef = useRef<string | null>(null);
+  // Tracks the manifest count across refetches to detect when polling can stop.
+  const prevManifestCountRef = useRef<number>(-1);
   useEffect(() => {
     if (prevProjectIdRef.current !== null && prevProjectIdRef.current !== id) {
       // Project switched — wipe stale module manifests immediately so the
       // canvas nodeTypes map never contains types from a different project.
       clearModuleManifests();
       setManifests([]);
+      // Reset the manifest count tracker so stale counts from the previous
+      // project do not prematurely stop polling for the new project.
+      prevManifestCountRef.current = -1;
     }
     prevProjectIdRef.current = id;
   }, [id, setManifests]);
@@ -100,15 +107,26 @@ export default function Constructor() {
     staleTime: 30_000,
     // Silent failure: 404 / network error → treat as empty list (no toast).
     retry: false,
+    // Poll every 3s after install/enable/disable until manifests stabilise.
+    // pendingPoll is set by ModulePanel after a successful mutation and cleared
+    // here once two consecutive fetches return the same manifest count.
+    refetchInterval: pendingPoll ? 3_000 : false,
   });
 
   // Sync fetched manifests into the Zustand store (and the fast Map).
   // Runs whenever the query result changes (including the initial undefined→data transition).
+  // Also stops polling once the manifest count has stabilised across two fetches
+  // (i.e. the newly deployed module is now visible or deploy failed silently).
   useEffect(() => {
-    if (fetchedManifests !== undefined) {
-      setManifests(fetchedManifests);
+    if (fetchedManifests === undefined) return;
+    setManifests(fetchedManifests);
+    const count = fetchedManifests.length;
+    // Stop polling once manifest count stabilises (same value two fetches in a row).
+    if (pendingPoll && prevManifestCountRef.current === count) {
+      stopPoll();
     }
-  }, [fetchedManifests, setManifests]);
+    prevManifestCountRef.current = count;
+  }, [fetchedManifests, setManifests, pendingPoll, stopPoll]);
 
   // Merge static node types with module node types.
   // Only recomputes when moduleManifests list reference changes —
