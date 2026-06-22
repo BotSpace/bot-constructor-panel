@@ -53,6 +53,10 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     edgesVisible: true,
     toggleEdgesVisibility: () => set((state) => ({ edgesVisible: !state.edgesVisible })),
 
+    // Edge mid-point "insert node" pending state
+    pendingEdgeInsert: null,
+    setPendingEdgeInsert: (payload) => set({ pendingEdgeInsert: payload }),
+
     // Barcha slice'larni birlashtiramiz
     // Har bir slice'ga (set, get) ni uzatamiz
     ...createFlowSlice(set, get, {} as any),

@@ -84,4 +84,17 @@ export interface FlowStoreState
   // Edge visibility toggle
   edgesVisible: boolean;
   toggleEdgesVisibility: () => void;
+  // Edge mid-point "insert node" pending state
+  pendingEdgeInsert: {
+    edgeId: string;
+    source: string;
+    sourceHandle: string | null | undefined;
+    target: string;
+    targetHandle: string | null | undefined;
+    midX: number;
+    midY: number;
+  } | null;
+  setPendingEdgeInsert: (
+    payload: FlowStoreState["pendingEdgeInsert"]
+  ) => void;
 }

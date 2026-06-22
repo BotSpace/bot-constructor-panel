@@ -35,6 +35,12 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet'
 import { useTranslations } from 'next-intl'
 import { useDebugContextStore } from '@/components/layout/debug-console/debug-context-store'
 import { VariableInspectorPanel } from '@/components/layout/debug-console/VariableInspectorPanel'
@@ -387,23 +393,34 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 </DialogContent>
             </Dialog>
 
-            {/* Errors panel dialog */}
-            <Dialog open={errorsOpen} onOpenChange={(v) => { setErrorsOpen(v); if (v) markAllRead(); }}>
-                <DialogContent
-                    className="w-[92vw] max-w-[720px] sm:max-w-[720px] p-0 h-[70vh] flex flex-col overflow-hidden gap-0"
-                    showCloseButton
+            {/* Errors panel sheet — matches credentials/modules sidebar style */}
+            <Sheet
+                open={errorsOpen}
+                onOpenChange={(v) => { setErrorsOpen(v); if (v) markAllRead(); }}
+                modal={false}
+            >
+                <SheetContent
+                    side="right"
+                    showOverlay={false}
+                    showCloseButton={false}
+                    onInteractOutside={() => setErrorsOpen(false)}
+                    className="w-full sm:max-w-[480px] flex flex-col gap-0 p-0 overflow-hidden"
                 >
-                    <DialogHeader className="flex-row items-center gap-2 px-4 py-3 border-b border-border shrink-0 space-y-0">
-                        <AlertTriangle className="w-4 h-4 text-destructive shrink-0" />
-                        <DialogTitle className="text-sm font-semibold leading-none">
-                            {t('errors')}
-                        </DialogTitle>
-                    </DialogHeader>
-                    <div className="flex-1 min-h-0">
+                    <SheetHeader className="shrink-0 border-b px-5 py-4 gap-0 space-y-0">
+                        <div className="flex items-center gap-3">
+                            <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
+                            <div className="flex-1 min-w-0">
+                                <SheetTitle className="text-base font-semibold leading-tight">
+                                    {t('errors')}
+                                </SheetTitle>
+                            </div>
+                        </div>
+                    </SheetHeader>
+                    <div className="flex-1 min-h-0 overflow-hidden">
                         <ErrorsPanel />
                     </div>
-                </DialogContent>
-            </Dialog>
+                </SheetContent>
+            </Sheet>
         </>
     )
 }

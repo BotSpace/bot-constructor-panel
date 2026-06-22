@@ -41,8 +41,12 @@ import {
   Image,
   Calendar,
   Bell,
+  Link,
+  KeyRound,
   type LucideIcon,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 import {
   getProjectModules,
@@ -50,6 +54,7 @@ import {
   enableModule,
   disableModule,
   getModuleDetail,
+  registerSelfHostedModule,
 } from "@/services/requests/module";
 import {
   ProjectModule,
@@ -643,6 +648,171 @@ interface ModulePanelProps {
   projectId: string;
 }
 
+// ---------------------------------------------------------------------------
+// Self-hosted module registration form
+// ---------------------------------------------------------------------------
+interface SelfHostedFormProps {
+  projectId: string;
+  onSuccess: () => void;
+}
+
+function SelfHostedForm({ projectId, onSuccess }: SelfHostedFormProps) {
+  const queryClient = useQueryClient();
+  const [endpoint, setEndpoint] = useState("");
+  const [name, setName] = useState("");
+  const [authToken, setAuthToken] = useState("");
+  const [showToken, setShowToken] = useState(false);
+
+  const endpointError =
+    endpoint.length > 0 && !/^https?:\/\/.+/.test(endpoint.trim())
+      ? "URL https:// yoki http:// bilan boshlanishi kerak"
+      : null;
+
+  const registerMutation = useMutation({
+    mutationFn: () =>
+      registerSelfHostedModule(projectId, {
+        endpoint: endpoint.trim(),
+        name: name.trim() || undefined,
+        auth_token: authToken.trim() || undefined,
+      }),
+    onSuccess: () => {
+      toast.success("Modul muvaffaqiyatli qo'shildi");
+      setEndpoint("");
+      setName("");
+      setAuthToken("");
+      void queryClient.invalidateQueries({ queryKey: ["project-modules", projectId] });
+      void queryClient.invalidateQueries({ queryKey: ["module-manifests", projectId] });
+      onSuccess();
+    },
+    onError: (err: unknown) => {
+      const msg =
+        (err as any)?.response?.data?.detail ??
+        (err as any)?.response?.data?.endpoint?.[0] ??
+        "Modulni qo'shishda xatolik yuz berdi";
+      toast.error(msg);
+    },
+  });
+
+  const canSubmit =
+    endpoint.trim().length > 0 &&
+    !endpointError &&
+    !registerMutation.isPending;
+
+  return (
+    <div className="p-4 flex flex-col gap-4">
+      {/* Info banner */}
+      <div className="rounded-lg border border-white/10 bg-white/3 px-4 py-3 text-[12px] text-zinc-400 leading-relaxed">
+        <p className="font-medium text-zinc-300 mb-1">O&apos;z serveringizda ishlaydigan modul</p>
+        <p>
+          Modul JSON-RPC 2.0 protokolida{" "}
+          <code className="rounded bg-white/10 px-1 py-0.5 font-mono text-zinc-300">describe</code>{" "}
+          va{" "}
+          <code className="rounded bg-white/10 px-1 py-0.5 font-mono text-zinc-300">execute</code>{" "}
+          methodlarini qo&apos;llab-quvvatlashi kerak.
+        </p>
+      </div>
+
+      {/* Endpoint URL */}
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-xs text-zinc-400 flex items-center gap-1.5">
+          <Link className="h-3.5 w-3.5" />
+          Endpoint URL
+          <span className="text-destructive">*</span>
+        </Label>
+        <Input
+          value={endpoint}
+          onChange={(e) => setEndpoint(e.target.value)}
+          placeholder="https://my-server.com/rpc"
+          className={[
+            "h-9 bg-white/5 border-white/15 text-white placeholder:text-zinc-600",
+            "focus-visible:border-white/30 focus-visible:ring-0",
+            endpointError ? "border-destructive/60" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          disabled={registerMutation.isPending}
+          autoComplete="off"
+          spellCheck={false}
+        />
+        {endpointError && (
+          <p className="text-[11px] text-destructive">{endpointError}</p>
+        )}
+      </div>
+
+      {/* Display name (optional) */}
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-xs text-zinc-400">
+          Modul nomi
+          <span className="ml-1 text-zinc-600">(ixtiyoriy)</span>
+        </Label>
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Masalan: My Weather Module"
+          className="h-9 bg-white/5 border-white/15 text-white placeholder:text-zinc-600 focus-visible:border-white/30 focus-visible:ring-0"
+          disabled={registerMutation.isPending}
+        />
+      </div>
+
+      {/* Auth token (optional) */}
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-xs text-zinc-400 flex items-center gap-1.5">
+          <KeyRound className="h-3.5 w-3.5" />
+          Auth token
+          <span className="ml-1 text-zinc-600">(ixtiyoriy)</span>
+        </Label>
+        <div className="relative">
+          <Input
+            type={showToken ? "text" : "password"}
+            value={authToken}
+            onChange={(e) => setAuthToken(e.target.value)}
+            placeholder="Bearer token yoki API kalit"
+            className="h-9 bg-white/5 border-white/15 text-white placeholder:text-zinc-600 focus-visible:border-white/30 focus-visible:ring-0 pr-10"
+            disabled={registerMutation.isPending}
+            autoComplete="new-password"
+          />
+          <button
+            type="button"
+            onClick={() => setShowToken((v) => !v)}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+            tabIndex={-1}
+          >
+            {showToken ? (
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" />
+                <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            ) : (
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            )}
+          </button>
+        </div>
+      </div>
+
+      <Button
+        className="w-full gap-2 mt-1 bg-primary hover:bg-primary/90"
+        size="sm"
+        disabled={!canSubmit}
+        onClick={() => registerMutation.mutate()}
+      >
+        {registerMutation.isPending ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        ) : (
+          <Plus className="h-3.5 w-3.5" />
+        )}
+        Modulni qo&apos;shish
+      </Button>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main ModulePanel component
+// ---------------------------------------------------------------------------
 export function ModulePanel({ open, onOpenChange, projectId }: ModulePanelProps) {
   const queryClient = useQueryClient();
   const [detailSlug, setDetailSlug] = useState<string | null>(null);
@@ -823,6 +993,12 @@ export function ModulePanel({ open, onOpenChange, projectId }: ModulePanelProps)
                         </span>
                       )}
                     </TabsTrigger>
+                    <TabsTrigger
+                      value="custom"
+                      className="flex-1 text-xs data-[state=active]:bg-white/10 data-[state=active]:text-white text-zinc-400"
+                    >
+                      O&apos;z modul
+                    </TabsTrigger>
                   </TabsList>
 
                   {/* Installed tab */}
@@ -887,6 +1063,18 @@ export function ModulePanel({ open, onOpenChange, projectId }: ModulePanelProps)
                           ))}
                         </div>
                       )}
+                    </ScrollArea>
+                  </TabsContent>
+
+                  {/* Custom (self-hosted) tab */}
+                  <TabsContent value="custom" className="flex-1 min-h-0 mt-2 overflow-hidden">
+                    <ScrollArea className="h-full">
+                      <SelfHostedForm
+                        projectId={projectId}
+                        onSuccess={() => {
+                          /* Stay on current tab; list refreshes via invalidateQueries */
+                        }}
+                      />
                     </ScrollArea>
                   </TabsContent>
                 </Tabs>

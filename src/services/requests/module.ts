@@ -86,3 +86,27 @@ export async function getModuleDetail(
   const { data } = await instanceAuth.get(`/modules/${moduleId}/`);
   return ((data as any)?.data ?? data) as ModuleDetail;
 }
+
+// ---------------------------------------------------------------------------
+// POST /api/project/{id}/modules/register-self-hosted/
+// Register the caller's own self-hosted module for this project.
+// Backend creates (or reuses) a private ModuleModel and links it via
+// ProjectModuleModel.  Only the owner of the project may call this.
+//
+// NOTE: This endpoint does NOT exist yet on the backend.  When it is added
+// the shape below must be honoured.  The frontend is already wired up so
+// the UI can be demoed / reviewed before the backend lands.
+//
+// Request body: { endpoint: string; name?: string; auth_token?: string }
+// Response:     ProjectModule  (same shape as /project/{id}/modules/ items)
+// ---------------------------------------------------------------------------
+export async function registerSelfHostedModule(
+  projectId: string | number,
+  payload: { endpoint: string; name?: string; auth_token?: string }
+): Promise<ProjectModule> {
+  const { data } = await instanceAuth.post(
+    `/project/${projectId}/modules/register-self-hosted/`,
+    payload
+  );
+  return ((data as any)?.data ?? data) as ProjectModule;
+}
