@@ -63,6 +63,8 @@ export default function Constructor() {
     loadFlow,
     isDirty,
     edgesVisible,
+    pendingEdgeInsert,
+    setPendingEdgeInsert,
   } = useFlowStore();
 
   const { searchPanelIsOpen } = useSearchStore();
@@ -565,6 +567,58 @@ export default function Constructor() {
   // Node tanlanganda yaratish va ulash
   const handleNodeSelected = useCallback(
     (element: ElementItemType) => {
+      // Edge o'rtasiga node qo'shish (Plus button on edge)
+      const edgeInsert = useFlowStore.getState().pendingEdgeInsert;
+      if (edgeInsert) {
+        const { edgeId, source, sourceHandle, target, targetHandle, midX, midY } = edgeInsert;
+
+        // Yangi node ni edge o'rtasiga joylashtirish
+        const allNodes = useFlowStore.getState().nodes;
+        const sourceNode = allNodes.find((n) => n.id === source);
+        const targetNode = allNodes.find((n) => n.id === target);
+        const elementManifest = getNodeManifestByType(element.triggerId);
+        const NODE_W = elementManifest?.size.width ?? 280;
+        const NODE_H = 160;
+
+        // A va B orasiga, markazga joylash
+        let newX = midX - NODE_W / 2;
+        let newY = midY - NODE_H / 2;
+        if (sourceNode && targetNode) {
+          newX = (sourceNode.position.x + targetNode.position.x) / 2 - NODE_W / 2;
+          newY = (sourceNode.position.y + targetNode.position.y) / 2 - NODE_H / 2;
+        }
+
+        addNode(element, { x: newX, y: newY });
+
+        setTimeout(() => {
+          const currentNodes = useFlowStore.getState().nodes;
+          const newNode = currentNodes[currentNodes.length - 1];
+          if (!newNode) return;
+
+          // Eski edge'ni o'chirish
+          useFlowStore.getState().onEdgesChange([{ id: edgeId, type: "remove" }]);
+
+          // A → N
+          onConnect({
+            source,
+            sourceHandle: sourceHandle ?? null,
+            target: newNode.id,
+            targetHandle: null,
+          });
+
+          // N → B
+          onConnect({
+            source: newNode.id,
+            sourceHandle: null,
+            target,
+            targetHandle: targetHandle ?? null,
+          });
+
+          setPendingEdgeInsert(null);
+        }, 50);
+        return;
+      }
+
       if (pendingConnectionRef.current) {
         const { source, sourceHandle, position } = pendingConnectionRef.current;
 
@@ -657,16 +711,24 @@ export default function Constructor() {
         addNode(element, { x: centerX, y: centerY });
       }
     },
-    [addNode, onConnect, getViewport]
+    [addNode, onConnect, getViewport, setPendingEdgeInsert]
   );
+
+  // pendingEdgeInsert o'zgarganda NodeSelectionDialog'ni ochish
+  useEffect(() => {
+    if (pendingEdgeInsert) {
+      setShowNodeDialog(true);
+    }
+  }, [pendingEdgeInsert]);
 
   // Dialog yopilganda tozalash
   const handleDialogClose = useCallback((open: boolean) => {
     setShowNodeDialog(open);
     if (!open) {
       pendingConnectionRef.current = null;
+      setPendingEdgeInsert(null);
     }
-  }, []);
+  }, [setPendingEdgeInsert]);
 
 
   const isValidConnection = (connection: Connection) => {
