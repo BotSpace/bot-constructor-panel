@@ -113,6 +113,14 @@ export function NodeSelectionDialog({
     const categoryRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
     const [activeCategoryIndexNav, setActiveCategoryIndexNav] = useState(0);
 
+    // Timestamp of the last open — used to ignore the "outside interaction" that
+    // fires while the sheet is still opening (e.g. the mouse moving away from the
+    // context menu), which would otherwise instantly close it before it's usable.
+    const openedAtRef = useRef(0);
+    useEffect(() => {
+        if (open) openedAtRef.current = Date.now();
+    }, [open]);
+
     const elements = useElements();
 
     const MUST_HAVE_IDS = useMemo(
@@ -317,7 +325,15 @@ export function NodeSelectionDialog({
                 side="right"
                 showOverlay={false}
                 showCloseButton={false}
-                onInteractOutside={() => onOpenChange(false)}
+                onInteractOutside={(e) => {
+                    // Ignore the interaction that lands while the sheet is still
+                    // opening (mouse still travelling from the context menu).
+                    if (Date.now() - openedAtRef.current < 500) {
+                        e.preventDefault();
+                        return;
+                    }
+                    onOpenChange(false);
+                }}
                 className={cn(
                     "w-full gap-0 overflow-hidden border-l border-white/10 bg-[#141414] p-0 text-white shadow-2xl",
                     "sm:max-w-[420px]"
