@@ -35,12 +35,15 @@ import {
 } from "@/components/layout/running-bot-limit-modal";
 
 /**
- * Statuses where the engine pod is still transitioning — show spinner.
+ * Statuses where the engine pod is still STARTING — show spinner.
  * "pending"     — backend'dan WS orqali kelishi mumkin (deploy queue'da kutish)
  * "initializing"— local optimistic va backend'dan kelishi mumkin (pod ko'tarilmoqda)
- * "stopping"    — to'xtatilmoqda (pod o'chirilmoqda)
+ *
+ * "stopping" ATAYIN yo'q: stop optimistik "stopped" qiladi (Play ko'rinadi). Agar
+ * backend WS "stopping" yuborsa va u LOADING'da bo'lsa, debug yozuvi o'chganda
+ * (pod ketganda) polling status'ni ololmay spinner abadiy qotib qolardi.
  */
-const LOADING_STATUSES = new Set(["initializing", "pending", "stopping"]);
+const LOADING_STATUSES = new Set(["initializing", "pending"]);
 
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugingButtons() {
@@ -72,9 +75,16 @@ export default function DebugingButtons() {
           .get<APIDetailCreateResponse<ProjectRetrive>>(`/project/${id}`)
           .then(({ data }) => {
             const debug = data?.data?.debug;
-            if (!debug) return;
+            const current = useProjectStore.getState().project?.debug;
+            if (!debug) {
+              // Debug yozuvi yo'q = bot to'liq to'xtagan. Loading'dan chiqamiz.
+              if (current && current.status !== "stopped") {
+                changeDebug({ ...current, status: "stopped" });
+              }
+              return;
+            }
             // Faqat status o'zgargan bo'lsagina yangilaymiz
-            if (debug.status !== useProjectStore.getState().project?.debug?.status) {
+            if (debug.status !== current?.status) {
               changeDebug(debug);
             }
           })
