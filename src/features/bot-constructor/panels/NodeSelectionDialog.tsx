@@ -486,7 +486,7 @@ interface NodeCardProps {
 }
 
 function NodeCard({ element, isActive, groupLabel, groupId, onClick, onMouseEnter, refCallback }: NodeCardProps) {
-    const role = getRoleLabel(groupId);
+    const role = element.role ?? getRoleLabel(groupId);
     return (
         <button
             ref={refCallback}
