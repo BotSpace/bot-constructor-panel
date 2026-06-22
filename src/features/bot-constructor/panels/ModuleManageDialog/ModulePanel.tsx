@@ -63,6 +63,7 @@ import {
   ModuleDetail,
 } from "@/types/http/module";
 import { cn } from "@/lib/utils";
+import { useModuleManifestStore } from "@/features/bot-constructor/manifest/moduleManifestStore";
 
 // ---------------------------------------------------------------------------
 // Module icon — `icon` is a Lucide name string (e.g. "sparkles"), not a glyph.
@@ -658,6 +659,7 @@ interface SelfHostedFormProps {
 
 function SelfHostedForm({ projectId, onSuccess }: SelfHostedFormProps) {
   const queryClient = useQueryClient();
+  const startPoll = useModuleManifestStore((s) => s.startPoll);
   const [endpoint, setEndpoint] = useState("");
   const [name, setName] = useState("");
   const [authToken, setAuthToken] = useState("");
@@ -682,6 +684,7 @@ function SelfHostedForm({ projectId, onSuccess }: SelfHostedFormProps) {
       setAuthToken("");
       void queryClient.invalidateQueries({ queryKey: ["project-modules", projectId] });
       void queryClient.invalidateQueries({ queryKey: ["module-manifests", projectId] });
+      startPoll();
       onSuccess();
     },
     onError: (err: unknown) => {
@@ -815,6 +818,7 @@ function SelfHostedForm({ projectId, onSuccess }: SelfHostedFormProps) {
 // ---------------------------------------------------------------------------
 export function ModulePanel({ open, onOpenChange, projectId }: ModulePanelProps) {
   const queryClient = useQueryClient();
+  const startPoll = useModuleManifestStore((s) => s.startPoll);
   const [detailSlug, setDetailSlug] = useState<string | null>(null);
   const [pendingDisable, setPendingDisable] = useState<ProjectModule | null>(null);
   const [enablingSlug, setEnablingSlug] = useState<string | null>(null);
@@ -863,6 +867,10 @@ export function ModulePanel({ open, onOpenChange, projectId }: ModulePanelProps)
       void queryClient.invalidateQueries({ queryKey: ["project-modules", projectId] });
       void queryClient.invalidateQueries({ queryKey: ["module-manifests", projectId] });
       void queryClient.invalidateQueries({ queryKey: ["available-modules"] });
+      // Start polling so the constructor re-fetches manifests until the newly
+      // deployed module transitions from "pending" to "running" and its node
+      // types appear in the sidebar without a full page reload.
+      startPoll();
     },
     onError: () => {
       toast.error("Modulni o'rnatishda xatolik yuz berdi");
@@ -879,6 +887,8 @@ export function ModulePanel({ open, onOpenChange, projectId }: ModulePanelProps)
       void queryClient.invalidateQueries({ queryKey: ["project-modules", projectId] });
       void queryClient.invalidateQueries({ queryKey: ["module-manifests", projectId] });
       void queryClient.invalidateQueries({ queryKey: ["available-modules"] });
+      // Poll after disable so node types disappear from the sidebar promptly.
+      startPoll();
     },
     onError: () => {
       toast.error("Modulni o'chirishda xatolik yuz berdi");

@@ -33,6 +33,7 @@ import {
 } from "@/services/requests/module";
 import { ProjectModule, AvailableModule, ModuleStatus } from "@/types/http/module";
 import { cn } from "@/lib/utils";
+import { useModuleManifestStore } from "@/features/bot-constructor/manifest/moduleManifestStore";
 
 interface ModuleManageDialogProps {
   open: boolean;
@@ -76,6 +77,7 @@ export function ModuleManageDialog({
   projectId,
 }: ModuleManageDialogProps) {
   const queryClient = useQueryClient();
+  const startPoll = useModuleManifestStore((s) => s.startPoll);
 
   // Enabled modules list
   const {
@@ -106,6 +108,7 @@ export function ModuleManageDialog({
       toast.success("Modul yoqildi");
       void queryClient.invalidateQueries({ queryKey: ["project-modules", projectId] });
       void queryClient.invalidateQueries({ queryKey: ["module-manifests", projectId] });
+      startPoll();
     },
     onError: () => {
       toast.error("Modulni yoqishda xatolik yuz berdi");
@@ -119,6 +122,7 @@ export function ModuleManageDialog({
       toast.success("Modul o'chirildi");
       void queryClient.invalidateQueries({ queryKey: ["project-modules", projectId] });
       void queryClient.invalidateQueries({ queryKey: ["module-manifests", projectId] });
+      startPoll();
     },
     onError: () => {
       toast.error("Modulni o'chirishda xatolik yuz berdi");

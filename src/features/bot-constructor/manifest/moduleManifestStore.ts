@@ -14,6 +14,18 @@ interface ModuleManifestState {
    * this Zustand store (for React re-renders / nodeTypes diffing).
    */
   setManifests: (manifests: NodeManifest[]) => void;
+  /**
+   * When true, the constructor polls the module-manifests endpoint every few
+   * seconds.  Set to true after install/enable/disable so newly deployed
+   * modules appear in the sidebar without a full page reload.
+   * The constructor resets this to false once it detects the manifest count
+   * has stabilised (no change between two consecutive fetches).
+   */
+  pendingPoll: boolean;
+  /** Start polling — call after a successful install / enable / disable. */
+  startPoll: () => void;
+  /** Stop polling — called by the constructor once manifests are stable. */
+  stopPoll: () => void;
 }
 
 export const useModuleManifestStore = create<ModuleManifestState>((set) => ({
@@ -26,4 +38,7 @@ export const useModuleManifestStore = create<ModuleManifestState>((set) => ({
     registerModuleManifests(safe);
     set({ manifests: safe });
   },
+  pendingPoll: false,
+  startPoll: () => set({ pendingPoll: true }),
+  stopPoll: () => set({ pendingPoll: false }),
 }));
