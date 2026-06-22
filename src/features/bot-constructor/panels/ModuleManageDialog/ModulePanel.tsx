@@ -750,7 +750,16 @@ export function ModulePanel({ open, onOpenChange, projectId }: ModulePanelProps)
           side="right"
           showOverlay={false}
           showCloseButton={false}
-          onInteractOutside={() => onOpenChange(false)}
+          onInteractOutside={(e) => {
+            // When the uninstall confirm AlertDialog is open, its overlay/focus
+            // counts as "outside" this non-modal sheet — that would close the whole
+            // panel and unmount the dialog (the flash-close). Keep the sheet open.
+            if (pendingDisable !== null) {
+              e.preventDefault();
+              return;
+            }
+            onOpenChange(false);
+          }}
           className={cn(
             "w-full gap-0 overflow-hidden border-l border-white/10 bg-[#141414] p-0 text-white shadow-2xl",
             "sm:max-w-[420px]"

@@ -89,7 +89,7 @@ export default function Constructor() {
     prevProjectIdRef.current = id;
   }, [id, setManifests]);
 
-  const { data: fetchedManifests } = useQuery({
+  const { data: fetchedManifests, isFetched: manifestsFetched } = useQuery({
     queryKey: ["module-manifests", id],
     queryFn: () => getProjectModuleManifests(id),
     enabled: !!id,
@@ -154,6 +154,10 @@ export default function Constructor() {
   useEffect(() => {
     if (loading) return;
     if (!project) return;
+    // Wait for module manifests to settle before building the flow — otherwise
+    // module node types aren't registered yet and their nodes render as blank
+    // "not found" rectangles until the manifests arrive (the flash the user saw).
+    if (!manifestsFetched) return;
     // Only load once per project session — do not re-load when project metadata
     // (e.g. debug.status) changes after the initial fetch.
     if (hasLoadedFlowRef.current) return;
@@ -172,7 +176,7 @@ export default function Constructor() {
       });
       toast.error(message);
     });
-  }, [loading, project, loadFlow]);
+  }, [loading, project, loadFlow, manifestsFetched]);
 
   // Seed debug stores from backend on mount (once per project session).
   // This ensures that after a page refresh the Variable Inspector and Errors
@@ -671,8 +675,20 @@ export default function Constructor() {
   };
 
 
+  // Show a loading veil until the project AND module manifests are ready, so the
+  // canvas never paints module nodes before their types are registered.
+  const editorLoading = loading || !manifestsFetched;
+
   return (
     <>
+      {editorLoading && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0e0e0e]">
+          <div className="flex flex-col items-center gap-3 text-zinc-400">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-600 border-t-primary" />
+            <span className="text-sm">Yuklanmoqda...</span>
+          </div>
+        </div>
+      )}
       <ContextMenu>
         <ContextMenuTrigger>
           <div
