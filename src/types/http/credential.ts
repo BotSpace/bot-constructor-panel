@@ -2,8 +2,9 @@
 // Credential feature — shared TypeScript types
 // ---------------------------------------------------------------------------
 
-export type CredentialFieldType = "text" | "password" | "number" | "select" | "textarea";
+export type CredentialFieldType = "text" | "password" | "number" | "select" | "textarea" | "url" | "switch";
 export type CredentialMode = "apikey" | "bearer" | "header" | "basic" | "none" | "oauth2";
+export type CredentialSource = "system" | "admin" | "module";
 
 export interface CredentialFieldOption {
   value: string;
@@ -35,6 +36,10 @@ export interface CredentialType {
   provider?: string;
   /** OAuth2-only: requested scopes */
   scopes?: string[];
+  /** Where the type comes from: system code, admin UI, or external module */
+  source?: CredentialSource;
+  /** Whether the type definition is editable in admin */
+  editable?: boolean;
 }
 
 // List / detail: secret fields are masked as "••••last4" or null
@@ -55,11 +60,11 @@ export interface CredentialListItem {
 export interface CreateCredentialPayload {
   name: string;
   type_key: string;
-  data: Record<string, string | number>;
+  data: Record<string, string | number | boolean>;
 }
 
 export interface PatchCredentialPayload {
   name?: string;
-  data?: Record<string, string | number>;
+  data?: Record<string, string | number | boolean>;
 }
 
