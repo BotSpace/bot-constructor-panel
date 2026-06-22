@@ -317,10 +317,17 @@ function InstalledItem({
   onDisable,
 }: InstalledItemProps) {
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => onDetail(pm.module.slug)}
-      className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onDetail(pm.module.slug);
+        }
+      }}
+      className="group flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
     >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
         <ModuleIcon name={pm.module.icon} className="h-4 w-4 text-zinc-300" />
@@ -351,7 +358,7 @@ function InstalledItem({
       >
         <Trash2 className="h-3.5 w-3.5" />
       </Button>
-    </button>
+    </div>
   );
 }
 
@@ -371,10 +378,17 @@ function AvailableItem({
   onEnable,
 }: AvailableItemProps) {
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => onDetail(m.slug)}
-      className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onDetail(m.slug);
+        }
+      }}
+      className="group flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
     >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
         <ModuleIcon name={m.icon} className="h-4 w-4 text-zinc-300" />
@@ -402,7 +416,7 @@ function AvailableItem({
         )}
         O&apos;rnatish
       </Button>
-    </button>
+    </div>
   );
 }
 
