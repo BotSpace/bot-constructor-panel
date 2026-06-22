@@ -32,6 +32,16 @@ import {
   Loader2,
   Zap,
   Box,
+  Sparkles,
+  Bot,
+  Database,
+  Globe,
+  MessageSquare,
+  CreditCard,
+  Image,
+  Calendar,
+  Bell,
+  type LucideIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -48,6 +58,39 @@ import {
   ModuleDetail,
 } from "@/types/http/module";
 import { cn } from "@/lib/utils";
+
+// ---------------------------------------------------------------------------
+// Module icon — `icon` is a Lucide name string (e.g. "sparkles"), not a glyph.
+// Map known names → component; fall back to Puzzle. Curated map keeps the bundle
+// small. ponytail: extend the map as new modules ship; no dynamic barrel import.
+// ---------------------------------------------------------------------------
+const ICON_MAP: Record<string, LucideIcon> = {
+  sparkles: Sparkles,
+  puzzle: Puzzle,
+  box: Box,
+  zap: Zap,
+  bot: Bot,
+  database: Database,
+  globe: Globe,
+  "message-square": MessageSquare,
+  message: MessageSquare,
+  "credit-card": CreditCard,
+  payment: CreditCard,
+  image: Image,
+  calendar: Calendar,
+  bell: Bell,
+};
+
+function ModuleIcon({
+  name,
+  className,
+}: {
+  name?: string | null;
+  className?: string;
+}) {
+  const Ico = (name && ICON_MAP[name.toLowerCase()]) || Puzzle;
+  return <Ico className={className} />;
+}
 
 // ---------------------------------------------------------------------------
 // Status helpers
@@ -279,8 +322,8 @@ function InstalledItem({
       onClick={() => onDetail(pm.module.slug)}
       className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
     >
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-base">
-        {pm.module.icon || <Puzzle className="h-4 w-4 text-zinc-400" />}
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
+        <ModuleIcon name={pm.module.icon} className="h-4 w-4 text-zinc-300" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-white truncate">{pm.module.name}</p>
@@ -333,8 +376,8 @@ function AvailableItem({
       onClick={() => onDetail(m.slug)}
       className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
     >
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-base">
-        {m.icon || <Puzzle className="h-4 w-4 text-zinc-400" />}
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
+        <ModuleIcon name={m.icon} className="h-4 w-4 text-zinc-300" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-white truncate">{m.name}</p>
@@ -443,8 +486,8 @@ function ModuleDetailView({
           <div className="p-5 pb-6">
             {/* Icon + name */}
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-2xl">
-                {detail.icon || <Puzzle className="h-6 w-6 text-zinc-400" />}
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
+                <ModuleIcon name={detail.icon} className="h-6 w-6 text-zinc-300" />
               </div>
               <div>
                 <h2 className="text-base font-bold text-white">{detail.name}</h2>
