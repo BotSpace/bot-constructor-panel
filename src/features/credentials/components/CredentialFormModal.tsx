@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import {
   Loader2,
   Eye,
@@ -49,6 +50,7 @@ import {
   CredentialType,
   CredentialListItem,
   CredentialFieldDef,
+  CredentialSource,
 } from "@/types/http/credential";
 import { cn } from "@/lib/utils";
 
@@ -100,8 +102,9 @@ function FieldRenderer({ field, value, isEdit, onChange }: FieldRendererProps) {
 
   const isSecret = field.secret === true;
   const placeholder =
-    isEdit && isSecret ? "Unchanged (empty = keep existing)" : field.label;
+    isEdit && isSecret ? "O'zgarishsiz qoldirish uchun bo'sh qoldiring" : (field.label ?? "");
 
+  // select
   if (field.type === "select" && field.options?.length) {
     return (
       <Select value={value} onValueChange={onChange}>
@@ -119,6 +122,7 @@ function FieldRenderer({ field, value, isEdit, onChange }: FieldRendererProps) {
     );
   }
 
+  // textarea
   if (field.type === "textarea") {
     return (
       <Textarea
@@ -134,7 +138,8 @@ function FieldRenderer({ field, value, isEdit, onChange }: FieldRendererProps) {
     );
   }
 
-  if (field.type === "password") {
+  // password or secret
+  if (field.type === "password" || isSecret) {
     return (
       <div className="relative">
         <Input
@@ -143,7 +148,7 @@ function FieldRenderer({ field, value, isEdit, onChange }: FieldRendererProps) {
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="pr-9"
-          autoComplete="off"
+          autoComplete="new-password"
           data-1p-ignore="true"
           data-lpignore="true"
           data-bwignore="true"
@@ -160,9 +165,62 @@ function FieldRenderer({ field, value, isEdit, onChange }: FieldRendererProps) {
     );
   }
 
+  // switch / toggle (bool stored as "true"/"false")
+  if (field.type === "switch") {
+    const checked = value === "true";
+    return (
+      <div className="flex items-center gap-2 h-9">
+        <Switch
+          checked={checked}
+          onCheckedChange={(v) => onChange(v ? "true" : "false")}
+          id={`field-switch-${field.name}`}
+        />
+        <label
+          htmlFor={`field-switch-${field.name}`}
+          className="text-sm text-muted-foreground cursor-pointer select-none"
+        >
+          {checked ? "Yoqilgan" : "O'chirilgan"}
+        </label>
+      </div>
+    );
+  }
+
+  // url
+  if (field.type === "url") {
+    return (
+      <Input
+        type="url"
+        placeholder={placeholder || "https://..."}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        autoComplete="off"
+        data-1p-ignore="true"
+        data-lpignore="true"
+        data-bwignore="true"
+      />
+    );
+  }
+
+  // number
+  if (field.type === "number") {
+    return (
+      <Input
+        type="number"
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        autoComplete="off"
+        data-1p-ignore="true"
+        data-lpignore="true"
+        data-bwignore="true"
+      />
+    );
+  }
+
+  // text (default)
   return (
     <Input
-      type={field.type === "number" ? "number" : "text"}
+      type="text"
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -173,6 +231,19 @@ function FieldRenderer({ field, value, isEdit, onChange }: FieldRendererProps) {
     />
   );
 }
+
+// ---------------------------------------------------------------------------
+// Source badge helper
+// ---------------------------------------------------------------------------
+
+const SOURCE_BADGE: Record<
+  NonNullable<CredentialSource>,
+  { label: string; className: string }
+> = {
+  system: { label: "System", className: "bg-muted text-muted-foreground" },
+  admin: { label: "Admin", className: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
+  module: { label: "Modul", className: "bg-violet-500/10 text-violet-600 dark:text-violet-400" },
+};
 
 // ---------------------------------------------------------------------------
 // Step 1 — card grid type picker
@@ -216,6 +287,9 @@ function TypePicker({
             {filtered.map((type) => {
               const Icon = getTypeIcon(type.icon);
               const color = type.color || undefined;
+              const sourceBadge = type.source && type.source !== "system"
+                ? SOURCE_BADGE[type.source]
+                : null;
               return (
                 <button
                   key={type.key}
@@ -233,9 +307,21 @@ function TypePicker({
                   >
                     <Icon className="h-5 w-5" style={color ? { color } : undefined} />
                   </div>
-                  <span className="text-[12px] font-medium leading-tight line-clamp-2">
-                    {type.label}
-                  </span>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[12px] font-medium leading-tight line-clamp-2">
+                      {type.label}
+                    </span>
+                    {sourceBadge ? (
+                      <span
+                        className={cn(
+                          "mt-0.5 inline-flex items-center rounded px-1 py-px text-[10px] font-medium leading-none",
+                          sourceBadge.className
+                        )}
+                      >
+                        {sourceBadge.label}
+                      </span>
+                    ) : null}
+                  </div>
                 </button>
               );
             })}
@@ -598,7 +684,12 @@ export function CredentialFormModal({
     setSelectedType(type);
     const defaults: Record<string, string> = {};
     type.fields.forEach((f) => {
-      if (f.default !== undefined && f.default !== null) {
+      if (f.type === "switch") {
+        // switch defaults to "false" unless explicitly set
+        defaults[f.name] = f.default !== undefined && f.default !== null
+          ? String(f.default)
+          : "false";
+      } else if (f.default !== undefined && f.default !== null) {
         defaults[f.name] = String(f.default);
       }
     });
@@ -616,6 +707,8 @@ export function CredentialFormModal({
 
     for (const field of selectedType.fields) {
       if (!field.required) continue;
+      // switch always has a value ("true"/"false") — skip required check
+      if (field.type === "switch") continue;
       const val = fieldValues[field.name] ?? "";
       if (!val && isEdit && field.secret) continue;
       if (!val) return `"${field.label}" maydoni to'ldirilishi shart`;
@@ -632,10 +725,15 @@ export function CredentialFormModal({
 
     setSaving(true);
     try {
-      const data: Record<string, string | number> = {};
+      const data: Record<string, string | number | boolean> = {};
       selectedType!.fields.forEach((f) => {
         const val = fieldValues[f.name] ?? "";
         if (isEdit && f.secret && !val) return;
+        if (f.type === "switch") {
+          // Always send boolean for switch fields
+          data[f.name] = val === "true";
+          return;
+        }
         if (val !== "") {
           data[f.name] = f.type === "number" ? Number(val) : val;
         }
