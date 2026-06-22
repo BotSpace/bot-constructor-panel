@@ -63,6 +63,9 @@ export interface ElementItemType {
   color: string;
   triggerId: string;
   defaultData?: Record<string, unknown>;
+  /** Optional role badge (Trigger/Action/Integration/...) for nodes whose group
+   *  doesn't map to a fixed role — e.g. module nodes mixing triggers + actions. */
+  role?: string;
 }
 
 export interface ElementTypes {

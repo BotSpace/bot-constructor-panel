@@ -36,7 +36,8 @@
       {
         "type": "switch",
         "key": "withArgs",
-        "label": "Argumentlarni ushlash"
+        "label": "Argumentlarni ushlash",
+        "optional": true
       },
       {
         "type": "switch",
@@ -47,7 +48,8 @@
       {
         "type": "switch",
         "key": "save_state",
-        "label": "Ma'lumotni saqlash"
+        "label": "Ma'lumotni saqlash",
+        "optional": true
       },
       {
         "type": "text",
@@ -73,7 +75,7 @@
       }
     ],
     "defaults": {
-      "command": "",
+      "command": "/start",
       "withArgs": false,
       "global": true
     }
@@ -259,7 +261,8 @@
       {
         "type": "switch",
         "key": "save_state",
-        "label": "Ma'lumotni saqlash"
+        "label": "Ma'lumotni saqlash",
+        "optional": true
       },
       {
         "type": "text",
@@ -4165,7 +4168,8 @@
       {
         "type": "switch",
         "key": "save_state",
-        "label": "Ma'lumotni saqlash"
+        "label": "Ma'lumotni saqlash",
+        "optional": true
       },
       {
         "type": "text",
@@ -4239,7 +4243,8 @@
       {
         "type": "switch",
         "key": "save_state",
-        "label": "Ma'lumotni saqlash"
+        "label": "Ma'lumotni saqlash",
+        "optional": true
       },
       {
         "type": "text",
@@ -5068,7 +5073,8 @@
       {
         "type": "switch",
         "key": "save_state",
-        "label": "Ma'lumotni saqlash"
+        "label": "Ma'lumotni saqlash",
+        "optional": true
       },
       {
         "type": "text",

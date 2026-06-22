@@ -167,6 +167,13 @@ export function useElements(): ElementTypes[] {
           color: SIDEBAR_COLOR_CLASS_REGISTRY[entry.colorToken] || "",
           triggerId: entry.type,
           defaultData: entry.defaults,
+          role:
+            (entry as { trigger?: boolean }).trigger ||
+            entry.category === "triggers"
+              ? "Trigger"
+              : entry.category === "integrations"
+                ? "Integration"
+                : "Action",
         })) as ElementItemType[],
       });
     }
