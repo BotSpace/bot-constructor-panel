@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Sheet,
@@ -649,6 +649,14 @@ export function ModulePanel({ open, onOpenChange, projectId }: ModulePanelProps)
   const [pendingDisable, setPendingDisable] = useState<ProjectModule | null>(null);
   const [enablingSlug, setEnablingSlug] = useState<string | null>(null);
 
+  // Opening the confirm dialog from inside a non-modal Sheet makes Radix fire
+  // onOpenChange(false) in the same tick (focus/pointer shift), instantly closing
+  // it. Record when it opened and ignore that immediate close.
+  const disableOpenedAtRef = useRef(0);
+  useEffect(() => {
+    if (pendingDisable !== null) disableOpenedAtRef.current = Date.now();
+  }, [pendingDisable]);
+
   // Reset on close
   useEffect(() => {
     if (!open) {
@@ -883,7 +891,11 @@ export function ModulePanel({ open, onOpenChange, projectId }: ModulePanelProps)
       <AlertDialog
         open={pendingDisable !== null}
         onOpenChange={(v) => {
-          if (!v && !disableMutation.isPending) setPendingDisable(null);
+          if (v) return;
+          if (disableMutation.isPending) return;
+          // Ignore the spurious close fired in the same tick as opening.
+          if (Date.now() - disableOpenedAtRef.current < 400) return;
+          setPendingDisable(null);
         }}
       >
         <AlertDialogContent>
