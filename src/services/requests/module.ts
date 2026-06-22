@@ -10,12 +10,15 @@ import { ProjectModule, AvailableModule, ModuleDetail } from "@/types/http/modul
 export async function getProjectModuleManifests(
   projectId: string | number
 ): Promise<NodeManifest[]> {
-  const { data } = await instanceAuth.get<{
-    manifests?: NodeManifest[];
-    data?: NodeManifest[];
-  }>(`/project/${projectId}/module-manifests/`);
-  // Backend returns { manifests: [...] }; tolerate { data: [...] } too.
-  return data?.manifests ?? data?.data ?? [];
+  const { data } = await instanceAuth.get(
+    `/project/${projectId}/module-manifests/`
+  );
+  // Shapes seen in the wild:
+  //   { manifests: [...] }                      (raw view)
+  //   { status, data: { manifests: [...] } }    (envelope renderer)
+  const body = (data as any)?.data ?? data;
+  const manifests = body?.manifests ?? body;
+  return Array.isArray(manifests) ? manifests : [];
 }
 
 // ---------------------------------------------------------------------------
@@ -25,10 +28,13 @@ export async function getProjectModuleManifests(
 export async function getProjectModules(
   projectId: string | number
 ): Promise<ProjectModule[]> {
-  const { data } = await instanceAuth.get<ProjectModule[]>(
-    `/project/${projectId}/modules/`
-  );
-  return Array.isArray(data) ? data : [];
+  const { data } = await instanceAuth.get(`/project/${projectId}/modules/`);
+  // Project endpoints come wrapped: { status, data: [...] }; tolerate plain array.
+  if (Array.isArray(data)) return data;
+  const d = data as any;
+  if (Array.isArray(d?.data)) return d.data;
+  if (Array.isArray(d?.results)) return d.results;
+  return [];
 }
 
 // ---------------------------------------------------------------------------
@@ -39,11 +45,11 @@ export async function enableModule(
   projectId: string | number,
   moduleSlug: string
 ): Promise<ProjectModule> {
-  const { data } = await instanceAuth.post<ProjectModule>(
+  const { data } = await instanceAuth.post(
     `/project/${projectId}/modules/`,
     { module_slug: moduleSlug }
   );
-  return data;
+  return ((data as any)?.data ?? data) as ProjectModule;
 }
 
 // ---------------------------------------------------------------------------
@@ -77,6 +83,6 @@ export async function listAvailableModules(): Promise<AvailableModule[]> {
 export async function getModuleDetail(
   moduleId: number | string
 ): Promise<ModuleDetail> {
-  const { data } = await instanceAuth.get<ModuleDetail>(`/modules/${moduleId}/`);
-  return data;
+  const { data } = await instanceAuth.get(`/modules/${moduleId}/`);
+  return ((data as any)?.data ?? data) as ModuleDetail;
 }
