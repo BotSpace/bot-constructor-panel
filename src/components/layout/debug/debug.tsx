@@ -57,6 +57,23 @@ export default function DebugingButtons() {
     null
   );
 
+  // "starting" stays true from the debug click until the engine is actually
+  // running (or failed). Intermediate/missing statuses during deploy must NOT
+  // flip the button back to Play — that was the "loading disappears then the
+  // countdown appears" gap. Cleared on running/failed or after a safety timeout.
+  const [starting, setStarting] = useState(false);
+  const startTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    const s = project?.debug?.status;
+    // Only a terminal RUNNING/FAILED clears "starting". NOT "stopped": during a
+    // reload the old pod stops briefly ("stopped") before the new one comes up —
+    // clearing here would drop the loading mid-restart (the gap the user saw).
+    if (s === "running" || s === "failed") {
+      setStarting(false);
+      if (startTimeoutRef.current) clearTimeout(startTimeoutRef.current);
+    }
+  }, [project?.debug?.status]);
+
   // Polling: agar WS debug_status eventi kelmasa (yoki kech kelsa) va status
   // "loading" holatida qolsa, har 3s da backend'dan status tekshiramiz.
   // WS ishlasa u oldinda bo'ladi — polling faqat fallback.
@@ -64,7 +81,7 @@ export default function DebugingButtons() {
 
   useEffect(() => {
     const status = project?.debug?.status;
-    const isLoading = status !== undefined && LOADING_STATUSES.has(status);
+    const isLoading = starting || (status !== undefined && LOADING_STATUSES.has(status));
 
     if (isLoading) {
       // Avvalgi polling bo'lsa to'xtatamiz
@@ -77,8 +94,9 @@ export default function DebugingButtons() {
             const debug = data?.data?.debug;
             const current = useProjectStore.getState().project?.debug;
             if (!debug) {
-              // Debug yozuvi yo'q = bot to'liq to'xtagan. Loading'dan chiqamiz.
-              if (current && current.status !== "stopped") {
+              // While starting, a missing debug record just means the pod isn't
+              // up yet — keep loading. Otherwise (e.g. after stop) mark stopped.
+              if (!starting && current && current.status !== "stopped") {
                 changeDebug({ ...current, status: "stopped" });
               }
               return;
@@ -106,23 +124,32 @@ export default function DebugingButtons() {
         pollingRef.current = null;
       }
     };
-  }, [project?.debug?.status, id, changeDebug]);
+  }, [project?.debug?.status, id, changeDebug, starting]);
 
   /* Ctrl+R is handled in constructor.tsx as a keyboard shortcut */
 
   /* --------------------------- Debug bot actions --------------------------- */
   async function handleRunAndRelaodDebugBot() {
+    // Capture original status before optimistic update so we can revert on error
+    const prevStatus = project?.debug.status ?? "stopped";
+
+    // Show loading IMMEDIATELY (before the awaited save) and hold it until the
+    // engine is running — so neither the save wait nor the reload's transient
+    // "stopped" can flip the button back to Play.
+    setStarting(true);
+    if (startTimeoutRef.current) clearTimeout(startTimeoutRef.current);
+    startTimeoutRef.current = setTimeout(() => setStarting(false), 90_000);
+
     // Saqlash tugashini KUTAMIZ — aks holda PATCH va /debug/ poygada bo'lib,
     // backend eski flow bilan debug konteyner ko'tarishi mumkin.
     try {
       await saveFlow(id);
     } catch {
+      setStarting(false);
+      if (startTimeoutRef.current) clearTimeout(startTimeoutRef.current);
       toast.error("Flow saqlanmadi — debug bekor qilindi, qayta urinib ko'ring.");
       return;
     }
-
-    // Capture original status before optimistic update so we can revert on error
-    const prevStatus = project?.debug.status ?? "stopped";
 
     if (project)
       changeDebug({
@@ -139,6 +166,8 @@ export default function DebugingButtons() {
         const raw = err?.response?.data;
         const data = raw?.data ?? raw;
         // Revert optimistic status update in all error cases
+        setStarting(false);
+        if (startTimeoutRef.current) clearTimeout(startTimeoutRef.current);
         if (project)
           changeDebug({ ...project["debug"], status: prevStatus });
 
@@ -265,7 +294,7 @@ export default function DebugingButtons() {
               </DropdownMenu>
 
             </>
-          ) : LOADING_STATUSES.has(project.debug.status) ? (
+          ) : starting || LOADING_STATUSES.has(project.debug.status) ? (
             <BottomPanelButton size={'icon'} disabled>
               <LoaderCircle className="h-4 w-4 animate-spin" />
             </BottomPanelButton>
