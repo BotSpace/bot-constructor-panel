@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   BotMessageSquare,
   RotateCcw,
@@ -14,6 +14,8 @@ import { toast } from "react-hot-toast";
 import { useParams } from "next/navigation";
 
 import { instanceAuth } from "@/services/instance";
+import type { ProjectRetrive } from "@/types/http/project";
+import type { APIDetailCreateResponse } from "@/types/http/response";
 
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { useFlowStore } from "@/features/bot-constructor/store";
@@ -32,6 +34,14 @@ import {
   RunningBotLimitError,
 } from "@/components/layout/running-bot-limit-modal";
 
+/**
+ * Statuses where the engine pod is still transitioning — show spinner.
+ * "pending"     — backend'dan WS orqali kelishi mumkin (deploy queue'da kutish)
+ * "initializing"— local optimistic va backend'dan kelishi mumkin (pod ko'tarilmoqda)
+ * "stopping"    — to'xtatilmoqda (pod o'chirilmoqda)
+ */
+const LOADING_STATUSES = new Set(["initializing", "pending", "stopping"]);
+
 /* ----------------------------- HEADER ACTIONS ----------------------------- */
 export default function DebugingButtons() {
   const { id }: { id: string } = useParams();
@@ -43,6 +53,50 @@ export default function DebugingButtons() {
   const [limitError, setLimitError] = useState<RunningBotLimitError | null>(
     null
   );
+
+  // Polling: agar WS debug_status eventi kelmasa (yoki kech kelsa) va status
+  // "loading" holatida qolsa, har 3s da backend'dan status tekshiramiz.
+  // WS ishlasa u oldinda bo'ladi — polling faqat fallback.
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const status = project?.debug?.status;
+    const isLoading = status !== undefined && LOADING_STATUSES.has(status);
+
+    if (isLoading) {
+      // Avvalgi polling bo'lsa to'xtatamiz
+      if (pollingRef.current) clearInterval(pollingRef.current);
+
+      pollingRef.current = setInterval(() => {
+        instanceAuth
+          .get<APIDetailCreateResponse<ProjectRetrive>>(`/project/${id}`)
+          .then(({ data }) => {
+            const debug = data?.data?.debug;
+            if (!debug) return;
+            // Faqat status o'zgargan bo'lsagina yangilaymiz
+            if (debug.status !== useProjectStore.getState().project?.debug?.status) {
+              changeDebug(debug);
+            }
+          })
+          .catch(() => {
+            // Silent — WS asosiy kanal, polling faqat fallback
+          });
+      }, 3000);
+    } else {
+      // Loading holatidan chiqdik — pollingni to'xtatamiz
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+      }
+    }
+
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+      }
+    };
+  }, [project?.debug?.status, id, changeDebug]);
 
   /* Ctrl+R is handled in constructor.tsx as a keyboard shortcut */
 
@@ -201,7 +255,7 @@ export default function DebugingButtons() {
               </DropdownMenu>
 
             </>
-          ) : project.debug.status === "initializing" ? (
+          ) : LOADING_STATUSES.has(project.debug.status) ? (
             <BottomPanelButton size={'icon'} disabled>
               <LoaderCircle className="h-4 w-4 animate-spin" />
             </BottomPanelButton>
