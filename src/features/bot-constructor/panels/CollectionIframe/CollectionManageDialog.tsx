@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,6 +49,14 @@ export function CollectionManageDialog({
   );
   const [deleting, setDeleting] = useState(false);
 
+  // Opening a nested AlertDialog inside a non-modal Sheet causes Radix to fire
+  // onInteractOutside on the Sheet in the same tick, instantly closing it.
+  // Record when the delete dialog opened and ignore that spurious close.
+  const deleteOpenedAtRef = useRef(0);
+  useEffect(() => {
+    if (pendingDelete !== null) deleteOpenedAtRef.current = Date.now();
+  }, [pendingDelete]);
+
   // Reload list whenever the dialog opens
   useEffect(() => {
     if (open && projectId) {
@@ -87,17 +94,38 @@ export function CollectionManageDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[520px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Database className="w-5 h-5" />
-              {t("title")}
-            </DialogTitle>
-            <DialogDescription>{t("description")}</DialogDescription>
-          </DialogHeader>
+      <Sheet open={open} onOpenChange={onOpenChange} modal={false}>
+        <SheetContent
+          side="right"
+          showOverlay={false}
+          showCloseButton={false}
+          onInteractOutside={(e) => {
+            // Nested AlertDialog open — prevent spurious Sheet close
+            if (pendingDelete !== null) {
+              e.preventDefault();
+              return;
+            }
+            onOpenChange(false);
+          }}
+          className="w-full sm:max-w-[640px] flex flex-col gap-0 p-0 overflow-hidden"
+        >
+          {/* Header */}
+          <SheetHeader className="shrink-0 border-b px-5 py-4 gap-0 space-y-0">
+            <div className="flex items-center gap-3">
+              <Database className="w-5 h-5 text-muted-foreground shrink-0" />
+              <div className="flex-1 min-w-0">
+                <SheetTitle className="text-base font-semibold leading-tight">
+                  {t("title")}
+                </SheetTitle>
+                <SheetDescription className="text-xs mt-0.5">
+                  {t("description")}
+                </SheetDescription>
+              </div>
+            </div>
+          </SheetHeader>
 
-          <div className="min-h-[120px]">
+          {/* List — scrollable area */}
+          <div className="flex-1 min-h-0 overflow-hidden">
             {loading ? (
               <div className="flex items-center justify-center py-10">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -107,8 +135,8 @@ export function CollectionManageDialog({
                 {t("empty")}
               </p>
             ) : (
-              <ScrollArea className="max-h-[360px]">
-                <div className="space-y-2">
+              <ScrollArea className="h-full">
+                <div className="space-y-2 px-4 py-3">
                   {collections.map((item) => (
                     <div
                       key={item.id}
@@ -149,19 +177,24 @@ export function CollectionManageDialog({
             )}
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+          {/* Footer */}
+          <div className="shrink-0 border-t px-5 py-3">
+            <Button variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
               {t("close")}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Destructive confirmation dialog */}
       <AlertDialog
         open={pendingDelete !== null}
-        onOpenChange={(open) => {
-          if (!open && !deleting) setPendingDelete(null);
+        onOpenChange={(v) => {
+          if (v) return;
+          if (deleting) return;
+          // Ignore the spurious close fired in the same tick as opening
+          if (Date.now() - deleteOpenedAtRef.current < 400) return;
+          setPendingDelete(null);
         }}
       >
         <AlertDialogContent>

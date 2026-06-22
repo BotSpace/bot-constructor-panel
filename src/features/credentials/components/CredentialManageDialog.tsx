@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -64,6 +63,14 @@ export function CredentialManageDialog({
   const [testing, setTesting] = useState<number | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editItem, setEditItem] = useState<CredentialListItem | null>(null);
+
+  // Opening a nested AlertDialog inside a non-modal Sheet causes Radix to fire
+  // onInteractOutside on the Sheet in the same tick, instantly closing it.
+  // Record when the delete dialog opened and ignore that spurious close.
+  const deleteOpenedAtRef = useRef(0);
+  useEffect(() => {
+    if (pendingDelete !== null) deleteOpenedAtRef.current = Date.now();
+  }, [pendingDelete]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -130,20 +137,38 @@ export function CredentialManageDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[600px] overflow-hidden">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Credentials
-            </DialogTitle>
-            <DialogDescription>
-              Autentifikatsiya ma&apos;lumotlari — barcha loyihalaringiz uchun umumiy
-            </DialogDescription>
-          </DialogHeader>
+      <Sheet open={open} onOpenChange={onOpenChange} modal={false}>
+        <SheetContent
+          side="right"
+          showOverlay={false}
+          showCloseButton={false}
+          onInteractOutside={(e) => {
+            // Nested AlertDialog open — prevent spurious Sheet close
+            if (pendingDelete !== null || formOpen) {
+              e.preventDefault();
+              return;
+            }
+            onOpenChange(false);
+          }}
+          className="w-full sm:max-w-[480px] flex flex-col gap-0 p-0 overflow-hidden"
+        >
+          {/* Header */}
+          <SheetHeader className="shrink-0 border-b px-5 py-4 gap-0 space-y-0">
+            <div className="flex items-center gap-3">
+              <Shield className="h-5 w-5 text-muted-foreground shrink-0" />
+              <div className="flex-1 min-w-0">
+                <SheetTitle className="text-base font-semibold leading-tight">
+                  Credentials
+                </SheetTitle>
+                <SheetDescription className="text-xs mt-0.5">
+                  Autentifikatsiya ma&apos;lumotlari — barcha loyihalaringiz uchun umumiy
+                </SheetDescription>
+              </div>
+            </div>
+          </SheetHeader>
 
           {/* Toolbar: filter + actions */}
-          <div className="flex items-center gap-2 pr-6">
+          <div className="shrink-0 flex items-center gap-2 px-5 py-3 border-b">
             <Select
               value={typeFilter || "all"}
               onValueChange={handleFilterChange}
@@ -169,8 +194,8 @@ export function CredentialManageDialog({
             </Button>
           </div>
 
-          {/* List */}
-          <div className="min-h-[160px] min-w-0 overflow-hidden">
+          {/* List — scrollable area */}
+          <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -182,74 +207,72 @@ export function CredentialManageDialog({
                   : "Hozircha credential yo'q"}
               </p>
             ) : (
-              <div className="max-h-[380px] overflow-y-auto pr-1">
-                <div className="space-y-1.5">
-                  {credentials.map((item) => (
-                    <div
-                      key={item.id}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg border px-4 py-3",
-                        "group hover:bg-muted/40 transition-colors"
-                      )}
-                    >
-                      <Shield className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <div className="space-y-1.5">
+                {credentials.map((item) => (
+                  <div
+                    key={item.id}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg border px-4 py-3",
+                      "group hover:bg-muted/40 transition-colors"
+                    )}
+                  >
+                    <Shield className="h-4 w-4 shrink-0 text-muted-foreground" />
 
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {item.type?.label ?? item.type_key}
-                        </p>
-                      </div>
-
-                      <span className="text-[10px] text-muted-foreground hidden sm:block">
-                        {new Date(item.updated_at).toLocaleDateString()}
-                      </span>
-
-                      {/* Actions — shown on hover */}
-                      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-7 w-7"
-                          title="Test"
-                          disabled={testing === item.id}
-                          onClick={() => handleTest(item)}
-                        >
-                          {testing === item.id ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : (
-                            <FlaskConical className="h-3.5 w-3.5" />
-                          )}
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-7 w-7"
-                          title="Tahrirlash"
-                          onClick={() => handleEdit(item)}
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-7 w-7 text-destructive hover:text-destructive"
-                          title="O'chirish"
-                          onClick={() => setPendingDelete(item)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.type?.label ?? item.type_key}
+                      </p>
                     </div>
-                  ))}
-                </div>
+
+                    <span className="text-[10px] text-muted-foreground hidden sm:block">
+                      {new Date(item.updated_at).toLocaleDateString()}
+                    </span>
+
+                    {/* Actions — shown on hover */}
+                    <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        title="Test"
+                        disabled={testing === item.id}
+                        onClick={() => handleTest(item)}
+                      >
+                        {testing === item.id ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <FlaskConical className="h-3.5 w-3.5" />
+                        )}
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        title="Tahrirlash"
+                        onClick={() => handleEdit(item)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-destructive hover:text-destructive"
+                        title="O'chirish"
+                        onClick={() => setPendingDelete(item)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
 
           {/* Pagination */}
           {totalPages > 1 ? (
-            <div className="flex items-center justify-center gap-2 pt-1">
+            <div className="shrink-0 flex items-center justify-center gap-2 border-t px-5 py-3">
               <Button
                 size="sm"
                 variant="outline"
@@ -274,19 +297,24 @@ export function CredentialManageDialog({
             </div>
           ) : null}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+          {/* Footer */}
+          <div className="shrink-0 border-t px-5 py-3">
+            <Button variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
               Yopish
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Delete confirmation */}
       <AlertDialog
         open={pendingDelete !== null}
         onOpenChange={(v) => {
-          if (!v && !deleting) setPendingDelete(null);
+          if (v) return;
+          if (deleting) return;
+          // Ignore the spurious close fired in the same tick as opening
+          if (Date.now() - deleteOpenedAtRef.current < 400) return;
+          setPendingDelete(null);
         }}
       >
         <AlertDialogContent>
