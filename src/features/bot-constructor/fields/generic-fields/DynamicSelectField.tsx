@@ -38,6 +38,11 @@ interface DynamicSelectFieldProps {
   data: Record<string, unknown>;
   dataKey: string;
   resource: string;
+  /**
+   * Data key that holds the credential id. When undefined the field does NOT
+   * require a credential — it fetches options unconditionally (module fields).
+   * When provided the old gate logic applies: credential must be selected first.
+   */
   credentialKey?: string;
   dependsOn?: string[];
   label?: string;
@@ -51,22 +56,33 @@ export function DynamicSelectField({
   data,
   dataKey,
   resource,
-  credentialKey = "credential_id",
+  credentialKey,
   dependsOn = [],
   label,
   placeholder = "Tanlang...",
   allowCustom = true,
 }: DynamicSelectFieldProps) {
   const updateNodeData = useFlowStore((s) => s.updateNodeData);
+  const nodes = useFlowStore((s) => s.nodes);
 
-  // Resolve credential id
-  const credentialId = data[credentialKey];
-  const credentialIdStr =
-    typeof credentialId === "number"
+  // Whether this field requires a credential at all
+  const requiresCredential = credentialKey !== undefined;
+
+  // Resolve credential id (only relevant when requiresCredential)
+  const credentialId = requiresCredential ? data[credentialKey as string] : undefined;
+  const credentialIdStr = requiresCredential
+    ? typeof credentialId === "number"
       ? String(credentialId)
       : typeof credentialId === "string" && credentialId !== ""
         ? credentialId
-        : null;
+        : null
+    : null;
+
+  // Derive module_slug from node type (e.g. "mymodule.PickCity" → "mymodule").
+  // Built-in nodes (no dot in type) do not send module_slug.
+  const nodeType = nodes.find((n) => n.id === nodeId)?.type ?? "";
+  const dotIndex = nodeType.indexOf(".");
+  const moduleSlug = dotIndex > 0 ? nodeType.slice(0, dotIndex) : null;
 
   // Resolve dependency values
   const depValues: Record<string, string> = {};
@@ -84,8 +100,9 @@ export function DynamicSelectField({
   // Build cache key
   const cacheKey = JSON.stringify({
     resource,
-    credentialId: credentialIdStr,
+    credentialId: requiresCredential ? credentialIdStr : undefined,
     params: depValues,
+    moduleSlug,
   });
 
   const [options, setOptions] = useState<OptionItem[] | null>(null);
@@ -99,16 +116,20 @@ export function DynamicSelectField({
 
   const currentValue = typeof data[dataKey] === "string" ? (data[dataKey] as string) : "";
 
-  const isDisabled = !credentialIdStr || !!missingDep;
+  // Field is disabled when:
+  //   - requiresCredential AND credential not yet chosen, OR
+  //   - a dependency key is missing
+  const isDisabled = (requiresCredential && !credentialIdStr) || !!missingDep;
 
-  const disabledHint = !credentialIdStr
+  const disabledHint = requiresCredential && !credentialIdStr
     ? "Avval credential tanlang"
     : missingDep
       ? `Avval "${missingDep}" ni tanlang`
       : null;
 
   const fetchOptions = (forceRefresh = false) => {
-    if (!credentialIdStr || missingDep) return;
+    // Guard: if credential is required but not yet provided, or dep missing → skip
+    if ((requiresCredential && !credentialIdStr) || missingDep) return;
 
     if (!forceRefresh && _optionsCache.has(cacheKey)) {
       setOptions(_optionsCache.get(cacheKey)!);
@@ -119,11 +140,18 @@ export function DynamicSelectField({
     setLoading(true);
     setError(null);
 
+    // Build request body: include credential_id only when required; add
+    // module_slug so the backend knows which module handles the resource.
+    const body: Record<string, unknown> = { params: depValues };
+    if (requiresCredential && credentialIdStr) {
+      body.credential_id = Number(credentialIdStr);
+    }
+    if (moduleSlug) {
+      body.module_slug = moduleSlug;
+    }
+
     instanceAuth
-      .post(`/v1/credentials/options/${resource}/`, {
-        credential_id: Number(credentialIdStr),
-        params: depValues,
-      })
+      .post(`/v1/credentials/options/${resource}/`, body)
       .then(({ data: raw }) => {
         const r = (raw ?? {}) as Record<string, unknown>;
         // Support {options:[...]} and {data:{options:[...]}} envelopes
@@ -155,7 +183,7 @@ export function DynamicSelectField({
       });
   };
 
-  // Reload when credential or deps change
+  // Reload when credential / deps / module context change
   useEffect(() => {
     if (isDisabled) {
       setOptions(null);
