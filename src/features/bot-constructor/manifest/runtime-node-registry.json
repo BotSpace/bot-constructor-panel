@@ -3224,16 +3224,18 @@
       {
         "kind": "source",
         "side": "right",
-        "id": "next",
+        "id": "true",
         "offsetClass": "translate-y-[-200%]",
-        "styleVariant": "danger"
+        "styleVariant": "success",
+        "label": "Ha"
       },
       {
         "kind": "source",
         "side": "right",
-        "id": "true",
+        "id": "next",
         "offsetClass": "translate-y-[200%]",
-        "styleVariant": "success"
+        "styleVariant": "danger",
+        "label": "Yo’q"
       }
     ],
     "content": [
@@ -3278,16 +3280,18 @@
       {
         "kind": "source",
         "side": "right",
-        "id": "next",
-        "offsetClass": "translate-y-[200%]",
-        "styleVariant": "accent"
+        "id": "true",
+        "offsetClass": "translate-y-[-200%]",
+        "styleVariant": "success",
+        "label": "Ha"
       },
       {
         "kind": "source",
         "side": "right",
-        "id": "true",
-        "offsetClass": "translate-y-[-200%]",
-        "styleVariant": "danger"
+        "id": "next",
+        "offsetClass": "translate-y-[200%]",
+        "styleVariant": "danger",
+        "label": "Yo’q"
       }
     ],
     "content": [
@@ -3333,7 +3337,8 @@
         "kind": "source",
         "side": "right",
         "id": "true",
-        "styleVariant": "accent"
+        "styleVariant": "success",
+        "label": "Aks holda"
       }
     ],
     "content": [
