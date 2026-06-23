@@ -103,6 +103,10 @@ function GenericHandleRenderer({
   // opacity:0 hides the pill while keeping pointer-events active so the
   // handle still acts as a valid edge drop target.
   if (handle.hidden) {
+    // Hidden TARGET (input): anchor the connection point at the node CENTER so the
+    // incoming edge connects to the middle of the node (not the left edge). The pill
+    // is invisible (opacity:0) but still a valid edge endpoint/drop target.
+    const centered = handle.kind === "target";
     return (
       <PillHandle
         id={handle.id ?? `${handle.kind}-${handle.side}`}
@@ -112,7 +116,11 @@ function GenericHandleRenderer({
         isConnectableStart={true}
         showPlus={false}
         className={handle.offsetClass}
-        style={{ opacity: 0 }}
+        style={
+          centered
+            ? { opacity: 0, left: "50%", top: "50%", transform: "translate(-50%, -50%)" }
+            : { opacity: 0 }
+        }
       />
     );
   }
