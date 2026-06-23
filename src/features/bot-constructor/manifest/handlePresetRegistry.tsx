@@ -1,6 +1,6 @@
 import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { ReactNode, useEffect, useMemo } from "react";
+import { CSSProperties, ReactNode, useEffect, useMemo } from "react";
 import { Position, useUpdateNodeInternals } from "reactflow";
 import { SourceHandles, TargetHandles } from "@/features/bot-constructor/canvas/handles";
 import { DeleteMessageSource } from "@/features/bot-constructor/canvas/handles/DeleteMessageSource";
@@ -27,6 +27,17 @@ const HANDLE_VARIANT_TONE: Record<string, PillHandleTone> = {
   danger: "danger",
   accent: "accent",
 };
+
+// offsetClass manifestdan RUNTIME'da keladi (masalan "translate-y-[-150%]"). Tailwind
+// faqat build vaqtida source'da uchragan klasslarni generatsiya qiladi — runtime'dagi
+// ixtiyoriy qiymatlar (modul har xil offset yuboradi) CSS'da yo'q, ya'ni klass hech
+// nimani ko'chirmaydi. Shu sabab offset'ni inline `translate` style sifatida qo'llaymiz
+// (PillHandle'ning `transform`'i bilan kompozitsiya bo'ladi, hech qachon purge bo'lmaydi).
+function offsetStyle(offsetClass?: string): CSSProperties | undefined {
+  if (!offsetClass) return undefined;
+  const m = offsetClass.match(/translate-y-\[(-?[\d.]+(?:%|px|rem|em)?)\]/);
+  return m ? { translate: `0 ${m[1]}` } : undefined;
+}
 
 interface GenericHandleRendererProps {
   handle: NodeHandleManifest;
@@ -115,11 +126,10 @@ function GenericHandleRenderer({
         tone={tone}
         isConnectableStart={true}
         showPlus={false}
-        className={handle.offsetClass}
         style={
           centered
             ? { opacity: 0, left: "50%", top: "50%", transform: "translate(-50%, -50%)" }
-            : { opacity: 0 }
+            : { opacity: 0, ...offsetStyle(handle.offsetClass) }
         }
       />
     );
@@ -142,13 +152,13 @@ function GenericHandleRenderer({
           isConnectableStart={handle.kind !== "target"}
           showPlus={handle.kind === "source"}
           title={handle.label}
-          className={handle.offsetClass}
+          style={offsetStyle(handle.offsetClass)}
         />
         <div
-          className={handle.offsetClass}
           style={{
             position: "absolute",
             top: "50%",
+            ...offsetStyle(handle.offsetClass),
             ...(isRight ? { right: "18px" } : isLeft ? { left: "18px" } : {}),
             pointerEvents: "none",
           }}
@@ -181,7 +191,7 @@ function GenericHandleRenderer({
       tone={tone}
       isConnectableStart={handle.kind !== "target"}
       showPlus={handle.kind === "source"}
-      className={handle.offsetClass}
+      style={offsetStyle(handle.offsetClass)}
     />
   );
 }
