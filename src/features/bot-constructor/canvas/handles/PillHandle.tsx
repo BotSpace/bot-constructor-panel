@@ -73,7 +73,10 @@ export function PillHandle({
       className={cn(
         "group/handle !rounded-md !border-0 flex items-center justify-center shadow-sm",
         "!transition-all !duration-150 ease-out",
-        "!w-4 !h-4 hover:!w-5 hover:!h-5",
+        // Hover = visual scale only. Don't grow w/h: percentage offsets like
+        // translate-y-[-200%] are relative to the handle's own box, so growing
+        // w/h recomputes the offset and shifts the handle up. scale keeps the box fixed.
+        "!w-4 !h-4 origin-center hover:!scale-125",
         TONE_CLASSES[tone],
         className
       )}
