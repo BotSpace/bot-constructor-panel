@@ -153,8 +153,15 @@ function GenericHandleRenderer({
     // Handle PillHandle'da offsetStyle bilan vertikal ajraydi. Label esa node
     // TASHQARISIDA (o'ng chetdan keyin, handle yonida) — node ichidagi kontent bilan
     // ustma-ust kelmaydi. Vertikal handle bilan piksel-offset orqali tekislanadi.
+    // Hover-group: handle (circle) ustiga borilganda label HAM scale bo'lsin (birga
+    // o'sadi, circle label ustiga chiqib ketmaydi). Wrapper butun node'ni qoplaydi,
+    // pointer-events:none — faqat ICHIDAGI pill hover qilinganda group-hover ishlaydi
+    // (node body'ga emas). Har labelli handle o'z wrapper'iga ega → faqat o'z label'i scale.
     return (
-      <>
+      <div
+        className="group/lh"
+        style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
+      >
         <PillHandle
           id={handle.id ?? `${handle.kind}-${handle.side}`}
           type={handle.kind}
@@ -166,11 +173,12 @@ function GenericHandleRenderer({
           style={offsetStyle(handle.offsetClass)}
         />
         <span
-          className="text-muted-foreground font-medium"
+          className="text-muted-foreground font-medium transition-transform duration-150 group-hover/lh:scale-125"
           style={{
             position: "absolute",
             top: `calc(50% + ${dy}px)`,
             transform: "translateY(-50%)",
+            transformOrigin: isRight ? "left center" : "right center",
             ...(isRight
               ? { left: "100%", marginLeft: 30 }
               : { right: "100%", marginRight: 30 }),
@@ -183,7 +191,7 @@ function GenericHandleRenderer({
         >
           {handle.label}
         </span>
-      </>
+      </div>
     );
   }
 
@@ -353,6 +361,7 @@ function SwitchCaseSources({ nodeId }: { nodeId: string }) {
         return (
           <div
             key={caseId}
+            className="group/sc"
             style={{ position: "absolute", right: 0, top: `${topPct}%`, transform: "translateY(-50%)" }}
           >
             <PillHandle
@@ -368,14 +377,15 @@ function SwitchCaseSources({ nodeId }: { nodeId: string }) {
                 position: "absolute",
                 top: "50%",
                 transform: "translateY(-50%)",
-                right: "calc(100% + 14px)",
+                transformOrigin: "left center",
+                left: "calc(100% + 30px)",
                 whiteSpace: "nowrap",
                 fontSize: 9,
                 lineHeight: "12px",
                 pointerEvents: "none",
                 userSelect: "none",
               }}
-              className="text-muted-foreground font-medium"
+              className="text-muted-foreground font-medium transition-transform duration-150 group-hover/sc:scale-125"
             >
               {label}
             </span>
@@ -384,6 +394,7 @@ function SwitchCaseSources({ nodeId }: { nodeId: string }) {
       })}
       {hasDefault && (
         <div
+          className="group/sc"
           style={{
             position: "absolute",
             right: 0,
@@ -404,6 +415,7 @@ function SwitchCaseSources({ nodeId }: { nodeId: string }) {
               position: "absolute",
               top: "50%",
               transform: "translateY(-50%)",
+              transformOrigin: "left center",
               left: "calc(100% + 30px)",
               whiteSpace: "nowrap",
               fontSize: 9,
@@ -411,7 +423,7 @@ function SwitchCaseSources({ nodeId }: { nodeId: string }) {
               pointerEvents: "none",
               userSelect: "none",
             }}
-            className="text-muted-foreground font-medium"
+            className="text-muted-foreground font-medium transition-transform duration-150 group-hover/sc:scale-125"
           >
             Default
           </span>
