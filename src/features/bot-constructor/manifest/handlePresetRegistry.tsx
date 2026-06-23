@@ -39,6 +39,18 @@ function offsetStyle(offsetClass?: string): CSSProperties | undefined {
   return m ? { translate: `0 ${m[1]}` } : undefined;
 }
 
+// PillHandle = !w-4 !h-4 = 16px. Handle'ning `translate-y-[X%]` offseti o'z box'iga
+// (16px) nisbatan. Label alohida element (boshqa balandlik) — handle bilan TO'G'RI
+// tekislanishi uchun offsetni PIKSELga aylantirib (% * 16px) label'ga qo'llaymiz.
+const HANDLE_PX = 16;
+function offsetPx(offsetClass?: string): number {
+  if (!offsetClass) return 0;
+  const m = offsetClass.match(/translate-y-\[(-?[\d.]+)(%|px)\]/);
+  if (!m) return 0;
+  const v = parseFloat(m[1]);
+  return m[2] === "px" ? v : (v / 100) * HANDLE_PX;
+}
+
 interface GenericHandleRendererProps {
   handle: NodeHandleManifest;
   nodeId: string;
@@ -137,11 +149,10 @@ function GenericHandleRenderer({
 
   if (handle.label) {
     const isRight = handle.side === "right";
-    const isLeft = handle.side === "left";
-    // The handle itself is positioned EXACTLY like the plain (no-label) path —
-    // offsetClass on the PillHandle so React Flow places it correctly (multiple
-    // handles spread vertically). The label is a separate, non-interfering element
-    // offset by the SAME offsetClass so it sits next to its handle.
+    const dy = offsetPx(handle.offsetClass);
+    // Handle PillHandle'da offsetStyle bilan vertikal ajraydi. Label esa node
+    // TASHQARISIDA (o'ng chetdan keyin, handle yonida) — node ichidagi kontent bilan
+    // ustma-ust kelmaydi. Vertikal handle bilan piksel-offset orqali tekislanadi.
     return (
       <>
         <PillHandle
@@ -154,31 +165,24 @@ function GenericHandleRenderer({
           title={handle.label}
           style={offsetStyle(handle.offsetClass)}
         />
-        <div
+        <span
+          className="text-muted-foreground font-medium"
           style={{
             position: "absolute",
-            top: "50%",
-            ...offsetStyle(handle.offsetClass),
-            ...(isRight ? { right: "18px" } : isLeft ? { left: "18px" } : {}),
+            top: `calc(50% + ${dy}px)`,
+            transform: "translateY(-50%)",
+            ...(isRight
+              ? { left: "100%", marginLeft: 28 }
+              : { right: "100%", marginRight: 28 }),
+            whiteSpace: "nowrap",
+            fontSize: 9,
+            lineHeight: "12px",
             pointerEvents: "none",
+            userSelect: "none",
           }}
         >
-          <span
-            style={{
-              position: "absolute",
-              top: 0,
-              transform: "translateY(-50%)",
-              ...(isRight ? { right: 0 } : isLeft ? { left: 0 } : {}),
-              whiteSpace: "nowrap",
-              fontSize: 9,
-              lineHeight: "12px",
-              userSelect: "none",
-            }}
-            className="text-muted-foreground font-medium"
-          >
-            {handle.label}
-          </span>
-        </div>
+          {handle.label}
+        </span>
       </>
     );
   }
