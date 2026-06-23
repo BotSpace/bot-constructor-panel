@@ -231,8 +231,8 @@ export const getFormatFlow = (
         if (h.id) handleRank.set(h.id, parseOffsetRank(h));
       });
 
-      // For each handle, collect the direct children (one hop only — deeper
-      // descendants are already correctly placed relative to their own parents)
+      // For each handle, collect the direct children (one hop). Their subtrees
+      // are shifted rigidly afterwards so descendants follow the branch node.
       const handleToChildren = new Map<string, string[]>();
       handles.forEach((hId) => {
         const childIds = outEdges
@@ -256,8 +256,11 @@ export const getFormatFlow = (
         .map((id) => posById.get(id)?.position.y ?? 0)
         .sort((a, b) => a - b);
 
-      // Expected vertical order: handle with smallest rank → topmost Y slots
-      // Assign the sorted Y values to children in handle-rank order
+      // Expected vertical order: handle with smallest rank → topmost Y slots.
+      // Assign the sorted Y values to children in handle-rank order, AND shift
+      // each child's whole forward subtree by the same delta — otherwise moving
+      // a branch node leaves its descendants behind and downstream edges cross.
+      const shifted = new Set<string>(allChildIds); // direct children set explicitly below
       let yIdx = 0;
       sortedHandleGroups.forEach(([, childIds]) => {
         // Sort children within the same handle group by their current Y so
@@ -267,8 +270,24 @@ export const getFormatFlow = (
         );
         sorted.forEach((childId) => {
           const node = posById.get(childId);
-          if (node) {
-            node.position = { ...node.position, y: currentYs[yIdx++] ?? node.position.y };
+          if (!node) return;
+          const newY = currentYs[yIdx++] ?? node.position.y;
+          const delta = newY - node.position.y;
+          node.position = { ...node.position, y: newY };
+          if (delta === 0) return;
+          // Shift the child's forward descendants (BFS) by the same delta so the
+          // whole subtree moves rigidly with the branch node.
+          const queue = [childId];
+          while (queue.length) {
+            const cur = queue.shift()!;
+            (outBySource.get(cur) ?? []).forEach((e) => {
+              const t = e.target;
+              if (shifted.has(t)) return;
+              shifted.add(t);
+              const tn = posById.get(t);
+              if (tn) tn.position = { ...tn.position, y: tn.position.y + delta };
+              queue.push(t);
+            });
           }
         });
       });
