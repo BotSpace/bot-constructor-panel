@@ -1294,8 +1294,7 @@
     "iconName": "clapperboard",
     "colorToken": "action-fuchsia",
     "size": {
-      "width": 200,
-      "height": 150
+      "width": 200
     },
     "sidebar": {
       "enabled": true,
@@ -1331,8 +1330,7 @@
     "iconName": "microphone",
     "colorToken": "action-violet",
     "size": {
-      "width": 200,
-      "height": 150
+      "width": 200
     },
     "sidebar": {
       "enabled": true,
@@ -1385,8 +1383,7 @@
     "iconName": "video",
     "colorToken": "action-purple",
     "size": {
-      "width": 200,
-      "height": 150
+      "width": 200
     },
     "sidebar": {
       "enabled": true,
@@ -2303,8 +2300,7 @@
     "iconName": "dice",
     "colorToken": "action-amber",
     "size": {
-      "width": 200,
-      "height": 150
+      "width": 200
     },
     "sidebar": {
       "enabled": true,
@@ -2745,8 +2741,7 @@
     "iconName": "forward",
     "colorToken": "message-op-slate-light",
     "size": {
-      "width": 200,
-      "height": 150
+      "width": 200
     },
     "sidebar": {
       "enabled": true,
@@ -2788,8 +2783,7 @@
     "iconName": "admin",
     "colorToken": "message-op-red",
     "size": {
-      "width": 200,
-      "height": 150
+      "width": 200
     },
     "sidebar": {
       "enabled": true,
@@ -2825,8 +2819,7 @@
     "iconName": "copy",
     "colorToken": "message-op-slate",
     "size": {
-      "width": 200,
-      "height": 150
+      "width": 200
     },
     "sidebar": {
       "enabled": true,
@@ -3542,8 +3535,7 @@
     "iconName": "timer",
     "colorToken": "flow-amber",
     "size": {
-      "width": 200,
-      "height": 150
+      "width": 200
     },
     "sidebar": {
       "enabled": true,
@@ -4039,8 +4031,7 @@
     "iconName": "corner-up-left",
     "colorToken": "flow-purple",
     "size": {
-      "width": 200,
-      "height": 150
+      "width": 200
     },
     "sidebar": {
       "enabled": true,
