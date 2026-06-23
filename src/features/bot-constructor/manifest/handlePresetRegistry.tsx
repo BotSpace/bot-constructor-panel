@@ -20,16 +20,6 @@ const HANDLE_SIDE_TO_POSITION: Record<string, Position> = {
   bottom: Position.Bottom,
 };
 
-// PillHandle uses translate(calc(100% + 8px), -50%) for right-side handles.
-// When the wrapper div already sets top:0 (anchored to its own center), we keep the
-// same transform so the pill dot lands 8px outside the card edge, vertically centered.
-const HANDLE_LABEL_OFFSET: Record<string, string> = {
-  right: "translate(calc(100% + 8px), -50%)",
-  left: "translate(calc(-100% - 8px), -50%)",
-  top: "translate(-50%, calc(-100% - 8px))",
-  bottom: "translate(-50%, calc(100% + 8px))",
-};
-
 const HANDLE_VARIANT_TONE: Record<string, PillHandleTone> = {
   default: "neutral",
   success: "success",
@@ -130,17 +120,12 @@ function GenericHandleRenderer({
   if (handle.label) {
     const isRight = handle.side === "right";
     const isLeft = handle.side === "left";
-    // Wrapper sits at top:50% (node center) then offsetClass (e.g. translate-y-[-85%])
-    // shifts it vertically — exactly the same mechanic as plain PillHandle + offsetClass.
+    // The handle itself is positioned EXACTLY like the plain (no-label) path —
+    // offsetClass on the PillHandle so React Flow places it correctly (multiple
+    // handles spread vertically). The label is a separate, non-interfering element
+    // offset by the SAME offsetClass so it sits next to its handle.
     return (
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          ...(isRight ? { right: 0 } : isLeft ? { left: 0 } : {}),
-        }}
-        className={handle.offsetClass}
-      >
+      <>
         <PillHandle
           id={handle.id ?? `${handle.kind}-${handle.side}`}
           type={handle.kind}
@@ -149,26 +134,34 @@ function GenericHandleRenderer({
           isConnectableStart={handle.kind !== "target"}
           showPlus={handle.kind === "source"}
           title={handle.label}
-          // PillHandle applies its own translate, we reset top so it anchors to the wrapper div
-          style={{ top: 0, transform: HANDLE_LABEL_OFFSET[handle.side ?? "right"] }}
+          className={handle.offsetClass}
         />
-        <span
+        <div
+          className={handle.offsetClass}
           style={{
             position: "absolute",
-            top: 0,
-            transform: "translateY(-50%)",
-            ...(isRight ? { right: "calc(100% + 14px)" } : isLeft ? { left: "calc(100% + 14px)" } : {}),
-            whiteSpace: "nowrap",
-            fontSize: 9,
-            lineHeight: "12px",
+            top: "50%",
+            ...(isRight ? { right: "18px" } : isLeft ? { left: "18px" } : {}),
             pointerEvents: "none",
-            userSelect: "none",
           }}
-          className="text-muted-foreground font-medium"
         >
-          {handle.label}
-        </span>
-      </div>
+          <span
+            style={{
+              position: "absolute",
+              top: 0,
+              transform: "translateY(-50%)",
+              ...(isRight ? { right: 0 } : isLeft ? { left: 0 } : {}),
+              whiteSpace: "nowrap",
+              fontSize: 9,
+              lineHeight: "12px",
+              userSelect: "none",
+            }}
+            className="text-muted-foreground font-medium"
+          >
+            {handle.label}
+          </span>
+        </div>
+      </>
     );
   }
 
