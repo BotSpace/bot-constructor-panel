@@ -294,6 +294,59 @@ export const getFormatFlow = (
     });
   }
 
+  // ── Convergence (merge) re-centering ──────────────────────────────────────
+  // The branch correction above shifts each branch's subtree RIGIDLY, assuming a
+  // tree. When two branches MERGE into one node (diamond), that node was shifted
+  // with whichever branch happened to be processed first → it sticks to one side
+  // instead of sitting between its parents. Re-center every multi-parent node at
+  // the average of its parents' vertical centers, then shift its forward subtree
+  // by the same delta. Processed left-to-right (by x) so parents are final first.
+  {
+    const posById = new Map<string, (typeof layoutedNormalNodes)[0]>();
+    layoutedNormalNodes.forEach((n) => posById.set(n.id, n));
+
+    const parentsByChild = new Map<string, string[]>();
+    const outBySrc = new Map<string, string[]>();
+    forwardEdges.forEach((e) => {
+      if (!posById.has(e.source) || !posById.has(e.target)) return;
+      if (!parentsByChild.has(e.target)) parentsByChild.set(e.target, []);
+      parentsByChild.get(e.target)!.push(e.source);
+      if (!outBySrc.has(e.source)) outBySrc.set(e.source, []);
+      outBySrc.get(e.source)!.push(e.target);
+    });
+
+    const hOf = (n: (typeof layoutedNormalNodes)[0]) => n.height ?? DEFAULT_NODE_HEIGHT;
+
+    const ordered = [...layoutedNormalNodes].sort((a, b) => a.position.x - b.position.x);
+    ordered.forEach((node) => {
+      const parents = parentsByChild.get(node.id);
+      if (!parents || parents.length < 2) return;
+      const parentNodes = parents
+        .map((p) => posById.get(p))
+        .filter((p): p is (typeof layoutedNormalNodes)[0] => Boolean(p));
+      if (parentNodes.length < 2) return;
+      const avgCenterY =
+        parentNodes.reduce((s, p) => s + p.position.y + hOf(p) / 2, 0) / parentNodes.length;
+      const newY = avgCenterY - hOf(node) / 2;
+      const delta = newY - node.position.y;
+      if (Math.abs(delta) < 1) return;
+      node.position = { ...node.position, y: newY };
+      // Shift the merge node's forward descendants by the same delta so they follow.
+      const seen = new Set<string>([node.id]);
+      const queue = [node.id];
+      while (queue.length) {
+        const cur = queue.shift()!;
+        (outBySrc.get(cur) ?? []).forEach((t) => {
+          if (seen.has(t)) return;
+          seen.add(t);
+          const tn = posById.get(t);
+          if (tn) tn.position = { ...tn.position, y: tn.position.y + delta };
+          queue.push(t);
+        });
+      }
+    });
+  }
+
   // Build a quick lookup of layouted normal node positions
   const normalPositionMap = new Map<string, { x: number; y: number; width: number; height: number }>();
   layoutedNormalNodes.forEach((n) => {
