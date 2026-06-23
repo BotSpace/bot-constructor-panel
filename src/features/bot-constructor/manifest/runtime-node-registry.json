@@ -57,21 +57,45 @@
         "label": "State Key",
         "placeholder": "Masalan: user_message, phone, etc.",
         "helpText": "Ma'lumot shu kalitga saqlanadi",
-        "visibleWhen": { "key": "save_state", "equals": true }
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       },
       {
         "type": "select",
         "key": "state_type",
         "label": "Ma'lumot Turi",
         "options": [
-          {"value": "text", "label": "text"},
-          {"value": "number", "label": "number"},
-          {"value": "photo", "label": "photo"},
-          {"value": "video", "label": "video"},
-          {"value": "document", "label": "document"},
-          {"value": "any", "label": "any"}
+          {
+            "value": "text",
+            "label": "text"
+          },
+          {
+            "value": "number",
+            "label": "number"
+          },
+          {
+            "value": "photo",
+            "label": "photo"
+          },
+          {
+            "value": "video",
+            "label": "video"
+          },
+          {
+            "value": "document",
+            "label": "document"
+          },
+          {
+            "value": "any",
+            "label": "any"
+          }
         ],
-        "visibleWhen": { "key": "save_state", "equals": true }
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       }
     ],
     "defaults": {
@@ -153,16 +177,46 @@
         "key": "type",
         "label": "Xabar turi",
         "options": [
-          {"value": "any",      "label": "Har qanday xabar"},
-          {"value": "text",     "label": "Matn"},
-          {"value": "location", "label": "Joylashuv"},
-          {"value": "contact",  "label": "Kontakt"},
-          {"value": "phone",    "label": "Telefon"},
-          {"value": "document", "label": "Hujjat"},
-          {"value": "photo",    "label": "Rasm"},
-          {"value": "video",    "label": "Video"},
-          {"value": "audio",    "label": "Audio"},
-          {"value": "sticker",  "label": "Stiker"}
+          {
+            "value": "any",
+            "label": "Har qanday xabar"
+          },
+          {
+            "value": "text",
+            "label": "Matn"
+          },
+          {
+            "value": "location",
+            "label": "Joylashuv"
+          },
+          {
+            "value": "contact",
+            "label": "Kontakt"
+          },
+          {
+            "value": "phone",
+            "label": "Telefon"
+          },
+          {
+            "value": "document",
+            "label": "Hujjat"
+          },
+          {
+            "value": "photo",
+            "label": "Rasm"
+          },
+          {
+            "value": "video",
+            "label": "Video"
+          },
+          {
+            "value": "audio",
+            "label": "Audio"
+          },
+          {
+            "value": "sticker",
+            "label": "Stiker"
+          }
         ]
       },
       {
@@ -170,88 +224,190 @@
         "key": "filter",
         "label": "Filter",
         "options": [
-          {"value": "any",         "label": "Har qanday"},
-          {"value": "equals",      "label": "Teng"},
-          {"value": "contains",    "label": "Ichida"},
-          {"value": "not-contains","label": "Ichida emas"},
-          {"value": "starts_with", "label": "Boshlanadi"},
-          {"value": "regex",       "label": "Regex"},
-          {"value": "command",     "label": "Buyruq"}
+          {
+            "value": "any",
+            "label": "Har qanday"
+          },
+          {
+            "value": "equals",
+            "label": "Teng"
+          },
+          {
+            "value": "contains",
+            "label": "Ichida"
+          },
+          {
+            "value": "not-contains",
+            "label": "Ichida emas"
+          },
+          {
+            "value": "starts_with",
+            "label": "Boshlanadi"
+          },
+          {
+            "value": "regex",
+            "label": "Regex"
+          },
+          {
+            "value": "command",
+            "label": "Buyruq"
+          }
         ],
-        "visibleWhen": {"key": "type", "oneOf": ["text", "phone", "contact"]}
+        "visibleWhen": {
+          "key": "type",
+          "oneOf": [
+            "text",
+            "phone",
+            "contact"
+          ]
+        }
       },
       {
         "type": "select",
         "key": "filter",
         "label": "Filter",
         "options": [
-          {"value": "any",       "label": "Har qanday"},
-          {"value": "size",      "label": "Hajm (MB)"}
+          {
+            "value": "any",
+            "label": "Har qanday"
+          },
+          {
+            "value": "size",
+            "label": "Hajm (MB)"
+          }
         ],
-        "visibleWhen": {"key": "type", "oneOf": ["photo", "video", "audio"]}
+        "visibleWhen": {
+          "key": "type",
+          "oneOf": [
+            "photo",
+            "video",
+            "audio"
+          ]
+        }
       },
       {
         "type": "select",
         "key": "filter",
         "label": "Filter",
         "options": [
-          {"value": "any",       "label": "Har qanday"},
-          {"value": "size",      "label": "Hajm (MB)"},
-          {"value": "extension", "label": "Kengaytmasi"}
+          {
+            "value": "any",
+            "label": "Har qanday"
+          },
+          {
+            "value": "size",
+            "label": "Hajm (MB)"
+          },
+          {
+            "value": "extension",
+            "label": "Kengaytmasi"
+          }
         ],
-        "visibleWhen": {"key": "type", "oneOf": ["document"]}
+        "visibleWhen": {
+          "key": "type",
+          "oneOf": [
+            "document"
+          ]
+        }
       },
       {
         "type": "select",
         "key": "filter",
         "label": "Filter",
         "options": [
-          {"value": "any",    "label": "Har qanday"},
-          {"value": "radius", "label": "Radius (ichida)"}
+          {
+            "value": "any",
+            "label": "Har qanday"
+          },
+          {
+            "value": "radius",
+            "label": "Radius (ichida)"
+          }
         ],
-        "visibleWhen": {"key": "type", "oneOf": ["location"]}
+        "visibleWhen": {
+          "key": "type",
+          "oneOf": [
+            "location"
+          ]
+        }
       },
       {
         "type": "text",
         "key": "context.value",
         "label": "Parametr qiymati",
         "placeholder": "Masalan: /start, salom, .pdf ...",
-        "visibleWhen": {"key": "filter", "oneOf": ["equals", "contains", "not-contains", "starts_with", "regex", "command", "extension"]}
+        "visibleWhen": {
+          "key": "filter",
+          "oneOf": [
+            "equals",
+            "contains",
+            "not-contains",
+            "starts_with",
+            "regex",
+            "command",
+            "extension"
+          ]
+        }
       },
       {
         "type": "number",
         "key": "context.radius.lat",
         "label": "Radius — Kenglik (lat)",
         "placeholder": "41.2995",
-        "visibleWhen": {"key": "filter", "oneOf": ["radius"]}
+        "visibleWhen": {
+          "key": "filter",
+          "oneOf": [
+            "radius"
+          ]
+        }
       },
       {
         "type": "number",
         "key": "context.radius.lng",
         "label": "Radius — Uzunlik (lng)",
         "placeholder": "69.2401",
-        "visibleWhen": {"key": "filter", "oneOf": ["radius"]}
+        "visibleWhen": {
+          "key": "filter",
+          "oneOf": [
+            "radius"
+          ]
+        }
       },
       {
         "type": "number",
         "key": "context.radius.km",
         "label": "Radius — Masofa (km)",
         "placeholder": "5",
-        "visibleWhen": {"key": "filter", "oneOf": ["radius"]}
+        "visibleWhen": {
+          "key": "filter",
+          "oneOf": [
+            "radius"
+          ]
+        }
       },
       {
         "type": "number",
         "key": "context.size.min",
         "label": "Hajm — Minimum (MB)",
         "placeholder": "0",
-        "visibleWhen": {"key": "filter", "oneOf": ["size"]}
+        "visibleWhen": {
+          "key": "filter",
+          "oneOf": [
+            "size"
+          ]
+        }
       },
       {
         "type": "number",
         "key": "context.size.max",
         "label": "Hajm — Maksimum (MB)",
         "placeholder": "50",
-        "visibleWhen": {"key": "filter", "oneOf": ["size"]}
+        "visibleWhen": {
+          "key": "filter",
+          "oneOf": [
+            "size"
+          ]
+        }
       },
       {
         "type": "switch",
@@ -270,21 +426,45 @@
         "label": "State Key",
         "placeholder": "Masalan: user_message, phone, etc.",
         "helpText": "Ma'lumot shu kalitga saqlanadi",
-        "visibleWhen": { "key": "save_state", "equals": true }
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       },
       {
         "type": "select",
         "key": "state_type",
         "label": "Ma'lumot Turi",
         "options": [
-          {"value": "text", "label": "text"},
-          {"value": "number", "label": "number"},
-          {"value": "photo", "label": "photo"},
-          {"value": "video", "label": "video"},
-          {"value": "document", "label": "document"},
-          {"value": "any", "label": "any"}
+          {
+            "value": "text",
+            "label": "text"
+          },
+          {
+            "value": "number",
+            "label": "number"
+          },
+          {
+            "value": "photo",
+            "label": "photo"
+          },
+          {
+            "value": "video",
+            "label": "video"
+          },
+          {
+            "value": "document",
+            "label": "document"
+          },
+          {
+            "value": "any",
+            "label": "any"
+          }
         ],
-        "visibleWhen": { "key": "save_state", "equals": true }
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       }
     ],
     "defaults": {
@@ -1281,14 +1461,14 @@
         "key": "latitude",
         "label": "Latitude",
         "placeholder": "41.311151",
-        "step": 1e-6
+        "step": 0.000001
       },
       {
         "type": "number",
         "key": "longitude",
         "label": "Longitude",
         "placeholder": "69.279737",
-        "step": 1e-6
+        "step": 0.000001
       },
       {
         "type": "action-recipients",
@@ -2592,7 +2772,9 @@
       }
     ],
     "defaults": {
-      "recipientIds": [""]
+      "recipientIds": [
+        ""
+      ]
     }
   },
   {
@@ -3995,7 +4177,10 @@
       "timeout": 30,
       "storeHeaders": false
     },
-    "producesState": ["http_response", "http_success"]
+    "producesState": [
+      "http_response",
+      "http_success"
+    ]
   },
   {
     "type": "CallbackQueryAnswerNode",
@@ -4185,21 +4370,45 @@
         "label": "State Key",
         "placeholder": "Masalan: user_message, phone, etc.",
         "helpText": "Ma'lumot shu kalitga saqlanadi",
-        "visibleWhen": { "key": "save_state", "equals": true }
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       },
       {
         "type": "select",
         "key": "state_type",
         "label": "Ma'lumot Turi",
         "options": [
-          {"value": "text", "label": "text"},
-          {"value": "number", "label": "number"},
-          {"value": "photo", "label": "photo"},
-          {"value": "video", "label": "video"},
-          {"value": "document", "label": "document"},
-          {"value": "any", "label": "any"}
+          {
+            "value": "text",
+            "label": "text"
+          },
+          {
+            "value": "number",
+            "label": "number"
+          },
+          {
+            "value": "photo",
+            "label": "photo"
+          },
+          {
+            "value": "video",
+            "label": "video"
+          },
+          {
+            "value": "document",
+            "label": "document"
+          },
+          {
+            "value": "any",
+            "label": "any"
+          }
         ],
-        "visibleWhen": { "key": "save_state", "equals": true }
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       }
     ],
     "defaults": {
@@ -4260,21 +4469,45 @@
         "label": "State Key",
         "placeholder": "Masalan: user_message, phone, etc.",
         "helpText": "Ma'lumot shu kalitga saqlanadi",
-        "visibleWhen": { "key": "save_state", "equals": true }
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       },
       {
         "type": "select",
         "key": "state_type",
         "label": "Ma'lumot Turi",
         "options": [
-          {"value": "text", "label": "text"},
-          {"value": "number", "label": "number"},
-          {"value": "photo", "label": "photo"},
-          {"value": "video", "label": "video"},
-          {"value": "document", "label": "document"},
-          {"value": "any", "label": "any"}
+          {
+            "value": "text",
+            "label": "text"
+          },
+          {
+            "value": "number",
+            "label": "number"
+          },
+          {
+            "value": "photo",
+            "label": "photo"
+          },
+          {
+            "value": "video",
+            "label": "video"
+          },
+          {
+            "value": "document",
+            "label": "document"
+          },
+          {
+            "value": "any",
+            "label": "any"
+          }
         ],
-        "visibleWhen": { "key": "save_state", "equals": true }
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       }
     ],
     "defaults": {
@@ -4450,7 +4683,9 @@
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_model"],
+    "accessoryAttachesTo": [
+      "ai_model"
+    ],
     "titleKey": "constructor.ai.openai.name",
     "descriptionKey": "constructor.ai.openai.description",
     "titleFallback": "OpenAI",
@@ -4516,7 +4751,9 @@
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_model"],
+    "accessoryAttachesTo": [
+      "ai_model"
+    ],
     "titleKey": "constructor.ai.ollama.name",
     "descriptionKey": "constructor.ai.ollama.description",
     "titleFallback": "Ollama",
@@ -4584,7 +4821,9 @@
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_model"],
+    "accessoryAttachesTo": [
+      "ai_model"
+    ],
     "titleKey": "constructor.ai.gemini.name",
     "descriptionKey": "constructor.ai.gemini.description",
     "titleFallback": "Gemini",
@@ -4660,7 +4899,9 @@
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_model"],
+    "accessoryAttachesTo": [
+      "ai_model"
+    ],
     "titleKey": "constructor.ai.anthropic.name",
     "descriptionKey": "constructor.ai.anthropic.description",
     "titleFallback": "Anthropic",
@@ -4727,7 +4968,9 @@
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_tool"],
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
     "titleKey": "constructor.ai.httpTool.name",
     "descriptionKey": "constructor.ai.httpTool.description",
     "titleFallback": "HTTP",
@@ -4841,7 +5084,9 @@
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_tool"],
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
     "titleKey": "constructor.ai.collectionTool.name",
     "descriptionKey": "constructor.ai.collectionTool.description",
     "titleFallback": "Collection",
@@ -4920,7 +5165,9 @@
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_tool"],
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
     "titleKey": "constructor.ai.customCodeTool.name",
     "descriptionKey": "constructor.ai.customCodeTool.description",
     "titleFallback": "Custom Code Tool",
@@ -4983,7 +5230,9 @@
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_tool"],
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
     "titleKey": "constructor.ai.knowledgeTool.name",
     "descriptionKey": "constructor.ai.knowledgeTool.description",
     "titleFallback": "Knowledge",
@@ -5090,21 +5339,45 @@
         "label": "State Key",
         "placeholder": "Masalan: user_message, phone, etc.",
         "helpText": "Ma'lumot shu kalitga saqlanadi",
-        "visibleWhen": { "key": "save_state", "equals": true }
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       },
       {
         "type": "select",
         "key": "state_type",
         "label": "Ma'lumot Turi",
         "options": [
-          {"value": "text", "label": "text"},
-          {"value": "number", "label": "number"},
-          {"value": "photo", "label": "photo"},
-          {"value": "video", "label": "video"},
-          {"value": "document", "label": "document"},
-          {"value": "any", "label": "any"}
+          {
+            "value": "text",
+            "label": "text"
+          },
+          {
+            "value": "number",
+            "label": "number"
+          },
+          {
+            "value": "photo",
+            "label": "photo"
+          },
+          {
+            "value": "video",
+            "label": "video"
+          },
+          {
+            "value": "document",
+            "label": "document"
+          },
+          {
+            "value": "any",
+            "label": "any"
+          }
         ],
-        "visibleWhen": { "key": "save_state", "equals": true }
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       }
     ],
     "defaults": {
@@ -5188,14 +5461,14 @@
         "key": "latitude",
         "label": "Latitude",
         "placeholder": "41.311151",
-        "step": 1e-6
+        "step": 0.000001
       },
       {
         "type": "number",
         "key": "longitude",
         "label": "Longitude",
         "placeholder": "69.279737",
-        "step": 1e-6
+        "step": 0.000001
       },
       {
         "type": "text",
@@ -5325,50 +5598,14 @@
     ],
     "content": [
       {
-        "type": "collection-select",
-        "key": "collection_name",
-        "label": "Collection",
-        "withFilters": false,
-        "contextKeyField": "resultKey"
-      },
-      {
-        "type": "textarea",
-        "key": "filter",
-        "label": "Filter (JSON)",
-        "placeholder": "{\"status\": \"active\"}",
-        "helpText": "MongoDB filter — bo'sh qoldirilsa hammasi olinadi",
-        "optional": true
-      },
-      {
-        "type": "textarea",
-        "key": "sort",
-        "label": "Sort (JSON)",
-        "placeholder": "{\"createdAt\": -1}",
-        "helpText": "1 — o'sish, -1 — kamayish tartibida",
-        "optional": true
-      },
-      {
-        "type": "number",
-        "key": "limit",
-        "label": "Limit",
-        "placeholder": "10",
-        "min": 1,
-        "max": 1000,
-        "helpText": "Maksimal qaytariladigan hujjatlar soni",
-        "optional": true
-      },
-      {
-        "type": "text",
-        "key": "resultKey",
-        "label": "Natija kaliti (state)",
-        "placeholder": "collection_results",
-        "helpText": "State ichida saqlanadigan kalit nomi"
+        "type": "widget",
+        "widgetKey": "loadCollectionList"
       }
     ],
     "defaults": {
-      "collection_name": "",
-      "filter": "",
-      "sort": "",
+      "collection": null,
+      "filters": [],
+      "sorts": [],
       "limit": 10,
       "resultKey": "collection_results"
     }
@@ -6389,7 +6626,9 @@
         "label": "Varaq (Sheet)",
         "resource": "google_sheet_tabs",
         "credentialKey": "credential_id",
-        "dependsOn": ["spreadsheet_id"]
+        "dependsOn": [
+          "spreadsheet_id"
+        ]
       },
       {
         "type": "text",
@@ -6404,11 +6643,17 @@
         "label": "Qator qiymatlari (ustunlar bo'yicha)",
         "resource": "google_sheet_columns",
         "credentialKey": "credential_id",
-        "dependsOn": ["spreadsheet_id", "sheet"],
+        "dependsOn": [
+          "spreadsheet_id",
+          "sheet"
+        ],
         "optional": true,
         "visibleWhen": {
           "key": "operation",
-          "oneOf": ["append", "update"]
+          "oneOf": [
+            "append",
+            "update"
+          ]
         }
       },
       {
@@ -6530,7 +6775,10 @@
         "optional": true,
         "visibleWhen": {
           "key": "operation",
-          "oneOf": ["create_folder", "upload"]
+          "oneOf": [
+            "create_folder",
+            "upload"
+          ]
         }
       },
       {
@@ -6542,7 +6790,10 @@
         "credentialKey": "credential_id",
         "visibleWhen": {
           "key": "operation",
-          "oneOf": ["create_folder", "upload"]
+          "oneOf": [
+            "create_folder",
+            "upload"
+          ]
         }
       },
       {
@@ -6584,14 +6835,19 @@
       "file_id": "",
       "responseVariable": "drive_response"
     },
-    "producesState": ["drive_response", "drive_success"]
+    "producesState": [
+      "drive_response",
+      "drive_success"
+    ]
   },
   {
     "type": "AIDateTimeToolNode",
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_tool"],
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
     "titleKey": "constructor.ai.dateTimeTool.name",
     "descriptionKey": "constructor.ai.dateTimeTool.description",
     "titleFallback": "DateTime",
@@ -6639,7 +6895,9 @@
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_tool"],
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
     "titleKey": "constructor.ai.googleSheetsTool.name",
     "descriptionKey": "constructor.ai.googleSheetsTool.description",
     "titleFallback": "Google Sheets",
@@ -6711,7 +6969,9 @@
     "status": "runtime",
     "category": "ai",
     "accessory": true,
-    "accessoryAttachesTo": ["ai_tool"],
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
     "titleKey": "constructor.ai.paymentLinkTool.name",
     "descriptionKey": "constructor.ai.paymentLinkTool.description",
     "titleFallback": "Payment Link",
