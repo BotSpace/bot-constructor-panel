@@ -42,6 +42,13 @@ export interface NodeHandleManifest {
   side?: "left" | "right" | "top" | "bottom";
   offsetClass?: string;
   styleVariant?: "default" | "success" | "warning" | "danger" | "accent";
+  /**
+   * When true the handle is rendered invisible (opacity-0, pointer-events-none)
+   * so it does not show on the canvas, but the DOM element stays present so
+   * React Flow can still route edges to it. Existing edge connections are
+   * preserved. Only applies to generic (non-preset) handles.
+   */
+  hidden?: boolean;
 }
 
 export interface NodeVisibilityRule {

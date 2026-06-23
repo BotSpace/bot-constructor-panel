@@ -3218,7 +3218,8 @@
         "kind": "target",
         "side": "left",
         "id": "target-handler",
-        "styleVariant": "accent"
+        "styleVariant": "accent",
+        "hidden": true
       },
       {
         "kind": "source",
@@ -3271,7 +3272,8 @@
         "kind": "target",
         "side": "left",
         "id": "target-handler",
-        "styleVariant": "accent"
+        "styleVariant": "accent",
+        "hidden": true
       },
       {
         "kind": "source",
@@ -3324,7 +3326,8 @@
         "kind": "target",
         "side": "left",
         "id": "target-handler",
-        "styleVariant": "accent"
+        "styleVariant": "accent",
+        "hidden": true
       },
       {
         "kind": "source",

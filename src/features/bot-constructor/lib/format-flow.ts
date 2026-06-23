@@ -1,6 +1,7 @@
 import dagre from "dagre";
 import { Node, Edge, Position } from "reactflow";
 import { getNodeManifestByType } from "@/features/bot-constructor/manifest/manifestStore";
+import { NodeHandleManifest } from "@/features/bot-constructor/manifest/types";
 
 type Direction = "TB" | "LR";
 
@@ -177,6 +178,102 @@ export const getFormatFlow = (
       },
     };
   });
+
+  // ── Branch-aware vertical correction ──────────────────────────────────────
+  // Dagre doesn't know about sourceHandle names, so when a node has multiple
+  // source handles (e.g. IfConditionNode: "next" at top, "true" at bottom), the
+  // children can be placed in the wrong vertical order (edges cross).
+  //
+  // Fix: for each parent that has ≥2 edges leaving different sourceHandles,
+  // sort the handles by their visual Y offset from the manifest (negative
+  // offsetClass → upper handle, positive → lower), then sort the dagre-placed
+  // children to match that order (upper child gets the smallest Y).
+  {
+    // Map nodeId → layouted position (mutable — we patch Y in place)
+    const posById = new Map<string, (typeof layoutedNormalNodes)[0]>();
+    layoutedNormalNodes.forEach((n) => posById.set(n.id, n));
+
+    // Group outgoing normal edges by source node
+    const outBySource = new Map<string, Edge[]>();
+    forwardEdges.forEach((e) => {
+      if (!outBySource.has(e.source)) outBySource.set(e.source, []);
+      outBySource.get(e.source)!.push(e);
+    });
+
+    outBySource.forEach((outEdges, sourceId) => {
+      // Only care about nodes with multiple edges that carry distinct sourceHandles
+      const handles = [...new Set(outEdges.map((e) => e.sourceHandle).filter(Boolean))];
+      if (handles.length < 2) return;
+
+      const sourceManifest = getNodeManifestByType(
+        normalNodes.find((n) => n.id === sourceId)?.type ?? ""
+      );
+      if (!sourceManifest?.handles) return;
+
+      // Build handle → vertical rank from the manifest.
+      // Parse the numeric value inside translate-y-[...] from offsetClass:
+      //   "translate-y-[-200%]" → -200 (upper)
+      //   "translate-y-[200%]"  → +200 (lower)
+      // Handles without an offsetClass get rank 0 (center).
+      const parseOffsetRank = (h: NodeHandleManifest): number => {
+        if (!h.offsetClass) return 0;
+        const m = h.offsetClass.match(/translate-y-\[(-?\d+)/);
+        return m ? parseInt(m[1], 10) : 0;
+      };
+
+      // Only consider source handles
+      const sourceHandles = sourceManifest.handles.filter((h) => h.kind === "source" && h.id);
+      if (sourceHandles.length < 2) return;
+
+      // rank map: handleId → numeric Y rank (lower number = higher on screen)
+      const handleRank = new Map<string, number>();
+      sourceHandles.forEach((h) => {
+        if (h.id) handleRank.set(h.id, parseOffsetRank(h));
+      });
+
+      // For each handle, collect the direct children (one hop only — deeper
+      // descendants are already correctly placed relative to their own parents)
+      const handleToChildren = new Map<string, string[]>();
+      handles.forEach((hId) => {
+        const childIds = outEdges
+          .filter((e) => e.sourceHandle === hId)
+          .map((e) => e.target)
+          .filter((id) => posById.has(id));
+        if (childIds.length > 0) handleToChildren.set(hId!, childIds);
+      });
+
+      // Sort handle groups by their visual rank (ascending = top → bottom)
+      const sortedHandleGroups = [...handleToChildren.entries()].sort(
+        ([hA], [hB]) => (handleRank.get(hA) ?? 0) - (handleRank.get(hB) ?? 0)
+      );
+
+      // Collect ALL children across all handle groups and their current Y values
+      const allChildIds = sortedHandleGroups.flatMap(([, ids]) => ids);
+      if (allChildIds.length < 2) return;
+
+      // Current Y values of all children (sorted ascending = top → bottom)
+      const currentYs = allChildIds
+        .map((id) => posById.get(id)?.position.y ?? 0)
+        .sort((a, b) => a - b);
+
+      // Expected vertical order: handle with smallest rank → topmost Y slots
+      // Assign the sorted Y values to children in handle-rank order
+      let yIdx = 0;
+      sortedHandleGroups.forEach(([, childIds]) => {
+        // Sort children within the same handle group by their current Y so
+        // their relative order is preserved (no unnecessary re-shuffling)
+        const sorted = [...childIds].sort(
+          (a, b) => (posById.get(a)?.position.y ?? 0) - (posById.get(b)?.position.y ?? 0)
+        );
+        sorted.forEach((childId) => {
+          const node = posById.get(childId);
+          if (node) {
+            node.position = { ...node.position, y: currentYs[yIdx++] ?? node.position.y };
+          }
+        });
+      });
+    });
+  }
 
   // Build a quick lookup of layouted normal node positions
   const normalPositionMap = new Map<string, { x: number; y: number; width: number; height: number }>();

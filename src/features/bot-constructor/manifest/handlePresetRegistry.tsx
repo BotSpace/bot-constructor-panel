@@ -94,6 +94,25 @@ function GenericHandleRenderer({
 
   const tone = HANDLE_VARIANT_TONE[handle.styleVariant || "default"];
 
+  // When `hidden` is true the handle must remain in the DOM so React Flow can
+  // still route edges to it, but it must not be visible on the canvas.
+  // opacity:0 hides the pill while keeping pointer-events active so the
+  // handle still acts as a valid edge drop target.
+  if (handle.hidden) {
+    return (
+      <PillHandle
+        id={handle.id ?? `${handle.kind}-${handle.side}`}
+        type={handle.kind}
+        position={HANDLE_SIDE_TO_POSITION[handle.side]}
+        tone={tone}
+        isConnectableStart={true}
+        showPlus={false}
+        className={handle.offsetClass}
+        style={{ opacity: 0 }}
+      />
+    );
+  }
+
   return (
     <PillHandle
       id={handle.id ?? `${handle.kind}-${handle.side}`}
