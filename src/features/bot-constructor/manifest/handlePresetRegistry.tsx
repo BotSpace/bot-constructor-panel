@@ -178,7 +178,10 @@ function GenericHandleRenderer({
             position: "absolute",
             top: `calc(50% + ${dy}px)`,
             transform: "translateY(-50%)",
-            transformOrigin: isRight ? "left center" : "right center",
+            // Label'ni circle MARKAZIDAN scale qilamiz (circle markazi label chap
+            // chetidan ~14px chapda: gap 30 - pill markazi 16). Shunda label circle
+            // bilan AYNAN bir xil transformga tushadi → hover'da X bo'yicha birga suriladi.
+            transformOrigin: isRight ? "-14px center" : "calc(100% + 14px) center",
             ...(isRight
               ? { left: "100%", marginLeft: 30 }
               : { right: "100%", marginRight: 30 }),
@@ -377,7 +380,7 @@ function SwitchCaseSources({ nodeId }: { nodeId: string }) {
                 position: "absolute",
                 top: "50%",
                 transform: "translateY(-50%)",
-                transformOrigin: "left center",
+                transformOrigin: "-14px center",
                 left: "calc(100% + 30px)",
                 whiteSpace: "nowrap",
                 fontSize: 9,
@@ -415,7 +418,7 @@ function SwitchCaseSources({ nodeId }: { nodeId: string }) {
               position: "absolute",
               top: "50%",
               transform: "translateY(-50%)",
-              transformOrigin: "left center",
+              transformOrigin: "-14px center",
               left: "calc(100% + 30px)",
               whiteSpace: "nowrap",
               fontSize: 9,
