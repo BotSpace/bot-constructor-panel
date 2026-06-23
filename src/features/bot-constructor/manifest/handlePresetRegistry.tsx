@@ -20,6 +20,16 @@ const HANDLE_SIDE_TO_POSITION: Record<string, Position> = {
   bottom: Position.Bottom,
 };
 
+// PillHandle uses translate(calc(100% + 8px), -50%) for right-side handles.
+// When the wrapper div already sets top:0 (anchored to its own center), we keep the
+// same transform so the pill dot lands 8px outside the card edge, vertically centered.
+const HANDLE_LABEL_OFFSET: Record<string, string> = {
+  right: "translate(calc(100% + 8px), -50%)",
+  left: "translate(calc(-100% - 8px), -50%)",
+  top: "translate(-50%, calc(-100% - 8px))",
+  bottom: "translate(-50%, calc(100% + 8px))",
+};
+
 const HANDLE_VARIANT_TONE: Record<string, PillHandleTone> = {
   default: "neutral",
   success: "success",
@@ -84,6 +94,10 @@ function GenericHandleRenderer({
     return <DynamicOutputsSources nodeId={nodeId} />;
   }
 
+  if (handle.preset === "switch-case-sources") {
+    return <SwitchCaseSources nodeId={nodeId} />;
+  }
+
   if (handle.preset === "accessory-ports") {
     return <AccessoryPortHandles ports={accessoryPorts ?? []} />;
   }
@@ -110,6 +124,51 @@ function GenericHandleRenderer({
         className={handle.offsetClass}
         style={{ opacity: 0 }}
       />
+    );
+  }
+
+  if (handle.label) {
+    const isRight = handle.side === "right";
+    const isLeft = handle.side === "left";
+    // Wrapper sits at top:50% (node center) then offsetClass (e.g. translate-y-[-85%])
+    // shifts it vertically — exactly the same mechanic as plain PillHandle + offsetClass.
+    return (
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          ...(isRight ? { right: 0 } : isLeft ? { left: 0 } : {}),
+        }}
+        className={handle.offsetClass}
+      >
+        <PillHandle
+          id={handle.id ?? `${handle.kind}-${handle.side}`}
+          type={handle.kind}
+          position={HANDLE_SIDE_TO_POSITION[handle.side]}
+          tone={tone}
+          isConnectableStart={handle.kind !== "target"}
+          showPlus={handle.kind === "source"}
+          title={handle.label}
+          // PillHandle applies its own translate, we reset top so it anchors to the wrapper div
+          style={{ top: 0, transform: HANDLE_LABEL_OFFSET[handle.side ?? "right"] }}
+        />
+        <span
+          style={{
+            position: "absolute",
+            top: 0,
+            transform: "translateY(-50%)",
+            ...(isRight ? { right: "calc(100% + 14px)" } : isLeft ? { left: "calc(100% + 14px)" } : {}),
+            whiteSpace: "nowrap",
+            fontSize: 9,
+            lineHeight: "12px",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+          className="text-muted-foreground font-medium"
+        >
+          {handle.label}
+        </span>
+      </div>
     );
   }
 
@@ -230,6 +289,120 @@ function DynamicOutputsSources({ nodeId }: { nodeId: string }) {
       position={Position.Right}
       tone="accent"
     />
+  );
+}
+
+interface SwitchCase {
+  id: string;
+  match: string;
+  label?: string;
+}
+
+function SwitchCaseSources({ nodeId }: { nodeId: string }) {
+  const nodes = useFlowStore((state) => state.nodes);
+  const updateNodeInternals = useUpdateNodeInternals();
+
+  const { cases, hasDefault } = useMemo(() => {
+    const node = nodes.find((item) => item.id === nodeId);
+    const rawCases = Array.isArray(node?.data?.cases)
+      ? (node.data.cases as SwitchCase[])
+      : [];
+    const def = node?.data?.default === true;
+    return { cases: rawCases, hasDefault: def };
+  }, [nodeId, nodes]);
+
+  useEffect(() => {
+    updateNodeInternals(nodeId);
+  }, [nodeId, cases, hasDefault, updateNodeInternals]);
+
+  const totalHandles = cases.length + (hasDefault ? 1 : 0);
+
+  if (totalHandles === 0) {
+    return (
+      <PillHandle
+        id="source-handler"
+        type="source"
+        position={Position.Right}
+        tone="accent"
+      />
+    );
+  }
+
+  return (
+    <>
+      {cases.map((c, index) => {
+        const topPct = ((index + 1) / (totalHandles + 1)) * 100;
+        const label = c.label || c.match || `Case ${index + 1}`;
+        // id bo'sh bo'lsa index'dan stable key yasaymiz
+        const caseId = c.id || `case_${index}`;
+        return (
+          <div
+            key={caseId}
+            style={{ position: "absolute", right: 0, top: `${topPct}%`, transform: "translateY(-50%)" }}
+          >
+            <PillHandle
+              id={`output-${caseId}`}
+              type="source"
+              position={Position.Right}
+              tone="neutral"
+              title={label}
+              style={{ top: 0, transform: "translate(calc(100% + 8px), -50%)" }}
+            />
+            <span
+              style={{
+                position: "absolute",
+                top: "50%",
+                transform: "translateY(-50%)",
+                right: "calc(100% + 14px)",
+                whiteSpace: "nowrap",
+                fontSize: 9,
+                lineHeight: "12px",
+                pointerEvents: "none",
+                userSelect: "none",
+              }}
+              className="text-muted-foreground font-medium"
+            >
+              {label}
+            </span>
+          </div>
+        );
+      })}
+      {hasDefault && (
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            top: `${(totalHandles / (totalHandles + 1)) * 100}%`,
+            transform: "translateY(-50%)",
+          }}
+        >
+          <PillHandle
+            id="output-default"
+            type="source"
+            position={Position.Right}
+            tone="accent"
+            title="Default"
+            style={{ top: 0, transform: "translate(calc(100% + 8px), -50%)" }}
+          />
+          <span
+            style={{
+              position: "absolute",
+              top: "50%",
+              transform: "translateY(-50%)",
+              right: "calc(100% + 14px)",
+              whiteSpace: "nowrap",
+              fontSize: 9,
+              lineHeight: "12px",
+              pointerEvents: "none",
+              userSelect: "none",
+            }}
+            className="text-muted-foreground font-medium"
+          >
+            Default
+          </span>
+        </div>
+      )}
+    </>
   );
 }
 

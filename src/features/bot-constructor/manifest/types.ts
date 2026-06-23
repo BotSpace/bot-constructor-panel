@@ -36,12 +36,18 @@ export interface NodeHandleManifest {
     | "delete-message-source"
     | "subflow-dynamic-sources"
     | "dynamic-outputs-sources"
+    | "switch-case-sources"
     | "accessory-ports";
   kind?: "source" | "target";
   id?: string;
   side?: "left" | "right" | "top" | "bottom";
   offsetClass?: string;
   styleVariant?: "default" | "success" | "warning" | "danger" | "accent";
+  /**
+   * Optional label shown next to the handle on the canvas.
+   * Used for named outputs (e.g. module node multi-output handles).
+   */
+  label?: string;
   /**
    * When true the handle is rendered invisible (opacity-0, pointer-events-none)
    * so it does not show on the canvas, but the DOM element stays present so

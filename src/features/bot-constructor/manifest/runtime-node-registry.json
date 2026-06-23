@@ -6749,5 +6749,81 @@
       "tool": "payment_link",
       "paymentType": "click"
     }
+  },
+  {
+    "type": "SwitchNode",
+    "status": "runtime",
+    "category": "flowControl",
+    "titleKey": "constructor.flowControl.switch.name",
+    "descriptionKey": "constructor.flowControl.switch.description",
+    "titleFallback": "Switch (Tanlov)",
+    "descriptionFallback": "Qiymatni case'lar bilan solishtiradi va tegishli chiqishga yo'naltiradi.",
+    "iconName": "switch",
+    "colorToken": "flow-violet",
+    "size": {
+      "width": 220
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "flowControl",
+      "sortOrder": 15,
+      "elementType": "switch"
+    },
+    "handles": [
+      {
+        "kind": "target",
+        "side": "left",
+        "id": "target-handler",
+        "styleVariant": "accent",
+        "hidden": true
+      },
+      {
+        "preset": "switch-case-sources"
+      }
+    ],
+    "content": [
+      {
+        "type": "text",
+        "key": "value",
+        "label": "Qiymat",
+        "placeholder": "{{state.status}}"
+      },
+      {
+        "type": "array-editor",
+        "key": "cases",
+        "label": "Case'lar",
+        "addLabel": "Case qo'shish",
+        "maxItems": 20,
+        "defaultItem": {
+          "id": "",
+          "match": "",
+          "label": ""
+        },
+        "itemFields": [
+          {
+            "key": "match",
+            "type": "text",
+            "label": "Qiymat (match)",
+            "placeholder": "approved"
+          },
+          {
+            "key": "label",
+            "type": "text",
+            "label": "Nom (ixtiyoriy)",
+            "placeholder": "Tasdiqlandi"
+          }
+        ]
+      },
+      {
+        "type": "switch",
+        "key": "default",
+        "label": "Default chiqish (mos kelmasa)"
+      }
+    ],
+    "defaults": {
+      "value": "",
+      "cases": [],
+      "default": false
+    }
   }
 ]
