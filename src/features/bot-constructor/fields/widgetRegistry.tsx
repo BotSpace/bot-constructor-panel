@@ -2720,6 +2720,227 @@ function SubFlowWidget({ nodeId, data }: WidgetProps) {
   );
 }
 
+function LoadCollectionListWidget({ nodeId, data }: WidgetProps) {
+  const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const nodes = useFlowStore((state) => state.nodes);
+  const edges = useFlowStore((state) => state.edges);
+  const { data: collections } = useCollectionStore();
+
+  const selectedCollection =
+    data.collection && typeof data.collection === "object"
+      ? (data.collection as { name?: string })
+      : null;
+
+  const { data: collectionDetail } = useReactQueryAction<CollectionDetail>({
+    url: selectedCollection?.name
+      ? `cms/projects/[id]/collections/${selectedCollection.name}/`
+      : undefined,
+    enabled: Boolean(selectedCollection?.name),
+  });
+
+  const availableStateKeys = useMemo(
+    () => getAvailableStateKeys(nodes, edges, nodeId),
+    [edges, nodeId, nodes]
+  );
+
+  const collectionFields = useMemo(() => {
+    if (!collectionDetail?.fields) return [];
+    return [
+      { id: "_id", label: "id" },
+      ...collectionDetail.fields.map((f) => ({
+        id: f.name,
+        label: f.label || f.name,
+        type: f.kind as any,
+      })),
+    ];
+  }, [collectionDetail?.fields]);
+
+  return (
+    <div className="space-y-4">
+      {/* Collection selector */}
+      <div className="space-y-2">
+        <Label>Collection</Label>
+        <Select
+          value={selectedCollection?.name ?? ""}
+          onValueChange={(value) => {
+            const collection = collections?.find((item) => item.name === value);
+            updateNodeData(nodeId, {
+              collection: collection || null,
+              filters: [],
+              sorts: [],
+            });
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Collection tanlang" />
+          </SelectTrigger>
+          <SelectContent>
+            {collections?.map((collection) => (
+              <SelectItem key={collection.id} value={collection.name}>
+                {collection.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Result key */}
+      <div className="space-y-2">
+        <Label>Natija kaliti (state)</Label>
+        <Input
+          placeholder="collection_results"
+          value={typeof data.resultKey === "string" ? data.resultKey : ""}
+          onChange={(e) => updateNodeData(nodeId, { resultKey: e.target.value })}
+        />
+        <p className="text-xs text-muted-foreground">
+          {`{{${typeof data.resultKey === "string" && data.resultKey ? data.resultKey : "collection_results"}.0.fieldname}}`}
+        </p>
+      </div>
+
+      {/* Limit */}
+      <div className="space-y-2">
+        <Label>Limit</Label>
+        <Input
+          type="number"
+          placeholder="10"
+          min={1}
+          max={1000}
+          value={typeof data.limit === "number" ? data.limit : 10}
+          onChange={(e) =>
+            updateNodeData(nodeId, { limit: parseInt(e.target.value) || 10 })
+          }
+        />
+        <p className="text-xs text-muted-foreground">Maksimal qaytariladigan hujjatlar soni (1–1000)</p>
+      </div>
+
+      {/* Filters */}
+      {selectedCollection && collectionDetail?.fields ? (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-2">
+          <Label className="text-xs font-medium text-muted-foreground">Filterlar</Label>
+          <FilterBuilder
+            fields={collectionFields as any}
+            filters={Array.isArray(data.filters) ? (data.filters as any) : []}
+            onChange={(filters) => updateNodeData(nodeId, { filters })}
+            stateKeys={availableStateKeys}
+          />
+        </div>
+      ) : null}
+
+      {/* Sorts */}
+      {selectedCollection && collectionDetail?.fields ? (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-2">
+          <Label className="text-xs font-medium text-muted-foreground">Saralash (Sort)</Label>
+          <SortBuilderWidget
+            fields={collectionFields}
+            sorts={Array.isArray(data.sorts) ? (data.sorts as SortRuleData[]) : []}
+            onChange={(sorts) => updateNodeData(nodeId, { sorts })}
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Inline sort builder for LoadCollectionList (avoids extra file import issues)
+// ---------------------------------------------------------------------------
+interface SortRuleData {
+  id: string;
+  field: string;
+  direction: "asc" | "desc";
+}
+
+interface SortBuilderWidgetProps {
+  fields: { id: string; label: string }[];
+  sorts: SortRuleData[];
+  onChange: (sorts: SortRuleData[]) => void;
+}
+
+function SortBuilderWidget({ fields, sorts, onChange }: SortBuilderWidgetProps) {
+  const addSort = () => {
+    const usedFields = sorts.map((s) => s.field);
+    const nextField = fields.find((f) => !usedFields.includes(f.id));
+    onChange([
+      ...sorts,
+      { id: Math.random().toString(36).slice(2), field: nextField?.id ?? "", direction: "asc" as const },
+    ]);
+  };
+
+  const removeSort = (id: string) => onChange(sorts.filter((s) => s.id !== id));
+
+  const updateSort = (id: string, patch: Partial<SortRuleData>) =>
+    onChange(sorts.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+
+  const usedFields = sorts.map((s) => s.field);
+
+  return (
+    <div className="space-y-2">
+      {sorts.length === 0 ? (
+        <div className="text-center py-4 text-muted-foreground">
+          <p className="text-sm mb-2">Sort qoidasi yo'q</p>
+          <Button onClick={addSort} variant="outline" size="sm" disabled={fields.length === 0}>
+            <PlusIcon className="h-4 w-4 mr-1" />
+            Sort qo'shish
+          </Button>
+        </div>
+      ) : (
+        <>
+          {sorts.map((rule) => {
+            const availableFields = fields.filter(
+              (f) => f.id === rule.field || !usedFields.includes(f.id)
+            );
+            return (
+              <div
+                key={rule.id}
+                className="flex items-center gap-2 p-2 rounded-lg border border-border bg-card hover:bg-accent/30 transition-all group"
+              >
+                <Select value={rule.field} onValueChange={(v) => updateSort(rule.id, { field: v })}>
+                  <SelectTrigger className="flex-1 min-w-0 h-8 text-sm">
+                    <SelectValue placeholder="Field tanlang" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableFields.map((f) => (
+                      <SelectItem key={f.id} value={f.id}>
+                        {f.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select
+                  value={rule.direction}
+                  onValueChange={(v) => updateSort(rule.id, { direction: v as "asc" | "desc" })}
+                >
+                  <SelectTrigger className="w-[90px] shrink-0 h-8 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="asc">A → Z</SelectItem>
+                    <SelectItem value="desc">Z → A</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive shrink-0"
+                  onClick={() => removeSort(rule.id)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          })}
+          {sorts.length < fields.length && (
+            <Button onClick={addSort} variant="outline" size="sm" className="w-full mt-1">
+              <PlusIcon className="h-4 w-4 mr-1" />
+              Sort qo'shish
+            </Button>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 const widgetRegistry: Record<string, (props: WidgetProps) => ReactNode> = {
   messageTrigger: MessageTriggerWidget,
   callbackQueryTrigger: CallbackQueryTriggerWidget,
@@ -2739,6 +2960,7 @@ const widgetRegistry: Record<string, (props: WidgetProps) => ReactNode> = {
   formNode: FormWidget,
   collectionNode: CollectionWidget,
   loadCollectionItem: LoadCollectionItemWidget,
+  loadCollectionList: LoadCollectionListWidget,
   subFlow: SubFlowWidget,
   aiAgentAdvanced: AIAgentAdvancedWidget,
   aiCollectionToolConfig: AICollectionToolConfigWidget,

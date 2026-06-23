@@ -166,6 +166,7 @@ export interface NodeFieldManifest {
   // collection-select
   withFieldMapping?: boolean;
   withFilters?: boolean;
+  withSorts?: boolean;
   contextKeyField?: string;
   // state-type-select
   keyField?: string;
