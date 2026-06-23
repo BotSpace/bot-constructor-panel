@@ -3108,13 +3108,21 @@
     ],
     "content": [
       {
+        "type": "text",
+        "key": "key",
+        "label": "Saqlash nomi (state)",
+        "placeholder": "yuklangan_fayl",
+        "helpText": "Yuklangan fayl shu nom bilan saqlanadi: {{state_NOM}} = fayl UUID, {{state_NOM_file_url}} = yuklab olish URL'i (masalan Gemini STT audio uchun)."
+      },
+      {
         "type": "description",
-        "textFallback": "Bu node file turidagi MessageTrigger'dan keyin kelishi kerak. Fayl ID trigger'dan avtomatik olinadi."
+        "textFallback": "Foydalanuvchi yuborgan faylni (ovoz/rasm/video/hujjat) Telegram'dan yuklab oladi va platformaga saqlaydi. Ovoz/audio xabari (voice) turidagi triggerdan keyin qo'ying."
       }
     ],
     "footer": [],
     "defaults": {
-      "messageType": ""
+      "messageType": "",
+      "key": "yuklangan_fayl"
     }
   },
   {
