@@ -172,8 +172,8 @@ function GenericHandleRenderer({
             top: `calc(50% + ${dy}px)`,
             transform: "translateY(-50%)",
             ...(isRight
-              ? { left: "100%", marginLeft: 28 }
-              : { right: "100%", marginRight: 28 }),
+              ? { left: "100%", marginLeft: 40 }
+              : { right: "100%", marginRight: 40 }),
             whiteSpace: "nowrap",
             fontSize: 9,
             lineHeight: "12px",
