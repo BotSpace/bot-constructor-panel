@@ -2988,20 +2988,21 @@
       },
       {
         "preset": "source-default"
-      },
-      {
-        "preset": "delete-message-source"
       }
     ],
     "content": [
       {
         "type": "switch",
         "key": "deleteFromContext",
-        "label": "Contextdan xabarni o'chirish"
+        "label": "Contextdan xabarni o'chirish",
+        "optional": true
       },
       {
-        "type": "description",
-        "textFallback": "O'chiriladigan xabarni delete-message-source edge orqali ulang.",
+        "type": "node-select",
+        "key": "targetNodeId",
+        "label": "O'chiriladigan xabar (node)",
+        "optional": true,
+        "helpText": "Xabar yuborilgan node'ni tanlang — o'sha node yuborgan xabar o'chiriladi.",
         "visibleWhen": {
           "key": "deleteFromContext",
           "equals": false

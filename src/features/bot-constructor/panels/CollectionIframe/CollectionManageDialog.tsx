@@ -107,7 +107,7 @@ export function CollectionManageDialog({
             }
             onOpenChange(false);
           }}
-          className="w-full sm:max-w-[640px] flex flex-col gap-0 p-0 overflow-hidden"
+          className="w-full sm:max-w-[480px] flex flex-col gap-0 p-0 overflow-hidden"
         >
           {/* Header */}
           <SheetHeader className="shrink-0 border-b px-5 py-4 gap-0 space-y-0">

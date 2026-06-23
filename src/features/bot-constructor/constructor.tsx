@@ -27,9 +27,12 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Plus, Text } from "lucide-react";
+import { Plus, Text, RotateCcw, Key, Database, Shield, Puzzle, Keyboard, Braces, AlertTriangle } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
+import { useBottomPanelStore, type BottomPanelKey } from "@/features/bot-constructor/store/bottom-panel-store";
+import { useDebugControlStore } from "@/features/bot-constructor/store/debug-control";
 import { useSearchStore } from "@/features/bot-constructor/panels/search/search-store";
 import { debugConsoleStore } from "@/components/layout/debug-console/store";
 import { useIsMobile } from "@/hooks/use-is-mobile";
@@ -47,6 +50,7 @@ import { clearModuleManifests } from "@/features/bot-constructor/manifest/manife
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
+  const t = useTranslations("editor.toolbar");
 
   // Real-time collaboration: dedicated collab WS for this project (best-effort).
   useCollab(id);
@@ -154,6 +158,10 @@ export default function Constructor() {
   // context menu land exactly where the user right-clicked.
   const lastRightClickFlowPosRef = useRef<{ x: number; y: number } | null>(null);
   const contextMenuAddPosRef = useRef<{ x: number; y: number } | null>(null);
+  // Context menu'dan ochiladigan panel — menu TO'LIQ yopilgach (onCloseAutoFocus)
+  // ochamiz, shunda yopilish jarayonidagi pointer/focus eventlari panelni darrov
+  // yopib qo'ymaydi (cursor harakatlansa ham). Magic setTimeout o'rniga deterministik.
+  const pendingPanelRef = useRef<BottomPanelKey | null>(null);
   const pendingConnectionRef = useRef<{
     source: string;
     sourceHandle: string | null | undefined;
@@ -395,7 +403,11 @@ export default function Constructor() {
   );
 
   // Store'dan kerakli qismlarni olamiz
-  const { formatFlow, collapseAllNodes, expandAllNodes, setEditingNodeId } = useFlowStore();
+  const { formatFlow, setEditingNodeId } = useFlowStore();
+
+  // Bottom panel open states — shared with context menu
+  const { openPanel } = useBottomPanelStore();
+  const reloadDebug = useDebugControlStore((s) => s.reloadDebug);
 
   // Single click only selects the node (React Flow handles selection itself);
   // the edit modal opens on double click.
@@ -456,29 +468,18 @@ export default function Constructor() {
     { preventDefault: true }
   );
 
+  // Debug botni reload qilish — keyboard shortcut va context menu uchun umumiy.
+  // DebugingButtons registratsiya qilgan AYNAN o'sha run/reload oqimini chaqiramiz
+  // (starting flag + loading, save'ni kutish, limit/error). Dublikat logika yo'q —
+  // shu sabab statusbar tugmasi bilan bir xil ishlaydi (loading ko'rinadi).
+  function handleReloadDebug() {
+    reloadDebug?.();
+  }
+
   // Ctrl+R - Debug botni reload qilish
   useKeyboardShortcut(
     ["Control", "r"],
-    () => {
-      if (!project) return;
-
-      saveFlow(id);
-
-      const { changeDebug } = useProjectStore.getState();
-      changeDebug({
-        ...project.debug,
-        status: "initializing",
-      });
-
-      instanceAuth
-        .get(`/project/${id}/debug/`)
-        .then(() => {
-          toast.success("Bot ishga tushirilmoqda...");
-        })
-        .catch(() => {
-          toast.error("Botni ishga tushirishda xatolik yuz berdi.");
-        });
-    },
+    () => { handleReloadDebug(); },
     { preventDefault: true }
   );
 
@@ -839,10 +840,17 @@ export default function Constructor() {
         </ContextMenuTrigger>
         <ContextMenuContent
           onCloseAutoFocus={(e) => {
-            // When opening the node sidebar, suppress the menu's focus-return
-            // to the canvas — that async focus event fires onInteractOutside on
-            // the (non-modal) sheet and would close it immediately.
-            if (contextMenuAddPosRef.current) e.preventDefault();
+            // Menu yopilganda fokus canvas'ga qaytishini DOIM bostiramiz — bu async
+            // focus eventi yangi ochilgan panel/dialog (collections, credentials,
+            // errors, ...)da onInteractOutside chaqirib uni darrov yopib qo'yadi.
+            e.preventDefault();
+            // Panelni menu TO'LIQ yopilgach shu yerda ochamiz (onClick'da emas):
+            // shunda yopilish jarayonidagi pointer/focus eventlari (cursor harakati)
+            // panelni darrov yopib qo'ymaydi. Deterministik, setTimeout kerak emas.
+            if (pendingPanelRef.current) {
+              openPanel(pendingPanelRef.current);
+              pendingPanelRef.current = null;
+            }
           }}
         >
           <ContextMenuItem
@@ -853,22 +861,45 @@ export default function Constructor() {
               setTimeout(() => setShowNodeDialog(true), 0);
             }}
           >
-            <Plus />
-            Yangi node qo&apos;shish
+            <Plus size={16} />
+            {t("addNode")}
           </ContextMenuItem>
           {/* Format */}
           <ContextMenuItem onClick={handleFormating}>
-            <Text />
-            Formatlash
+            <Text size={16} />
+            {t("format")}
             <ContextMenuShortcut>⌘ i</ContextMenuShortcut>
           </ContextMenuItem>
-          <ContextMenuItem onClick={collapseAllNodes}>
-            <CollapseIcon />
-            Barchasino yopish
+          {/* Reload debug bot */}
+          <ContextMenuItem onClick={handleReloadDebug}>
+            <RotateCcw size={16} />
+            {t("reload")}
+            <ContextMenuShortcut>⌘ r</ContextMenuShortcut>
           </ContextMenuItem>
-          <ContextMenuItem onClick={expandAllNodes}>
-            <ExpandIcon />
-            Barchasino ochish
+          {/* Collections */}
+          <ContextMenuItem onSelect={() => { pendingPanelRef.current = "collection"; }}>
+            <Database size={16} />
+            {t("collections")}
+          </ContextMenuItem>
+          {/* Credentials */}
+          <ContextMenuItem onSelect={() => { pendingPanelRef.current = "credential"; }}>
+            <Shield size={16} />
+            {t("credentials")}
+          </ContextMenuItem>
+          {/* Modules */}
+          <ContextMenuItem onSelect={() => { pendingPanelRef.current = "module"; }}>
+            <Puzzle size={16} />
+            {t("modules")}
+          </ContextMenuItem>
+          {/* Variables */}
+          <ContextMenuItem onSelect={() => { pendingPanelRef.current = "variables"; }}>
+            <Braces size={16} />
+            {t("variables")}
+          </ContextMenuItem>
+          {/* Errors */}
+          <ContextMenuItem onSelect={() => { pendingPanelRef.current = "errors"; }}>
+            <AlertTriangle size={16} />
+            {t("errors")}
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>

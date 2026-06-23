@@ -608,7 +608,10 @@
       "errors": "Xatolar",
       "errorsEmpty": "Xato yo'q",
       "errorsClear": "Tozalash",
-      "errorsDetail": "Tafsilot"
+      "errorsDetail": "Tafsilot",
+      "reload": "Debug botni qayta yuklash",
+      "format": "Formatlash (auto-layout)",
+      "addNode": "Node qo'shish"
     },
     "saveStatus": {
       "saving": "Saqlanmoqda...",

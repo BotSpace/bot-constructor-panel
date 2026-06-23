@@ -615,7 +615,10 @@
       "errors": "Ошибки",
       "errorsEmpty": "Ошибок нет",
       "errorsClear": "Очистить",
-      "errorsDetail": "Подробнее"
+      "errorsDetail": "Подробнее",
+      "reload": "Перезапустить debug-бота",
+      "format": "Форматировать (auto-layout)",
+      "addNode": "Добавить узел"
     },
     "saveStatus": {
       "saving": "Сохранение...",

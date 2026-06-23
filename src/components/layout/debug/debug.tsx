@@ -19,6 +19,7 @@ import type { APIDetailCreateResponse } from "@/types/http/response";
 
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { useDebugControlStore } from "@/features/bot-constructor/store/debug-control";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -127,6 +128,19 @@ export default function DebugingButtons() {
   }, [project?.debug?.status, id, changeDebug, starting]);
 
   /* Ctrl+R is handled in constructor.tsx as a keyboard shortcut */
+
+  // Context menu / Ctrl+R reload uchun: AYNAN shu komponentdagi run/reload oqimini
+  // (starting flag bilan birga) shared store'ga registratsiya qilamiz — dublikat emas.
+  const setReloadDebug = useDebugControlStore((s) => s.setReloadDebug);
+  const reloadRef = useRef<() => void>(() => {});
+  reloadRef.current = () => {
+    void handleRunAndRelaodDebugBot();
+  };
+  useEffect(() => {
+    const fn = () => reloadRef.current();
+    setReloadDebug(fn);
+    return () => setReloadDebug(null);
+  }, [setReloadDebug]);
 
   /* --------------------------- Debug bot actions --------------------------- */
   async function handleRunAndRelaodDebugBot() {

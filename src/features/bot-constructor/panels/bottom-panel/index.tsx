@@ -47,6 +47,7 @@ import { VariableInspectorPanel } from '@/components/layout/debug-console/Variab
 import useProjectStore from '@/features/bot-constructor/store/project'
 import { useDebugErrorsStore } from '@/features/bot-constructor/store/debug-errors'
 import { ErrorsPanel } from '@/features/bot-constructor/panels/ErrorsPanel'
+import { useBottomPanelStore } from '@/features/bot-constructor/store/bottom-panel-store'
 
 interface Props {
     addNodeOpen?: boolean;
@@ -67,19 +68,21 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const { isOpen, height, toggle } = debugConsoleStore()
     const { toggleSearchPanel } = useSearchStore()
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false)
-    const [shortcutsOpen, setShortcutsOpen] = useState(false)
     // Sync external open state (from top bar button)
     const effectiveNodeDialogOpen = addNodeOpen ?? nodeDialogOpen
     const setEffectiveNodeDialogOpen = (v: boolean) => {
         setNodeDialogOpen(v)
         onAddNodeOpenChange?.(v)
     }
-    const [envManageOpen, setEnvManageOpen] = useState(false)
-    const [collectionOpen, setCollectionOpen] = useState(false)
-    const [credentialOpen, setCredentialOpen] = useState(false)
-    const [moduleOpen, setModuleOpen] = useState(false)
-    const [variablesOpen, setVariablesOpen] = useState(false)
-    const [errorsOpen, setErrorsOpen] = useState(false)
+    const {
+        envOpen: envManageOpen, setEnvOpen: setEnvManageOpen,
+        collectionOpen, setCollectionOpen,
+        credentialOpen, setCredentialOpen,
+        moduleOpen, setModuleOpen,
+        shortcutsOpen, setShortcutsOpen,
+        variablesOpen, setVariablesOpen,
+        errorsOpen, setErrorsOpen,
+    } = useBottomPanelStore()
     const { snapshots } = useDebugContextStore()
     const { unreadCount: errorsUnread, markAllRead } = useDebugErrorsStore()
     const { project } = useProjectStore()
