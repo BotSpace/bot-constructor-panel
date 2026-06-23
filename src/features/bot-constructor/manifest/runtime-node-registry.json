@@ -2875,8 +2875,7 @@
     "iconName": "pin",
     "colorToken": "message-op-slate",
     "size": {
-      "width": 200,
-      "height": 150
+      "width": 200
     },
     "sidebar": {
       "enabled": true,
