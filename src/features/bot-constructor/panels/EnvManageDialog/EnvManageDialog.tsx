@@ -2,16 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -180,20 +178,36 @@ export function EnvManageDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[640px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Key className="w-5 h-5" />
-            Kalitlarni boshqarish
-          </DialogTitle>
-          <DialogDescription>
-            Loyihangiz uchun muhit o&apos;zgaruvchilarini qo&apos;shing,
-            tahrirlang yoki o&apos;chiring.
-          </DialogDescription>
-        </DialogHeader>
+    <Sheet open={open} onOpenChange={onOpenChange} modal={false}>
+      <SheetContent
+        side="right"
+        showOverlay={false}
+        onInteractOutside={() => onOpenChange(false)}
+        className="w-full sm:max-w-[480px] flex flex-col gap-0 p-0 overflow-hidden"
+      >
+        <SheetHeader className="shrink-0 border-b px-5 py-4 gap-0 space-y-0">
+          <div className="flex items-center gap-3">
+            <Key className="h-5 w-5 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <SheetTitle className="text-base font-semibold leading-tight">
+                Kalitlarni boshqarish
+              </SheetTitle>
+              <SheetDescription className="text-xs">
+                Loyiha muhit o&apos;zgaruvchilari
+              </SheetDescription>
+            </div>
+            <Button
+              size="sm"
+              onClick={handleStartCreate}
+              disabled={editing !== null}
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Yangi
+            </Button>
+          </div>
+        </SheetHeader>
 
-        <div className="space-y-4">
+        <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-4">
           {/* Add/Edit form */}
           {editing && (
             <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
@@ -306,9 +320,8 @@ export function EnvManageDialog({
               &quot;+&quot; tugmasini bosing.
             </div>
           ) : (
-            <ScrollArea className="max-h-[340px]">
-              <div className="space-y-2">
-                {envList.map((env) => (
+            <div className="space-y-2">
+              {envList.map((env) => (
                   <div
                     key={env.id}
                     className="flex items-center gap-3 rounded-lg border px-4 py-3 group hover:bg-muted/40 transition-colors"
@@ -374,20 +387,9 @@ export function EnvManageDialog({
                   </div>
                 ))}
               </div>
-            </ScrollArea>
           )}
         </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Yopish
-          </Button>
-          <Button onClick={handleStartCreate} disabled={editing !== null}>
-            <Plus className="w-4 h-4 mr-1" />
-            Yangi kalit
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }

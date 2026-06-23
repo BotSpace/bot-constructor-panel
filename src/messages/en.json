@@ -608,7 +608,10 @@
       "errors": "Errors",
       "errorsEmpty": "No errors",
       "errorsClear": "Clear",
-      "errorsDetail": "Detail"
+      "errorsDetail": "Detail",
+      "reload": "Reload debug bot",
+      "format": "Format (auto-layout)",
+      "addNode": "Add node"
     },
     "saveStatus": {
       "saving": "Saving...",

@@ -179,12 +179,12 @@ function GenericHandleRenderer({
             top: `calc(50% + ${dy}px)`,
             transform: "translateY(-50%)",
             // Label'ni circle MARKAZIDAN scale qilamiz (circle markazi label chap
-            // chetidan ~14px chapda: gap 30 - pill markazi 16). Shunda label circle
+            // chetidan ~24px chapda: gap 40 - pill markazi 16). Shunda label circle
             // bilan AYNAN bir xil transformga tushadi → hover'da X bo'yicha birga suriladi.
-            transformOrigin: isRight ? "-14px center" : "calc(100% + 14px) center",
+            transformOrigin: isRight ? "-24px center" : "calc(100% + 24px) center",
             ...(isRight
-              ? { left: "100%", marginLeft: 30 }
-              : { right: "100%", marginRight: 30 }),
+              ? { left: "100%", marginLeft: 40 }
+              : { right: "100%", marginRight: 40 }),
             whiteSpace: "nowrap",
             fontSize: 9,
             lineHeight: "12px",
@@ -380,8 +380,8 @@ function SwitchCaseSources({ nodeId }: { nodeId: string }) {
                 position: "absolute",
                 top: "50%",
                 transform: "translateY(-50%)",
-                transformOrigin: "-14px center",
-                left: "calc(100% + 30px)",
+                transformOrigin: "-24px center",
+                left: "calc(100% + 40px)",
                 whiteSpace: "nowrap",
                 fontSize: 9,
                 lineHeight: "12px",
@@ -418,8 +418,8 @@ function SwitchCaseSources({ nodeId }: { nodeId: string }) {
               position: "absolute",
               top: "50%",
               transform: "translateY(-50%)",
-              transformOrigin: "-14px center",
-              left: "calc(100% + 30px)",
+              transformOrigin: "-24px center",
+              left: "calc(100% + 40px)",
               whiteSpace: "nowrap",
               fontSize: 9,
               lineHeight: "12px",

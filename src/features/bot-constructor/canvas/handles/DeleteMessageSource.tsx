@@ -14,7 +14,9 @@ export function DeleteMessageSource() {
       position={Position.Right}
       tone="danger"
       title="O'chiriladigan Xabar"
-      style={{ top: "50%" }}
+      // source-default markazda (50%) turadi; bu ikkinchi (reference) source uni
+      // bosib qolmasligi uchun markazdan 24px pastga (pill 16px → kafolatli ajraladi).
+      style={{ top: "calc(50% + 24px)" }}
     />
   );
 }

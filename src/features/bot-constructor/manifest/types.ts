@@ -116,7 +116,9 @@ export interface NodeFieldManifest {
     | "credential"
     | "dynamic_inputs"
     // Dynamic (load-options) select — loads options from backend via credential
-    | "dynamic_select";
+    | "dynamic_select"
+    // Node selector — searchable combobox that picks a flow node by id
+    | "node-select";
   key?: string;
   widgetKey?: string;
   label?: string;

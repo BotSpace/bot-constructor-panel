@@ -116,6 +116,7 @@ const PANEL_ONLY_FIELD_TYPES = new Set([
   "credential",
   "dynamic_select",
   "dynamic_inputs",
+  "node-select",
 ]);
 
 function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {

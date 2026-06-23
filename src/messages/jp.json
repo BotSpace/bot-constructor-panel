@@ -615,7 +615,10 @@
       "errors": "エラー",
       "errorsEmpty": "エラーなし",
       "errorsClear": "クリア",
-      "errorsDetail": "詳細"
+      "errorsDetail": "詳細",
+      "reload": "デバッグボットを再起動",
+      "format": "フォーマット (自動レイアウト)",
+      "addNode": "ノードを追加"
     },
     "saveStatus": {
       "saving": "保存中...",
