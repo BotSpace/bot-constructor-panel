@@ -242,6 +242,10 @@
         "name": "If (条件分岐)",
         "description": "条件を確認し、TRUE/FALSE/NEXT へ振り分けます。"
       },
+      "switch": {
+        "name": "Switch (分岐選択)",
+        "description": "値をケースと比較し、一致した出力へ振り分けます。"
+      },
       "elseif": {
         "name": "Else If (それ以外の条件)",
         "description": "If の後に追加の条件を確認します。"

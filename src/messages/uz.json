@@ -238,6 +238,10 @@
         "name": "If (Agar)",
         "description": "Shartni tekshiradi va TRUE/FALSE/NEXT yo'nalishlarga ajratadi."
       },
+      "switch": {
+        "name": "Switch (Tanlov)",
+        "description": "Qiymatni case'lar bilan solishtiradi va tegishli chiqishga yo'naltiradi."
+      },
       "scheduler": {
         "name": "Rejalashtiruvchi",
         "description": "Kelajakdagi vaqtda flow'ni davom ettiradi."

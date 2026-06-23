@@ -19,6 +19,7 @@ import {
   FileText,
   Folder,
   FolderOpen,
+  GitBranch,
   Globe,
   Image,
   Images,
@@ -137,6 +138,8 @@ const LUCIDE_ICONS: Record<string, ReactNode> = {
   // ── Flow control ──────────────────────────────────────────────────────────
   /** IfConditionNode */
   split: <SplitSquareHorizontal className="text-primary" strokeWidth={2} />,
+  /** SwitchNode */
+  switch: <GitBranch className="text-primary" strokeWidth={2} />,
   /** ElseIfNode */
   repeat: <RefreshCcw className="text-primary" strokeWidth={2} />,
   /** DelayNode */

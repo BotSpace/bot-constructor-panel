@@ -238,6 +238,10 @@
         "name": "If",
         "description": "Checks condition and routes to TRUE/FALSE/NEXT."
       },
+      "switch": {
+        "name": "Switch",
+        "description": "Compares a value against cases and routes to the matching output."
+      },
       "scheduler": {
         "name": "Scheduler",
         "description": "Continues flow at a future scheduled time."
