@@ -375,6 +375,35 @@ export const getFormatFlow = (
     });
   }
 
+  // ── Resolve vertical overlaps within each column ──────────────────────────
+  // Centering each parent's children on the parent (branch correction) can stack
+  // two parents' children at (near) the same spot when the parents are vertically
+  // close — they end up overlapping/on top of each other. Within each column (nodes
+  // sharing ~the same X), push the lower of any overlapping pair down to keep a
+  // minimum gap. Order is preserved (sorted by Y), so no edges are re-crossed.
+  {
+    const COLUMN_TOL = 60; // px: nodes within this X distance count as one column
+    const V_MARGIN = 28; // min vertical gap between two nodes in a column
+    const columns = new Map<number, typeof layoutedNormalNodes>();
+    layoutedNormalNodes.forEach((n) => {
+      const key = Math.round(n.position.x / COLUMN_TOL);
+      if (!columns.has(key)) columns.set(key, []);
+      columns.get(key)!.push(n);
+    });
+    columns.forEach((colNodes) => {
+      colNodes.sort((a, b) => a.position.y - b.position.y);
+      for (let i = 1; i < colNodes.length; i++) {
+        const prev = colNodes[i - 1];
+        const cur = colNodes[i];
+        const minY =
+          prev.position.y + (prev.height ?? DEFAULT_NODE_HEIGHT) + V_MARGIN;
+        if (cur.position.y < minY) {
+          cur.position = { ...cur.position, y: minY };
+        }
+      }
+    });
+  }
+
   // Build a quick lookup of layouted normal node positions
   const normalPositionMap = new Map<string, { x: number; y: number; width: number; height: number }>();
   layoutedNormalNodes.forEach((n) => {
