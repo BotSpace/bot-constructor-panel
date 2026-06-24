@@ -5416,6 +5416,15 @@
     ],
     "content": [
       {
+        "type": "number",
+        "key": "chat_id",
+        "label": "Chat ID (ixtiyoriy)",
+        "placeholder": "masalan 123456789",
+        "optional": true,
+        "defaultVisible": false,
+        "helpText": "Berilsa, webhook kelganda flow aynan shu chat uchun ishlaydi (context'da chat_id/user_id va o'sha foydalanuvchi state'i). Bo'sh qoldirsangiz — chatsiz."
+      },
+      {
         "type": "read-only",
         "key": "webhook_url",
         "label": "Webhook URL",
