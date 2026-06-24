@@ -152,10 +152,15 @@ export function NodeVariablePanel({ stateKeys }: NodeVariablePanelProps) {
 
       {/* Footer — only when expanded */}
       {open && (
-      <div className="shrink-0 border-t border-white/10 p-4">
-        <Badge variant="outline" className="border-white/10 text-[11px] text-zinc-400">
-          Format: {`{{variable}}`}
-        </Badge>
+      <div className="shrink-0 border-t border-white/10 p-4 space-y-2">
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" className="border-white/10 text-[11px] text-zinc-400">
+            Public: {`{{variable}}`}
+          </Badge>
+          <Badge variant="outline" className="border-violet-400/20 text-[11px] text-violet-400">
+            Private: {`{{private.variable}}`}
+          </Badge>
+        </div>
       </div>
       )}
     </aside>

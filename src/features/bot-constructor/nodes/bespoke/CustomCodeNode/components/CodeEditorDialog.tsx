@@ -17,63 +17,68 @@ import { Button } from "@/components/ui/button";
 import { Code2, AlertCircle } from "lucide-react";
 import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 
-// Custom code uchun state/context yordamchi funksiyalari (autocomplete).
+// Custom code uchun o'zgaruvchilar modeli (autocomplete).
 //
-// YANGI (tavsiya etilgan) — to'g'ridan-to'g'ri obyekt-access:
-//   context.var_name   — context o'zgaruvchisini o'qish (masalan: context.first_name)
-//   state.var_name     — state o'zgaruvchisini o'qish; 'state_' prefiksi AVTOMATIK
-//                        (masalan: state.count → state_count kalit ostida saqlangan)
+// PUBLIC o'zgaruvchilar (vars):
+//   vars.name = value        — public o'zgaruvchi yozish → {{name}} bilan o'qiladi
+//   vars.name                — public o'zgaruvchi o'qish
 //
-// ESKI (hali ham ishlaydi) — funksiya orqali:
-//   get_context("key") / set_context("key", value)
-//   get_state("name")  / set_state("name", value)  — 'state_' avtomatik qo'shiladi
+// PRIVATE o'zgaruvchilar (maxfiy):
+//   private.token = value    — private o'zgaruvchi yozish → {{private.token}} bilan o'qiladi
+//   private.token            — private o'zgaruvchi o'qish
+//
+// AUTO-CONTEXT (faqat o'qish):
+//   vars.user.first_name     — foydalanuvchi ma'lumotlari ({{user.first_name}})
+//   vars.webhook.body        — webhook ma'lumotlari ({{webhook.body}})
+//   vars.message.text        — xabar ma'lumotlari ({{message.text}})
 
 const HELPER_COMPLETIONS = [
-  // --- Obyekt-access (yangi, tavsiya etilgan) ---
+  // --- vars — public o'zgaruvchilar (yangi model) ---
   {
-    label: "context",
+    label: "vars",
     type: "variable",
     boost: 100,
-    detail: "Context obyekti — barcha context o'zgaruvchilar",
-    info: "context.var_name — to'g'ridan-to'g'ri o'qish. Masalan: context.first_name, context.sheets_response",
+    detail: "Public o'zgaruvchilar obyekti",
+    info: "vars.name = value → {{name}} bilan o'qiladi.\nvars.user / vars.webhook / vars.message — auto-context (faqat o'qish).",
   },
   {
-    label: "context.",
+    label: "vars.",
     type: "variable",
     boost: 100,
-    apply: "context.",
-    detail: "context.var_name — context o'zgaruvchisini o'qish",
-    info: "Masalan: context.first_name, context.user_input, context.sheets_response",
+    apply: "vars.",
+    detail: "vars.name — public o'zgaruvchini o'qish/yozish",
+    info: "Masalan: vars.phone = '998901234567' → {{phone}}",
+  },
+  // --- private — maxfiy o'zgaruvchilar ---
+  {
+    label: "private",
+    type: "variable",
+    boost: 99,
+    detail: "Private (maxfiy) o'zgaruvchilar",
+    info: "private.token = value → {{private.token}} bilan o'qiladi. Foydalanuvchiga ko'rsatilmaydi.",
   },
   {
-    label: "state",
+    label: "private.",
     type: "variable",
-    boost: 100,
-    detail: "State obyekti — barcha state o'zgaruvchilar (state_ prefikssiz)",
-    info: "state.var_name — to'g'ridan-to'g'ri o'qish. Masalan: state.count, state.step",
+    boost: 99,
+    apply: "private.",
+    detail: "private.key — maxfiy o'zgaruvchini o'qish/yozish",
+    info: "Masalan: private.api_token = 'secret' → {{private.api_token}}",
   },
-  {
-    label: "state.",
-    type: "variable",
-    boost: 100,
-    apply: "state.",
-    detail: "state.var_name — state o'zgaruvchisini o'qish",
-    info: "Masalan: state.count, state.step, state.user_choice. 'state_' prefiksi avtomatik.",
-  },
-  // --- Funksiyalar (eski, hali ham ishlaydi) ---
+  // --- Eski funksiyalar (hali ham ishlaydi, lekin yangi model tavsiya etiladi) ---
   {
     label: "set_state",
     type: "function",
     apply: 'set_state("name", value)',
-    detail: "State yozish — 'state_' avtomatik qo'shiladi",
-    info: 'set_state("name", value) → node maydonida {{name}} yoki {{state.name}}',
+    detail: "(eski) State yozish — vars.name = value ishlatish tavsiya etiladi",
+    info: 'vars.name = value → {{name}} | private.name = value → {{private.name}}',
   },
   {
     label: "get_state",
     type: "function",
     apply: 'get_state("name")',
-    detail: "State o'qish — 'state_' avtomatik qo'shiladi",
-    info: 'get_state("name") → state_name qiymatini qaytaradi',
+    detail: "(eski) State o'qish — vars.name ishlatish tavsiya etiladi",
+    info: 'get_state("name") → vars.name bilan almashtirilsin',
   },
   {
     label: "has_state",
@@ -91,14 +96,14 @@ const HELPER_COMPLETIONS = [
     label: "set_context",
     type: "function",
     apply: 'set_context("key", value)',
-    detail: "Context yozish — prefiks YO'Q (kalit o'zgarmaydi)",
-    info: 'set_context("key", value) → node maydonida {{key}}',
+    detail: "(eski) Context yozish — vars.key = value ishlatish tavsiya etiladi",
+    info: 'set_context("key", value) → vars.key = value bilan almashtirilsin',
   },
   {
     label: "get_context",
     type: "function",
     apply: 'get_context("key")',
-    detail: "Context qiymatni o'qish",
+    detail: "(eski) Context o'qish — vars.key ishlatish tavsiya etiladi",
   },
 ];
 

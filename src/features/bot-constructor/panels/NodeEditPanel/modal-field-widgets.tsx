@@ -13,6 +13,10 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  HighlightedInput,
+  HighlightedTextarea,
+} from "@/features/bot-constructor/components/HighlightedInput";
 import { NodeFieldManifest } from "@/features/bot-constructor/manifest/types";
 import { renderCustomWidget } from "@/features/bot-constructor/fields/widgetRegistry";
 import { ArrayEditorField } from "@/features/bot-constructor/fields/generic-fields/ArrayEditorField";
@@ -495,7 +499,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
   if (field.type === "textarea") {
     return (
       <FieldShell label={field.label} helpText={field.helpText}>
-        <Textarea
+        <HighlightedTextarea
           placeholder={field.placeholder}
           rows={field.rows}
           value={typeof value === "string" ? value : ""}
@@ -522,9 +526,30 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
           ? String(value)
           : "";
 
+  // number fields don't contain {{vars}}, use plain Input
+  if (field.type === "number") {
+    return (
+      <FieldShell label={field.label} helpText={field.helpText}>
+        <Input
+          type="number"
+          min={field.min}
+          max={field.max}
+          step={field.step}
+          placeholder={field.placeholder}
+          value={normalizedValue}
+          onChange={(event) => {
+            const rawValue = event.target.value;
+            updateNodeData(nodeId, buildNestedPatch(data, fieldKey, rawValue === "" ? undefined : Number(rawValue)));
+          }}
+          className="h-10 border-white/10 bg-zinc-950/60"
+        />
+      </FieldShell>
+    );
+  }
+
   return (
     <FieldShell label={field.label} helpText={field.helpText}>
-      <Input
+      <HighlightedInput
         type={inputType}
         min={field.min}
         max={field.max}
@@ -532,12 +557,6 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         placeholder={field.placeholder}
         value={normalizedValue}
         onChange={(event) => {
-          if (field.type === "number") {
-            const rawValue = event.target.value;
-            updateNodeData(nodeId, buildNestedPatch(data, fieldKey, rawValue === "" ? undefined : Number(rawValue)));
-            return;
-          }
-
           updateNodeData(nodeId, buildNestedPatch(data, fieldKey, event.target.value));
         }}
         className="h-10 border-white/10 bg-zinc-950/60"
