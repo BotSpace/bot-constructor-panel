@@ -15,6 +15,12 @@
  *     dubl/ghost yo'q.
  *
  * Muhim: dinamik Tailwind klass ISHLATILMAYDI — inline style + CSS var.
+ *
+ * VAZIFA C FIX: Dropdown position:fixed + getBoundingClientRect — overflow:hidden
+ * ancestor'lardan chiqib ketmaydi. ReactDOM.createPortal ishlatilmaydi chunki
+ * Next.js SSR, shuning uchun useEffect ichida mount'dan keyin render qilinadi.
+ *
+ * VAZIFA D: Snippet/konstruksiyalar ({{#each}}, {{#if}}) ham tavsiya qilinadi.
  */
 
 import React, {
@@ -27,18 +33,114 @@ import React, {
   type TextareaHTMLAttributes,
   type InputHTMLAttributes,
 } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
 // ─── Regex ────────────────────────────────────────────────────────────────────
 
 const VAR_TOKEN_RE = /(\{\{[^}]+\}\})/g;
 
+// ─── Snippet tizimi ───────────────────────────────────────────────────────────
+
+interface Snippet {
+  /** Autocomplete ro'yxatida ko'rinadigan label */
+  label: string;
+  /** Dropdown'da ko'rinadigan hint (tur) */
+  kind: "loop" | "condition" | "context";
+  /**
+   * Insertga qo'yiladigan matn. `|` belgisi kursor joyi.
+   * Textarea'da ko'p qatorli, input'da bir qatorli versiyasi ishlatiladi.
+   */
+  insertMultiline: string;
+  insertSingleLine: string;
+  /** Filter trigger: shu prefix yozilganda ustuvor ko'rinadi */
+  triggerPrefix: string;
+}
+
+const SNIPPETS: Snippet[] = [
+  {
+    label: "#each — Ro'yxat (loop)",
+    kind: "loop",
+    triggerPrefix: "#",
+    insertMultiline: "{{#each collection.items}}\n  {{this.field}}\n{{/each}}",
+    insertSingleLine: "{{#each collection.items}} {{this.field}} {{/each}}",
+  },
+  {
+    label: "#if — Shart",
+    kind: "condition",
+    triggerPrefix: "#",
+    insertMultiline: "{{#if variable}}\n  \n{{/if}}",
+    insertSingleLine: "{{#if variable}} {{/if}}",
+  },
+  {
+    label: "@index — Tartib raqami (0 dan)",
+    kind: "context",
+    triggerPrefix: "@",
+    insertMultiline: "{{@index}}",
+    insertSingleLine: "{{@index}}",
+  },
+  {
+    label: "@number — Tartib raqami (1 dan)",
+    kind: "context",
+    triggerPrefix: "@",
+    insertMultiline: "{{@number}}",
+    insertSingleLine: "{{@number}}",
+  },
+  {
+    label: "this — Joriy element",
+    kind: "context",
+    triggerPrefix: "",
+    insertMultiline: "{{this}}",
+    insertSingleLine: "{{this}}",
+  },
+];
+
+/** Snippet yoki oddiy o'zgaruvchi ifodalovchi birlik */
+interface SuggestionItem {
+  id: string;
+  display: string;
+  isSnippet: boolean;
+  kind?: "loop" | "condition" | "context";
+  insertMultiline: string;
+  insertSingleLine: string;
+}
+
+function buildItems(suggestions: string[], query: string): SuggestionItem[] {
+  const q = query.toLowerCase();
+  // Snippet'lar: "#" yoki "@" trigger bo'lsa ustuvor
+  const isSnippetQuery = query.startsWith("#") || query.startsWith("@");
+  const snippetItems: SuggestionItem[] = SNIPPETS.filter((s) => {
+    if (isSnippetQuery) {
+      return s.label.toLowerCase().includes(q) || s.triggerPrefix === query[0];
+    }
+    return q === "" || s.label.toLowerCase().includes(q) || s.triggerPrefix.startsWith(q);
+  }).map((s) => ({
+    id: `__snippet__${s.label}`,
+    display: s.label,
+    isSnippet: true,
+    kind: s.kind,
+    insertMultiline: s.insertMultiline,
+    insertSingleLine: s.insertSingleLine,
+  }));
+
+  // Oddiy o'zgaruvchilar (snippet query bo'lsa kam ko'rinsin)
+  const varItems: SuggestionItem[] = suggestions
+    .filter((s) => q === "" || s.toLowerCase().includes(q))
+    .map((s) => ({
+      id: s,
+      display: `{{${s}}}`,
+      isSnippet: false,
+      insertMultiline: `{{${s}}}`,
+      insertSingleLine: `{{${s}}}`,
+    }));
+
+  // "#" yozilganda faqat snippet'lar; boshqa holda ikkalasi
+  if (isSnippetQuery) return snippetItems;
+  return [...snippetItems, ...varItems];
+}
+
 // ─── Token renderer ────────────────────────────────────────────────────────────
 
-/**
- * Matn ichidagi {{...}} tokenlarni rangli <span> bilan almashtiradi.
- * Oddiy qismlar var(--foreground) rangida (ko'rinadigan).
- */
 function highlightTokens(text: string): React.ReactNode[] {
   const parts = text.split(VAR_TOKEN_RE);
   const nodes: React.ReactNode[] = [];
@@ -46,7 +148,6 @@ function highlightTokens(text: string): React.ReactNode[] {
     const part = parts[i];
     if (!part) continue;
     if (i % 2 === 1) {
-      // {{...}} token — accent rang
       nodes.push(
         <span
           key={i}
@@ -61,7 +162,6 @@ function highlightTokens(text: string): React.ReactNode[] {
         </span>,
       );
     } else {
-      // Oddiy matn — foreground rang (ko'rinadigan, chunki input transparent)
       nodes.push(
         <span key={i} style={{ color: "var(--foreground)" }}>
           {part}
@@ -74,10 +174,6 @@ function highlightTokens(text: string): React.ReactNode[] {
 
 // ─── Mirror font sync ─────────────────────────────────────────────────────────
 
-/**
- * Mirror div'ga haqiqiy input/textarea'ning padding/font stillarini ko'chiradi.
- * boxSizing va borderWidth ham qo'shilgan — pikselma-piksel mos kelishi uchun.
- */
 function syncMirrorFont(
   sourceEl: HTMLInputElement | HTMLTextAreaElement,
   mirrorEl: HTMLDivElement,
@@ -102,9 +198,135 @@ function syncMirrorFont(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (mirrorEl.style as any)[prop] = (cs as any)[prop];
   }
-  // Border width: mirror has 0 border (wrapper has the border), but we need to
-  // account for the same total box width. Mirror border stays 0 — padding already
-  // copied above so the inner area aligns perfectly.
+}
+
+// ─── Dropdown portal (position:fixed) ────────────────────────────────────────
+
+interface DropdownPortalProps {
+  open: boolean;
+  items: SuggestionItem[];
+  activeIndex: number;
+  anchorRef: React.RefObject<HTMLElement | null>;
+  onSelect: (item: SuggestionItem) => void;
+  onMouseDown: (e: React.MouseEvent) => void;
+}
+
+function DropdownPortal({
+  open,
+  items,
+  activeIndex,
+  anchorRef,
+  onSelect,
+  onMouseDown,
+}: DropdownPortalProps) {
+  const activeRef = useRef<HTMLButtonElement>(null);
+  const [rect, setRect] = useState<{ top: number; left: number; width: number } | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Client-side only
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!open || !anchorRef.current) {
+      setRect(null);
+      return;
+    }
+    const el = anchorRef.current;
+    const r = el.getBoundingClientRect();
+    // position:fixed is viewport-relative — no scroll offset needed
+    setRect({ top: r.bottom + 2, left: r.left, width: r.width });
+  }, [open, anchorRef]);
+
+  useEffect(() => {
+    if (open && activeRef.current) {
+      activeRef.current.scrollIntoView({ block: "nearest" });
+    }
+  }, [open, activeIndex]);
+
+  if (!mounted || !open || items.length === 0 || !rect) return null;
+
+  const kindColors: Record<string, string> = {
+    loop: "hsl(200 80% 60%)",
+    condition: "hsl(280 70% 65%)",
+    context: "hsl(160 60% 55%)",
+  };
+
+  return createPortal(
+    <div
+      style={{
+        position: "fixed",
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999,
+        backgroundColor: "var(--popover)",
+        color: "var(--popover-foreground)",
+        border: "1px solid var(--border)",
+        borderRadius: "6px",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.35)",
+        maxHeight: "220px",
+        overflowY: "auto",
+        padding: "4px",
+      }}
+      onMouseDown={onMouseDown}
+    >
+      {items.map((item, index) => {
+        const isActive = index === activeIndex;
+        const accentColor = item.isSnippet && item.kind ? kindColors[item.kind] : "var(--primary)";
+        return (
+          <button
+            key={item.id}
+            ref={isActive ? activeRef : undefined}
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              onSelect(item);
+            }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              width: "100%",
+              textAlign: "left",
+              padding: "5px 8px",
+              borderRadius: "4px",
+              fontSize: "12px",
+              fontFamily: item.isSnippet ? "inherit" : "var(--font-mono, monospace)",
+              cursor: "pointer",
+              border: "none",
+              backgroundColor: isActive
+                ? "color-mix(in srgb, var(--primary) 15%, transparent)"
+                : "transparent",
+              color: isActive ? accentColor : "var(--popover-foreground)",
+            }}
+          >
+            {item.isSnippet ? (
+              <span
+                style={{
+                  fontSize: 10,
+                  padding: "1px 4px",
+                  borderRadius: 3,
+                  backgroundColor: "color-mix(in srgb, " + accentColor + " 20%, transparent)",
+                  color: accentColor,
+                  fontFamily: "var(--font-mono, monospace)",
+                  flexShrink: 0,
+                  letterSpacing: "0.02em",
+                }}
+              >
+                {item.kind === "loop" ? "loop" : item.kind === "condition" ? "if" : "ctx"}
+              </span>
+            ) : null}
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {item.display}
+            </span>
+          </button>
+        );
+      })}
+    </div>,
+    document.body
+  );
 }
 
 // ─── useVarAutocomplete hook ──────────────────────────────────────────────────
@@ -112,7 +334,7 @@ function syncMirrorFont(
 interface AutocompleteState {
   open: boolean;
   query: string;
-  filtered: string[];
+  items: SuggestionItem[];
   activeIndex: number;
 }
 
@@ -120,17 +342,16 @@ interface UseVarAutocompleteOptions {
   suggestions: string[];
   getValue: () => string;
   getCaretPosition: () => number;
+  /** multiline: textarea mode (ko'p qatorli snippet) */
+  multiline?: boolean;
   setValue: (next: string, caretPos: number) => void;
 }
 
 function getOpenQueryFromValue(value: string, caretPos: number): string | null {
-  // Find the text before caret
   const before = value.slice(0, caretPos);
-  // Find last {{ that is not yet closed
   const lastOpen = before.lastIndexOf("{{");
   if (lastOpen === -1) return null;
   const afterOpen = before.slice(lastOpen + 2);
-  // If there's a }} after the last {{ before caret, it's already closed
   if (afterOpen.includes("}}")) return null;
   return afterOpen;
 }
@@ -139,12 +360,13 @@ function useVarAutocomplete({
   suggestions,
   getValue,
   getCaretPosition,
+  multiline = false,
   setValue,
 }: UseVarAutocompleteOptions) {
   const [state, setState] = useState<AutocompleteState>({
     open: false,
     query: "",
-    filtered: [],
+    items: [],
     activeIndex: 0,
   });
 
@@ -155,14 +377,11 @@ function useVarAutocomplete({
         setState((prev) => (prev.open ? { ...prev, open: false } : prev));
         return;
       }
-      const q = query.toLowerCase();
-      const filtered = suggestions.filter(
-        (s) => q === "" || s.toLowerCase().includes(q),
-      );
+      const items = buildItems(suggestions, query);
       setState({
-        open: filtered.length > 0,
+        open: items.length > 0,
         query,
-        filtered,
+        items,
         activeIndex: 0,
       });
     },
@@ -179,22 +398,26 @@ function useVarAutocomplete({
     setState((prev) => ({ ...prev, open: false }));
   }, []);
 
-  const selectSuggestion = useCallback(
-    (suggestion: string) => {
+  const selectItem = useCallback(
+    (item: SuggestionItem) => {
       const value = getValue();
       const caret = getCaretPosition();
       const before = value.slice(0, caret);
       const after = value.slice(caret);
       const lastOpen = before.lastIndexOf("{{");
       if (lastOpen === -1) return;
-      // Replace "{{query" with "{{suggestion}}"
-      const newBefore = before.slice(0, lastOpen) + "{{" + suggestion + "}}";
+
+      const insert = multiline ? item.insertMultiline : item.insertSingleLine;
+      // Snippet ichida kursor joyi — faqat loop/condition snippet'larida mantiqli
+      // Snippet matnini "{{" oldidan boshlash o'rniga to'g'ri joyga qo'yamiz
+      const newBefore = before.slice(0, lastOpen) + insert;
       const newValue = newBefore + after;
+      // Kursor: snippet'lar uchun ohiriga qo'y ({{...}} ichiga kirish foydalanuvchiga qoladi)
       const newCaret = newBefore.length;
       setValue(newValue, newCaret);
       close();
     },
-    [getValue, getCaretPosition, setValue, close],
+    [getValue, getCaretPosition, multiline, setValue, close],
   );
 
   const handleKeyDown = useCallback(
@@ -209,7 +432,7 @@ function useVarAutocomplete({
         e.preventDefault();
         setState((prev) => ({
           ...prev,
-          activeIndex: (prev.activeIndex + 1) % Math.max(prev.filtered.length, 1),
+          activeIndex: (prev.activeIndex + 1) % Math.max(prev.items.length, 1),
         }));
         return;
       }
@@ -218,104 +441,23 @@ function useVarAutocomplete({
         setState((prev) => ({
           ...prev,
           activeIndex:
-            (prev.activeIndex - 1 + Math.max(prev.filtered.length, 1)) %
-            Math.max(prev.filtered.length, 1),
+            (prev.activeIndex - 1 + Math.max(prev.items.length, 1)) %
+            Math.max(prev.items.length, 1),
         }));
         return;
       }
       if (e.key === "Enter" || e.key === "Tab") {
-        if (state.filtered.length > 0) {
+        if (state.items.length > 0) {
           e.preventDefault();
-          selectSuggestion(state.filtered[state.activeIndex] ?? state.filtered[0]);
+          selectItem(state.items[state.activeIndex] ?? state.items[0]);
         }
         return;
       }
     },
-    [state, close, selectSuggestion],
+    [state, close, selectItem],
   );
 
-  return { state, checkTrigger, checkTriggerFromArgs, close, selectSuggestion, handleKeyDown };
-}
-
-// ─── Autocomplete Dropdown ────────────────────────────────────────────────────
-
-interface AutocompleteDropdownProps {
-  open: boolean;
-  items: string[];
-  activeIndex: number;
-  onSelect: (item: string) => void;
-}
-
-function AutocompleteDropdown({
-  open,
-  items,
-  activeIndex,
-  onSelect,
-}: AutocompleteDropdownProps) {
-  const activeRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (open && activeRef.current) {
-      activeRef.current.scrollIntoView({ block: "nearest" });
-    }
-  }, [open, activeIndex]);
-
-  if (!open || items.length === 0) return null;
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: "100%",
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        marginTop: "2px",
-        backgroundColor: "var(--popover)",
-        color: "var(--popover-foreground)",
-        border: "1px solid var(--border)",
-        borderRadius: "6px",
-        boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
-        maxHeight: "180px",
-        overflowY: "auto",
-        padding: "4px",
-      }}
-      // Prevent blur on input when clicking dropdown
-      onMouseDown={(e) => e.preventDefault()}
-    >
-      {items.map((item, index) => {
-        const isActive = index === activeIndex;
-        return (
-          <button
-            key={item}
-            ref={isActive ? activeRef : undefined}
-            type="button"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              onSelect(item);
-            }}
-            style={{
-              display: "block",
-              width: "100%",
-              textAlign: "left",
-              padding: "5px 8px",
-              borderRadius: "4px",
-              fontSize: "12px",
-              fontFamily: "var(--font-mono, monospace)",
-              cursor: "pointer",
-              border: "none",
-              backgroundColor: isActive
-                ? "color-mix(in srgb, var(--primary) 15%, transparent)"
-                : "transparent",
-              color: isActive ? "var(--primary)" : "var(--popover-foreground)",
-            }}
-          >
-            {`{{${item}}}`}
-          </button>
-        );
-      })}
-    </div>
-  );
+  return { state, checkTrigger, checkTriggerFromArgs, close, selectItem, handleKeyDown };
 }
 
 // ─── HighlightedInput ─────────────────────────────────────────────────────────
@@ -324,7 +466,6 @@ export interface HighlightedInputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange"> {
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
-  /** Autocomplete suggestions (e.g. state keys + user.id, message.text ...) */
   suggestions?: string[];
 }
 
@@ -335,6 +476,7 @@ export const HighlightedInput = forwardRef<HTMLInputElement, HighlightedInputPro
   ) {
     const inputRef = useRef<HTMLInputElement>(null);
     const mirrorRef = useRef<HTMLDivElement>(null);
+    const wrapperRef = useRef<HTMLDivElement>(null);
 
     useImperativeHandle(ref, () => inputRef.current as HTMLInputElement);
 
@@ -348,13 +490,13 @@ export const HighlightedInput = forwardRef<HTMLInputElement, HighlightedInputPro
       syncMirrorFont(inputRef.current, mirrorRef.current);
     });
 
-    const { state, checkTrigger, checkTriggerFromArgs, close, selectSuggestion, handleKeyDown } =
+    const { state, checkTriggerFromArgs, close, selectItem, handleKeyDown } =
       useVarAutocomplete({
         suggestions,
+        multiline: false,
         getValue: () => inputRef.current?.value ?? "",
         getCaretPosition: () => inputRef.current?.selectionStart ?? 0,
         setValue: (next, caretPos) => {
-          // Trigger React controlled onChange
           const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
             window.HTMLInputElement.prototype,
             "value",
@@ -362,7 +504,6 @@ export const HighlightedInput = forwardRef<HTMLInputElement, HighlightedInputPro
           if (nativeInputValueSetter && inputRef.current) {
             nativeInputValueSetter.call(inputRef.current, next);
             inputRef.current.dispatchEvent(new Event("input", { bubbles: true }));
-            // Set caret after React re-render
             requestAnimationFrame(() => {
               if (inputRef.current) {
                 inputRef.current.setSelectionRange(caretPos, caretPos);
@@ -375,7 +516,6 @@ export const HighlightedInput = forwardRef<HTMLInputElement, HighlightedInputPro
     const handleChange = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange(e);
-        // Use value/caret directly from the event — avoids rAF/React-batching skew
         const val = e.target.value;
         const caret = e.target.selectionStart ?? val.length;
         checkTriggerFromArgs(val, caret);
@@ -385,6 +525,7 @@ export const HighlightedInput = forwardRef<HTMLInputElement, HighlightedInputPro
 
     return (
       <div
+        ref={wrapperRef}
         className={cn(
           "relative flex min-w-0 w-full rounded-md border border-input",
           "shadow-xs overflow-visible",
@@ -392,7 +533,7 @@ export const HighlightedInput = forwardRef<HTMLInputElement, HighlightedInputPro
         )}
         style={style}
       >
-        {/* Mirror — behind the real input; shows full text via foreground color */}
+        {/* Mirror */}
         <div
           ref={mirrorRef}
           aria-hidden="true"
@@ -401,25 +542,20 @@ export const HighlightedInput = forwardRef<HTMLInputElement, HighlightedInputPro
             inset: 0,
             pointerEvents: "none",
             overflow: "hidden",
-            // No color here — each span carries its own color (foreground or primary)
             whiteSpace: "pre",
             border: "0px solid transparent",
             zIndex: 0,
-            // Single-line <input> vertically centers its text; mirror a block div
-            // would top-align it. Flex-center the inner line so it matches the
-            // input's caret/text baseline exactly.
             display: "flex",
             alignItems: "center",
           }}
         >
           <span style={{ whiteSpace: "pre" }}>
             {highlightTokens(value)}
-            {/* Trailing zero-width space keeps height consistent when empty */}
             {"​"}
           </span>
         </div>
 
-        {/* Real input — color:transparent so only mirror text shows; caret visible */}
+        {/* Real input */}
         <input
           ref={inputRef}
           value={value}
@@ -442,19 +578,20 @@ export const HighlightedInput = forwardRef<HTMLInputElement, HighlightedInputPro
           style={{
             position: "relative",
             zIndex: 1,
-            // Input text invisible — mirror shows it; caret remains visible
             color: "transparent",
             caretColor: "var(--foreground)",
           }}
           {...rest}
         />
 
-        {/* Autocomplete dropdown */}
-        <AutocompleteDropdown
+        {/* Dropdown — position:fixed portal */}
+        <DropdownPortal
           open={state.open}
-          items={state.filtered}
+          items={state.items}
           activeIndex={state.activeIndex}
-          onSelect={selectSuggestion}
+          anchorRef={wrapperRef}
+          onSelect={selectItem}
+          onMouseDown={(e) => e.preventDefault()}
         />
       </div>
     );
@@ -467,7 +604,6 @@ export interface HighlightedTextareaProps
   extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "value" | "onChange"> {
   value: string;
   onChange: React.ChangeEventHandler<HTMLTextAreaElement>;
-  /** Autocomplete suggestions (e.g. state keys + user.id, message.text ...) */
   suggestions?: string[];
 }
 
@@ -480,6 +616,7 @@ export const HighlightedTextarea = forwardRef<
 ) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mirrorRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement);
 
@@ -496,9 +633,10 @@ export const HighlightedTextarea = forwardRef<
     mirrorRef.current.style.width = `${textareaRef.current.offsetWidth}px`;
   });
 
-  const { state, checkTriggerFromArgs, close, selectSuggestion, handleKeyDown } =
+  const { state, checkTriggerFromArgs, close, selectItem, handleKeyDown } =
     useVarAutocomplete({
       suggestions,
+      multiline: true,
       getValue: () => textareaRef.current?.value ?? "",
       getCaretPosition: () => textareaRef.current?.selectionStart ?? 0,
       setValue: (next, caretPos) => {
@@ -521,7 +659,6 @@ export const HighlightedTextarea = forwardRef<
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       onChange(e);
-      // Use value/caret directly from the event — avoids rAF/React-batching skew
       const val = e.target.value;
       const caret = e.target.selectionStart ?? val.length;
       checkTriggerFromArgs(val, caret);
@@ -531,6 +668,7 @@ export const HighlightedTextarea = forwardRef<
 
   return (
     <div
+      ref={wrapperRef}
       className={cn(
         "relative w-full overflow-visible rounded-md border border-input shadow-xs",
         className,
@@ -555,11 +693,10 @@ export const HighlightedTextarea = forwardRef<
         }}
       >
         {highlightTokens(value)}
-        {/* Trailing newline keeps mirror height in sync */}
         {"\n​"}
       </div>
 
-      {/* Real textarea — color:transparent; mirror shows the text */}
+      {/* Real textarea */}
       <textarea
         ref={textareaRef}
         value={value}
@@ -582,7 +719,6 @@ export const HighlightedTextarea = forwardRef<
           position: "relative",
           zIndex: 1,
           backgroundColor: "transparent",
-          // Text invisible — mirror renders it; caret stays visible
           color: "transparent",
           caretColor: "var(--foreground)",
           resize: "vertical",
@@ -592,12 +728,14 @@ export const HighlightedTextarea = forwardRef<
         {...rest}
       />
 
-      {/* Autocomplete dropdown */}
-      <AutocompleteDropdown
+      {/* Dropdown — position:fixed portal */}
+      <DropdownPortal
         open={state.open}
-        items={state.filtered}
+        items={state.items}
         activeIndex={state.activeIndex}
-        onSelect={selectSuggestion}
+        anchorRef={wrapperRef}
+        onSelect={selectItem}
+        onMouseDown={(e) => e.preventDefault()}
       />
     </div>
   );

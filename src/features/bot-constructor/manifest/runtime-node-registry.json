@@ -527,7 +527,8 @@
       {
         "type": "richTextMessage",
         "key": "messageText",
-        "label": "Xabar matni"
+        "label": "Xabar matni",
+        "helpText": "O'zgaruvchilarni {{ }} ichida yozing.\nMisol: Salom {{user.first_name}}, balans: {{vars.balance}}\nKontekst: {{user.id}}, {{message.text}}, {{webhook.body.field}}\nRo'yxat uchun loop:\n{{#each collection.items}}\n  {{this.name}} — {{this.price}}\n{{/each}}\nIchida {{@index}} (0 dan) yoki {{@number}} (1 dan) ishlatish mumkin."
       },
       {
         "type": "action-recipients",
@@ -2605,7 +2606,8 @@
         "type": "richTextMessage",
         "key": "messageText",
         "label": "Xabar matni",
-        "intro": "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi"
+        "intro": "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi",
+        "helpText": "O'zgaruvchilarni {{ }} ichida yozing.\nMisol: {{user.first_name}}, {{vars.summa}}\nRo'yxat: {{#each collection.items}} {{this.nom}} {{/each}}"
       },
       {
         "type": "action-recipients",
@@ -3805,13 +3807,15 @@
         "type": "text",
         "key": "variableName",
         "label": "O'zgaruvchi nomi",
-        "placeholder": "my_variable"
+        "placeholder": "my_variable",
+        "helpText": "Keyingi node'larda {{vars.my_variable}} yoki {{my_variable}} sifatida o'qiladi."
       },
       {
         "type": "text",
         "key": "value",
         "label": "Qiymat",
         "placeholder": "Qiymat kiriting",
+        "helpText": "Statik qiymat yoki o'zgaruvchi: {{message.text}}, {{user.id}}, {{webhook.body.field}}",
         "visibleWhen": {
           "key": "operation",
           "notEquals": "delete"
@@ -4142,19 +4146,21 @@
         "type": "text",
         "key": "url",
         "label": "URL",
-        "placeholder": "https://api.example.com/endpoint"
+        "placeholder": "https://api.example.com/endpoint",
+        "helpText": "To'liq URL manzil. O'zgaruvchi ishlatish mumkin: https://api.example.com/users/{{user.id}}"
       },
       {
         "type": "textarea",
         "key": "headers",
         "label": "Headers (JSON)",
-        "helpText": "{\"Authorization\": \"Bearer token\"}",
+        "helpText": "JSON formatida: {\"Authorization\": \"Bearer {{vars.token}}\", \"Content-Type\": \"application/json\"}",
         "optional": true
       },
       {
         "type": "textarea",
         "key": "body",
         "label": "Body (JSON)",
+        "helpText": "JSON formatida so'rov tanasi. O'zgaruvchi ishlatish mumkin:\n{\"name\": \"{{user.first_name}}\", \"phone\": \"{{vars.phone}}\"}",
         "visibleWhen": {
           "key": "method",
           "notEquals": "GET"
@@ -4165,14 +4171,15 @@
         "type": "textarea",
         "key": "data",
         "label": "Data",
-        "helpText": "JSON yoki matn — body bilan bir xil, lekin alohida key sifatida",
+        "helpText": "JSON yoki matn formatida. Body o'rniga ishlatiladi (form-data uchun).",
         "optional": true
       },
       {
         "type": "text",
         "key": "responseVariable",
         "label": "Javob o'zgaruvchisi",
-        "placeholder": "response"
+        "placeholder": "response",
+        "helpText": "API javobi shu nom bilan saqlanadi. Keyingi node'larda {{vars.response}} yoki {{response}} sifatida ishlatiladi."
       },
       {
         "type": "number",
