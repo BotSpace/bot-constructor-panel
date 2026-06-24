@@ -118,7 +118,11 @@ export interface NodeFieldManifest {
     // Dynamic (load-options) select — loads options from backend via credential
     | "dynamic_select"
     // Node selector — searchable combobox that picks a flow node by id
-    | "node-select";
+    | "node-select"
+    // Read-only display field — shows data[key] as uneditable text with a copy
+    // button. When autofill="webhook" the field mints a unique URL on mount via
+    // POST /api/webhook/endpoint/ and stores the result into node data.
+    | "read-only";
   key?: string;
   widgetKey?: string;
   label?: string;
@@ -197,6 +201,14 @@ export interface NodeFieldManifest {
    *  selector shows only credentials of this type and the "new credential"
    *  dialog opens pre-locked to this type. Omit to show all credentials. */
   credentialType?: string;
+  // read-only field
+  /**
+   * When set to "webhook" the field auto-mints a unique webhook URL on first
+   * render by calling POST /api/webhook/endpoint/ with (project, node_id),
+   * then writes the returned url/token into node data. Subsequent renders skip
+   * the call if the key already holds a non-empty value (idempotent cache).
+   */
+  autofill?: "webhook";
   // dynamic_select field
   /** Resource name passed to POST /v1/credentials/options/<resource>/ */
   resource?: string;
