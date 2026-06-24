@@ -96,7 +96,7 @@ const SNIPPETS: Snippet[] = [
 ];
 
 /** Snippet yoki oddiy o'zgaruvchi ifodalovchi birlik */
-interface SuggestionItem {
+export interface SuggestionItem {
   id: string;
   display: string;
   isSnippet: boolean;
@@ -105,7 +105,7 @@ interface SuggestionItem {
   insertSingleLine: string;
 }
 
-function buildItems(suggestions: string[], query: string): SuggestionItem[] {
+export function buildItems(suggestions: string[], query: string): SuggestionItem[] {
   const q = query.toLowerCase();
   // Snippet'lar: "#" yoki "@" trigger bo'lsa ustuvor
   const isSnippetQuery = query.startsWith("#") || query.startsWith("@");

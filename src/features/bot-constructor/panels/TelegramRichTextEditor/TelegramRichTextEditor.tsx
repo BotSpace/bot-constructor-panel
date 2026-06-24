@@ -31,6 +31,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { VariableHighlightExtension } from "./variableHighlight";
+import {
+    buildItems,
+    type SuggestionItem,
+} from "@/features/bot-constructor/components/HighlightedInput";
 
 const TELEGRAM_INLINE_TAGS = new Set([
     "b", "strong", "i", "em", "u", "ins", "s", "strike", "del", "code", "a",
@@ -247,13 +251,24 @@ function EditorToolbar({
 
 interface AutocompleteDropdownProps {
     open: boolean;
-    items: string[];
+    items: SuggestionItem[];
     activeIndex: number;
-    onSelect: (item: string) => void;
+    onSelect: (item: SuggestionItem) => void;
     onMouseDown: (e: React.MouseEvent) => void;
     /** Editor — used to anchor the dropdown at the caret (via coordsAtPos). */
     editor: Editor | null;
 }
+
+const SNIPPET_KIND_COLOR: Record<string, string> = {
+    loop: "hsl(200 80% 60%)",
+    condition: "hsl(280 70% 65%)",
+    context: "hsl(160 60% 55%)",
+};
+const SNIPPET_KIND_BADGE: Record<string, string> = {
+    loop: "loop",
+    condition: "if",
+    context: "ctx",
+};
 
 function AutocompleteDropdown({
     open,
@@ -314,29 +329,51 @@ function AutocompleteDropdown({
         >
             {items.map((item, index) => {
                 const isActive = index === activeIndex;
+                const accent =
+                    item.isSnippet && item.kind ? SNIPPET_KIND_COLOR[item.kind] : "var(--primary)";
                 return (
                     <button
-                        key={item}
+                        key={item.id}
                         ref={isActive ? activeRef : undefined}
                         type="button"
                         onClick={() => onSelect(item)}
                         style={{
-                            display: "block",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
                             width: "100%",
                             textAlign: "left",
                             padding: "5px 8px",
                             borderRadius: "4px",
                             fontSize: "12px",
-                            fontFamily: "var(--font-mono, monospace)",
+                            fontFamily: item.isSnippet ? "inherit" : "var(--font-mono, monospace)",
                             cursor: "pointer",
                             border: "none",
                             backgroundColor: isActive
                                 ? "color-mix(in srgb, var(--primary) 15%, transparent)"
                                 : "transparent",
-                            color: isActive ? "var(--primary)" : "var(--popover-foreground)",
+                            color: isActive ? accent : "var(--popover-foreground)",
                         }}
                     >
-                        {`{{${item}}}`}
+                        {item.isSnippet && item.kind ? (
+                            <span
+                                style={{
+                                    fontSize: 10,
+                                    padding: "1px 4px",
+                                    borderRadius: 3,
+                                    backgroundColor: "color-mix(in srgb, " + accent + " 20%, transparent)",
+                                    color: accent,
+                                    fontFamily: "var(--font-mono, monospace)",
+                                    flexShrink: 0,
+                                    letterSpacing: "0.02em",
+                                }}
+                            >
+                                {SNIPPET_KIND_BADGE[item.kind]}
+                            </span>
+                        ) : null}
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {item.display}
+                        </span>
                     </button>
                 );
             })}
@@ -350,7 +387,7 @@ function AutocompleteDropdown({
 interface AutocompleteState {
     open: boolean;
     query: string;
-    filtered: string[];
+    filtered: SuggestionItem[];
     activeIndex: number;
 }
 
@@ -382,10 +419,9 @@ function useEditorAutocomplete(suggestions: string[]) {
                 setState((prev) => (prev.open ? { ...prev, open: false } : prev));
                 return;
             }
-            const q = query.toLowerCase();
-            const filtered = suggestions.filter(
-                (s) => q === "" || s.toLowerCase().includes(q),
-            );
+            // Same item builder as HighlightedInput → snippets (#each, #if, @index…)
+            // appear alongside plain variables.
+            const filtered = buildItems(suggestions, query);
             setState({
                 open: filtered.length > 0,
                 query,
@@ -401,16 +437,16 @@ function useEditorAutocomplete(suggestions: string[]) {
     }, []);
 
     const selectSuggestion = useCallback(
-        (editor: Editor, suggestion: string) => {
+        (editor: Editor, item: SuggestionItem) => {
             const { state: editorState } = editor;
             const { from } = editorState.selection;
             const textBefore = editorState.doc.textBetween(0, from, "\n", "\0");
             const lastOpen = textBefore.lastIndexOf("{{");
             if (lastOpen === -1) return;
 
-            // Delete from lastOpen position to cursor, then insert {{suggestion}}
-            // lastOpen is a character offset in the text; need to find ProseMirror pos.
-            // We'll use deleteRange + insertContent approach.
+            // Delete the typed "{{…" then insert the item. Use the single-line snippet
+            // form so we insert plain text — a multiline snippet's "\n" would serialise
+            // to a literal "<br>" here (onUpdate only maps paragraph breaks to "\n").
             const deleteFrom = from - (textBefore.length - lastOpen);
             const deleteTo = from;
 
@@ -418,7 +454,7 @@ function useEditorAutocomplete(suggestions: string[]) {
                 .chain()
                 .focus()
                 .deleteRange({ from: deleteFrom, to: deleteTo })
-                .insertContent(`{{${suggestion}}}`)
+                .insertContent(item.insertSingleLine)
                 .run();
 
             close();
@@ -484,6 +520,15 @@ function InlineEditorContent({
     const { acState, checkTrigger, close, selectSuggestion, handleKeyDown } =
         useEditorAutocomplete(suggestions);
 
+    // Keep the latest autocomplete keydown in a ref so the editor's (stable)
+    // handleKeyDown always sees current state. The old setOptions-in-useEffect
+    // approach re-wrapped the handler each render, leaking stale closures — so
+    // Enter sometimes fell through to ProseMirror and inserted a newline instead
+    // of selecting the active suggestion.
+    const editorRef = useRef<Editor | null>(null);
+    const handleKeyDownRef = useRef(handleKeyDown);
+    handleKeyDownRef.current = handleKeyDown;
+
     const editor = useEditor({
         immediatelyRender: false,
         extensions: [
@@ -512,32 +557,16 @@ function InlineEditorContent({
             attributes: {
                 class: "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[120px] px-3 py-2 text-sm leading-relaxed",
             },
-            handleKeyDown: (view, event) => {
-                // Build a temporary editor-like object to pass to handleKeyDown.
-                // We need the actual editor instance; store it via ref.
-                return false; // handled in onKeyDown via editorRef
+            // Runs BEFORE ProseMirror's keymap (so Enter/Tab can be intercepted to
+            // select a suggestion). Reads the latest handler via ref.
+            handleKeyDown: (_view, event) => {
+                const ed = editorRef.current;
+                return ed ? handleKeyDownRef.current(ed, event) : false;
             },
         },
     });
 
-    // Store editor in ref for the keydown handler
-    const editorRef = useRef<Editor | null>(null);
     editorRef.current = editor;
-
-    // Override editorProps.handleKeyDown after editor is created
-    useEffect(() => {
-        if (!editor) return;
-        const originalHandleKeyDown = editor.options.editorProps.handleKeyDown;
-        editor.setOptions({
-            editorProps: {
-                ...editor.options.editorProps,
-                handleKeyDown: (_view, event) => {
-                    if (originalHandleKeyDown?.(_view, event)) return true;
-                    return handleKeyDown(editor, event);
-                },
-            },
-        });
-    }, [editor, handleKeyDown]);
 
     return (
         <div
@@ -586,6 +615,10 @@ function LazyEditorContent({
     const { acState, checkTrigger, close, selectSuggestion, handleKeyDown } =
         useEditorAutocomplete(suggestions);
 
+    const editorRef = useRef<Editor | null>(null);
+    const handleKeyDownRef = useRef(handleKeyDown);
+    handleKeyDownRef.current = handleKeyDown;
+
     const editor = useEditor({
         immediatelyRender: false,
         extensions: [
@@ -600,8 +633,6 @@ function LazyEditorContent({
             VariableHighlightExtension,
         ],
         content: defaultValue?.replace(/\n/g, "<br>") || "",
-        onCreate: ({ editor: _ed }) => {
-        },
         onUpdate: ({ editor: ed }) => {
             let html_content = ed.getHTML();
             html_content = html_content.replace(/<\/p><p>/g, "\n");
@@ -616,22 +647,14 @@ function LazyEditorContent({
             attributes: {
                 class: "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[160px] px-4 py-3 text-sm leading-relaxed",
             },
+            handleKeyDown: (_view, event) => {
+                const ed = editorRef.current;
+                return ed ? handleKeyDownRef.current(ed, event) : false;
+            },
         },
     });
 
-    useEffect(() => {
-        if (!editor) return;
-        const originalHandleKeyDown = editor.options.editorProps.handleKeyDown;
-        editor.setOptions({
-            editorProps: {
-                ...editor.options.editorProps,
-                handleKeyDown: (_view, event) => {
-                    if (originalHandleKeyDown?.(_view, event)) return true;
-                    return handleKeyDown(editor, event);
-                },
-            },
-        });
-    }, [editor, handleKeyDown]);
+    editorRef.current = editor;
 
     const charCount = editor?.getText().length ?? 0;
 
