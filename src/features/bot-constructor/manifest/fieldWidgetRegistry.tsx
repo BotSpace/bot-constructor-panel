@@ -117,6 +117,7 @@ const PANEL_ONLY_FIELD_TYPES = new Set([
   "dynamic_select",
   "dynamic_inputs",
   "node-select",
+  "read-only",
 ]);
 
 function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
