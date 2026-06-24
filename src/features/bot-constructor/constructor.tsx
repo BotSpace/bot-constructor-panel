@@ -811,6 +811,11 @@ export default function Constructor() {
             <ReactFlow
               isValidConnection={isValidConnection}
               id="canvas-area"
+              // Perf: only render nodes/edges inside the viewport (virtualization),
+              // and don't lift selected nodes to a new layer (avoids reflow). Big win
+              // once the canvas has many nodes.
+              onlyRenderVisibleElements
+              elevateNodesOnSelect={false}
               nodeTypes={nodeTypes}
               edgeTypes={CustomEdge}
               nodes={nodes}
