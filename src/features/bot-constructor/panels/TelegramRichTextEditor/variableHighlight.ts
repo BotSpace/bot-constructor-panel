@@ -33,7 +33,6 @@ function buildDecorations(doc: PmNode): DecorationSet {
             "color: var(--primary, hsl(220 90% 56%))",
             "background-color: color-mix(in srgb, var(--primary, hsl(220 90% 56%)) 18%, transparent)",
             "border-radius: 3px",
-            "padding: 0 2px",
           ].join("; "),
         }),
       );

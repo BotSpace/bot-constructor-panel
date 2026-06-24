@@ -55,7 +55,6 @@ function highlightTokens(text: string): React.ReactNode[] {
               "color-mix(in srgb, var(--primary, hsl(220 90% 56%)) 18%, transparent)",
             color: "var(--primary, hsl(220 90% 56%))",
             borderRadius: "3px",
-            padding: "0 2px",
           }}
         >
           {part}
@@ -149,25 +148,32 @@ function useVarAutocomplete({
     activeIndex: 0,
   });
 
+  const checkTriggerFromArgs = useCallback(
+    (value: string, caret: number) => {
+      const query = getOpenQueryFromValue(value, caret);
+      if (query === null) {
+        setState((prev) => (prev.open ? { ...prev, open: false } : prev));
+        return;
+      }
+      const q = query.toLowerCase();
+      const filtered = suggestions.filter(
+        (s) => q === "" || s.toLowerCase().includes(q),
+      );
+      setState({
+        open: filtered.length > 0,
+        query,
+        filtered,
+        activeIndex: 0,
+      });
+    },
+    [suggestions],
+  );
+
   const checkTrigger = useCallback(() => {
     const value = getValue();
     const caret = getCaretPosition();
-    const query = getOpenQueryFromValue(value, caret);
-    if (query === null) {
-      setState((prev) => (prev.open ? { ...prev, open: false } : prev));
-      return;
-    }
-    const q = query.toLowerCase();
-    const filtered = suggestions.filter(
-      (s) => q === "" || s.toLowerCase().includes(q),
-    );
-    setState({
-      open: filtered.length > 0,
-      query,
-      filtered,
-      activeIndex: 0,
-    });
-  }, [suggestions, getValue, getCaretPosition]);
+    checkTriggerFromArgs(value, caret);
+  }, [getValue, getCaretPosition, checkTriggerFromArgs]);
 
   const close = useCallback(() => {
     setState((prev) => ({ ...prev, open: false }));
@@ -228,7 +234,7 @@ function useVarAutocomplete({
     [state, close, selectSuggestion],
   );
 
-  return { state, checkTrigger, close, selectSuggestion, handleKeyDown };
+  return { state, checkTrigger, checkTriggerFromArgs, close, selectSuggestion, handleKeyDown };
 }
 
 // ─── Autocomplete Dropdown ────────────────────────────────────────────────────
@@ -342,7 +348,7 @@ export const HighlightedInput = forwardRef<HTMLInputElement, HighlightedInputPro
       syncMirrorFont(inputRef.current, mirrorRef.current);
     });
 
-    const { state, checkTrigger, close, selectSuggestion, handleKeyDown } =
+    const { state, checkTrigger, checkTriggerFromArgs, close, selectSuggestion, handleKeyDown } =
       useVarAutocomplete({
         suggestions,
         getValue: () => inputRef.current?.value ?? "",
@@ -369,10 +375,12 @@ export const HighlightedInput = forwardRef<HTMLInputElement, HighlightedInputPro
     const handleChange = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange(e);
-        // checkTrigger runs after state updates
-        requestAnimationFrame(checkTrigger);
+        // Use value/caret directly from the event — avoids rAF/React-batching skew
+        const val = e.target.value;
+        const caret = e.target.selectionStart ?? val.length;
+        checkTriggerFromArgs(val, caret);
       },
-      [onChange, checkTrigger],
+      [onChange, checkTriggerFromArgs],
     );
 
     return (
@@ -481,7 +489,7 @@ export const HighlightedTextarea = forwardRef<
     mirrorRef.current.style.width = `${textareaRef.current.offsetWidth}px`;
   });
 
-  const { state, checkTrigger, close, selectSuggestion, handleKeyDown } =
+  const { state, checkTriggerFromArgs, close, selectSuggestion, handleKeyDown } =
     useVarAutocomplete({
       suggestions,
       getValue: () => textareaRef.current?.value ?? "",
@@ -506,9 +514,12 @@ export const HighlightedTextarea = forwardRef<
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       onChange(e);
-      requestAnimationFrame(checkTrigger);
+      // Use value/caret directly from the event — avoids rAF/React-batching skew
+      const val = e.target.value;
+      const caret = e.target.selectionStart ?? val.length;
+      checkTriggerFromArgs(val, caret);
     },
-    [onChange, checkTrigger],
+    [onChange, checkTriggerFromArgs],
   );
 
   return (
