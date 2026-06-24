@@ -229,15 +229,25 @@ export const getFormatFlow = (
       // Switch — whose handles come from the dynamic "switch-case-sources" preset — was
       // skipped entirely and its case children kept dagre's arbitrary order.)
       const manifestById = new Map<string, NodeHandleManifest>();
-      sourceManifest.handles.forEach((h) => {
-        if (h.id) manifestById.set(h.id, h);
+      const manifestIndexById = new Map<string, number>();
+      sourceManifest.handles.forEach((h, i) => {
+        if (h.id) {
+          manifestById.set(h.id, h);
+          manifestIndexById.set(h.id, i);
+        }
       });
       const rankOf = (handleId: string): number => {
         const caseMatch = handleId.match(/^output-case_(\d+)$/);
         if (caseMatch) return parseInt(caseMatch[1], 10);
         if (handleId === "output-default") return 1_000_000;
         const mh = manifestById.get(handleId);
-        return mh ? parseOffsetRank(mh) : 0;
+        // offsetClass (translate-y) encodes vertical position precisely → use it.
+        if (mh?.offsetClass) return parseOffsetRank(mh);
+        // No offsetClass (e.g. module nodes' found/failed) → fall back to the handle's
+        // declaration order in the manifest, which IS the visual top→bottom order.
+        // Otherwise both rank 0 and the children keep dagre's arbitrary order → the
+        // Found/Failed edges cross.
+        return manifestIndexById.get(handleId) ?? 0;
       };
 
       // rank map: handleId → numeric Y rank (lower number = higher on screen)
