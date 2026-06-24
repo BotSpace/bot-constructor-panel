@@ -28,12 +28,28 @@ interface ModuleManifestState {
   stopPoll: () => void;
 }
 
-export const useModuleManifestStore = create<ModuleManifestState>((set) => ({
+// Cheap signature of the module node-type set. The canvas remounts ALL nodes when
+// `manifests` (and thus nodeTypes) changes reference. The manifest poll runs every 3s
+// for ~90s after a module op and returns a NEW array each time — even when the type set
+// is unchanged. Compare signatures so we keep the SAME reference (no remount) unless the
+// node types actually changed.
+const manifestSignature = (arr: NodeManifest[]): string =>
+  arr
+    .map((m) => m.type)
+    .sort()
+    .join("|");
+
+export const useModuleManifestStore = create<ModuleManifestState>((set, get) => ({
   manifests: [],
   setManifests: (manifests) => {
     // React Query data is undefined while loading — coerce so the store always
     // holds an array (buildModuleNodeTypes does .reduce on it).
     const safe = Array.isArray(manifests) ? manifests : [];
+    if (manifestSignature(safe) === manifestSignature(get().manifests)) {
+      // Same module node types — keep the reference stable so nodeTypes (and every
+      // node) does not remount. The lookup Map already holds these from the prior call.
+      return;
+    }
     clearModuleManifests();
     registerModuleManifests(safe);
     set({ manifests: safe });
