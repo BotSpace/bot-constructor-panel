@@ -376,14 +376,37 @@ export const getFormatFlow = (
   }
 
   // ── Resolve vertical overlaps within each column ──────────────────────────
-  // Centering each parent's children on the parent (branch correction) can stack
-  // two parents' children at (near) the same spot when the parents are vertically
-  // close — they end up overlapping/on top of each other. Within each column (nodes
-  // sharing ~the same X), push the lower of any overlapping pair down to keep a
-  // minimum gap. Order is preserved (sorted by Y), so no edges are re-crossed.
+  // Centering each parent's children on the parent (branch correction) makes two
+  // parents' child-stacks OVERLAP when the parents sit close together. A plain
+  // sort-by-Y then de-overlap would INTERLEAVE them (e.g. FILE.found, DL.downloaded,
+  // FILE.failed, DL.failed). Instead group each column by the child's parent center
+  // Y first, then by its own Y — so one parent's children all come before the next
+  // parent's — and only then push overlapping nodes down to keep a minimum gap.
   {
     const COLUMN_TOL = 60; // px: nodes within this X distance count as one column
     const V_MARGIN = 28; // min vertical gap between two nodes in a column
+
+    const posById = new Map<string, (typeof layoutedNormalNodes)[0]>();
+    layoutedNormalNodes.forEach((n) => posById.set(n.id, n));
+    const parentsByChild = new Map<string, string[]>();
+    forwardEdges.forEach((e) => {
+      if (!posById.has(e.source) || !posById.has(e.target)) return;
+      if (!parentsByChild.has(e.target)) parentsByChild.set(e.target, []);
+      parentsByChild.get(e.target)!.push(e.source);
+    });
+    // Grouping key: average vertical centre of the node's parents (falls back to the
+    // node's own Y when it has no laid-out parent). Keeps siblings of one parent together.
+    const groupKey = (n: (typeof layoutedNormalNodes)[0]): number => {
+      const parents = (parentsByChild.get(n.id) ?? [])
+        .map((p) => posById.get(p))
+        .filter((p): p is (typeof layoutedNormalNodes)[0] => Boolean(p));
+      if (!parents.length) return n.position.y;
+      return (
+        parents.reduce((s, p) => s + p.position.y + (p.height ?? DEFAULT_NODE_HEIGHT) / 2, 0) /
+        parents.length
+      );
+    };
+
     const columns = new Map<number, typeof layoutedNormalNodes>();
     layoutedNormalNodes.forEach((n) => {
       const key = Math.round(n.position.x / COLUMN_TOL);
@@ -391,7 +414,7 @@ export const getFormatFlow = (
       columns.get(key)!.push(n);
     });
     columns.forEach((colNodes) => {
-      colNodes.sort((a, b) => a.position.y - b.position.y);
+      colNodes.sort((a, b) => groupKey(a) - groupKey(b) || a.position.y - b.position.y);
       for (let i = 1; i < colNodes.length; i++) {
         const prev = colNodes[i - 1];
         const cur = colNodes[i];
