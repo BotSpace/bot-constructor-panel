@@ -221,14 +221,29 @@ export const getFormatFlow = (
         return m ? parseInt(m[1], 10) : 0;
       };
 
-      // Only consider source handles
-      const sourceHandles = sourceManifest.handles.filter((h) => h.kind === "source" && h.id);
-      if (sourceHandles.length < 2) return;
+      // Rank each USED source handle by its on-screen vertical position. Dynamic
+      // handles — Switch renders "output-case_<n>" (cases, top→bottom by index) and
+      // "output-default" (always last/bottom) — have NO manifest offsetClass, so derive
+      // their rank from the handle-id pattern. Named/static handles fall back to their
+      // manifest offsetClass. (The old code only looked at manifest source handles, so
+      // Switch — whose handles come from the dynamic "switch-case-sources" preset — was
+      // skipped entirely and its case children kept dagre's arbitrary order.)
+      const manifestById = new Map<string, NodeHandleManifest>();
+      sourceManifest.handles.forEach((h) => {
+        if (h.id) manifestById.set(h.id, h);
+      });
+      const rankOf = (handleId: string): number => {
+        const caseMatch = handleId.match(/^output-case_(\d+)$/);
+        if (caseMatch) return parseInt(caseMatch[1], 10);
+        if (handleId === "output-default") return 1_000_000;
+        const mh = manifestById.get(handleId);
+        return mh ? parseOffsetRank(mh) : 0;
+      };
 
       // rank map: handleId → numeric Y rank (lower number = higher on screen)
       const handleRank = new Map<string, number>();
-      sourceHandles.forEach((h) => {
-        if (h.id) handleRank.set(h.id, parseOffsetRank(h));
+      handles.forEach((hId) => {
+        if (hId) handleRank.set(hId, rankOf(hId));
       });
 
       // For each handle, collect the direct children (one hop). Their subtrees
