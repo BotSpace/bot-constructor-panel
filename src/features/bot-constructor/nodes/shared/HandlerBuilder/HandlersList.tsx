@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
-import { Position } from "reactflow";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { Position, useUpdateNodeInternals } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 import { Button } from "@/components/ui/button";
@@ -21,11 +21,43 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
   const inPanel = useIsInNodePanel();
   const nodes = useFlowStore((state) => state.nodes);
   const edges = useFlowStore((state) => state.edges);
+  const updateNodeInternals = useUpdateNodeInternals();
 
   // Source node ni topish
   const sourceNode = useMemo(() => {
     return nodes.find((n) => n.id === sourceNodeId);
   }, [nodes, sourceNodeId]);
+
+  // Routable tugmalar ro'yxati — handle chiqaradigan (callback) tugmalar, matn bo'yicha
+  // dedup qilingan (faqat birinchi takror handle oladi). Bitta joyda hisoblanadi:
+  // ro'yxat ham, handle re-measure ham shundan.
+  const routableButtons = useMemo(() => {
+    const NON_ROUTABLE = ["url", "web_app", "login_url", "switch_inline_query", "switch_inline_query_current_chat"];
+    const seenText = new Set<string>();
+    const normalized = getNodeKeyboard(sourceNode?.data ?? { keyboard });
+    return (normalized[normalized.active] as any[][]) // eslint-disable-line @typescript-eslint/no-explicit-any
+      .flat()
+      .filter((b: any) => b?.handler !== false && !NON_ROUTABLE.includes(b?.type)) // eslint-disable-line @typescript-eslint/no-explicit-any
+      .map((button: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+        const label: string =
+          button.text || (button.collectionData?.collection ? button.collectionData.collection : "");
+        const isFirstOccurrence = !seenText.has(label);
+        if (isFirstOccurrence) seenText.add(label);
+        return { button, label, isFirstOccurrence };
+      });
+  }, [sourceNode?.data, keyboard]);
+
+  // React Flow dinamik handle'larni avtomatik qayta o'lchamaydi. Tugma qo'shil/o'chsa
+  // yoki nomi o'zgarsa, mavjud handle ID'lar to'plami o'zgaradi — shu paytda
+  // updateNodeInternals chaqirib hamma handle'ni qayta o'lchatamiz, aks holda oxirgi
+  // qo'shilgan tugmaning handle pozitsiyasi stale qolib, undan chiqqan edge ko'rinmaydi.
+  const handleSignature = routableButtons
+    .filter((b) => b.isFirstOccurrence)
+    .map((b) => b.label)
+    .join("|");
+  useEffect(() => {
+    if (sourceNodeId) updateNodeInternals(sourceNodeId);
+  }, [sourceNodeId, handleSignature, updateNodeInternals]);
 
   /**
    * Handle uchun pozitsiyani aniqlash:
@@ -58,37 +90,9 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
   return (
     <div className="space-y-2 w-full">
       <div className="space-y-2">
-        {(() => {
-          const normalized = getNodeKeyboard(sourceNode?.data ?? { keyboard });
-          const NON_ROUTABLE = ["url", "web_app", "login_url", "switch_inline_query", "switch_inline_query_current_chat"];
-          return (normalized[normalized.active] as any[][])
-            .flat()
-            .filter((b: any) => b?.handler !== false && !NON_ROUTABLE.includes(b?.type));
-        })().length > 0 && (
+        {routableButtons.length > 0 && (
           <div className="flex flex-col gap-2 mb-3 pb-3 border-b">
-            {(() => {
-              const seenText = new Set<string>();
-              const normalized = getNodeKeyboard(sourceNode?.data ?? { keyboard });
-              return (normalized[normalized.active] as any[][])
-                .flat()
-                // handler switch: false bo'lsa tugma handle sifatida ko'rinmaydi.
-                // url, web_app, login_url va switch_inline_* turlari callback emas —
-                // ulardan routing edge chiqmasligi kerak, shuning uchun filtrlanadi.
-                .filter((button: any) =>
-                  button?.handler !== false &&
-                  !["url", "web_app", "login_url", "switch_inline_query", "switch_inline_query_current_chat"].includes(button?.type)
-                )
-                .map((button: any) => {
-                  const label: string =
-                    button.text ||
-                    (button.collectionData?.collection
-                      ? button.collectionData.collection
-                      : "");
-                  const isFirstOccurrence = !seenText.has(label);
-                  if (isFirstOccurrence) seenText.add(label);
-                  return { button, label, isFirstOccurrence };
-                });
-            })().map(({ button, label, isFirstOccurrence }: { button: any; label: string; isFirstOccurrence: boolean }) => {
+            {routableButtons.map(({ button, label, isFirstOccurrence }: { button: any; label: string; isFirstOccurrence: boolean }) => { // eslint-disable-line @typescript-eslint/no-explicit-any
               const handleId = `target-handler-${sourceNodeId}-${label}`;
               const pos = getHandlePosition(handleId);
               return (
