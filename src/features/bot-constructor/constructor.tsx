@@ -89,6 +89,15 @@ export default function Constructor() {
   const prevProjectIdRef = useRef<string | null>(null);
   // Tracks the manifest count across refetches to detect when polling can stop.
   const prevManifestCountRef = useRef<number>(-1);
+  // Polling baseline: the manifest count at the moment an enable/disable started.
+  // We keep polling until the count CHANGES (the module's node types appeared or
+  // disappeared) or a safety timeout. The old logic stopped as soon as the count
+  // was merely stable — during a slow module deploy the count stays at the OLD
+  // value for several fetches, so it stopped BEFORE the new nodes arrived (the
+  // sidebar only updated after a full page reload).
+  const pollBaselineRef = useRef<number>(-1);
+  const pollAttemptsRef = useRef<number>(0);
+  const MAX_MANIFEST_POLLS = 30; // ~90s at the 3s interval — covers module deploy
   useEffect(() => {
     if (prevProjectIdRef.current !== null && prevProjectIdRef.current !== id) {
       // Project switched — wipe stale module manifests immediately so the
@@ -101,6 +110,15 @@ export default function Constructor() {
     }
     prevProjectIdRef.current = id;
   }, [id, setManifests]);
+
+  // When a mutation kicks off polling, record the current count as the baseline
+  // and reset the attempt counter, so we poll until the count actually changes.
+  useEffect(() => {
+    if (pendingPoll) {
+      pollBaselineRef.current = prevManifestCountRef.current;
+      pollAttemptsRef.current = 0;
+    }
+  }, [pendingPoll]);
 
   const { data: fetchedManifests, isFetched: manifestsFetched } = useQuery({
     queryKey: ["module-manifests", id],
@@ -125,9 +143,14 @@ export default function Constructor() {
     if (fetchedManifests === undefined) return;
     setManifests(fetchedManifests);
     const count = fetchedManifests.length;
-    // Stop polling once manifest count stabilises (same value two fetches in a row).
-    if (pendingPoll && prevManifestCountRef.current === count) {
-      stopPoll();
+    if (pendingPoll) {
+      pollAttemptsRef.current += 1;
+      // Stop once the count CHANGES from the pre-mutation baseline (the module's
+      // node types appeared/disappeared) or after the safety timeout.
+      const changed = pollBaselineRef.current >= 0 && count !== pollBaselineRef.current;
+      if (changed || pollAttemptsRef.current >= MAX_MANIFEST_POLLS) {
+        stopPoll();
+      }
     }
     prevManifestCountRef.current = count;
   }, [fetchedManifests, setManifests, pendingPoll, stopPoll]);
