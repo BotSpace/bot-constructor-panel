@@ -9,6 +9,7 @@ import {
 import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -62,6 +63,7 @@ export function StateTypeSelectField({
     typeof data[typeField] === "string" ? (data[typeField] as string) : "";
   const customType =
     typeof data.customType === "string" ? (data.customType as string) : "";
+  const isPrivate = data.private === true;
 
   return (
     <div className="grid gap-3">
@@ -123,6 +125,26 @@ export function StateTypeSelectField({
           />
         </div>
       ) : null}
+
+      {/* Private switch */}
+      <div className="flex items-center justify-between gap-3 rounded-md border border-white/10 bg-white/[0.02] px-3 py-2">
+        <div className="min-w-0">
+          <Label className="cursor-pointer text-sm text-zinc-200">
+            Maxfiy (private)
+          </Label>
+          <p className="mt-0.5 text-[11px] leading-relaxed text-zinc-500">
+            {isPrivate
+              ? `{{private.${stateKey || "key"}}} sifatida o'qiladi`
+              : `{{${stateKey || "key"}}} sifatida o'qiladi (public)`}
+          </p>
+        </div>
+        <Switch
+          checked={isPrivate}
+          onCheckedChange={(checked) =>
+            updateNodeData(nodeId, { private: checked })
+          }
+        />
+      </div>
     </div>
   );
 }
