@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,39 +38,41 @@ export function WebhookUrlField({ nodeId, data, field }: WebhookUrlFieldProps) {
   const [minting, setMinting] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Guard: run mint only once per mount; even if project loads slightly late.
-  const didMintRef = useRef(false);
+  // Desired chat binding (optional chat_id field) vs the one the current URL was
+  // minted for. When they differ we re-mint so the URL matches the chat binding.
+  const desiredChatId = Number(data.chat_id) || 0;
+  const mintedChatId = Number(data.webhook_chat_id) || 0;
 
   useEffect(() => {
     // Only autofill=webhook triggers minting.
     if (field.autofill !== "webhook") return;
-    // Already has a value — skip (cache hit via node data).
-    if (currentValue) return;
-    // Already kicked off a request this mount cycle.
-    if (didMintRef.current) return;
     // Project not loaded yet — wait for it.
     if (!project?.id) return;
+    // URL already minted for the desired chat binding — nothing to do.
+    if (currentValue && mintedChatId === desiredChatId) return;
 
-    didMintRef.current = true;
-    setMinting(true);
-
-    mintWebhookEndpoint(project.id, nodeId)
-      .then((result) => {
-        updateNodeData(nodeId, {
-          [fieldKey]: result.url,
-          webhook_token: result.token,
+    // Debounce: chat_id is a number input; avoid minting on every keystroke.
+    const timer = setTimeout(() => {
+      setMinting(true);
+      mintWebhookEndpoint(project.id, nodeId, desiredChatId)
+        .then((result) => {
+          updateNodeData(nodeId, {
+            [fieldKey]: result.url,
+            webhook_token: result.token,
+            webhook_chat_id: result.chat_id,
+          });
+        })
+        .catch(() => {
+          toast.error("Webhook URL yaratishda xatolik yuz berdi");
+        })
+        .finally(() => {
+          setMinting(false);
         });
-      })
-      .catch(() => {
-        toast.error("Webhook URL yaratishda xatolik yuz berdi");
-        didMintRef.current = false; // allow retry on next render
-      })
-      .finally(() => {
-        setMinting(false);
-      });
-    // Intentionally depend only on project.id — re-run if project loads late.
+    }, 700);
+
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project?.id]);
+  }, [project?.id, desiredChatId]);
 
   const handleCopy = () => {
     if (!currentValue) return;
