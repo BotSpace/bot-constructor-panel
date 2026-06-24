@@ -271,25 +271,28 @@ export default function Constructor() {
       chat_id?: string | number;
       node_id?: string;
       node_type?: string;
+      level?: string;
       message: string;
       detail?: string;
       ts: number | string;
     };
     instanceAuth
-      .get<Array<RawError> | { results: Array<RawError> }>(
+      .get<Array<RawError> | { results?: Array<RawError>; errors?: Array<RawError> }>(
         `/debug/errors/`,
         { params: { project_id: projectId } }
       )
       .then(({ data }) => {
+        // Backend javobi { errors: [...] }; eski shakllar uchun results/array ham qo'llanadi.
         const raw: Array<RawError> = Array.isArray(data)
           ? data
-          : (data as { results: Array<RawError> })?.results ?? [];
+          : data?.errors ?? data?.results ?? [];
         if (raw.length === 0) return;
         const raws = raw.map((e) => ({
           project: projectId,
           chat_id: e.chat_id,
           node_id: e.node_id,
           node_type: e.node_type,
+          level: e.level,
           message: e.message || "Unknown error",
           detail: e.detail,
           ts: e.ts ?? Date.now(),
