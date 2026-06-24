@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { DynamicMessageConstructor } from "@/features/bot-constructor/nodes/bespoke/TextMessageNode/components/dynamic-message-constructor-modal";
 import TelegramRichTextEditor from "@/features/bot-constructor/panels/TelegramRichTextEditor/TelegramRichTextEditor";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { useVarSuggestions } from "@/features/bot-constructor/hooks/useVarSuggestions";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { uploadFile } from "@/services/requests/file";
 import { cn } from "@/lib/utils";
@@ -60,6 +61,7 @@ export function RichTextMessageField({
   showParseMode,
 }: RichTextMessageFieldProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const suggestions = useVarSuggestions(nodeId);
   const value = typeof data[textKey] === "string" ? (data[textKey] as string) : "";
   const parseMode = typeof data.parseMode === "string" ? data.parseMode : "None";
   const dynamicMessages = dynamicKey ? data[dynamicKey] : undefined;
@@ -90,6 +92,7 @@ export function RichTextMessageField({
       <TelegramRichTextEditor
         defaultValue={value}
         onChange={(nextValue) => updateNodeData(nodeId, { [textKey]: nextValue })}
+        suggestions={suggestions}
       />
 
       {showParseMode ? (
@@ -190,6 +193,7 @@ export interface MediaMessageFieldProps {
 export function MediaMessageField({ nodeId, data, kind }: MediaMessageFieldProps) {
   const project = useProjectStore((state) => state.project);
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const suggestions = useVarSuggestions(nodeId);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -366,6 +370,7 @@ export function MediaMessageField({ nodeId, data, kind }: MediaMessageFieldProps
           <TelegramRichTextEditor
             defaultValue={captionValue}
             onChange={(caption) => updateNodeData(nodeId, { caption })}
+            suggestions={suggestions}
           />
         )}
         <div
