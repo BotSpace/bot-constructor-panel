@@ -5388,13 +5388,13 @@
     }
   },
   {
-    "type": "ExternalWebhookTriggerNode",
+    "type": "WebhookTriggerNode",
     "status": "runtime",
     "category": "triggers",
-    "titleKey": "constructor.triggers.externalWebhook.name",
-    "descriptionKey": "constructor.triggers.externalWebhook.description",
-    "titleFallback": "Tashqi Webhook Triggeri",
-    "descriptionFallback": "Tashqi webhook (stripe/payme/...) kelganda trigger qilinadi.",
+    "titleKey": "constructor.triggers.webhookTrigger.name",
+    "descriptionKey": "constructor.triggers.webhookTrigger.description",
+    "titleFallback": "Webhook Trigger",
+    "descriptionFallback": "Tashqi webhook URL kelganda ishga tushadi. Har bir node o'z unique URL'ini oladi.",
     "iconName": "globe",
     "colorToken": "trigger-blue",
     "size": {
@@ -5404,7 +5404,7 @@
       "enabled": true,
       "groupId": "triggers",
       "sortOrder": 27,
-      "elementType": "external_webhook"
+      "elementType": "webhook"
     },
     "handles": [
       {
@@ -5416,15 +5416,33 @@
     ],
     "content": [
       {
+        "type": "read-only",
+        "key": "webhook_url",
+        "label": "Webhook URL",
+        "autofill": "webhook",
+        "helpText": "Bu node'ning unique URL'i. Tashqi servisga shu URL'ni bering."
+      },
+      {
+        "type": "switch",
+        "key": "wait_response",
+        "label": "Javobni kutish",
+        "helpText": "Yoqilsa, flow tugagach quyidagi o'zgaruvchidagi qiymat HTTP javob sifatida qaytariladi."
+      },
+      {
         "type": "text",
-        "key": "provider",
-        "label": "Provider",
-        "placeholder": "stripe, payme, click, ...",
-        "helpText": "Webhook yuboruvchi servis nomi (ixtiyoriy belgi)"
+        "key": "response_variable",
+        "label": "Javob o'zgaruvchisi",
+        "placeholder": "response",
+        "visibleWhen": {
+          "key": "wait_response",
+          "equals": true
+        }
       }
     ],
     "defaults": {
-      "provider": ""
+      "webhook_url": "",
+      "wait_response": false,
+      "response_variable": ""
     }
   },
   {

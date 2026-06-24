@@ -80,7 +80,7 @@ const LUCIDE_ICONS: Record<string, ReactNode> = {
   "mouse-pointer": <MousePointerClick className="text-primary" strokeWidth={2} />,
   /** ReplyButtonTriggerNode: reply */
   reply: <MessageSquareDashed className="text-primary" strokeWidth={2} />,
-  /** ExternalWebhookTriggerNode: webhook */
+  /** WebhookTriggerNode: webhook */
   globe: <Globe className="text-primary" strokeWidth={2} />,
   /** PreCheckoutTriggerNode */
   "credit-card": <CreditCard className="text-primary" strokeWidth={2} />,
