@@ -4,6 +4,7 @@ import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 import {
     Bold,
@@ -250,6 +251,8 @@ interface AutocompleteDropdownProps {
     activeIndex: number;
     onSelect: (item: string) => void;
     onMouseDown: (e: React.MouseEvent) => void;
+    /** Editor — used to anchor the dropdown at the caret (via coordsAtPos). */
+    editor: Editor | null;
 }
 
 function AutocompleteDropdown({
@@ -258,8 +261,15 @@ function AutocompleteDropdown({
     activeIndex,
     onSelect,
     onMouseDown,
+    editor,
 }: AutocompleteDropdownProps) {
     const activeRef = useRef<HTMLButtonElement>(null);
+    const [mounted, setMounted] = useState(false);
+
+    // Client-only — createPortal needs document.
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (open && activeRef.current) {
@@ -267,23 +277,36 @@ function AutocompleteDropdown({
         }
     }, [open, activeIndex]);
 
-    if (!open || items.length === 0) return null;
+    if (!mounted || !open || items.length === 0 || !editor) return null;
 
-    return (
+    // Anchor at the caret. The editor lives inside an overflow-hidden container, so
+    // an in-flow absolutely-positioned dropdown gets clipped — render it in a portal
+    // on <body> with fixed (viewport) positioning instead. Recomputed each render so
+    // it tracks the caret while typing.
+    let rect: { top: number; left: number; width: number } | null = null;
+    try {
+        const coords = editor.view.coordsAtPos(editor.state.selection.from);
+        const domRect = editor.view.dom.getBoundingClientRect();
+        rect = { top: coords.bottom + 4, left: domRect.left, width: domRect.width };
+    } catch {
+        rect = null;
+    }
+    if (!rect) return null;
+
+    return createPortal(
         <div
             onMouseDown={onMouseDown}
             style={{
-                position: "absolute",
-                bottom: "100%",
-                left: 0,
-                right: 0,
-                zIndex: 50,
-                marginBottom: "2px",
+                position: "fixed",
+                top: rect.top,
+                left: rect.left,
+                width: rect.width,
+                zIndex: 9999,
                 backgroundColor: "var(--popover)",
                 color: "var(--popover-foreground)",
                 border: "1px solid var(--border)",
                 borderRadius: "6px",
-                boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.35)",
                 maxHeight: "180px",
                 overflowY: "auto",
                 padding: "4px",
@@ -317,7 +340,8 @@ function AutocompleteDropdown({
                     </button>
                 );
             })}
-        </div>
+        </div>,
+        document.body,
     );
 }
 
@@ -537,6 +561,7 @@ function InlineEditorContent({
                     if (editor) selectSuggestion(editor, item);
                 }}
                 onMouseDown={(e) => e.preventDefault()}
+                editor={editor}
             />
         </div>
     );
@@ -653,6 +678,7 @@ function LazyEditorContent({
                         if (editor) selectSuggestion(editor, item);
                     }}
                     onMouseDown={(e) => e.preventDefault()}
+                    editor={editor}
                 />
             </div>
 
