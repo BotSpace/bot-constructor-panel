@@ -266,15 +266,28 @@ export const getFormatFlow = (
       const allChildIds = sortedHandleGroups.flatMap(([, ids]) => ids);
       if (allChildIds.length < 2) return;
 
-      // Current Y values of all children (sorted ascending = top → bottom)
-      const currentYs = allChildIds
-        .map((id) => posById.get(id)?.position.y ?? 0)
-        .sort((a, b) => a - b);
+      // Target Y slots: stack the children as a tight column CENTERED on the parent's
+      // vertical center (top→bottom in handle-rank order), each spaced by its own
+      // height + a gap. This keeps a branch's children NEXT TO the branch node instead
+      // of inheriting dagre's spread-out slots — which could fling e.g. the "success"
+      // child to the top of the column, far above its parent (long crossing edge).
+      const parentNode = posById.get(sourceId);
+      const parentCenterY =
+        (parentNode?.position.y ?? 0) + (parentNode?.height ?? DEFAULT_NODE_HEIGHT) / 2;
+      const BRANCH_GAP = 48;
+      const childHeights = allChildIds.map((cid) => posById.get(cid)?.height ?? DEFAULT_NODE_HEIGHT);
+      const stackHeight =
+        childHeights.reduce((s, h) => s + h, 0) + BRANCH_GAP * (allChildIds.length - 1);
+      const targetYs: number[] = [];
+      let stackCursor = parentCenterY - stackHeight / 2;
+      allChildIds.forEach((_, i) => {
+        targetYs.push(stackCursor); // top-left Y of child i
+        stackCursor += childHeights[i] + BRANCH_GAP;
+      });
 
-      // Expected vertical order: handle with smallest rank → topmost Y slots.
-      // Assign the sorted Y values to children in handle-rank order, AND shift
-      // each child's whole forward subtree by the same delta — otherwise moving
-      // a branch node leaves its descendants behind and downstream edges cross.
+      // Assign the target Y slots to children in handle-rank order, AND shift each
+      // child's whole forward subtree by the same delta — otherwise moving a branch
+      // node leaves its descendants behind and downstream edges cross.
       const shifted = new Set<string>(allChildIds); // direct children set explicitly below
       let yIdx = 0;
       sortedHandleGroups.forEach(([, childIds]) => {
@@ -286,7 +299,7 @@ export const getFormatFlow = (
         sorted.forEach((childId) => {
           const node = posById.get(childId);
           if (!node) return;
-          const newY = currentYs[yIdx++] ?? node.position.y;
+          const newY = targetYs[yIdx++] ?? node.position.y;
           const delta = newY - node.position.y;
           node.position = { ...node.position, y: newY };
           if (delta === 0) return;
