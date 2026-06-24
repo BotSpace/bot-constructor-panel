@@ -5414,6 +5414,13 @@
         "preset": "source-default"
       }
     ],
+    "producesState": [
+      "webhook.body",
+      "webhook.query",
+      "webhook.headers",
+      "webhook.method",
+      "webhook.raw"
+    ],
     "content": [
       {
         "type": "text",
