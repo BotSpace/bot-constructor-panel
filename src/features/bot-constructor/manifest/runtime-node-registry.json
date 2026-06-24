@@ -5442,6 +5442,7 @@
         "key": "response_variable",
         "label": "Javob o'zgaruvchisi",
         "placeholder": "response",
+        "helpText": "Flow ichida bu o'zgaruvchiga qiymat yozing (masalan CustomCode'da set_state(\"response\", qiymat) yoki StateNode bilan), shu yerga o'sha nomni yozing. {{state.response}} yoki {{webhook.body}} kabi ifoda ham bo'ladi.",
         "visibleWhen": {
           "key": "wait_response",
           "equals": true
