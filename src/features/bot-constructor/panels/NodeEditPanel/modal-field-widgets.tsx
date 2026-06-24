@@ -22,6 +22,7 @@ import { CollectionSelectField } from "@/features/bot-constructor/fields/generic
 import { CredentialSelectField } from "@/features/bot-constructor/fields/generic-fields/CredentialSelectField";
 import { NodeSelectField } from "@/features/bot-constructor/fields/generic-fields/NodeSelectField";
 import { DynamicSelectField } from "@/features/bot-constructor/fields/generic-fields/DynamicSelectField";
+import { WebhookUrlField } from "@/features/bot-constructor/fields/generic-fields/WebhookUrlField";
 import { DynamicInputsField } from "@/features/bot-constructor/fields/generic-fields/DynamicInputsField";
 import { ConditionListField } from "@/features/bot-constructor/fields/generic-fields/ConditionListField";
 import { CronEditorField } from "@/features/bot-constructor/fields/generic-fields/CronEditorField";
@@ -317,6 +318,10 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         placeholder={field.placeholder}
       />
     );
+  }
+
+  if (field.type === "read-only") {
+    return <WebhookUrlField nodeId={nodeId} data={data} field={field} />;
   }
 
   if (field.type === "dynamic_inputs" && field.resource) {
