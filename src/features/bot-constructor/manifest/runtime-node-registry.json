@@ -96,6 +96,17 @@
           "key": "save_state",
           "equals": true
         }
+      },
+      {
+        "type": "switch",
+        "key": "private",
+        "label": "Maxfiy (private)",
+        "helpText": "Yoqilsa, bu qiymat {{private.key}} sifatida saqlanadi",
+        "optional": true,
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       }
     ],
     "defaults": {
@@ -461,6 +472,17 @@
             "label": "any"
           }
         ],
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
+      },
+      {
+        "type": "switch",
+        "key": "private",
+        "label": "Maxfiy (private)",
+        "helpText": "Yoqilsa, bu qiymat {{private.key}} sifatida saqlanadi",
+        "optional": true,
         "visibleWhen": {
           "key": "save_state",
           "equals": true
@@ -1458,14 +1480,14 @@
         "key": "latitude",
         "label": "Latitude",
         "placeholder": "41.311151",
-        "step": 0.000001
+        "step": 1e-06
       },
       {
         "type": "number",
         "key": "longitude",
         "label": "Longitude",
         "placeholder": "69.279737",
-        "step": 0.000001
+        "step": 1e-06
       },
       {
         "type": "action-recipients",
@@ -4408,6 +4430,17 @@
           "key": "save_state",
           "equals": true
         }
+      },
+      {
+        "type": "switch",
+        "key": "private",
+        "label": "Maxfiy (private)",
+        "helpText": "Yoqilsa, bu qiymat {{private.key}} sifatida saqlanadi",
+        "optional": true,
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       }
     ],
     "defaults": {
@@ -4503,6 +4536,17 @@
             "label": "any"
           }
         ],
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
+      },
+      {
+        "type": "switch",
+        "key": "private",
+        "label": "Maxfiy (private)",
+        "helpText": "Yoqilsa, bu qiymat {{private.key}} sifatida saqlanadi",
+        "optional": true,
         "visibleWhen": {
           "key": "save_state",
           "equals": true
@@ -5377,6 +5421,17 @@
           "key": "save_state",
           "equals": true
         }
+      },
+      {
+        "type": "switch",
+        "key": "private",
+        "label": "Maxfiy (private)",
+        "helpText": "Yoqilsa, bu qiymat {{private.key}} sifatida saqlanadi",
+        "optional": true,
+        "visibleWhen": {
+          "key": "save_state",
+          "equals": true
+        }
       }
     ],
     "defaults": {
@@ -5495,14 +5550,14 @@
         "key": "latitude",
         "label": "Latitude",
         "placeholder": "41.311151",
-        "step": 0.000001
+        "step": 1e-06
       },
       {
         "type": "number",
         "key": "longitude",
         "label": "Longitude",
         "placeholder": "69.279737",
-        "step": 0.000001
+        "step": 1e-06
       },
       {
         "type": "text",
