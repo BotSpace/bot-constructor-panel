@@ -130,32 +130,38 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
           break;
         }
         case "error": {
-          // Flow execution error — {project, chat_id, node_id, node_type, message, detail, ts}
+          // Flow alert — {project, chat_id, node_id, node_type, level, message, detail, ts}
+          // level: error | warning | info (absent → error, handled by the store).
           if (String(data.project) === String(project.id)) {
             const raw = {
               project: data.project as string | number,
               chat_id: data.chat_id as string | number | undefined,
               node_id: data.node_id as string | undefined,
               node_type: data.node_type as string | undefined,
+              level: data.level,
               message: (data.message as string) || "Unknown error",
               detail: data.detail as string | undefined,
               ts: (data.ts as number | string) ?? Date.now(),
             };
             useDebugErrorsStore.getState().addError(raw);
 
-            // Debounced toast so rapid errors don't spam
+            // Debounced toast so rapid alerts don't spam. Info goes to the panel
+            // silently; warning/error pop a (level-styled) toast.
+            const level = data.level === "warning" || data.level === "info" ? data.level : "error";
             const now = Date.now();
-            if (now - lastErrorToastRef.current >= ERROR_TOAST_DEBOUNCE_MS) {
+            if (level !== "info" && now - lastErrorToastRef.current >= ERROR_TOAST_DEBOUNCE_MS) {
               lastErrorToastRef.current = now;
               const nodeLabel = raw.node_type
                 ? `[${raw.node_type}]`
                 : raw.node_id
                 ? `[${raw.node_id}]`
                 : "";
-              toast.error(
-                `${nodeLabel ? nodeLabel + " " : ""}${raw.message}`.trim(),
-                { duration: 4000, id: "flow-error-toast" }
-              );
+              const text = `${nodeLabel ? nodeLabel + " " : ""}${raw.message}`.trim();
+              if (level === "warning") {
+                toast(text, { icon: "⚠️", duration: 4000, id: "flow-error-toast" });
+              } else {
+                toast.error(text, { duration: 4000, id: "flow-error-toast" });
+              }
             }
           }
           break;
