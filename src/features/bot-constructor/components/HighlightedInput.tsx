@@ -405,11 +405,18 @@ export const HighlightedInput = forwardRef<HTMLInputElement, HighlightedInputPro
             whiteSpace: "pre",
             border: "0px solid transparent",
             zIndex: 0,
+            // Single-line <input> vertically centers its text; mirror a block div
+            // would top-align it. Flex-center the inner line so it matches the
+            // input's caret/text baseline exactly.
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          {highlightTokens(value)}
-          {/* Trailing zero-width space keeps height consistent when empty */}
-          {"​"}
+          <span style={{ whiteSpace: "pre" }}>
+            {highlightTokens(value)}
+            {/* Trailing zero-width space keeps height consistent when empty */}
+            {"​"}
+          </span>
         </div>
 
         {/* Real input — color:transparent so only mirror text shows; caret visible */}
