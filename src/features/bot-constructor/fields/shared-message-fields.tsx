@@ -22,14 +22,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { DynamicMessageConstructor } from "@/features/bot-constructor/nodes/bespoke/TextMessageNode/components/dynamic-message-constructor-modal";
 import TelegramRichTextEditor from "@/features/bot-constructor/panels/TelegramRichTextEditor/TelegramRichTextEditor";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useVarSuggestions } from "@/features/bot-constructor/hooks/useVarSuggestions";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { uploadFile } from "@/services/requests/file";
+import { FieldHelp } from "@/features/bot-constructor/components/FieldHelp";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, ListPlus, Loader2, Upload } from "lucide-react";
+import { CheckCircle2, Loader2, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -41,10 +41,10 @@ export interface RichTextMessageFieldProps {
   nodeId: string;
   /** data key for the message text value */
   textKey: string;
-  /** data key for dynamic messages; omit to hide the dynamic-message button */
-  dynamicKey?: string;
   data: Record<string, unknown>;
   label: string;
+  /** Optional help text shown in ? popover */
+  helpText?: string;
   /** Optional intro note rendered above the editor */
   intro?: string;
   /** Whether to show the parse-mode selector */
@@ -54,9 +54,9 @@ export interface RichTextMessageFieldProps {
 export function RichTextMessageField({
   nodeId,
   textKey,
-  dynamicKey,
   data,
   label,
+  helpText,
   intro,
   showParseMode,
 }: RichTextMessageFieldProps) {
@@ -64,7 +64,6 @@ export function RichTextMessageField({
   const suggestions = useVarSuggestions(nodeId);
   const value = typeof data[textKey] === "string" ? (data[textKey] as string) : "";
   const parseMode = typeof data.parseMode === "string" ? data.parseMode : "None";
-  const dynamicMessages = dynamicKey ? data[dynamicKey] : undefined;
 
   return (
     <div className="grid gap-3">
@@ -74,19 +73,9 @@ export function RichTextMessageField({
         </div>
       ) : null}
 
-      <div className="flex items-center justify-between gap-2">
+      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
         <Label>{label}</Label>
-        {dynamicKey ? (
-          <DynamicMessageConstructor
-            handleUpdate={(update) => updateNodeData(nodeId, update)}
-            initialDynamicMessages={dynamicMessages as never}
-            id={nodeId}
-          >
-            <Button size="icon-sm" variant="outline">
-              <ListPlus />
-            </Button>
-          </DynamicMessageConstructor>
-        ) : null}
+        {helpText ? <FieldHelp text={helpText} /> : null}
       </div>
 
       <TelegramRichTextEditor

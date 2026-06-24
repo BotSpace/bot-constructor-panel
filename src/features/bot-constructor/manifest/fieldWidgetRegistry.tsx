@@ -24,6 +24,7 @@ import {
   MediaMessageField,
 } from "@/features/bot-constructor/fields/shared-message-fields";
 import { CredentialSelectField } from "@/features/bot-constructor/fields/generic-fields/CredentialSelectField";
+import { FieldHelp } from "@/features/bot-constructor/components/FieldHelp";
 
 interface FieldWidgetProps {
   nodeId: string;
@@ -31,12 +32,15 @@ interface FieldWidgetProps {
   field: NodeFieldManifest;
 }
 
-function HelpText({ text }: { text?: string }) {
-  if (!text) {
-    return null;
-  }
-
-  return <p className="text-xs text-muted-foreground">{text}</p>;
+/** Label + optional help icon row */
+function LabelWithHelp({ label, helpText }: { label?: string; helpText?: string }) {
+  if (!label && !helpText) return null;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+      {label ? <Label>{label}</Label> : null}
+      {helpText ? <FieldHelp text={helpText} /> : null}
+    </div>
+  );
 }
 
 function StringArrayField({ nodeId, data, field }: FieldWidgetProps) {
@@ -67,7 +71,7 @@ function StringArrayField({ nodeId, data, field }: FieldWidgetProps) {
 
   return (
     <div className="grid gap-2">
-      {field.label ? <Label>{field.label}</Label> : null}
+      <LabelWithHelp label={field.label} helpText={field.helpText} />
       <div className="grid gap-2">
         {values.map((value, index) => (
           <div key={`${field.key}-${index}`} className="flex items-center gap-2">
@@ -147,8 +151,8 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
         nodeId={nodeId}
         data={data}
         textKey={field.key || "messageText"}
-        dynamicKey="dynamicMessages"
         label={field.label || "Xabar matni"}
+        helpText={field.helpText}
         intro={field.intro}
         showParseMode={false}
       />
@@ -167,7 +171,7 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
   if (field.type === "select") {
     return (
       <div className="grid gap-2">
-        {field.label ? <Label>{field.label}</Label> : null}
+        <LabelWithHelp label={field.label} helpText={field.helpText} />
         <Select
           value={typeof value === "string" ? value : ""}
           onValueChange={(nextValue) =>
@@ -185,29 +189,31 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
             ))}
           </SelectContent>
         </Select>
-        <HelpText text={field.helpText} />
       </div>
     );
   }
 
   if (field.type === "checkbox") {
     return (
-      <Label className="flex items-center gap-2 cursor-pointer">
-        <Checkbox
-          checked={Boolean(value)}
-          onCheckedChange={(checked) =>
-            updateNodeData(nodeId, { [fieldKey]: Boolean(checked) })
-          }
-        />
-        <span>{field.label}</span>
-      </Label>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <Label className="flex items-center gap-2 cursor-pointer">
+          <Checkbox
+            checked={Boolean(value)}
+            onCheckedChange={(checked) =>
+              updateNodeData(nodeId, { [fieldKey]: Boolean(checked) })
+            }
+          />
+          <span>{field.label}</span>
+        </Label>
+        {field.helpText ? <FieldHelp text={field.helpText} /> : null}
+      </div>
     );
   }
 
   if (field.type === "switch") {
     return (
       <div className="flex items-center justify-between gap-2">
-        {field.label ? <Label>{field.label}</Label> : null}
+        <LabelWithHelp label={field.label} helpText={field.helpText} />
         <Switch
           checked={Boolean(value)}
           onCheckedChange={(checked) =>
@@ -221,7 +227,7 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
   if (field.type === "textarea") {
     return (
       <div className="grid gap-2">
-        {field.label ? <Label>{field.label}</Label> : null}
+        <LabelWithHelp label={field.label} helpText={field.helpText} />
         <Textarea
           placeholder={field.placeholder}
           rows={field.rows}
@@ -230,7 +236,6 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
             updateNodeData(nodeId, { [fieldKey]: event.target.value })
           }
         />
-        <HelpText text={field.helpText} />
       </div>
     );
   }
@@ -247,7 +252,7 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
 
   return (
     <div className="grid gap-2">
-      {field.label ? <Label>{field.label}</Label> : null}
+      <LabelWithHelp label={field.label} helpText={field.helpText} />
       <Input
         type={inputType}
         min={field.min}
@@ -267,7 +272,6 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
           updateNodeData(nodeId, { [fieldKey]: event.target.value });
         }}
       />
-      <HelpText text={field.helpText} />
     </div>
   );
 }

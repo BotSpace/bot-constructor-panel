@@ -682,7 +682,6 @@ function EditMessageWidget({ nodeId, data }: WidgetProps) {
           nodeId={nodeId}
           data={data}
           textKey="newText"
-          dynamicKey="dynamicMessages"
           label="Yangi matn"
           showParseMode
         />
@@ -691,7 +690,6 @@ function EditMessageWidget({ nodeId, data }: WidgetProps) {
           nodeId={nodeId}
           data={data}
           textKey="newCaption"
-          dynamicKey="dynamicMessages"
           label="Yangi caption"
           showParseMode
         />
