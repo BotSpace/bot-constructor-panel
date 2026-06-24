@@ -170,9 +170,23 @@ export function GenericNodeRenderer({
     manifest.descriptionKey,
     manifest.descriptionFallback
   );
+  // Nodes with dynamic case outputs (Switch — "switch-case-sources" handles) grow
+  // taller as cases are added, so the per-case handles spread vertically (topPct)
+  // instead of overlapping on a fixed-height card. React Flow re-measures the DOM
+  // height, so edges/handles reroute automatically.
+  const hasDynamicCases = manifest.handles?.some((h) => h.preset === "switch-case-sources");
+  const sw = data as { cases?: unknown[]; default?: boolean };
+  const caseHandleCount = hasDynamicCases
+    ? (Array.isArray(sw.cases) ? sw.cases.length : 0) + (sw.default ? 1 : 0)
+    : 0;
+  const dynamicMinHeight =
+    caseHandleCount > 3
+      ? Math.max(manifest.size.minHeight ?? 0, (caseHandleCount + 1) * 34)
+      : manifest.size.minHeight;
+
   const sizeStyle = {
     width: manifest.size.width,
-    minHeight: manifest.size.minHeight,
+    minHeight: dynamicMinHeight,
     height: manifest.size.height,
   };
 
