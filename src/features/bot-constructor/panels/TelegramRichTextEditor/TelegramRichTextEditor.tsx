@@ -3,7 +3,7 @@
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
 import {
     Bold,
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { VariableHighlightExtension } from "./variableHighlight";
 
 const TELEGRAM_INLINE_TAGS = new Set([
     "b", "strong", "i", "em", "u", "ins", "s", "strike", "del", "code", "a",
@@ -241,12 +242,223 @@ function EditorToolbar({
     );
 }
 
-function InlineEditorContent({ defaultValue, onChange }: {
+// ─── Autocomplete dropdown (shared by both editor instances) ──────────────────
+
+interface AutocompleteDropdownProps {
+    open: boolean;
+    items: string[];
+    activeIndex: number;
+    onSelect: (item: string) => void;
+    onMouseDown: (e: React.MouseEvent) => void;
+}
+
+function AutocompleteDropdown({
+    open,
+    items,
+    activeIndex,
+    onSelect,
+    onMouseDown,
+}: AutocompleteDropdownProps) {
+    const activeRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (open && activeRef.current) {
+            activeRef.current.scrollIntoView({ block: "nearest" });
+        }
+    }, [open, activeIndex]);
+
+    if (!open || items.length === 0) return null;
+
+    return (
+        <div
+            onMouseDown={onMouseDown}
+            style={{
+                position: "absolute",
+                bottom: "100%",
+                left: 0,
+                right: 0,
+                zIndex: 50,
+                marginBottom: "2px",
+                backgroundColor: "var(--popover)",
+                color: "var(--popover-foreground)",
+                border: "1px solid var(--border)",
+                borderRadius: "6px",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+                maxHeight: "180px",
+                overflowY: "auto",
+                padding: "4px",
+            }}
+        >
+            {items.map((item, index) => {
+                const isActive = index === activeIndex;
+                return (
+                    <button
+                        key={item}
+                        ref={isActive ? activeRef : undefined}
+                        type="button"
+                        onClick={() => onSelect(item)}
+                        style={{
+                            display: "block",
+                            width: "100%",
+                            textAlign: "left",
+                            padding: "5px 8px",
+                            borderRadius: "4px",
+                            fontSize: "12px",
+                            fontFamily: "var(--font-mono, monospace)",
+                            cursor: "pointer",
+                            border: "none",
+                            backgroundColor: isActive
+                                ? "color-mix(in srgb, var(--primary) 15%, transparent)"
+                                : "transparent",
+                            color: isActive ? "var(--primary)" : "var(--popover-foreground)",
+                        }}
+                    >
+                        {`{{${item}}}`}
+                    </button>
+                );
+            })}
+        </div>
+    );
+}
+
+// ─── useEditorAutocomplete hook ───────────────────────────────────────────────
+
+interface AutocompleteState {
+    open: boolean;
+    query: string;
+    filtered: string[];
+    activeIndex: number;
+}
+
+function getQueryFromEditor(editor: Editor): string | null {
+    const { state } = editor;
+    const { from } = state.selection;
+    // Get all text from start of document to cursor position
+    const textBefore = state.doc.textBetween(0, from, "\n", "\0");
+    const lastOpen = textBefore.lastIndexOf("{{");
+    if (lastOpen === -1) return null;
+    const afterOpen = textBefore.slice(lastOpen + 2);
+    // Already closed?
+    if (afterOpen.includes("}}")) return null;
+    return afterOpen;
+}
+
+function useEditorAutocomplete(suggestions: string[]) {
+    const [state, setState] = useState<AutocompleteState>({
+        open: false,
+        query: "",
+        filtered: [],
+        activeIndex: 0,
+    });
+
+    const checkTrigger = useCallback(
+        (editor: Editor) => {
+            const query = getQueryFromEditor(editor);
+            if (query === null) {
+                setState((prev) => (prev.open ? { ...prev, open: false } : prev));
+                return;
+            }
+            const q = query.toLowerCase();
+            const filtered = suggestions.filter(
+                (s) => q === "" || s.toLowerCase().includes(q),
+            );
+            setState({
+                open: filtered.length > 0,
+                query,
+                filtered,
+                activeIndex: 0,
+            });
+        },
+        [suggestions],
+    );
+
+    const close = useCallback(() => {
+        setState((prev) => ({ ...prev, open: false }));
+    }, []);
+
+    const selectSuggestion = useCallback(
+        (editor: Editor, suggestion: string) => {
+            const { state: editorState } = editor;
+            const { from } = editorState.selection;
+            const textBefore = editorState.doc.textBetween(0, from, "\n", "\0");
+            const lastOpen = textBefore.lastIndexOf("{{");
+            if (lastOpen === -1) return;
+
+            // Delete from lastOpen position to cursor, then insert {{suggestion}}
+            // lastOpen is a character offset in the text; need to find ProseMirror pos.
+            // We'll use deleteRange + insertContent approach.
+            const deleteFrom = from - (textBefore.length - lastOpen);
+            const deleteTo = from;
+
+            editor
+                .chain()
+                .focus()
+                .deleteRange({ from: deleteFrom, to: deleteTo })
+                .insertContent(`{{${suggestion}}}`)
+                .run();
+
+            close();
+        },
+        [close],
+    );
+
+    const handleKeyDown = useCallback(
+        (editor: Editor, e: KeyboardEvent): boolean => {
+            if (!state.open) return false;
+            if (e.key === "Escape") {
+                close();
+                return true;
+            }
+            if (e.key === "ArrowDown") {
+                setState((prev) => ({
+                    ...prev,
+                    activeIndex:
+                        (prev.activeIndex + 1) % Math.max(prev.filtered.length, 1),
+                }));
+                return true;
+            }
+            if (e.key === "ArrowUp") {
+                setState((prev) => ({
+                    ...prev,
+                    activeIndex:
+                        (prev.activeIndex - 1 + Math.max(prev.filtered.length, 1)) %
+                        Math.max(prev.filtered.length, 1),
+                }));
+                return true;
+            }
+            if (e.key === "Enter" || e.key === "Tab") {
+                if (state.filtered.length > 0) {
+                    selectSuggestion(
+                        editor,
+                        state.filtered[state.activeIndex] ?? state.filtered[0],
+                    );
+                    return true;
+                }
+            }
+            return false;
+        },
+        [state, close, selectSuggestion],
+    );
+
+    return { acState: state, checkTrigger, close, selectSuggestion, handleKeyDown };
+}
+
+// ─── InlineEditorContent ──────────────────────────────────────────────────────
+
+function InlineEditorContent({
+    defaultValue,
+    onChange,
+    suggestions = [],
+}: {
     defaultValue: string;
     onChange?: (value: string) => void;
+    suggestions?: string[];
 }) {
     const onChangeRef = useRef(onChange);
     onChangeRef.current = onChange;
+
+    const { acState, checkTrigger, close, selectSuggestion, handleKeyDown } =
+        useEditorAutocomplete(suggestions);
 
     const editor = useEditor({
         immediatelyRender: false,
@@ -259,23 +471,55 @@ function InlineEditorContent({ defaultValue, onChange }: {
                 listItem: false,
             }),
             Underline,
+            VariableHighlightExtension,
         ],
         content: defaultValue?.replace(/\n/g, "<br>") || "",
-        onUpdate: ({ editor }) => {
-            let html_content = editor.getHTML();
+        onUpdate: ({ editor: ed }) => {
+            let html_content = ed.getHTML();
             html_content = html_content.replace(/<\/p><p>/g, "\n");
             html_content = html_content.replace(/<\/?p>/g, "");
             onChangeRef.current?.(html_content);
+            checkTrigger(ed);
+        },
+        onSelectionUpdate: ({ editor: ed }) => {
+            checkTrigger(ed);
         },
         editorProps: {
             attributes: {
                 class: "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[120px] px-3 py-2 text-sm leading-relaxed",
             },
+            handleKeyDown: (view, event) => {
+                // Build a temporary editor-like object to pass to handleKeyDown.
+                // We need the actual editor instance; store it via ref.
+                return false; // handled in onKeyDown via editorRef
+            },
         },
     });
 
+    // Store editor in ref for the keydown handler
+    const editorRef = useRef<Editor | null>(null);
+    editorRef.current = editor;
+
+    // Override editorProps.handleKeyDown after editor is created
+    useEffect(() => {
+        if (!editor) return;
+        const originalHandleKeyDown = editor.options.editorProps.handleKeyDown;
+        editor.setOptions({
+            editorProps: {
+                ...editor.options.editorProps,
+                handleKeyDown: (_view, event) => {
+                    if (originalHandleKeyDown?.(_view, event)) return true;
+                    return handleKeyDown(editor, event);
+                },
+            },
+        });
+    }, [editor, handleKeyDown]);
+
     return (
-        <div className="tg-editor rounded-lg border border-border/60 overflow-hidden shadow-sm" style={{ backgroundColor: '#171717' }}>
+        <div
+            className="tg-editor rounded-lg border border-border/60 overflow-hidden shadow-sm"
+            style={{ backgroundColor: "#171717", position: "relative" }}
+        >
             <div className="border-b border-border/40 bg-muted/20">
                 <EditorToolbar editor={editor} />
             </div>
@@ -285,17 +529,37 @@ function InlineEditorContent({ defaultValue, onChange }: {
                     {editor?.getText().length ?? 0} belgi
                 </div>
             </div>
+            <AutocompleteDropdown
+                open={acState.open}
+                items={acState.filtered}
+                activeIndex={acState.activeIndex}
+                onSelect={(item) => {
+                    if (editor) selectSuggestion(editor, item);
+                }}
+                onMouseDown={(e) => e.preventDefault()}
+            />
         </div>
     );
 }
 
-function LazyEditorContent({ defaultValue, onChange, onClose }: {
+// ─── LazyEditorContent ────────────────────────────────────────────────────────
+
+function LazyEditorContent({
+    defaultValue,
+    onChange,
+    onClose,
+    suggestions = [],
+}: {
     defaultValue: string;
     onChange?: (value: string) => void;
     onClose: () => void;
+    suggestions?: string[];
 }) {
     const onChangeRef = useRef(onChange);
     onChangeRef.current = onChange;
+
+    const { acState, checkTrigger, close, selectSuggestion, handleKeyDown } =
+        useEditorAutocomplete(suggestions);
 
     const editor = useEditor({
         immediatelyRender: false,
@@ -308,19 +572,20 @@ function LazyEditorContent({ defaultValue, onChange, onClose }: {
                 listItem: false,
             }),
             Underline,
+            VariableHighlightExtension,
         ],
         content: defaultValue?.replace(/\n/g, "<br>") || "",
-        onCreate: ({ editor }) => {
+        onCreate: ({ editor: _ed }) => {
         },
-        onUpdate: ({ editor }) => {
-            let html_content = editor.getHTML();
-
+        onUpdate: ({ editor: ed }) => {
+            let html_content = ed.getHTML();
             html_content = html_content.replace(/<\/p><p>/g, "\n");
             html_content = html_content.replace(/<\/?p>/g, "");
-
-            console.log("🔍 ~ LazyEditorContent ~ src/features/bot-constructor/panels/TelegramRichTextEditor/TelegramRichTextEditor.tsx:272 ~ html_content:", html_content);
-
             onChangeRef.current?.(html_content);
+            checkTrigger(ed);
+        },
+        onSelectionUpdate: ({ editor: ed }) => {
+            checkTrigger(ed);
         },
         editorProps: {
             attributes: {
@@ -328,6 +593,20 @@ function LazyEditorContent({ defaultValue, onChange, onClose }: {
             },
         },
     });
+
+    useEffect(() => {
+        if (!editor) return;
+        const originalHandleKeyDown = editor.options.editorProps.handleKeyDown;
+        editor.setOptions({
+            editorProps: {
+                ...editor.options.editorProps,
+                handleKeyDown: (_view, event) => {
+                    if (originalHandleKeyDown?.(_view, event)) return true;
+                    return handleKeyDown(editor, event);
+                },
+            },
+        });
+    }, [editor, handleKeyDown]);
 
     const charCount = editor?.getText().length ?? 0;
 
@@ -351,7 +630,10 @@ function LazyEditorContent({ defaultValue, onChange, onClose }: {
                 </button>
             </div>
 
-            <div className="tg-editor mx-4 mb-4 rounded-lg border border-border/60 overflow-hidden shadow-sm" style={{ backgroundColor: '#171717' }}>
+            <div
+                className="tg-editor mx-4 mb-4 rounded-lg border border-border/60 overflow-hidden shadow-sm"
+                style={{ backgroundColor: "#171717", position: "relative" }}
+            >
                 <div className="border-b border-border/40 bg-muted/20">
                     <EditorToolbar editor={editor} />
                 </div>
@@ -362,6 +644,16 @@ function LazyEditorContent({ defaultValue, onChange, onClose }: {
                         {charCount} belgi
                     </div>
                 </div>
+
+                <AutocompleteDropdown
+                    open={acState.open}
+                    items={acState.filtered}
+                    activeIndex={acState.activeIndex}
+                    onSelect={(item) => {
+                        if (editor) selectSuggestion(editor, item);
+                    }}
+                    onMouseDown={(e) => e.preventDefault()}
+                />
             </div>
 
             <div className="flex items-center justify-end gap-2 px-5 pb-5">
@@ -385,7 +677,17 @@ function LazyEditorContent({ defaultValue, onChange, onClose }: {
     );
 }
 
-export default function TelegramRichTextEditor({ defaultValue, onChange }: { defaultValue?: string, onChange?: (value: string) => void }) {
+// ─── Main export ──────────────────────────────────────────────────────────────
+
+export default function TelegramRichTextEditor({
+    defaultValue,
+    onChange,
+    suggestions,
+}: {
+    defaultValue?: string;
+    onChange?: (value: string) => void;
+    suggestions?: string[];
+}) {
     const inPanel = useIsInNodePanel();
 
     // Sidebar'da inline editor ko'rsatish
@@ -394,6 +696,7 @@ export default function TelegramRichTextEditor({ defaultValue, onChange }: { def
             <InlineEditorContent
                 defaultValue={defaultValue || ""}
                 onChange={onChange}
+                suggestions={suggestions}
             />
         );
     }

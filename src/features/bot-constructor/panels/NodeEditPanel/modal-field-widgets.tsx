@@ -47,6 +47,7 @@ import { KeyboardConfig } from "@/features/bot-constructor/panels";
 import { ButtonConfig } from "@/features/bot-constructor/panels/ButtonGenerator/types";
 import { InlineKeyboardEditor } from "@/features/bot-constructor/panels/ButtonGenerator/InlineKeyboardEditor";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { useVarSuggestions } from "@/features/bot-constructor/hooks/useVarSuggestions";
 import { cn } from "@/lib/utils";
 import { Plus, X } from "lucide-react";
 
@@ -184,6 +185,7 @@ function buildNestedPatch(
 
 export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const suggestions = useVarSuggestions(nodeId);
   const fieldKey = field.key || "";
   const value = getNestedValue(data, fieldKey);
 
@@ -505,6 +507,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
           value={typeof value === "string" ? value : ""}
           onChange={(event) => updateNodeData(nodeId, buildNestedPatch(data, fieldKey, event.target.value))}
           className="min-h-28 border-white/10 bg-zinc-950/60"
+          suggestions={suggestions}
         />
       </FieldShell>
     );
@@ -560,6 +563,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
           updateNodeData(nodeId, buildNestedPatch(data, fieldKey, event.target.value));
         }}
         className="h-10 border-white/10 bg-zinc-950/60"
+        suggestions={suggestions}
       />
     </FieldShell>
   );
