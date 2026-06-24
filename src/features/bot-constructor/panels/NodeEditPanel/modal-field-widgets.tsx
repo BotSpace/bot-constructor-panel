@@ -17,6 +17,7 @@ import {
   HighlightedInput,
   HighlightedTextarea,
 } from "@/features/bot-constructor/components/HighlightedInput";
+import { FieldHelp } from "@/features/bot-constructor/components/FieldHelp";
 import { NodeFieldManifest } from "@/features/bot-constructor/manifest/types";
 import { renderCustomWidget } from "@/features/bot-constructor/fields/widgetRegistry";
 import { ArrayEditorField } from "@/features/bot-constructor/fields/generic-fields/ArrayEditorField";
@@ -75,13 +76,17 @@ function FieldShell({
         compact && "flex items-center justify-between gap-3 space-y-0"
       )}
     >
-      {label ? (
-        <Label className="text-xs font-medium uppercase tracking-wide text-zinc-400">
-          {label}
-        </Label>
+      {label || helpText ? (
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          {label ? (
+            <Label className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+              {label}
+            </Label>
+          ) : null}
+          {helpText ? <FieldHelp text={helpText} /> : null}
+        </div>
       ) : null}
       {children}
-      {helpText ? <p className="text-xs leading-relaxed text-zinc-500">{helpText}</p> : null}
     </div>
   );
 }
@@ -201,8 +206,8 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         nodeId={nodeId}
         data={data}
         textKey={field.key || "messageText"}
-        dynamicKey="dynamicMessages"
         label={field.label || "Xabar matni"}
+        helpText={field.helpText}
         intro={field.intro}
         showParseMode={false}
       />
@@ -465,18 +470,18 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
   if (field.type === "checkbox") {
     return (
       <div className="space-y-1">
-        <Label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-200">
-          <Checkbox
-            checked={Boolean(value)}
-            onCheckedChange={(checked) =>
-              updateNodeData(nodeId, buildNestedPatch(data, fieldKey, checked === true))
-            }
-          />
-          {field.label}
-        </Label>
-        {field.helpText ? (
-          <p className="text-xs leading-relaxed text-zinc-500">{field.helpText}</p>
-        ) : null}
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <Label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-200">
+            <Checkbox
+              checked={Boolean(value)}
+              onCheckedChange={(checked) =>
+                updateNodeData(nodeId, buildNestedPatch(data, fieldKey, checked === true))
+              }
+            />
+            {field.label}
+          </Label>
+          {field.helpText ? <FieldHelp text={field.helpText} /> : null}
+        </div>
       </div>
     );
   }
@@ -490,10 +495,8 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
             onCheckedChange={(checked) => updateNodeData(nodeId, buildNestedPatch(data, fieldKey, checked))}
           />
           {field.label ? <Label className="cursor-pointer text-sm text-zinc-200">{field.label}</Label> : null}
+          {field.helpText ? <FieldHelp text={field.helpText} /> : null}
         </div>
-        {field.helpText ? (
-          <p className="text-xs leading-relaxed text-zinc-500">{field.helpText}</p>
-        ) : null}
       </div>
     );
   }
