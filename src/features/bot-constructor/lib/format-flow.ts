@@ -375,56 +375,82 @@ export const getFormatFlow = (
     });
   }
 
-  // ── Resolve vertical overlaps within each column ──────────────────────────
-  // Centering each parent's children on the parent (branch correction) makes two
-  // parents' child-stacks OVERLAP when the parents sit close together. A plain
-  // sort-by-Y then de-overlap would INTERLEAVE them (e.g. FILE.found, DL.downloaded,
-  // FILE.failed, DL.failed). Instead group each column by the child's parent center
-  // Y first, then by its own Y — so one parent's children all come before the next
-  // parent's — and only then push overlapping nodes down to keep a minimum gap.
+  // ── Tidy-tree vertical pass: center each parent on its children ────────────
+  // dagre + branch correction leaves children spread far down while parents cluster
+  // near the top (parents "yonma-yon", children fall away). Walk columns RIGHT→LEFT:
+  // first stack every column without overlaps, then pull each parent to the vertical
+  // centre of its direct children (which sit to the right and are already finalised).
+  // Result: every parent sits beside its child block, staggered down the canvas —
+  // not bunched up at the top.
   {
+    type Node0 = (typeof layoutedNormalNodes)[0];
     const COLUMN_TOL = 60; // px: nodes within this X distance count as one column
     const V_MARGIN = 28; // min vertical gap between two nodes in a column
+    const hOf = (n: Node0) => n.height ?? DEFAULT_NODE_HEIGHT;
 
-    const posById = new Map<string, (typeof layoutedNormalNodes)[0]>();
+    const posById = new Map<string, Node0>();
     layoutedNormalNodes.forEach((n) => posById.set(n.id, n));
+
     const parentsByChild = new Map<string, string[]>();
+    const childrenByParent = new Map<string, string[]>();
     forwardEdges.forEach((e) => {
       if (!posById.has(e.source) || !posById.has(e.target)) return;
       if (!parentsByChild.has(e.target)) parentsByChild.set(e.target, []);
       parentsByChild.get(e.target)!.push(e.source);
+      if (!childrenByParent.has(e.source)) childrenByParent.set(e.source, []);
+      childrenByParent.get(e.source)!.push(e.target);
     });
-    // Grouping key: average vertical centre of the node's parents (falls back to the
-    // node's own Y when it has no laid-out parent). Keeps siblings of one parent together.
-    const groupKey = (n: (typeof layoutedNormalNodes)[0]): number => {
+
+    // Group a column by the child's parent centre so siblings of one parent stay
+    // together (no interleaving of two parents' children), then by own Y.
+    const groupKey = (n: Node0): number => {
       const parents = (parentsByChild.get(n.id) ?? [])
         .map((p) => posById.get(p))
-        .filter((p): p is (typeof layoutedNormalNodes)[0] => Boolean(p));
+        .filter((p): p is Node0 => Boolean(p));
       if (!parents.length) return n.position.y;
-      return (
-        parents.reduce((s, p) => s + p.position.y + (p.height ?? DEFAULT_NODE_HEIGHT) / 2, 0) /
-        parents.length
-      );
+      return parents.reduce((s, p) => s + p.position.y + hOf(p) / 2, 0) / parents.length;
     };
 
-    const columns = new Map<number, typeof layoutedNormalNodes>();
+    const deOverlap = (colNodes: Node0[], byGroup: boolean) => {
+      colNodes.sort((a, b) =>
+        byGroup
+          ? groupKey(a) - groupKey(b) || a.position.y - b.position.y
+          : a.position.y - b.position.y
+      );
+      for (let i = 1; i < colNodes.length; i++) {
+        const prev = colNodes[i - 1];
+        const cur = colNodes[i];
+        const minY = prev.position.y + hOf(prev) + V_MARGIN;
+        if (cur.position.y < minY) cur.position = { ...cur.position, y: minY };
+      }
+    };
+
+    const columns = new Map<number, Node0[]>();
     layoutedNormalNodes.forEach((n) => {
       const key = Math.round(n.position.x / COLUMN_TOL);
       if (!columns.has(key)) columns.set(key, []);
       columns.get(key)!.push(n);
     });
-    columns.forEach((colNodes) => {
-      colNodes.sort((a, b) => groupKey(a) - groupKey(b) || a.position.y - b.position.y);
-      for (let i = 1; i < colNodes.length; i++) {
-        const prev = colNodes[i - 1];
-        const cur = colNodes[i];
-        const minY =
-          prev.position.y + (prev.height ?? DEFAULT_NODE_HEIGHT) + V_MARGIN;
-        if (cur.position.y < minY) {
-          cur.position = { ...cur.position, y: minY };
-        }
-      }
-    });
+    const colKeys = [...columns.keys()].sort((a, b) => a - b); // left → right
+
+    // 1. Stack every column (parent-grouped) so leaf children never overlap/interleave.
+    colKeys.forEach((k) => deOverlap(columns.get(k)!, true));
+
+    // 2. Right → left: pull each parent to the centre of its child block, then restack
+    //    the column (parents pushed down by collisions stay ordered by their children).
+    for (let i = colKeys.length - 1; i >= 0; i--) {
+      const colNodes = columns.get(colKeys[i])!;
+      colNodes.forEach((n) => {
+        const kids = (childrenByParent.get(n.id) ?? [])
+          .map((id) => posById.get(id))
+          .filter((c): c is Node0 => Boolean(c));
+        if (!kids.length) return;
+        const top = Math.min(...kids.map((c) => c.position.y));
+        const bottom = Math.max(...kids.map((c) => c.position.y + hOf(c)));
+        n.position = { ...n.position, y: (top + bottom) / 2 - hOf(n) / 2 };
+      });
+      deOverlap(colNodes, false);
+    }
   }
 
   // Build a quick lookup of layouted normal node positions
