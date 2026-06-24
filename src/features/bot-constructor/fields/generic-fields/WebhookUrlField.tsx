@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,41 +38,37 @@ export function WebhookUrlField({ nodeId, data, field }: WebhookUrlFieldProps) {
   const [minting, setMinting] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Desired chat binding (optional chat_id field) vs the one the current URL was
-  // minted for. When they differ we re-mint so the URL matches the chat binding.
-  const desiredChatId = Number(data.chat_id) || 0;
-  const mintedChatId = Number(data.webhook_chat_id) || 0;
+  // Guard: mint only once per mount, even if the project loads slightly late.
+  const didMintRef = useRef(false);
 
   useEffect(() => {
     // Only autofill=webhook triggers minting.
     if (field.autofill !== "webhook") return;
+    // Already minted (cache hit via node data) or kicked off this mount.
+    if (currentValue || didMintRef.current) return;
     // Project not loaded yet — wait for it.
     if (!project?.id) return;
-    // URL already minted for the desired chat binding — nothing to do.
-    if (currentValue && mintedChatId === desiredChatId) return;
 
-    // Debounce: chat_id is a number input; avoid minting on every keystroke.
-    const timer = setTimeout(() => {
-      setMinting(true);
-      mintWebhookEndpoint(project.id, nodeId, desiredChatId)
-        .then((result) => {
-          updateNodeData(nodeId, {
-            [fieldKey]: result.url,
-            webhook_token: result.token,
-            webhook_chat_id: result.chat_id,
-          });
-        })
-        .catch(() => {
-          toast.error("Webhook URL yaratishda xatolik yuz berdi");
-        })
-        .finally(() => {
-          setMinting(false);
+    // The URL is per-node and stable; chat binding (the chat_id field) is
+    // resolved by the engine at webhook-arrival time, so it does not affect the URL.
+    didMintRef.current = true;
+    setMinting(true);
+    mintWebhookEndpoint(project.id, nodeId)
+      .then((result) => {
+        updateNodeData(nodeId, {
+          [fieldKey]: result.url,
+          webhook_token: result.token,
         });
-    }, 700);
-
-    return () => clearTimeout(timer);
+      })
+      .catch(() => {
+        toast.error("Webhook URL yaratishda xatolik yuz berdi");
+        didMintRef.current = false; // allow retry on next render
+      })
+      .finally(() => {
+        setMinting(false);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project?.id, desiredChatId]);
+  }, [project?.id]);
 
   const handleCopy = () => {
     if (!currentValue) return;
