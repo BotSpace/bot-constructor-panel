@@ -219,6 +219,12 @@ export function NodeEditDialog() {
               <div className="min-h-0 flex-1 overflow-y-auto bg-[#101010] node-edit-dialog-body">
                 {manifest && editingNode ? (
                   <ModalNodeFormRenderer
+                    // Remount the whole form when the selected node changes.
+                    // Some widgets (rich-text editor, media upload) are uncontrolled
+                    // and only read their initial value on mount — switching between
+                    // two same-type nodes reuses the instance and leaves the previous
+                    // node's content stuck. Keying on node id forces a fresh mount.
+                    key={editingNodeId}
                     nodeId={editingNodeId!}
                     data={editingNode.data as Record<string, unknown>}
                     manifest={manifest}
