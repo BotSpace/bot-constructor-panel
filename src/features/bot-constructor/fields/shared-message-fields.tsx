@@ -13,6 +13,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HighlightedInput } from "@/features/bot-constructor/components/HighlightedInput";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -231,18 +232,20 @@ export function MediaMessageField({ nodeId, data, kind }: MediaMessageFieldProps
         </Select>
 
         {sourceType === "file_id" ? (
-          <Input
+          <HighlightedInput
             placeholder={labels.fileIdPlaceholder}
             value={typeof data[fileIdKey] === "string" ? (data[fileIdKey] as string) : ""}
             onChange={(e) => updateNodeData(nodeId, { [fileIdKey]: e.target.value })}
+            suggestions={suggestions}
           />
         ) : null}
 
         {sourceType === "url" ? (
-          <Input
+          <HighlightedInput
             placeholder={labels.urlPlaceholder}
             value={typeof data[urlKey] === "string" ? (data[urlKey] as string) : ""}
             onChange={(e) => updateNodeData(nodeId, { [urlKey]: e.target.value })}
+            suggestions={suggestions}
           />
         ) : null}
 
@@ -327,18 +330,20 @@ export function MediaMessageField({ nodeId, data, kind }: MediaMessageFieldProps
         <div className="grid grid-cols-2 gap-3">
           <div className="grid gap-2">
             <Label>Ijrochi</Label>
-            <Input
+            <HighlightedInput
               placeholder="Masalan, Yulduz U."
               value={typeof data.performer === "string" ? (data.performer as string) : ""}
               onChange={(e) => updateNodeData(nodeId, { performer: e.target.value })}
+              suggestions={suggestions}
             />
           </div>
           <div className="grid gap-2">
             <Label>Sarlavha</Label>
-            <Input
+            <HighlightedInput
               placeholder="Masalan, Xasta bo'lma"
               value={typeof data.title === "string" ? (data.title as string) : ""}
               onChange={(e) => updateNodeData(nodeId, { title: e.target.value })}
+              suggestions={suggestions}
             />
           </div>
         </div>
