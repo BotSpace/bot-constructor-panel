@@ -179,10 +179,10 @@ export function GenericNodeRenderer({
   const caseHandleCount = hasDynamicCases
     ? (Array.isArray(sw.cases) ? sw.cases.length : 0) + (sw.default ? 1 : 0)
     : 0;
-  const dynamicMinHeight =
-    caseHandleCount > 3
-      ? Math.max(manifest.size.minHeight ?? 0, (caseHandleCount + 1) * 34)
-      : manifest.size.minHeight;
+  const isGrownCard = caseHandleCount > 3;
+  const dynamicMinHeight = isGrownCard
+    ? Math.max(manifest.size.minHeight ?? 0, (caseHandleCount + 1) * 34)
+    : manifest.size.minHeight;
 
   const sizeStyle = {
     width: manifest.size.width,
@@ -241,6 +241,9 @@ export function GenericNodeRenderer({
         "shadow-lg transition-shadow",
         selected && "ring-2 ring-primary",
         isTrigger && "rounded-tl-[2.5rem] rounded-bl-[2.5rem] rounded-tr-xl rounded-br-xl",
+        // When the card is grown for many case handles, vertically center the
+        // icon/title/badge instead of pinning them to the top.
+        isGrownCard && "flex flex-col justify-center",
       )}
       data-debug-status={debugStatus || undefined}
       style={sizeStyle}
