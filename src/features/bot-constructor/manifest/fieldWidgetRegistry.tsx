@@ -30,6 +30,17 @@ interface FieldWidgetProps {
   nodeId: string;
   data: Record<string, unknown>;
   field: NodeFieldManifest;
+  /**
+   * OVERRIDE: when provided, the widget reads this value instead of data[field.key].
+   * Used by ArrayEditorField to render per-item fields without touching the node root.
+   */
+  valueOverride?: unknown;
+  /**
+   * OVERRIDE: when provided, the widget calls onPatch({ [field.key]: value }) instead
+   * of updateNodeData(nodeId, { [field.key]: value }).
+   * Used by ArrayEditorField to route writes into the item object.
+   */
+  onPatch?: (partial: Record<string, unknown>) => void;
 }
 
 /** Label + optional help icon row */
@@ -124,10 +135,19 @@ const PANEL_ONLY_FIELD_TYPES = new Set([
   "read-only",
 ]);
 
-function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
+function DefaultFieldWidget({ nodeId, data, field, valueOverride, onPatch }: FieldWidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const fieldKey = field.key || "";
-  const value = data[fieldKey];
+  // When valueOverride is provided, use it; otherwise read from data.
+  const value = valueOverride !== undefined ? valueOverride : data[fieldKey];
+  // When onPatch is provided, route writes through it; otherwise update the node root.
+  const write = (partial: Record<string, unknown>) => {
+    if (onPatch) {
+      onPatch(partial);
+    } else {
+      updateNodeData(nodeId, partial);
+    }
+  };
 
   if (PANEL_ONLY_FIELD_TYPES.has(field.type)) {
     return null;
@@ -175,7 +195,7 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
         <Select
           value={typeof value === "string" ? value : ""}
           onValueChange={(nextValue) =>
-            updateNodeData(nodeId, { [fieldKey]: nextValue })
+            write({ [fieldKey]: nextValue })
           }
         >
           <SelectTrigger>
@@ -200,7 +220,7 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
           <Checkbox
             checked={Boolean(value)}
             onCheckedChange={(checked) =>
-              updateNodeData(nodeId, { [fieldKey]: Boolean(checked) })
+              write({ [fieldKey]: Boolean(checked) })
             }
           />
           <span>{field.label}</span>
@@ -217,7 +237,7 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
         <Switch
           checked={Boolean(value)}
           onCheckedChange={(checked) =>
-            updateNodeData(nodeId, { [fieldKey]: checked })
+            write({ [fieldKey]: checked })
           }
         />
       </div>
@@ -233,7 +253,7 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
           rows={field.rows}
           value={typeof value === "string" ? value : ""}
           onChange={(event) =>
-            updateNodeData(nodeId, { [fieldKey]: event.target.value })
+            write({ [fieldKey]: event.target.value })
           }
         />
       </div>
@@ -263,13 +283,13 @@ function DefaultFieldWidget({ nodeId, data, field }: FieldWidgetProps) {
         onChange={(event) => {
           if (field.type === "number") {
             const rawValue = event.target.value;
-            updateNodeData(nodeId, {
+            write({
               [fieldKey]: rawValue === "" ? undefined : Number(rawValue),
             });
             return;
           }
 
-          updateNodeData(nodeId, { [fieldKey]: event.target.value });
+          write({ [fieldKey]: event.target.value });
         }}
       />
     </div>

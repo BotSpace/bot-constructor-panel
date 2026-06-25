@@ -1,33 +1,28 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { ModalFieldWidget } from "@/features/bot-constructor/panels/NodeEditPanel/modal-field-widgets";
+import {
+  NodeFieldManifest,
+  ArrayEditorItemFieldSpec,
+} from "@/features/bot-constructor/manifest/types";
 import { Plus, X } from "lucide-react";
+import { useState } from "react";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface ItemFieldSpec {
-  key: string;
-  type: "text" | "number" | "select" | "checkbox" | "switch" | "textarea";
-  label?: string;
-  placeholder?: string;
-  options?: { value: string; label: string }[];
-  visibleWhen?: { key: string; equals?: unknown; notEquals?: unknown };
-}
+// Re-export the canonical ItemFieldSpec type so consumers can import it from here
+export type { ArrayEditorItemFieldSpec } from "@/features/bot-constructor/manifest/types";
+
+/**
+ * @deprecated Use ArrayEditorItemFieldSpec instead.
+ * Kept for backward-compat in case any old import uses ItemFieldSpec.
+ */
+export type ItemFieldSpec = ArrayEditorItemFieldSpec;
 
 export interface ArrayEditorFieldConfig {
   type: "array-editor";
@@ -36,7 +31,7 @@ export interface ArrayEditorFieldConfig {
   addLabel?: string;
   maxItems?: number;
   defaultItem?: Record<string, unknown>;
-  itemFields: ItemFieldSpec[];
+  itemFields: ArrayEditorItemFieldSpec[];
 }
 
 export interface ArrayEditorFieldProps {
@@ -51,7 +46,7 @@ export interface ArrayEditorFieldProps {
 
 function isItemFieldVisible(
   item: Record<string, unknown>,
-  spec: ItemFieldSpec
+  spec: ArrayEditorItemFieldSpec
 ): boolean {
   const rule = spec.visibleWhen;
   if (!rule) return true;
@@ -67,126 +62,81 @@ function isItemFieldVisible(
   return true;
 }
 
-// ---------------------------------------------------------------------------
-// Sub-field renderer
-// ---------------------------------------------------------------------------
-
-interface ItemFieldProps {
-  spec: ItemFieldSpec;
-  item: Record<string, unknown>;
-  onChange: (key: string, value: unknown) => void;
+/** Convert an ArrayEditorItemFieldSpec to a NodeFieldManifest for FieldWidget. */
+function specToManifest(spec: ArrayEditorItemFieldSpec): NodeFieldManifest {
+  return {
+    type: spec.type,
+    key: spec.key,
+    label: spec.label,
+    placeholder: spec.placeholder,
+    options: spec.options,
+    helpText: spec.helpText,
+    rows: spec.rows,
+    min: spec.min,
+    max: spec.max,
+    step: spec.step,
+  };
 }
 
-function ItemField({ spec, item, onChange }: ItemFieldProps) {
-  if (!isItemFieldVisible(item, spec)) return null;
+// ---------------------------------------------------------------------------
+// Per-item row
+// ---------------------------------------------------------------------------
 
-  const rawValue = item[spec.key];
+interface ItemRowProps {
+  index: number;
+  item: Record<string, unknown>;
+  specs: ArrayEditorItemFieldSpec[];
+  nodeId: string;
+  onPatch: (partial: Record<string, unknown>) => void;
+  onRemove: () => void;
+}
 
-  if (spec.type === "select") {
-    const strValue = typeof rawValue === "string" ? rawValue : "";
-    return (
-      <div className="grid gap-1">
-        {spec.label ? (
-          <Label className="text-[11px] text-white/50">{spec.label}</Label>
-        ) : null}
-        <Select value={strValue} onValueChange={(v) => onChange(spec.key, v)}>
-          <SelectTrigger className="h-8 border-white/10 bg-zinc-950/60 text-xs">
-            <SelectValue placeholder={spec.placeholder ?? "Tanlang"} />
-          </SelectTrigger>
-          <SelectContent>
-            {(spec.options ?? []).map((opt) => (
-              <SelectItem key={opt.value} value={opt.value} className="text-xs">
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    );
-  }
+function ItemRow({ index, item, specs, nodeId, onPatch, onRemove }: ItemRowProps) {
+  const [hovered, setHovered] = useState(false);
 
-  if (spec.type === "checkbox") {
-    return (
-      <Label className="flex cursor-pointer items-center gap-2 text-xs">
-        <Checkbox
-          checked={Boolean(rawValue)}
-          onCheckedChange={(checked) => onChange(spec.key, Boolean(checked))}
-        />
-        {spec.label ?? spec.key}
-      </Label>
-    );
-  }
-
-  if (spec.type === "switch") {
-    return (
-      <div className="flex items-center justify-between gap-2">
-        {spec.label ? (
-          <Label className="text-xs">{spec.label}</Label>
-        ) : null}
-        <Switch
-          checked={Boolean(rawValue)}
-          onCheckedChange={(checked) => onChange(spec.key, checked)}
-        />
-      </div>
-    );
-  }
-
-  if (spec.type === "textarea") {
-    const strValue = typeof rawValue === "string" ? rawValue : "";
-    return (
-      <div className="grid gap-1">
-        {spec.label ? (
-          <Label className="text-[11px] text-white/50">{spec.label}</Label>
-        ) : null}
-        <Textarea
-          placeholder={spec.placeholder}
-          value={strValue}
-          rows={2}
-          className="border-white/10 bg-zinc-950/60 text-xs"
-          onChange={(e) => onChange(spec.key, e.target.value)}
-        />
-      </div>
-    );
-  }
-
-  if (spec.type === "number") {
-    const numValue =
-      rawValue === undefined || rawValue === null ? "" : String(rawValue);
-    return (
-      <div className="grid gap-1">
-        {spec.label ? (
-          <Label className="text-[11px] text-white/50">{spec.label}</Label>
-        ) : null}
-        <Input
-          type="number"
-          placeholder={spec.placeholder}
-          value={numValue}
-          className="h-8 border-white/10 bg-zinc-950/60 text-xs"
-          onChange={(e) =>
-            onChange(
-              spec.key,
-              e.target.value === "" ? undefined : Number(e.target.value)
-            )
-          }
-        />
-      </div>
-    );
-  }
-
-  // default: text
-  const strValue = typeof rawValue === "string" ? rawValue : "";
   return (
-    <div className="grid gap-1">
-      {spec.label ? (
-        <Label className="text-[11px] text-white/50">{spec.label}</Label>
-      ) : null}
-      <Input
-        type="text"
-        placeholder={spec.placeholder}
-        value={strValue}
-        className="h-8 border-white/10 bg-zinc-950/60 text-xs"
-        onChange={(e) => onChange(spec.key, e.target.value)}
-      />
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div className="flex items-start gap-2 px-2 py-2.5">
+        {/* Index number */}
+        <span
+          className="mt-1.5 shrink-0 text-[11px] font-medium text-white/30"
+          style={{ minWidth: "1.1rem", textAlign: "right" }}
+        >
+          {index + 1}
+        </span>
+
+        {/* Fields stack */}
+        <div className="flex-1 space-y-2 min-w-0">
+          {specs.map((spec) => {
+            if (!isItemFieldVisible(item, spec)) return null;
+            const manifest = specToManifest(spec);
+            return (
+              <ModalFieldWidget
+                key={spec.key}
+                nodeId={nodeId}
+                data={item}
+                field={manifest}
+                valueOverride={item[spec.key]}
+                onPatch={onPatch}
+              />
+            );
+          })}
+        </div>
+
+        {/* Delete button — fades in on row hover */}
+        <button
+          type="button"
+          aria-label="O'chirish"
+          className="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded text-white/30 transition-colors hover:text-red-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400"
+          style={{ opacity: hovered ? 1 : 0, transition: "opacity 0.15s" }}
+          onClick={onRemove}
+        >
+          <X className="h-3 w-3" />
+        </button>
+      </div>
     </div>
   );
 }
@@ -219,67 +169,55 @@ export function ArrayEditorField({
     });
   };
 
-  const handleFieldChange = (
-    index: number,
-    subKey: string,
-    value: unknown
-  ) => {
+  /** Merge a partial patch into a single item and write the whole array back. */
+  const handlePatch = (index: number, partial: Record<string, unknown>) => {
     updateNodeData(nodeId, {
       [field.key]: items.map((item, i) =>
-        i === index ? { ...item, [subKey]: value } : item
+        i === index ? { ...item, ...partial } : item
       ),
     });
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
-      {field.label ? (
-        <div className="flex items-center justify-between">
+    <div className="space-y-1">
+      {/* Header row: label left, count right */}
+      <div className="flex items-center justify-between pb-0.5">
+        {field.label ? (
           <Label className="text-xs font-medium text-white/70">
             {field.label}
           </Label>
-          <span className="text-[10px] text-white/30">
-            {items.length}/{maxItems}
-          </span>
-        </div>
-      ) : null}
+        ) : null}
+        <span className="ml-auto text-[10px] text-white/30">
+          {items.length}/{maxItems}
+        </span>
+      </div>
 
+      {/* Items — flat rows inside a single light container */}
       {items.length > 0 ? (
-        <div className="space-y-2">
+        <div className="rounded-lg border border-white/[0.07] bg-white/[0.02]">
           {items.map((item, index) => (
-            <div
-              key={index}
-              className="rounded-xl border border-white/8 bg-white/[0.02] p-3 space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-medium text-white/40">
-                  #{index + 1}
-                </span>
-                <button
-                  type="button"
-                  aria-label="O'chirish"
-                  className="flex h-5 w-5 items-center justify-center rounded text-white/30 transition-colors hover:text-red-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400"
-                  onClick={() => handleRemoveItem(index)}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-
-              {field.itemFields.map((spec) => (
-                <ItemField
-                  key={spec.key}
-                  spec={spec}
-                  item={item}
-                  onChange={(subKey, value) =>
-                    handleFieldChange(index, subKey, value)
-                  }
+            <div key={index}>
+              <ItemRow
+                index={index}
+                item={item}
+                specs={field.itemFields}
+                nodeId={nodeId}
+                onPatch={(partial) => handlePatch(index, partial)}
+                onRemove={() => handleRemoveItem(index)}
+              />
+              {/* Thin separator between items; none after the last */}
+              {index < items.length - 1 ? (
+                <div
+                  className="mx-2"
+                  style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
                 />
-              ))}
+              ) : null}
             </div>
           ))}
         </div>
       ) : null}
 
+      {/* Add button */}
       <Button
         type="button"
         variant="outline"

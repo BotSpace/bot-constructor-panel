@@ -37,6 +37,8 @@ interface CredentialSelectFieldProps {
   label?: string;
   /** When true a "(required)" hint is shown next to the label */
   required?: boolean;
+  /** OVERRIDE: when provided, all writes go through onPatch instead of updateNodeData. */
+  onPatch?: (partial: Record<string, unknown>) => void;
 }
 
 export function CredentialSelectField({
@@ -46,11 +48,20 @@ export function CredentialSelectField({
   typeKey,
   label = "Credential",
   required,
+  onPatch,
 }: CredentialSelectFieldProps) {
   const updateNodeData = useFlowStore((s) => s.updateNodeData);
   const [credentials, setCredentials] = useState<CredentialListItem[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+
+  const write = (partial: Record<string, unknown>) => {
+    if (onPatch) {
+      onPatch(partial);
+    } else {
+      updateNodeData(nodeId, partial);
+    }
+  };
 
   // Current value — stored as a number (or null/undefined)
   const currentId = data[dataKey];
@@ -98,9 +109,9 @@ export function CredentialSelectField({
 
   const handleChange = (value: string) => {
     if (value === "__none__") {
-      updateNodeData(nodeId, { [dataKey]: null });
+      write({ [dataKey]: null });
     } else {
-      updateNodeData(nodeId, { [dataKey]: Number(value) });
+      write({ [dataKey]: Number(value) });
     }
   };
 

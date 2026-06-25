@@ -56,6 +56,16 @@ interface ModalFieldWidgetProps {
   nodeId: string;
   data: Record<string, unknown>;
   field: NodeFieldManifest;
+  /**
+   * OVERRIDE: when provided, the widget reads this value instead of data[field.key].
+   * Used by ArrayEditorField to render per-item fields without touching the node root.
+   */
+  valueOverride?: unknown;
+  /**
+   * OVERRIDE: when provided, all writes go through onPatch instead of updateNodeData.
+   * Used by ArrayEditorField to route writes into the item object.
+   */
+  onPatch?: (partial: Record<string, unknown>) => void;
 }
 
 function FieldShell({
@@ -91,15 +101,23 @@ function FieldShell({
   );
 }
 
-function StringArrayField({ nodeId, data, field }: ModalFieldWidgetProps) {
+function StringArrayField({ nodeId, data, field, onPatch }: ModalFieldWidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const fieldKey = field.key || "";
   const values = Array.isArray(data[fieldKey]) ? (data[fieldKey] as string[]) : [""];
 
+  const write = (partial: Record<string, unknown>) => {
+    if (onPatch) {
+      onPatch(partial);
+    } else {
+      updateNodeData(nodeId, partial);
+    }
+  };
+
   const updateValue = (index: number, value: string) => {
     const nextValues = [...values];
     nextValues[index] = value;
-    updateNodeData(nodeId, { [fieldKey]: nextValues });
+    write({ [fieldKey]: nextValues });
   };
 
   return (
@@ -120,7 +138,7 @@ function StringArrayField({ nodeId, data, field }: ModalFieldWidgetProps) {
                 size="icon"
                 className="h-10 w-10 shrink-0 text-zinc-400 hover:text-red-300"
                 onClick={() =>
-                  updateNodeData(nodeId, {
+                  write({
                     [fieldKey]: values.filter((_, currentIndex) => currentIndex !== index),
                   })
                 }
@@ -135,7 +153,7 @@ function StringArrayField({ nodeId, data, field }: ModalFieldWidgetProps) {
         type="button"
         variant="outline"
         className="w-full border-white/10 bg-zinc-950/40"
-        onClick={() => updateNodeData(nodeId, { [fieldKey]: [...values, ""] })}
+        onClick={() => write({ [fieldKey]: [...values, ""] })}
       >
         <Plus className="mr-2 h-4 w-4" />
         {field.addButtonLabel || "Qo'shish"}
@@ -188,11 +206,20 @@ function buildNestedPatch(
   return { [topKey]: patch };
 }
 
-export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps) {
+export function ModalFieldWidget({ nodeId, data, field, valueOverride, onPatch }: ModalFieldWidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const suggestions = useVarSuggestions(nodeId);
   const fieldKey = field.key || "";
-  const value = getNestedValue(data, fieldKey);
+  // When valueOverride is defined use it; otherwise read from data.
+  const value = valueOverride !== undefined ? valueOverride : getNestedValue(data, fieldKey);
+  // Route all writes through onPatch when it's provided; otherwise update the node root.
+  const write = (partial: Record<string, unknown>) => {
+    if (onPatch) {
+      onPatch(partial);
+    } else {
+      updateNodeData(nodeId, partial);
+    }
+  };
 
   if (field.type === "description") {
     return (
@@ -235,6 +262,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         nodeId={nodeId}
         data={data}
         field={field as Parameters<typeof CodeEditorField>[0]["field"]}
+        onPatch={onPatch}
       />
     );
   }
@@ -255,6 +283,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         nodeId={nodeId}
         data={data}
         field={field as Parameters<typeof CollectionSelectField>[0]["field"]}
+        onPatch={onPatch}
       />
     );
   }
@@ -308,12 +337,13 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         typeKey={field.credentialType}
         label={field.label}
         required={field.required ?? false}
+        onPatch={onPatch}
       />
     );
   }
 
   if (field.type === "node-select") {
-    return <NodeSelectField nodeId={nodeId} data={data} field={field} />;
+    return <NodeSelectField nodeId={nodeId} data={data} field={field} onPatch={onPatch} />;
   }
 
   if (field.type === "dynamic_select" && field.resource) {
@@ -357,7 +387,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
     return (
       <RecipientsManager
         recipients={recipients}
-        onUpdate={(update) => updateNodeData(nodeId, update)}
+        onUpdate={(update) => write(update)}
       />
     );
   }
@@ -379,7 +409,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
     return (
       <DynamicButtonForm
         value={val}
-        onChange={(v) => useFlowStore.getState().updateNodeData(nodeId, { [key]: v })}
+        onChange={(v) => write({ [key]: v })}
       />
     );
   }
@@ -403,7 +433,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
   }
 
   if (field.type === "stringArray") {
-    return <StringArrayField nodeId={nodeId} data={data} field={field} />;
+    return <StringArrayField nodeId={nodeId} data={data} field={field} onPatch={onPatch} />;
   }
 
   if (field.type === "select") {
@@ -417,7 +447,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
               <button
                 key={option.value}
                 type="button"
-                onClick={() => updateNodeData(nodeId, buildNestedPatch(data, fieldKey, option.value))}
+                onClick={() => write(buildNestedPatch(data, fieldKey, option.value))}
                 className={cn(
                   "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
                   current === option.value
@@ -446,7 +476,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         <Select
           value={currentSelectValue}
           onValueChange={(nextValue) =>
-            updateNodeData(nodeId, buildNestedPatch(data, fieldKey, fromSelectValue(nextValue)))
+            write(buildNestedPatch(data, fieldKey, fromSelectValue(nextValue)))
           }
         >
           <SelectTrigger className="h-10 border-white/10 bg-zinc-950/60">
@@ -475,7 +505,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
             <Checkbox
               checked={Boolean(value)}
               onCheckedChange={(checked) =>
-                updateNodeData(nodeId, buildNestedPatch(data, fieldKey, checked === true))
+                write(buildNestedPatch(data, fieldKey, checked === true))
               }
             />
             {field.label}
@@ -492,7 +522,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         <div className="flex items-center gap-2">
           <Switch
             checked={Boolean(value)}
-            onCheckedChange={(checked) => updateNodeData(nodeId, buildNestedPatch(data, fieldKey, checked))}
+            onCheckedChange={(checked) => write(buildNestedPatch(data, fieldKey, checked))}
           />
           {field.label ? <Label className="cursor-pointer text-sm text-zinc-200">{field.label}</Label> : null}
           {field.helpText ? <FieldHelp text={field.helpText} /> : null}
@@ -508,7 +538,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
           placeholder={field.placeholder}
           rows={field.rows}
           value={typeof value === "string" ? value : ""}
-          onChange={(event) => updateNodeData(nodeId, buildNestedPatch(data, fieldKey, event.target.value))}
+          onChange={(event) => write(buildNestedPatch(data, fieldKey, event.target.value))}
           className="min-h-28 border-white/10 bg-zinc-950/60"
           suggestions={suggestions}
         />
@@ -545,7 +575,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
           value={normalizedValue}
           onChange={(event) => {
             const rawValue = event.target.value;
-            updateNodeData(nodeId, buildNestedPatch(data, fieldKey, rawValue === "" ? undefined : Number(rawValue)));
+            write(buildNestedPatch(data, fieldKey, rawValue === "" ? undefined : Number(rawValue)));
           }}
           className="h-10 border-white/10 bg-zinc-950/60"
         />
@@ -563,7 +593,7 @@ export function ModalFieldWidget({ nodeId, data, field }: ModalFieldWidgetProps)
         placeholder={field.placeholder}
         value={normalizedValue}
         onChange={(event) => {
-          updateNodeData(nodeId, buildNestedPatch(data, fieldKey, event.target.value));
+          write(buildNestedPatch(data, fieldKey, event.target.value));
         }}
         className="h-10 border-white/10 bg-zinc-950/60"
         suggestions={suggestions}
