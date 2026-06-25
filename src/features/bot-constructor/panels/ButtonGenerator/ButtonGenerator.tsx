@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,7 @@ import {
   Settings2,
 } from "lucide-react";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 import { Badge } from "@/components/ui/badge";
 import { calculateActiveButtonCount } from "@/features/bot-constructor/panels/ButtonGenerator/utils";
 import { cn } from "@/lib/utils";
@@ -70,6 +71,12 @@ export function ButtonGenerator({
   } = useButtonGeneratorState(isOpen, keyboards);
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const nodes = useFlowStore((s) => s.nodes);
+  const edges = useFlowStore((s) => s.edges);
+  const availableStateKeys = useMemo(
+    () => getAvailableStateKeys(nodes, edges, node_id),
+    [nodes, edges, node_id]
+  );
 
   const handleUpdate = (update: Record<string, unknown>) => {
     if (node_id) {
@@ -290,6 +297,7 @@ export function ButtonGenerator({
       <EditButtonDialog
         button={editingButton?.button || null}
         isOpen={!!editingButton}
+        suggestions={availableStateKeys}
         onClose={() => setEditingButton(null)}
         onSave={(updatedButton) => {
           if (editingButton) {

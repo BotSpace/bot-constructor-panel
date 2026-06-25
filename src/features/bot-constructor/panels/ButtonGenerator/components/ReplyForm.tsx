@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HighlightedInput } from "@/features/bot-constructor/components/HighlightedInput";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -24,6 +25,8 @@ import { ButtonConfig } from "@/features/bot-constructor/panels/ButtonGenerator/
 import { WebAppForm } from "@/features/bot-constructor/panels/ButtonGenerator/components/WebAppForm";
 import { CollectionButtonForm } from "@/features/bot-constructor/panels/ButtonGenerator/components/CollectionButtonForm";
 import { cn } from "@/lib/utils";
+import { useFlowStore } from "@/features/bot-constructor/store";
+import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 import { Separator } from "@/components/ui/separator";
 
 interface ReplyFormProps {
@@ -67,6 +70,13 @@ export const ReplyForm = ({ onAdd, disabled, nodeId }: ReplyFormProps) => {
   const [actionType, setActionType] = useState<ReplyType>("reply");
   const [webAppUrl, setWebAppUrl] = useState("");
   const [pollType, setPollType] = useState<"quiz" | "regular">("regular");
+
+  const nodes = useFlowStore((s) => s.nodes);
+  const edges = useFlowStore((s) => s.edges);
+  const availableStateKeys = useMemo(
+    () => getAvailableStateKeys(nodes, edges, nodeId),
+    [nodes, edges, nodeId]
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,11 +166,12 @@ export const ReplyForm = ({ onAdd, disabled, nodeId }: ReplyFormProps) => {
         {!isSpecialType && (
           <div>
             <Label htmlFor="reply-text" className="text-xs mb-1.5 block">Tugma matni</Label>
-            <Input
+            <HighlightedInput
               id="reply-text"
-              placeholder="Masalan, Asosiy Menyu"
+              placeholder="Masalan, Asosiy Menyu yoki {{public_name}}"
               value={text}
               onChange={(e) => setText(e.target.value)}
+              suggestions={availableStateKeys}
               className="h-8 text-sm"
             />
           </div>

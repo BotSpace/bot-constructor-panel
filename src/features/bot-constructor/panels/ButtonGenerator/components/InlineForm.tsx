@@ -13,6 +13,7 @@ import {
   Search,
   MessageSquare,
 } from "lucide-react";
+import { HighlightedInput } from "@/features/bot-constructor/components/HighlightedInput";
 import { ButtonConfig, LoginUrlConfig } from "@/features/bot-constructor/panels/ButtonGenerator/types";
 import { WebAppForm } from "@/features/bot-constructor/panels/ButtonGenerator/components/WebAppForm";
 import { LoginUrlForm } from "@/features/bot-constructor/panels/ButtonGenerator/components/LoginUrlForm";
@@ -142,11 +143,12 @@ export const InlineForm = ({ onAdd, disabled, nodeId }: InlineFormProps) => {
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <Label htmlFor="inline-text" className="text-xs mb-1.5 block">Tugma matni</Label>
-          <Input
+          <HighlightedInput
             id="inline-text"
-            placeholder="Masalan, Saytimiz"
+            placeholder="Masalan, Saytimiz yoki {{public_name}}"
             value={text}
             onChange={(e) => setText(e.target.value)}
+            suggestions={availableStateKeys}
             className="h-8 text-sm"
           />
         </div>
@@ -163,11 +165,12 @@ export const InlineForm = ({ onAdd, disabled, nodeId }: InlineFormProps) => {
               <Label htmlFor="inline-value" className="text-xs mb-1.5 block">
                 {selectedType.label} qiymati
               </Label>
-              <Input
+              <HighlightedInput
                 id="inline-value"
                 placeholder={selectedType.placeholder}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
+                suggestions={availableStateKeys}
                 className="h-8 text-sm"
               />
             </div>
