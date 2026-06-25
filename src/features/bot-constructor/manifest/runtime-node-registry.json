@@ -572,7 +572,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -750,7 +751,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -907,7 +909,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -1064,7 +1067,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -1223,7 +1227,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -1532,7 +1537,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -1707,7 +1713,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -1819,7 +1826,8 @@
         "type": "text",
         "key": "question",
         "label": "Savol",
-        "placeholder": "Sevimli rangingiz qaysi?"
+        "placeholder": "Sevimli rangingiz qaysi?",
+        "i18n": true
       },
       {
         "type": "array-editor",
@@ -1940,7 +1948,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -2235,7 +2244,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -2480,7 +2490,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -2653,7 +2664,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -3669,7 +3681,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -4281,7 +4294,8 @@
             "key": "text",
             "type": "text",
             "label": "Matn",
-            "placeholder": "Tugma matni"
+            "placeholder": "Tugma matni",
+            "i18n": true
           },
           {
             "key": "type",
@@ -5581,13 +5595,15 @@
         "type": "text",
         "key": "title",
         "label": "Joy nomi",
-        "placeholder": "Samarqand Metro"
+        "placeholder": "Samarqand Metro",
+        "i18n": true
       },
       {
         "type": "text",
         "key": "address",
         "label": "Manzil",
-        "placeholder": "Samarqand ko'chasi, 1"
+        "placeholder": "Samarqand ko'chasi, 1",
+        "i18n": true
       },
       {
         "type": "action-recipients",
@@ -6490,7 +6506,8 @@
         "key": "buttonText",
         "label": "Tugma matni",
         "placeholder": "💳 To'lash",
-        "optional": true
+        "optional": true,
+        "i18n": true
       }
     ],
     "defaults": {

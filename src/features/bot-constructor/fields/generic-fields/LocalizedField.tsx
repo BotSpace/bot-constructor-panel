@@ -3,78 +3,49 @@
 /**
  * LocalizedField.tsx
  *
- * Wrapper that adds per-language tab strip editing to any richTextMessage field
+ * Type-aware wrapper that adds per-language tab strip editing to any field
  * whose manifest entry carries `i18n: true`.
+ *
+ * Supported field types:
+ *   richTextMessage → RichTextMessageField (TipTap editor)
+ *   text            → HighlightedInput (variable-aware single-line)
+ *   textarea        → HighlightedTextarea (variable-aware multi-line)
  *
  * Value contract (agreed with Go engine):
  *   - Single-language project: field value stays a plain string.
  *   - Multi-language project:  field value becomes { __i18n: true, en: "...", uz: "..." }.
  *   - On load: a plain string in multi-lang mode is treated as the defaultLanguage value.
+ *
+ * I18n value helpers live in ./i18n-helpers.ts to avoid a circular dependency
+ * (this file imports shared-message-fields; shared-message-fields also needs helpers).
  */
 
 import { useState } from "react";
+// Import helpers for local use AND re-export for backward compat.
+import {
+  type I18nValue,
+  isI18nValue,
+  getLangValue,
+  setLangValue,
+  LANG_LABELS,
+} from "./i18n-helpers";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { useVarSuggestions } from "@/features/bot-constructor/hooks/useVarSuggestions";
 import { NodeFieldManifest } from "@/features/bot-constructor/manifest/types";
 import { RichTextMessageField } from "@/features/bot-constructor/fields/shared-message-fields";
+import {
+  HighlightedInput,
+  HighlightedTextarea,
+} from "@/features/bot-constructor/components/HighlightedInput";
+import { Label } from "@/components/ui/label";
+import { FieldHelp } from "@/features/bot-constructor/components/FieldHelp";
 import { cn } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
-// I18n marker type helpers
+// Re-export helpers so existing callers that import from this file keep working.
 // ---------------------------------------------------------------------------
-
-export interface I18nValue {
-  __i18n: true;
-  [lang: string]: string | true;
-}
-
-export function isI18nValue(v: unknown): v is I18nValue {
-  return (
-    typeof v === "object" &&
-    v !== null &&
-    (v as Record<string, unknown>).__i18n === true
-  );
-}
-
-/** Extract per-language string from an i18n marker (or plain string). */
-export function getLangValue(raw: unknown, lang: string, defaultLang: string): string {
-  if (isI18nValue(raw)) {
-    const v = (raw as Record<string, unknown>)[lang];
-    return typeof v === "string" ? v : "";
-  }
-  // Plain string: belongs to the default language only.
-  if (typeof raw === "string" && lang === defaultLang) return raw;
-  return "";
-}
-
-/** Build a new I18nValue by updating one language's string. */
-export function setLangValue(
-  raw: unknown,
-  lang: string,
-  nextStr: string,
-  defaultLang: string
-): I18nValue {
-  const base: I18nValue = isI18nValue(raw)
-    ? (raw as I18nValue)
-    : { __i18n: true, [defaultLang]: typeof raw === "string" ? raw : "" };
-  return { ...base, [lang]: nextStr };
-}
-
-// ---------------------------------------------------------------------------
-// Label map
-// ---------------------------------------------------------------------------
-
-const LANG_LABELS: Record<string, string> = {
-  en: "EN",
-  ru: "RU",
-  uz: "UZ",
-  de: "DE",
-  fr: "FR",
-  ar: "AR",
-  tr: "TR",
-  kz: "KZ",
-  ja: "JA",
-  zh: "ZH",
-};
+export type { I18nValue };
+export { isI18nValue, getLangValue, setLangValue, LANG_LABELS };
 
 // ---------------------------------------------------------------------------
 // Component
@@ -90,6 +61,7 @@ export function LocalizedField({ nodeId, data, field }: LocalizedFieldProps) {
   const languages = useFlowStore((s) => s.languages);
   const defaultLanguage = useFlowStore((s) => s.defaultLanguage);
   const updateNodeData = useFlowStore((s) => s.updateNodeData);
+  const suggestions = useVarSuggestions(nodeId);
 
   const fieldKey = field.key || "messageText";
   const rawValue = data[fieldKey];
@@ -99,32 +71,67 @@ export function LocalizedField({ nodeId, data, field }: LocalizedFieldProps) {
     defaultLanguage || languages[0] || "en"
   );
 
-  // Guard: single-language mode → plain widget, no tabs, no markers.
+  // ---------------------------------------------------------------------------
+  // Single-language mode: plain widget, no tabs, no markers.
+  // ---------------------------------------------------------------------------
   if (languages.length <= 1) {
+    if (field.type === "richTextMessage") {
+      return (
+        <RichTextMessageField
+          nodeId={nodeId}
+          data={data}
+          textKey={fieldKey}
+          label={field.label || ""}
+          helpText={field.helpText}
+          intro={field.intro}
+          showParseMode={false}
+        />
+      );
+    }
+
+    // text / textarea — render type-appropriate widget, write plain string directly.
+    const plainStr = typeof rawValue === "string" ? rawValue : "";
+    const handlePlainChange = (next: string) =>
+      updateNodeData(nodeId, { [fieldKey]: next });
+
     return (
-      <RichTextMessageField
-        nodeId={nodeId}
-        data={data}
-        textKey={fieldKey}
-        label={field.label || ""}
-        helpText={field.helpText}
-        intro={field.intro}
-        showParseMode={false}
-      />
+      <div className="space-y-1.5">
+        {(field.label || field.helpText) ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            {field.label ? (
+              <Label className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+                {field.label}
+              </Label>
+            ) : null}
+            {field.helpText ? <FieldHelp text={field.helpText} /> : null}
+          </div>
+        ) : null}
+        {field.type === "textarea" ? (
+          <HighlightedTextarea
+            placeholder={field.placeholder}
+            rows={field.rows ?? 3}
+            value={plainStr}
+            onChange={(e) => handlePlainChange(e.target.value)}
+            suggestions={suggestions}
+            className="min-h-20 border-white/10 bg-zinc-950/60"
+          />
+        ) : (
+          <HighlightedInput
+            type="text"
+            placeholder={field.placeholder}
+            value={plainStr}
+            onChange={(e) => handlePlainChange(e.target.value)}
+            suggestions={suggestions}
+            className="h-10 border-white/10 bg-zinc-950/60"
+          />
+        )}
+      </div>
     );
   }
 
-  // Resolve the string value for the currently active language tab.
-  const currentValue = getLangValue(rawValue, activeLang, defaultLanguage);
-
-  // Fake data slice: the inner widget only sees a plain string for textKey.
-  const slottedData: Record<string, unknown> = { ...data, [fieldKey]: currentValue };
-
-  // Override onChange to write back the full i18n marker object.
-  const handleChange = (nextStr: string) => {
-    const nextMarker = setLangValue(rawValue, activeLang, nextStr, defaultLanguage);
-    updateNodeData(nodeId, { [fieldKey]: nextMarker });
-  };
+  // ---------------------------------------------------------------------------
+  // Multi-language mode: tab strip + per-language inner widget.
+  // ---------------------------------------------------------------------------
 
   // Sort tabs: defaultLanguage always first.
   const sortedLangs = [
@@ -132,53 +139,108 @@ export function LocalizedField({ nodeId, data, field }: LocalizedFieldProps) {
     ...languages.filter((l) => l !== defaultLanguage),
   ];
 
-  return (
-    <div className="space-y-2">
-      {/* Language tab strip */}
-      <div className="flex flex-wrap gap-1">
-        {sortedLangs.map((lang) => {
-          const hasContent =
-            getLangValue(rawValue, lang, defaultLanguage).trim() !== "";
-          const isActive = activeLang === lang;
+  // Resolve the string value for the currently active language tab.
+  const currentValue = getLangValue(rawValue, activeLang, defaultLanguage);
 
-          return (
-            <button
-              key={lang}
-              type="button"
-              onClick={() => setActiveLang(lang)}
-              className={cn(
-                "rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : [
-                      "border text-muted-foreground hover:text-foreground",
-                      hasContent
-                        ? "border-primary/40 text-foreground/70"
-                        : "border-border",
-                    ]
-              )}
-            >
-              {LANG_LABELS[lang] || lang.toUpperCase()}
-            </button>
-          );
-        })}
+  // Override onChange to write back the full i18n marker object.
+  const handleChange = (nextStr: string) => {
+    const nextMarker = setLangValue(rawValue, activeLang, nextStr, defaultLanguage);
+    updateNodeData(nodeId, { [fieldKey]: nextMarker });
+  };
+
+  const tabStrip = (
+    <div className="flex flex-wrap gap-1">
+      {sortedLangs.map((lang) => {
+        const hasContent =
+          getLangValue(rawValue, lang, defaultLanguage).trim() !== "";
+        const isActive = activeLang === lang;
+        return (
+          <button
+            key={lang}
+            type="button"
+            onClick={() => setActiveLang(lang)}
+            className={cn(
+              "rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider transition-colors",
+              isActive
+                ? "bg-primary text-primary-foreground"
+                : [
+                    "border text-muted-foreground hover:text-foreground",
+                    hasContent
+                      ? "border-primary/40 text-foreground/70"
+                      : "border-border",
+                  ]
+            )}
+          >
+            {LANG_LABELS[lang] || lang.toUpperCase()}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  // richTextMessage: existing path unchanged — slottedData trick for uncontrolled TipTap.
+  if (field.type === "richTextMessage") {
+    const slottedData: Record<string, unknown> = { ...data, [fieldKey]: currentValue };
+    return (
+      <div className="space-y-2">
+        {tabStrip}
+        {/*
+          key={activeLang} forces TelegramRichTextEditor to remount on tab switch
+          so it picks up the new defaultValue for the selected language.
+        */}
+        <RichTextMessageField
+          key={activeLang}
+          nodeId={nodeId}
+          data={slottedData}
+          textKey={fieldKey}
+          label={field.label || ""}
+          helpText={field.helpText}
+          intro={field.intro}
+          showParseMode={false}
+          onChange={handleChange}
+        />
       </div>
+    );
+  }
 
-      {/*
-        key={activeLang} forces TelegramRichTextEditor to remount on tab switch
-        so it picks up the new defaultValue for the selected language.
-      */}
-      <RichTextMessageField
-        key={activeLang}
-        nodeId={nodeId}
-        data={slottedData}
-        textKey={fieldKey}
-        label={field.label || ""}
-        helpText={field.helpText}
-        intro={field.intro}
-        showParseMode={false}
-        onChange={handleChange}
-      />
+  // text / textarea: label → tab strip → controlled input.
+  return (
+    <div className="space-y-1.5">
+      {(field.label || field.helpText) ? (
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          {field.label ? (
+            <Label className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+              {field.label}
+            </Label>
+          ) : null}
+          {field.helpText ? <FieldHelp text={field.helpText} /> : null}
+        </div>
+      ) : null}
+      <div className="space-y-2">
+        {tabStrip}
+        {field.type === "textarea" ? (
+          // key={activeLang} resets internal dropdown state on language switch.
+          <HighlightedTextarea
+            key={activeLang}
+            placeholder={field.placeholder}
+            rows={field.rows ?? 3}
+            value={currentValue}
+            onChange={(e) => handleChange(e.target.value)}
+            suggestions={suggestions}
+            className="min-h-20 border-white/10 bg-zinc-950/60"
+          />
+        ) : (
+          <HighlightedInput
+            key={activeLang}
+            type="text"
+            placeholder={field.placeholder}
+            value={currentValue}
+            onChange={(e) => handleChange(e.target.value)}
+            suggestions={suggestions}
+            className="h-10 border-white/10 bg-zinc-950/60"
+          />
+        )}
+      </div>
     </div>
   );
 }
