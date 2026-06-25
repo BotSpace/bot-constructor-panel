@@ -312,19 +312,21 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
   },
 
   saveFlow: async (project_id: string) => {
-    const { nodes, edges } = get();
+    const { nodes, edges, languages, defaultLanguage } = get();
     set({ isLoading: true });
 
     try {
       // flow_gz: gzip + base64 (backend kontrakt: PATCH flow_gz → backend ochib saqlaydi).
       // Compress xato bersa — plain flow bilan fallback (flow yo'qotilmasin).
+      // languages va defaultLanguage flow top-level'da saqlanadi (engine reads them).
+      const flowPayload = { nodes, edges, languages, defaultLanguage };
       let payload: Record<string, unknown>;
       try {
-        const flow_gz = compressFlow({ nodes, edges });
+        const flow_gz = compressFlow(flowPayload);
         payload = { flow_gz };
       } catch (compressErr) {
         console.warn("[saveFlow] compress xatolik, plain flow yuboriladi:", compressErr);
-        payload = { flow: { nodes, edges } };
+        payload = { flow: flowPayload };
       }
 
       const response = await instanceAuth.patch(`/project/${project_id}/`, payload);
@@ -378,6 +380,21 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
         throw new Error(message);
       }
 
+      // Extract i18n language settings from the top-level flow object.
+      // Legacy flows without these fields default to single-language mode.
+      const parsedFlow = parseFlowInput(flow);
+      const flowObj =
+        parsedFlow && typeof parsedFlow === "object"
+          ? (parsedFlow as Record<string, unknown>)
+          : {};
+      const loadedLanguages = Array.isArray(flowObj.languages)
+        ? (flowObj.languages as string[])
+        : ["en"];
+      const loadedDefault =
+        typeof flowObj.defaultLanguage === "string"
+          ? (flowObj.defaultLanguage as string)
+          : loadedLanguages[0] || "en";
+
       // Avval initialState ni o'rnatamiz, keyin nodes va edges ni.
       // Bu orqali onNodesChange va onEdgesChange chaqirilganda
       // initialState allaqachon mavjud bo'ladi.
@@ -388,6 +405,8 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
         },
         isDirty: false,
         lastSavedTime: new Date(),
+        languages: loadedLanguages,
+        defaultLanguage: loadedDefault,
       });
 
       // Keyin nodes va edges ni o'rnatamiz.

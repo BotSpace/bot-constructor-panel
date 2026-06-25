@@ -97,4 +97,8 @@ export interface FlowStoreState
   setPendingEdgeInsert: (
     payload: FlowStoreState["pendingEdgeInsert"]
   ) => void;
+  // Bot i18n: project-level language configuration (stored in flow JSON)
+  languages: string[];
+  defaultLanguage: string;
+  setLanguages: (languages: string[], defaultLanguage: string) => void;
 }

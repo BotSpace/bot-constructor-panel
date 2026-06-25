@@ -528,6 +528,7 @@
         "type": "richTextMessage",
         "key": "messageText",
         "label": "Xabar matni",
+        "i18n": true,
         "helpText": "O'zgaruvchilarni {{ }} ichida yozing.\nMisol: Salom {{user.first_name}}, balans: {{vars.balance}}\nKontekst: {{user.id}}, {{message.text}}, {{webhook.body.field}}\nRo'yxat uchun loop:\n{{#each collection.items}}\n  {{this.name}} — {{this.price}}\n{{/each}}\nIchida {{@index}} (0 dan) yoki {{@number}} (1 dan) ishlatish mumkin."
       },
       {
@@ -2440,7 +2441,8 @@
       {
         "type": "richTextMessage",
         "key": "newText",
-        "label": "Yangi matn"
+        "label": "Yangi matn",
+        "i18n": true
       },
       {
         "type": "select",
@@ -2606,6 +2608,7 @@
         "type": "richTextMessage",
         "key": "messageText",
         "label": "Xabar matni",
+        "i18n": true,
         "intro": "Callback bo'lsa xabarni tahrirlaydi, aks holda yangi xabar yuboradi",
         "helpText": "O'zgaruvchilarni {{ }} ichida yozing.\nMisol: {{user.first_name}}, {{vars.summa}}\nRo'yxat: {{#each collection.items}} {{this.nom}} {{/each}}"
       },

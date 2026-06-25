@@ -50,6 +50,12 @@ export interface RichTextMessageFieldProps {
   intro?: string;
   /** Whether to show the parse-mode selector */
   showParseMode?: boolean;
+  /**
+   * Override onChange handler. When provided, the editor calls this instead of
+   * updateNodeData(nodeId, { [textKey]: value }). Used by LocalizedField to
+   * intercept writes and store the i18n marker object.
+   */
+  onChange?: (value: string) => void;
 }
 
 export function RichTextMessageField({
@@ -60,6 +66,7 @@ export function RichTextMessageField({
   helpText,
   intro,
   showParseMode,
+  onChange,
 }: RichTextMessageFieldProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const suggestions = useVarSuggestions(nodeId);
@@ -81,7 +88,13 @@ export function RichTextMessageField({
 
       <TelegramRichTextEditor
         defaultValue={value}
-        onChange={(nextValue) => updateNodeData(nodeId, { [textKey]: nextValue })}
+        onChange={(nextValue) => {
+          if (onChange) {
+            onChange(nextValue);
+          } else {
+            updateNodeData(nodeId, { [textKey]: nextValue });
+          }
+        }}
         suggestions={suggestions}
       />
 

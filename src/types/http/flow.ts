@@ -5,5 +5,7 @@ export interface FlowData {
   flow: {
     nodes: Node[];
     edges: Edge[];
+    languages?: string[];
+    defaultLanguage?: string;
   };
 }

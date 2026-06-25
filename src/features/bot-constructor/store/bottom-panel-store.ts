@@ -8,6 +8,7 @@ export type BottomPanelKey =
     | 'shortcuts'
     | 'variables'
     | 'errors'
+    | 'languages'
 
 interface BottomPanelStore {
     envOpen: boolean
@@ -17,6 +18,7 @@ interface BottomPanelStore {
     shortcutsOpen: boolean
     variablesOpen: boolean
     errorsOpen: boolean
+    languagesOpen: boolean
 
     setEnvOpen: (v: boolean) => void
     setCollectionOpen: (v: boolean) => void
@@ -25,6 +27,7 @@ interface BottomPanelStore {
     setShortcutsOpen: (v: boolean) => void
     setVariablesOpen: (v: boolean) => void
     setErrorsOpen: (v: boolean) => void
+    setLanguagesOpen: (v: boolean) => void
 
     /** Open a panel by key — convenience for context menu */
     openPanel: (key: BottomPanelKey) => void
@@ -38,6 +41,7 @@ export const useBottomPanelStore = create<BottomPanelStore>((set) => ({
     shortcutsOpen: false,
     variablesOpen: false,
     errorsOpen: false,
+    languagesOpen: false,
 
     setEnvOpen: (v) => set({ envOpen: v }),
     setCollectionOpen: (v) => set({ collectionOpen: v }),
@@ -46,6 +50,7 @@ export const useBottomPanelStore = create<BottomPanelStore>((set) => ({
     setShortcutsOpen: (v) => set({ shortcutsOpen: v }),
     setVariablesOpen: (v) => set({ variablesOpen: v }),
     setErrorsOpen: (v) => set({ errorsOpen: v }),
+    setLanguagesOpen: (v) => set({ languagesOpen: v }),
 
     openPanel: (key) => {
         switch (key) {
@@ -56,6 +61,7 @@ export const useBottomPanelStore = create<BottomPanelStore>((set) => ({
             case 'shortcuts': set({ shortcutsOpen: true }); break
             case 'variables': set({ variablesOpen: true }); break
             case 'errors': set({ errorsOpen: true }); break
+            case 'languages': set({ languagesOpen: true }); break
         }
     },
 }))

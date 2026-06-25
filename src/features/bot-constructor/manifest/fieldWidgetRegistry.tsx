@@ -23,6 +23,7 @@ import {
   RichTextMessageField,
   MediaMessageField,
 } from "@/features/bot-constructor/fields/shared-message-fields";
+import { LocalizedField } from "@/features/bot-constructor/fields/generic-fields/LocalizedField";
 import { CredentialSelectField } from "@/features/bot-constructor/fields/generic-fields/CredentialSelectField";
 import { FieldHelp } from "@/features/bot-constructor/components/FieldHelp";
 
@@ -166,6 +167,10 @@ function DefaultFieldWidget({ nodeId, data, field, valueOverride, onPatch }: Fie
   }
 
   if (field.type === "richTextMessage") {
+    // When i18n: true, delegate to LocalizedField which adds language-tab strip.
+    if (field.i18n) {
+      return <LocalizedField nodeId={nodeId} data={data} field={field} />;
+    }
     return (
       <RichTextMessageField
         nodeId={nodeId}
