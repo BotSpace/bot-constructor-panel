@@ -4429,6 +4429,10 @@
             "label": "document"
           },
           {
+            "value": "callback",
+            "label": "Callback data (tugma bosilganda)"
+          },
+          {
             "value": "any",
             "label": "any"
           }
@@ -5418,6 +5422,10 @@
           {
             "value": "document",
             "label": "document"
+          },
+          {
+            "value": "callback",
+            "label": "Callback data (tugma bosilganda)"
           },
           {
             "value": "any",
