@@ -26,6 +26,7 @@ import { ToolParamsField } from "@/features/bot-constructor/fields/generic-field
 import { CollectionSelectField } from "@/features/bot-constructor/fields/generic-fields/CollectionSelectField";
 import { CredentialSelectField } from "@/features/bot-constructor/fields/generic-fields/CredentialSelectField";
 import { NodeSelectField } from "@/features/bot-constructor/fields/generic-fields/NodeSelectField";
+import { LocalizedField } from "@/features/bot-constructor/fields/generic-fields/LocalizedField";
 import { DynamicSelectField } from "@/features/bot-constructor/fields/generic-fields/DynamicSelectField";
 import { WebhookUrlField } from "@/features/bot-constructor/fields/generic-fields/WebhookUrlField";
 import { DynamicInputsField } from "@/features/bot-constructor/fields/generic-fields/DynamicInputsField";
@@ -228,6 +229,11 @@ export function ModalFieldWidget({ nodeId, data, field, valueOverride, onPatch }
   }
 
   if (field.type === "richTextMessage") {
+    // When i18n: true, delegate to LocalizedField which adds the language-tab
+    // strip (only renders tabs when the project has >1 language).
+    if (field.i18n) {
+      return <LocalizedField nodeId={nodeId} data={data} field={field} />;
+    }
     return (
       <RichTextMessageField
         nodeId={nodeId}
