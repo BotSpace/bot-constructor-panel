@@ -36,6 +36,8 @@ interface CollectionSelectFieldProps {
   nodeId: string;
   data: Record<string, unknown>;
   field: CollectionSelectFieldDef;
+  /** OVERRIDE: when provided, all writes go through onPatch instead of updateNodeData. */
+  onPatch?: (partial: Record<string, unknown>) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -46,8 +48,17 @@ export function CollectionSelectField({
   nodeId,
   data,
   field,
+  onPatch,
 }: CollectionSelectFieldProps) {
   const updateNodeData = useFlowStore((s) => s.updateNodeData);
+
+  const write = (partial: Record<string, unknown>) => {
+    if (onPatch) {
+      onPatch(partial);
+    } else {
+      updateNodeData(nodeId, partial);
+    }
+  };
   const nodes = useFlowStore((s) => s.nodes);
   const edges = useFlowStore((s) => s.edges);
 
@@ -95,7 +106,7 @@ export function CollectionSelectField({
       );
 
     if (hasChanges) {
-      updateNodeData(nodeId, { fieldMappings: nextMappings });
+      write({ fieldMappings: nextMappings });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collectionDetail?.fields, collectionName, nodeId]);
@@ -108,11 +119,11 @@ export function CollectionSelectField({
     if (field.withFilters) {
       update.filters = [];
     }
-    updateNodeData(nodeId, update);
+    write(update);
   };
 
   const handleStateKeyChange = (fieldName: string, stateKey: string) => {
-    updateNodeData(nodeId, {
+    write({
       fieldMappings: { ...fieldMappings, [fieldName]: stateKey },
     });
   };
@@ -157,7 +168,7 @@ export function CollectionSelectField({
               placeholder="e.g., selected_film"
               value={contextKeyValue}
               onChange={(e) =>
-                updateNodeData(nodeId, { [contextKeyField]: e.target.value })
+                write({ [contextKeyField]: e.target.value })
               }
             />
             <p className="text-xs text-muted-foreground">
@@ -180,7 +191,7 @@ export function CollectionSelectField({
                   })),
                 ]}
                 filters={Array.isArray(data.filters) ? (data.filters as any) : []}
-                onChange={(filters) => updateNodeData(nodeId, { filters })}
+                onChange={(filters) => write({ filters })}
                 stateKeys={availableStateKeys}
               />
             </div>

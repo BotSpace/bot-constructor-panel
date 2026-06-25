@@ -27,11 +27,21 @@ interface CodeEditorFieldProps {
   nodeId: string;
   data: Record<string, unknown>;
   field: CodeEditorFieldDef;
+  /** OVERRIDE: when provided, all writes go through onPatch instead of updateNodeData. */
+  onPatch?: (partial: Record<string, unknown>) => void;
 }
 
-export function CodeEditorField({ nodeId, data, field }: CodeEditorFieldProps) {
+export function CodeEditorField({ nodeId, data, field, onPatch }: CodeEditorFieldProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const [newOutput, setNewOutput] = useState("");
+
+  const write = (partial: Record<string, unknown>) => {
+    if (onPatch) {
+      onPatch(partial);
+    } else {
+      updateNodeData(nodeId, partial);
+    }
+  };
 
   const codeValue =
     typeof data[field.key] === "string" ? (data[field.key] as string) : "";
@@ -42,7 +52,7 @@ export function CodeEditorField({ nodeId, data, field }: CodeEditorFieldProps) {
       : [];
 
   const handleCodeChange = (code: string) => {
-    updateNodeData(nodeId, { ...data, [field.key]: code });
+    write({ ...data, [field.key]: code });
   };
 
   const addOutput = () => {
@@ -53,7 +63,7 @@ export function CodeEditorField({ nodeId, data, field }: CodeEditorFieldProps) {
       setNewOutput("");
       return;
     }
-    updateNodeData(nodeId, {
+    write({
       ...data,
       [field.outputsKey]: [...outputs, { name }],
     });
@@ -62,7 +72,7 @@ export function CodeEditorField({ nodeId, data, field }: CodeEditorFieldProps) {
 
   const removeOutput = (name: string) => {
     if (!field.outputsKey) return;
-    updateNodeData(nodeId, {
+    write({
       ...data,
       [field.outputsKey]: outputs.filter((o) => o.name !== name),
     });

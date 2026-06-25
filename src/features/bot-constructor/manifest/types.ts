@@ -70,14 +70,28 @@ export interface NodeFieldOptionManifest {
   label: string;
 }
 
-/** Item field spec for array-editor type */
+/** Item field spec for array-editor type.
+ *
+ * The `type` union covers all NodeFieldManifest types so that manifests can use
+ * any global field type inside array-editor items. At runtime, unsafe panel-only
+ * types (collection-select, nested-rows, etc.) are guarded by FieldWidget's
+ * PANEL_ONLY_FIELD_TYPES set and render null without throwing.
+ */
 export interface ArrayEditorItemFieldSpec {
   key: string;
-  type: "text" | "number" | "select" | "checkbox" | "switch" | "textarea";
+  /** Any NodeFieldManifest type. Simple types (text/number/select/checkbox/switch/textarea)
+   *  are always safe. Complex panel-only types render as null via FieldWidget guard. */
+  type: NodeFieldManifest["type"];
   label?: string;
   placeholder?: string;
   options?: NodeFieldOptionManifest[];
   visibleWhen?: NodeVisibilityRule;
+  /** Extra NodeFieldManifest props forwarded to FieldWidget for richer configs */
+  rows?: number;
+  min?: number;
+  max?: number;
+  step?: number;
+  helpText?: string;
 }
 
 export interface NodeFieldManifest {

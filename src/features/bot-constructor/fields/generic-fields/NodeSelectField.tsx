@@ -40,13 +40,23 @@ interface NodeSelectFieldProps {
   nodeId: string;
   data: Record<string, unknown>;
   field: NodeFieldManifest;
+  /** OVERRIDE: when provided, all writes go through onPatch instead of updateNodeData. */
+  onPatch?: (partial: Record<string, unknown>) => void;
 }
 
-export function NodeSelectField({ nodeId, data, field }: NodeSelectFieldProps) {
+export function NodeSelectField({ nodeId, data, field, onPatch }: NodeSelectFieldProps) {
   const t = useTranslations("constructor");
   const updateNodeData = useFlowStore((s) => s.updateNodeData);
   const nodes = useFlowStore((s) => s.nodes);
   const [open, setOpen] = useState(false);
+
+  const write = (partial: Record<string, unknown>) => {
+    if (onPatch) {
+      onPatch(partial);
+    } else {
+      updateNodeData(nodeId, partial);
+    }
+  };
 
   const fieldKey = field.key ?? "targetNodeId";
   const currentValue = typeof data[fieldKey] === "string" ? (data[fieldKey] as string) : "";
@@ -81,13 +91,13 @@ export function NodeSelectField({ nodeId, data, field }: NodeSelectFieldProps) {
     : null;
 
   const handleSelect = (id: string) => {
-    updateNodeData(nodeId, { [fieldKey]: id === currentValue ? "" : id });
+    write({ [fieldKey]: id === currentValue ? "" : id });
     setOpen(false);
   };
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
-    updateNodeData(nodeId, { [fieldKey]: "" });
+    write({ [fieldKey]: "" });
   };
 
   return (

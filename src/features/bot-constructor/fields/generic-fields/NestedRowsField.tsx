@@ -235,10 +235,8 @@ function ColumnCard({
   return (
     <div
       className={cn(
-        "relative w-full rounded-lg border p-2.5 space-y-2 transition-colors",
-        dynamic
-          ? "border-blue-500/25 bg-blue-500/[0.04]"
-          : "border-white/10 bg-white/[0.03]"
+        "relative w-full space-y-2 border-l-2 pl-2.5 transition-colors",
+        dynamic ? "border-blue-500/40" : "border-white/10"
       )}
     >
       {/* Top controls: type switcher + remove */}
@@ -358,7 +356,7 @@ function RowCard({
   const canAddColumn = row.columns.length < maxColumns;
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 space-y-2.5">
+    <div className="space-y-2.5 px-2 py-2.5">
       {/* Row header */}
       <div className="flex items-center justify-between">
         <span className="text-[11px] font-medium text-white/40">
@@ -593,10 +591,10 @@ export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
+    <div className="space-y-1">
       {/* Header */}
       {field.label ? (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pb-0.5">
           <Label className="text-xs font-medium text-white/70">
             {field.label}
           </Label>
@@ -604,31 +602,38 @@ export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
         </div>
       ) : null}
 
-      {/* Rows */}
+      {/* Rows — flat, yagona yengil konteyner, qatorlar orasida ingichka ajratuvchi */}
       {rows.length > 0 ? (
-        <div className="space-y-2">
+        <div className="rounded-lg border border-white/[0.07] bg-white/[0.02]">
           {rows.map((row, rowIdx) => (
-            <RowCard
-              key={rowIdx}
-              row={row}
-              rowIndex={rowIdx}
-              field={field}
-              allowDynamic={allowDynamic}
-              onColumnFieldChange={(colIdx, key, value) =>
-                handleColumnFieldChange(rowIdx, colIdx, key, value)
-              }
-              onColumnDynamicChange={(colIdx, value) =>
-                handleColumnDynamicChange(rowIdx, colIdx, value)
-              }
-              onAddStaticColumn={() => handleAddStaticColumn(rowIdx)}
-              onAddDynamicColumn={() => handleAddDynamicColumn(rowIdx)}
-              onRemoveColumn={(colIdx) => handleRemoveColumn(rowIdx, colIdx)}
-              onSwitchColumnType={(colIdx, toDynamic) =>
-                handleSwitchColumnType(rowIdx, colIdx, toDynamic)
-              }
-              onRemoveRow={() => handleRemoveRow(rowIdx)}
-              suggestions={availableStateKeys}
-            />
+            <div key={rowIdx}>
+              <RowCard
+                row={row}
+                rowIndex={rowIdx}
+                field={field}
+                allowDynamic={allowDynamic}
+                onColumnFieldChange={(colIdx, key, value) =>
+                  handleColumnFieldChange(rowIdx, colIdx, key, value)
+                }
+                onColumnDynamicChange={(colIdx, value) =>
+                  handleColumnDynamicChange(rowIdx, colIdx, value)
+                }
+                onAddStaticColumn={() => handleAddStaticColumn(rowIdx)}
+                onAddDynamicColumn={() => handleAddDynamicColumn(rowIdx)}
+                onRemoveColumn={(colIdx) => handleRemoveColumn(rowIdx, colIdx)}
+                onSwitchColumnType={(colIdx, toDynamic) =>
+                  handleSwitchColumnType(rowIdx, colIdx, toDynamic)
+                }
+                onRemoveRow={() => handleRemoveRow(rowIdx)}
+                suggestions={availableStateKeys}
+              />
+              {rowIdx < rows.length - 1 ? (
+                <div
+                  className="mx-2"
+                  style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
+                />
+              ) : null}
+            </div>
           ))}
         </div>
       ) : null}
