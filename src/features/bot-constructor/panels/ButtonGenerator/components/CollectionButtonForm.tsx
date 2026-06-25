@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HighlightedInput } from "@/features/bot-constructor/components/HighlightedInput";
 import { Label } from "@/components/ui/label";
 import { Database, Zap, PlusCircle, LayoutGrid, Settings2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -85,6 +86,12 @@ export const CollectionButtonForm = ({
   const insertToTemplate = (fieldName: string) => {
     setTextTemplate((prev) => prev + `{{${fieldName}}}`);
   };
+
+  // Tugma shabloni uchun tavsiyalar: kolleksiya maydonlari + flow o'zgaruvchilari
+  const templateSuggestions = useMemo(() => {
+    const fieldNames = (collectionFields?.fields ?? []).map((f) => f.name);
+    return [...fieldNames, ...availableStateKeys];
+  }, [collectionFields, availableStateKeys]);
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -171,11 +178,12 @@ export const CollectionButtonForm = ({
               </div>
 
               <div className="space-y-2">
-                <Input
+                <HighlightedInput
                   className="font-mono text-sm border-primary/30 focus-visible:ring-primary"
                   placeholder="Masalan: {{name}} - {{price}} so'm"
                   value={textTemplate}
                   onChange={(e) => setTextTemplate(e.target.value)}
+                  suggestions={templateSuggestions}
                 />
                 <p className="text-[10px] text-muted-foreground italic flex items-center gap-1">
                   <Zap className="w-3 h-3 text-yellow-500" /> Namuna:{" "}

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useButtonGeneratorState } from "@/features/bot-constructor/panels/ButtonGenerator/hook/useButtonGeneratorState";
 import { KeyboardPreview } from "@/features/bot-constructor/panels/ButtonGenerator/components/KeyboardPreview";
 import { EditButtonDialog } from "@/features/bot-constructor/panels/ButtonGenerator/components/EditButtonDialog";
 import { ButtonConfig, KeyboardConfig } from "@/features/bot-constructor/panels/ButtonGenerator/types";
 import { MessageSquare, Rows3, Settings2 } from "lucide-react";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 import { cn } from "@/lib/utils";
 import { InlineForm } from "@/features/bot-constructor/panels/ButtonGenerator/components/InlineForm";
 import { ReplyForm } from "@/features/bot-constructor/panels/ButtonGenerator/components/ReplyForm";
@@ -48,6 +49,12 @@ export function InlineKeyboardEditor({
   } = useButtonGeneratorState(true, initialKeyboard);
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const nodes = useFlowStore((s) => s.nodes);
+  const edges = useFlowStore((s) => s.edges);
+  const availableStateKeys = useMemo(
+    () => getAvailableStateKeys(nodes, edges, node_id),
+    [nodes, edges, node_id]
+  );
   const saveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -196,6 +203,7 @@ export function InlineKeyboardEditor({
       <EditButtonDialog
         button={editingButton?.button ?? null}
         isOpen={!!editingButton}
+        suggestions={availableStateKeys}
         onClose={() => setEditingButton(null)}
         onSave={(updatedButton) => {
           if (editingButton) {

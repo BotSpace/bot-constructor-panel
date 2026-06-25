@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HighlightedInput } from "@/features/bot-constructor/components/HighlightedInput";
 import { Label } from "@/components/ui/label";
 import { ButtonConfig } from "@/features/bot-constructor/panels/ButtonGenerator/types";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,8 @@ interface EditButtonDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedButton: Partial<ButtonConfig>) => void;
+  /** {{}} autocomplete uchun mavjud o'zgaruvchilar */
+  suggestions?: string[];
 }
 
 export const EditButtonDialog = ({
@@ -24,6 +27,7 @@ export const EditButtonDialog = ({
   isOpen,
   onClose,
   onSave,
+  suggestions = [],
 }: EditButtonDialogProps) => {
   const [text, setText] = useState("");
   const [value, setValue] = useState("");
@@ -82,11 +86,12 @@ export const EditButtonDialog = ({
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="edit-text">Tugma matni</Label>
-            <Input
+            <HighlightedInput
               id="edit-text"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Tugma matni..."
+              suggestions={suggestions}
+              placeholder="Tugma matni... yoki {{public_name}}"
             />
           </div>
           <div className="grid gap-2">
@@ -109,10 +114,11 @@ export const EditButtonDialog = ({
                 )}
               </>
             ) : (
-              <Input
+              <HighlightedInput
                 id="edit-value"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
+                suggestions={suggestions}
                 placeholder={getValuePlaceholder()}
               />
             )}
