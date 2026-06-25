@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from '@/features/bot-constructor/panels/bottom-panel/components/button'
-import { Database, Key, Keyboard, MoreHorizontal, Search, Eye, EyeOff, Shield, Braces, AlertTriangle, Puzzle } from 'lucide-react'
+import { Database, Key, Keyboard, Languages, MoreHorizontal, Search, Eye, EyeOff, Shield, Braces, AlertTriangle, Puzzle } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -23,6 +23,7 @@ import { CollectionManageDialog } from '@/features/bot-constructor/panels/Collec
 import { EnvManageDialog } from '@/features/bot-constructor/panels/EnvManageDialog/EnvManageDialog'
 import { CredentialManageDialog } from '@/features/credentials/components/CredentialManageDialog'
 import { ModulePanel } from '@/features/bot-constructor/panels/ModuleManageDialog/ModulePanel'
+import { LanguageSettingsDialog } from '@/features/bot-constructor/panels/LanguageSettingsDialog'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -61,7 +62,7 @@ interface Props {
 const FIXED_W = 227
 const SLOT = 48
 const MORE_W = 48
-const ALL_COUNT = 10
+const ALL_COUNT = 11
 
 function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const t = useTranslations('editor.toolbar')
@@ -82,6 +83,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
         shortcutsOpen, setShortcutsOpen,
         variablesOpen, setVariablesOpen,
         errorsOpen, setErrorsOpen,
+        languagesOpen, setLanguagesOpen,
     } = useBottomPanelStore()
     const { snapshots } = useDebugContextStore()
     const { unreadCount: errorsUnread, markAllRead } = useDebugErrorsStore()
@@ -242,6 +244,20 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
             ),
         },
         {
+            key: 'languages',
+            inline: (
+                <BottomPanelButton onClick={() => setLanguagesOpen(true)} title="Bot tillari" aria-label="Bot tillari">
+                    <Languages size={20} />
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="languages" onClick={() => setLanguagesOpen(true)}>
+                    <Languages size={16} className="mr-2" />
+                    Bot tillari
+                </DropdownMenuItem>
+            ),
+        },
+        {
             key: 'variables',
             inline: (
                 <BottomPanelButton
@@ -376,6 +392,11 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 open={moduleOpen}
                 onOpenChange={setModuleOpen}
                 projectId={id as string}
+            />
+
+            <LanguageSettingsDialog
+                open={languagesOpen}
+                onOpenChange={setLanguagesOpen}
             />
 
             {/* Variable Inspector — large 3-column dialog */}

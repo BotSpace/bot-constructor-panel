@@ -12,6 +12,13 @@ import { HighlightedInput } from "@/features/bot-constructor/components/Highligh
 import { Label } from "@/components/ui/label";
 import { ButtonConfig } from "@/features/bot-constructor/panels/ButtonGenerator/types";
 import { cn } from "@/lib/utils";
+import { useFlowStore } from "@/features/bot-constructor/store";
+import {
+  isI18nValue,
+  getLangValue,
+  setLangValue,
+  type I18nValue,
+} from "@/features/bot-constructor/fields/generic-fields/LocalizedField";
 
 interface EditButtonDialogProps {
   button: ButtonConfig | null;
@@ -22,6 +29,11 @@ interface EditButtonDialogProps {
   suggestions?: string[];
 }
 
+const LANG_LABELS: Record<string, string> = {
+  en: "EN", ru: "RU", uz: "UZ", de: "DE", fr: "FR",
+  ar: "AR", tr: "TR", kz: "KZ", ja: "JA", zh: "ZH",
+};
+
 export const EditButtonDialog = ({
   button,
   isOpen,
@@ -29,13 +41,23 @@ export const EditButtonDialog = ({
   onSave,
   suggestions = [],
 }: EditButtonDialogProps) => {
-  const [text, setText] = useState("");
+  const languages = useFlowStore((s) => s.languages);
+  const defaultLanguage = useFlowStore((s) => s.defaultLanguage);
+
+  // text: may be a plain string OR an I18nValue when multi-language.
+  const [textRaw, setTextRaw] = useState<string | I18nValue>("");
   const [value, setValue] = useState("");
   const [webAppUrl, setWebAppUrl] = useState("");
+  const [activeLang, setActiveLang] = useState(defaultLanguage || "en");
+
+  const isMultiLang = languages.length > 1;
 
   useEffect(() => {
     if (button) {
-      setText(button.text || "");
+      // Preserve existing i18n marker if present; otherwise plain string.
+      const raw = button.text as string | I18nValue | undefined;
+      setTextRaw(raw || "");
+      setActiveLang(defaultLanguage || languages[0] || "en");
       if (button.type === "web_app") {
         setWebAppUrl(button.webApp?.url || button.value || "");
         setValue("");
@@ -44,14 +66,36 @@ export const EditButtonDialog = ({
         setWebAppUrl("");
       }
     }
-  }, [button]);
+  }, [button, defaultLanguage, languages]);
+
+  // Current visible string for the active tab
+  const currentText = isMultiLang
+    ? getLangValue(textRaw, activeLang, defaultLanguage)
+    : (typeof textRaw === "string" ? textRaw : getLangValue(textRaw, defaultLanguage, defaultLanguage));
+
+  const handleTextChange = (nextStr: string) => {
+    if (!isMultiLang) {
+      setTextRaw(nextStr);
+    } else {
+      setTextRaw((prev) => setLangValue(prev, activeLang, nextStr, defaultLanguage));
+    }
+  };
+
+  // Resolve final text value for saving: plain string when single-language.
+  const resolveText = (): string | I18nValue => {
+    if (!isMultiLang) {
+      return typeof textRaw === "string" ? textRaw : getLangValue(textRaw, defaultLanguage, defaultLanguage);
+    }
+    return isI18nValue(textRaw) ? textRaw : { __i18n: true, [defaultLanguage]: typeof textRaw === "string" ? textRaw : "" };
+  };
 
   const handleSave = () => {
+    const finalText = resolveText();
     if (button?.type === "web_app") {
       if (!webAppUrl.startsWith("https://")) return;
-      onSave({ text, webApp: { url: webAppUrl }, value: webAppUrl });
+      onSave({ text: finalText as string, webApp: { url: webAppUrl }, value: webAppUrl });
     } else {
-      onSave({ text, value });
+      onSave({ text: finalText as string, value });
     }
     onClose();
   };
@@ -86,10 +130,35 @@ export const EditButtonDialog = ({
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="edit-text">Tugma matni</Label>
+            {isMultiLang && (
+              <div className="flex flex-wrap gap-1 mb-1">
+                {[defaultLanguage, ...languages.filter((l) => l !== defaultLanguage)].map((lang) => {
+                  const hasContent = getLangValue(textRaw, lang, defaultLanguage).trim() !== "";
+                  return (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => setActiveLang(lang)}
+                      className={cn(
+                        "rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider transition-colors",
+                        activeLang === lang
+                          ? "bg-primary text-primary-foreground"
+                          : [
+                              "border text-muted-foreground hover:text-foreground",
+                              hasContent ? "border-primary/40 text-foreground/70" : "border-border",
+                            ]
+                      )}
+                    >
+                      {LANG_LABELS[lang] || lang.toUpperCase()}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <HighlightedInput
               id="edit-text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
+              value={currentText}
+              onChange={(e) => handleTextChange(e.target.value)}
               suggestions={suggestions}
               placeholder="Tugma matni... yoki {{public_name}}"
             />

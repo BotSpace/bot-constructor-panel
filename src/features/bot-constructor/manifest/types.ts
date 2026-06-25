@@ -173,6 +173,13 @@ export interface NodeFieldManifest {
   is_state?: boolean;
   /** For richTextMessage: intro text shown above the editor */
   intro?: string;
+  /**
+   * When true the field supports multi-language content using the
+   * { __i18n: true, en: "...", uz: "..." } marker format (engine spec).
+   * Only meaningful on richTextMessage / mediaMessage caption fields.
+   * Ignored when the project has ≤1 language (single-language mode).
+   */
+  i18n?: boolean;
   /** For richTextMessage: label for the text area; for mediaMessage: media kind */
   mediaKind?: "photo" | "video" | "audio" | "file";
   // array-editor

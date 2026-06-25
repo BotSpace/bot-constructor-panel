@@ -57,6 +57,13 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
     pendingEdgeInsert: null,
     setPendingEdgeInsert: (payload) => set({ pendingEdgeInsert: payload }),
 
+    // Bot i18n: project-level language configuration
+    // Default: single-language mode — plain strings, no markers
+    languages: ["en"],
+    defaultLanguage: "en",
+    setLanguages: (languages, defaultLanguage) =>
+      set({ languages, defaultLanguage, isDirty: true }),
+
     // Barcha slice'larni birlashtiramiz
     // Har bir slice'ga (set, get) ni uzatamiz
     ...createFlowSlice(set, get, {} as any),
