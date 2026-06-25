@@ -29,6 +29,11 @@ import { useVarSuggestions } from "@/features/bot-constructor/hooks/useVarSugges
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { uploadFile } from "@/services/requests/file";
 import { FieldHelp } from "@/features/bot-constructor/components/FieldHelp";
+import {
+  getLangValue,
+  setLangValue,
+  LANG_LABELS,
+} from "@/features/bot-constructor/fields/generic-fields/i18n-helpers";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, Loader2, Upload } from "lucide-react";
 import { useRef, useState } from "react";
@@ -196,17 +201,39 @@ export interface MediaMessageFieldProps {
 export function MediaMessageField({ nodeId, data, kind }: MediaMessageFieldProps) {
   const project = useProjectStore((state) => state.project);
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const languages = useFlowStore((s) => s.languages);
+  const defaultLanguage = useFlowStore((s) => s.defaultLanguage);
   const suggestions = useVarSuggestions(nodeId);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Active language for the caption tab strip (only shown when languages.length > 1).
+  const [activeCaptionLang, setActiveCaptionLang] = useState<string>(
+    defaultLanguage || languages[0] || "en"
+  );
 
   const labels = MEDIA_LABELS[kind];
   const { sourceTypeKey, fileIdKey, urlKey } = labels;
   const sourceType =
     typeof data[sourceTypeKey] === "string" ? (data[sourceTypeKey] as string) : "upload";
-  const captionValue =
-    typeof data.caption === "string" ? (data.caption as string) : "";
+
+  // Caption: may be a plain string (single-lang / legacy) or an i18n marker.
+  const rawCaption = data.caption;
+  const isMultiLang = languages.length > 1;
+  const captionValue = isMultiLang
+    ? getLangValue(rawCaption, activeCaptionLang, defaultLanguage)
+    : (typeof rawCaption === "string" ? rawCaption : "");
+
+  // Caption change handler — writes i18n marker in multi-lang mode, plain string otherwise.
+  const handleCaptionChange = (next: string) => {
+    if (isMultiLang) {
+      updateNodeData(nodeId, {
+        caption: setLangValue(rawCaption, activeCaptionLang, next, defaultLanguage),
+      });
+    } else {
+      updateNodeData(nodeId, { caption: next });
+    }
+  };
 
   const handleFileUpload = async (file: File) => {
     setIsUploading(true);
@@ -365,18 +392,50 @@ export function MediaMessageField({ nodeId, data, kind }: MediaMessageFieldProps
       {/* Caption */}
       <div className="grid gap-2">
         <Label>{labels.captionLabel}</Label>
+
+        {/* Language tab strip — only shown when project has >1 language */}
+        {isMultiLang ? (
+          <div className="flex flex-wrap gap-1">
+            {[defaultLanguage, ...languages.filter((l) => l !== defaultLanguage)].map((lang) => {
+              const hasContent = getLangValue(rawCaption, lang, defaultLanguage).trim() !== "";
+              const isActive = activeCaptionLang === lang;
+              return (
+                <button
+                  key={lang}
+                  type="button"
+                  onClick={() => setActiveCaptionLang(lang)}
+                  className={cn(
+                    "rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider transition-colors",
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : [
+                          "border text-muted-foreground hover:text-foreground",
+                          hasContent
+                            ? "border-primary/40 text-foreground/70"
+                            : "border-border",
+                        ]
+                  )}
+                >
+                  {LANG_LABELS[lang] || lang.toUpperCase()}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+
         {kind === "file" ? (
           <Textarea
             className="min-h-[90px]"
             maxLength={1024}
             placeholder="Fayl uchun izoh..."
             value={captionValue}
-            onChange={(e) => updateNodeData(nodeId, { caption: e.target.value })}
+            onChange={(e) => handleCaptionChange(e.target.value)}
           />
         ) : (
           <TelegramRichTextEditor
+            key={isMultiLang ? activeCaptionLang : undefined}
             defaultValue={captionValue}
-            onChange={(caption) => updateNodeData(nodeId, { caption })}
+            onChange={(caption) => handleCaptionChange(caption)}
             suggestions={suggestions}
           />
         )}

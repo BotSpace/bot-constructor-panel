@@ -21,13 +21,18 @@ import {
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 import { cn } from "@/lib/utils";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ChevronDown, Database, Plus, Type, X } from "lucide-react";
 import {
   DynamicButtonForm,
   CollectionButtonData,
   DEFAULT_COLLECTION_BUTTON,
 } from "@/features/bot-constructor/fields/generic-fields/DynamicButtonForm";
+import {
+  getLangValue,
+  setLangValue,
+  LANG_LABELS,
+} from "@/features/bot-constructor/fields/generic-fields/i18n-helpers";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -40,6 +45,12 @@ export interface NestedColumnFieldSpec {
   placeholder?: string;
   options?: { value: string; label: string }[];
   visibleWhen?: { key: string; equals?: unknown; notEquals?: unknown };
+  /**
+   * When true and the project has >1 language, this text column stores its
+   * value as an i18n marker `{ __i18n: true, en: "...", uz: "..." }`.
+   * Only meaningful on `type: "text"` columns (switch/select stay plain).
+   */
+  i18n?: boolean;
 }
 
 export interface NestedRowsFieldConfig {
@@ -137,9 +148,20 @@ interface ColumnFieldProps {
   column: StaticColumn;
   onChange: (key: string, value: unknown) => void;
   suggestions?: string[];
+  /** Active language for i18n text columns (passed from NestedRowsField). */
+  activeLang?: string;
+  /** Default language for i18n read/write (passed from NestedRowsField). */
+  defaultLang?: string;
 }
 
-function ColumnField({ spec, column, onChange, suggestions = [] }: ColumnFieldProps) {
+function ColumnField({
+  spec,
+  column,
+  onChange,
+  suggestions = [],
+  activeLang = "en",
+  defaultLang = "en",
+}: ColumnFieldProps) {
   if (!isColumnFieldVisible(column, spec)) return null;
 
   const rawValue = column[spec.key];
@@ -185,7 +207,19 @@ function ColumnField({ spec, column, onChange, suggestions = [] }: ColumnFieldPr
   }
 
   // default: text
-  const strValue = typeof rawValue === "string" ? rawValue : "";
+  // When spec.i18n is true, resolve and write via i18n marker helpers.
+  const strValue = spec.i18n
+    ? getLangValue(rawValue, activeLang, defaultLang)
+    : (typeof rawValue === "string" ? rawValue : "");
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (spec.i18n) {
+      onChange(spec.key, setLangValue(rawValue, activeLang, e.target.value, defaultLang));
+    } else {
+      onChange(spec.key, e.target.value);
+    }
+  };
+
   return (
     <div className="grid gap-1">
       {spec.label ? (
@@ -197,7 +231,7 @@ function ColumnField({ spec, column, onChange, suggestions = [] }: ColumnFieldPr
         value={strValue}
         suggestions={suggestions}
         className="h-8 border-white/10 bg-zinc-950/60 text-xs"
-        onChange={(e) => onChange(spec.key, e.target.value)}
+        onChange={handleTextChange}
       />
     </div>
   );
@@ -217,6 +251,8 @@ interface ColumnCardProps {
   allowDynamic: boolean;
   onSwitchType: (toDynamic: boolean) => void;
   suggestions?: string[];
+  activeLang?: string;
+  defaultLang?: string;
 }
 
 function ColumnCard({
@@ -229,6 +265,8 @@ function ColumnCard({
   allowDynamic,
   onSwitchType,
   suggestions = [],
+  activeLang = "en",
+  defaultLang = "en",
 }: ColumnCardProps) {
   const dynamic = isDynamicColumn(column);
 
@@ -312,6 +350,8 @@ function ColumnCard({
             column={column as StaticColumn}
             onChange={onFieldChange}
             suggestions={suggestions}
+            activeLang={activeLang}
+            defaultLang={defaultLang}
           />
         ))
       )}
@@ -336,6 +376,8 @@ interface RowCardProps {
   onSwitchColumnType: (colIdx: number, toDynamic: boolean) => void;
   onRemoveRow: () => void;
   suggestions?: string[];
+  activeLang?: string;
+  defaultLang?: string;
 }
 
 function RowCard({
@@ -351,6 +393,8 @@ function RowCard({
   onSwitchColumnType,
   onRemoveRow,
   suggestions = [],
+  activeLang = "en",
+  defaultLang = "en",
 }: RowCardProps) {
   const maxColumns = field.maxColumns ?? 8;
   const canAddColumn = row.columns.length < maxColumns;
@@ -387,6 +431,8 @@ function RowCard({
               allowDynamic={allowDynamic}
               onSwitchType={(toDynamic) => onSwitchColumnType(colIdx, toDynamic)}
               suggestions={suggestions}
+              activeLang={activeLang}
+              defaultLang={defaultLang}
             />
           ))}
         </div>
@@ -467,9 +513,21 @@ export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const nodes = useFlowStore((s) => s.nodes);
   const edges = useFlowStore((s) => s.edges);
+  const languages = useFlowStore((s) => s.languages);
+  const defaultLanguage = useFlowStore((s) => s.defaultLanguage);
   const availableStateKeys = useMemo(
     () => getAvailableStateKeys(nodes, edges, nodeId),
     [nodes, edges, nodeId]
+  );
+
+  // Language tab strip — shown at the TOP of the grid when project has >1 language
+  // AND the field has at least one column spec with i18n: true.
+  const hasI18nColumns = field.columnFields.some((col) => col.i18n === true);
+  const showLangStrip = languages.length > 1 && hasI18nColumns;
+
+  // Active language selector for the whole button grid (a single strip, NOT per-cell tabs).
+  const [activeLang, setActiveLang] = useState<string>(
+    defaultLanguage || languages[0] || "en"
   );
 
   // Dynamic columns are opt-in via manifest only. Default OFF — a plain
@@ -602,6 +660,27 @@ export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
         </div>
       ) : null}
 
+      {/* Language tab strip — compact single selector for the whole button grid */}
+      {showLangStrip ? (
+        <div className="flex flex-wrap gap-1 pb-0.5">
+          {[defaultLanguage, ...languages.filter((l) => l !== defaultLanguage)].map((lang) => (
+            <button
+              key={lang}
+              type="button"
+              onClick={() => setActiveLang(lang)}
+              className={cn(
+                "rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider transition-colors",
+                activeLang === lang
+                  ? "bg-primary text-primary-foreground"
+                  : "border border-border text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {LANG_LABELS[lang] || lang.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       {/* Rows — flat, yagona yengil konteyner, qatorlar orasida ingichka ajratuvchi */}
       {rows.length > 0 ? (
         <div className="rounded-lg border border-white/[0.07] bg-white/[0.02]">
@@ -626,6 +705,8 @@ export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
                 }
                 onRemoveRow={() => handleRemoveRow(rowIdx)}
                 suggestions={availableStateKeys}
+                activeLang={activeLang}
+                defaultLang={defaultLanguage}
               />
               {rowIdx < rows.length - 1 ? (
                 <div

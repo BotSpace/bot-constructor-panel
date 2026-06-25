@@ -249,6 +249,8 @@ export interface NodeFieldManifest {
     placeholder?: string;
     options?: NodeFieldOptionManifest[];
     visibleWhen?: NodeVisibilityRule;
+    /** When true and project has >1 language, this text column stores i18n markers. */
+    i18n?: boolean;
   }[];
 }
 

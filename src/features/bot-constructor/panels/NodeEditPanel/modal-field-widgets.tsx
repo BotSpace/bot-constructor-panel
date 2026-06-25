@@ -538,6 +538,10 @@ export function ModalFieldWidget({ nodeId, data, field, valueOverride, onPatch }
   }
 
   if (field.type === "textarea") {
+    // When i18n: true, delegate to LocalizedField which adds language-tab strip.
+    if (field.i18n) {
+      return <LocalizedField nodeId={nodeId} data={data} field={field} />;
+    }
     return (
       <FieldShell label={field.label} helpText={field.helpText}>
         <HighlightedTextarea
@@ -587,6 +591,11 @@ export function ModalFieldWidget({ nodeId, data, field, valueOverride, onPatch }
         />
       </FieldShell>
     );
+  }
+
+  // text fields with i18n: true — delegate to LocalizedField for language tabs.
+  if (field.i18n) {
+    return <LocalizedField nodeId={nodeId} data={data} field={field} />;
   }
 
   return (
