@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HighlightedInput } from "@/features/bot-constructor/components/HighlightedInput";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -18,7 +19,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useFlowStore } from "@/features/bot-constructor/store";
+import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 import { cn } from "@/lib/utils";
+import { useMemo } from "react";
 import { ChevronDown, Database, Plus, Type, X } from "lucide-react";
 import {
   DynamicButtonForm,
@@ -133,9 +136,10 @@ interface ColumnFieldProps {
   spec: NestedColumnFieldSpec;
   column: StaticColumn;
   onChange: (key: string, value: unknown) => void;
+  suggestions?: string[];
 }
 
-function ColumnField({ spec, column, onChange }: ColumnFieldProps) {
+function ColumnField({ spec, column, onChange, suggestions = [] }: ColumnFieldProps) {
   if (!isColumnFieldVisible(column, spec)) return null;
 
   const rawValue = column[spec.key];
@@ -187,10 +191,11 @@ function ColumnField({ spec, column, onChange }: ColumnFieldProps) {
       {spec.label ? (
         <Label className="text-[11px] text-white/50">{spec.label}</Label>
       ) : null}
-      <Input
+      <HighlightedInput
         type="text"
         placeholder={spec.placeholder}
         value={strValue}
+        suggestions={suggestions}
         className="h-8 border-white/10 bg-zinc-950/60 text-xs"
         onChange={(e) => onChange(spec.key, e.target.value)}
       />
@@ -211,6 +216,7 @@ interface ColumnCardProps {
   canRemove: boolean;
   allowDynamic: boolean;
   onSwitchType: (toDynamic: boolean) => void;
+  suggestions?: string[];
 }
 
 function ColumnCard({
@@ -222,6 +228,7 @@ function ColumnCard({
   canRemove,
   allowDynamic,
   onSwitchType,
+  suggestions = [],
 }: ColumnCardProps) {
   const dynamic = isDynamicColumn(column);
 
@@ -306,6 +313,7 @@ function ColumnCard({
             spec={spec}
             column={column as StaticColumn}
             onChange={onFieldChange}
+            suggestions={suggestions}
           />
         ))
       )}
@@ -329,6 +337,7 @@ interface RowCardProps {
   onRemoveColumn: (colIdx: number) => void;
   onSwitchColumnType: (colIdx: number, toDynamic: boolean) => void;
   onRemoveRow: () => void;
+  suggestions?: string[];
 }
 
 function RowCard({
@@ -343,6 +352,7 @@ function RowCard({
   onRemoveColumn,
   onSwitchColumnType,
   onRemoveRow,
+  suggestions = [],
 }: RowCardProps) {
   const maxColumns = field.maxColumns ?? 8;
   const canAddColumn = row.columns.length < maxColumns;
@@ -378,6 +388,7 @@ function RowCard({
               canRemove={row.columns.length > 1}
               allowDynamic={allowDynamic}
               onSwitchType={(toDynamic) => onSwitchColumnType(colIdx, toDynamic)}
+              suggestions={suggestions}
             />
           ))}
         </div>
@@ -456,6 +467,12 @@ function RowCard({
 
 export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+  const nodes = useFlowStore((s) => s.nodes);
+  const edges = useFlowStore((s) => s.edges);
+  const availableStateKeys = useMemo(
+    () => getAvailableStateKeys(nodes, edges, nodeId),
+    [nodes, edges, nodeId]
+  );
 
   // Dynamic columns are opt-in via manifest only. Default OFF — a plain
   // nested-rows shows just a single "add column" button (no Static/Dynamic
@@ -610,6 +627,7 @@ export function NestedRowsField({ nodeId, data, field }: NestedRowsFieldProps) {
                 handleSwitchColumnType(rowIdx, colIdx, toDynamic)
               }
               onRemoveRow={() => handleRemoveRow(rowIdx)}
+              suggestions={availableStateKeys}
             />
           ))}
         </div>
