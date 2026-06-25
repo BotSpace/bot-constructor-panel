@@ -6,6 +6,7 @@ import { useCollectionStore } from "@/features/collections/store/collection-list
 import { useReactQueryAction } from "@/services/react-query";
 import { CollectionDetail } from "@/types/http/collection";
 import { Input } from "@/components/ui/input";
+import { HighlightedInput } from "@/features/bot-constructor/components/HighlightedInput";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -234,9 +235,10 @@ export function DynamicButtonForm({ value, onChange }: DynamicButtonFormProps) {
           <Label className="text-[10px] text-white/40">
             {t("buttonTextTemplate")}
           </Label>
-          <Input
+          <HighlightedInput
             value={value.text}
             placeholder={`{{name}} — {{price}}`}
+            suggestions={fieldNames}
             className="h-7 border-white/10 bg-zinc-950/60 text-[11px]"
             onChange={(e) => set({ text: e.target.value })}
           />
