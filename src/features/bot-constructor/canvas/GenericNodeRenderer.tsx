@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNodeCollapsed } from "@/features/bot-constructor/hooks/useNodeCollapsed";
+import { getNodeKeyboard } from "@/features/bot-constructor/lib/keyboard-compat";
 import { ActionPanel } from "@/features/bot-constructor/nodes/shared/ActionPanel";
 import { NodeHeader } from "@/features/bot-constructor/nodes/shared/NodeHeader";
 import { HandlersList } from "@/features/bot-constructor/nodes/shared/HandlerBuilder/HandlersList";
@@ -193,17 +194,16 @@ export function GenericNodeRenderer({
   ]);
   let handlerButtonCount = 0;
   if (hasHandlersList) {
-    const kbRaw = (data as Record<string, unknown>).keyboard;
-    if (kbRaw != null && typeof kbRaw === "object") {
-      const kb = kbRaw as { inline?: unknown[][]; reply?: unknown[][]; active?: string };
-      const rows = (kb.active === "reply" ? kb.reply : kb.inline) ?? [];
-      const flat = (rows as unknown[][]).flat();
-      handlerButtonCount = flat.filter((b: unknown) => {
-        if (b == null || typeof b !== "object") return false;
-        const btn = b as { type?: string; handler?: unknown };
-        return btn.handler !== false && !NON_ROUTABLE_KB.has(btn.type ?? "");
-      }).length;
-    }
+    // Use the same normalizer HandlersList uses so BOTH keyboard formats
+    // (new {rows,keyboard_kind} and legacy {keyboard:{inline,reply}}) are
+    // counted — otherwise the count is 0 and the node never grows.
+    const normalized = getNodeKeyboard(data);
+    const flat = (normalized[normalized.active] as unknown[][]).flat();
+    handlerButtonCount = flat.filter((b: unknown) => {
+      if (b == null || typeof b !== "object") return false;
+      const btn = b as { type?: string; handler?: unknown };
+      return btn.handler !== false && !NON_ROUTABLE_KB.has(btn.type ?? "");
+    }).length;
   }
 
   // Combined min-height: SwitchNode wins when grown; HandlersList grows for
