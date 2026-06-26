@@ -6305,7 +6305,7 @@
       "width": 200
     },
     "sidebar": {
-      "enabled": true,
+      "enabled": false,
       "groupId": "triggers",
       "sortOrder": 37,
       "elementType": "payment_status"

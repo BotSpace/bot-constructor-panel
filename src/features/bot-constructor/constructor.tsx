@@ -47,6 +47,7 @@ import { useDebugErrorsStore } from "@/features/bot-constructor/store/debug-erro
 import { useQuery } from "@tanstack/react-query";
 import { getProjectModuleManifests } from "@/services/requests/module";
 import { clearModuleManifests } from "@/features/bot-constructor/manifest/manifestStore";
+import { useFlowValidation } from "@/features/bot-constructor/hooks/useFlowValidation";
 
 export default function Constructor() {
   const { id }: { id: string } = useParams();
@@ -309,6 +310,10 @@ export default function Constructor() {
     mousePosition: mousePosition,
     onOpenPalette: () => { },
   });
+
+  // Client-side structural validation: surfaces warnings in the ErrorsPanel
+  // (e.g. PaymentNode with unconnected paid/failed handles).
+  useFlowValidation(id);
 
   // Tab yopilganda / fonga o'tganda saqlanmagan o'zgarishlarni best-effort yuboramiz.
   // visibilitychange(hidden) — sahifa hali tirik, oddiy so'rov yetib boradi;
