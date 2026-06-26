@@ -104,7 +104,7 @@ export const NodeHeader = ({
   return (
     <div
       onClick={onToggleCollapse}
-      className="relative flex flex-col items-center justify-center gap-3 px-4 py-6 cursor-pointer select-none hover:bg-muted/40 transition-colors rounded-t-[inherit]"
+      className="relative z-[1] flex flex-col items-center justify-center gap-3 px-4 py-6 cursor-pointer select-none rounded-t-[inherit]"
       role="button"
     >
       {/* Handle anchored to this header container so React Flow measures

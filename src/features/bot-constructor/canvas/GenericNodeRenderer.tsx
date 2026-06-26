@@ -251,7 +251,7 @@ export function GenericNodeRenderer({
   return (
     <Card
       className={cn(
-        "shadow-lg transition-shadow",
+        "group/card relative shadow-lg transition-shadow",
         selected && "ring-2 ring-primary",
         isTrigger && "rounded-tl-[2.5rem] rounded-bl-[2.5rem] rounded-tr-xl rounded-br-xl",
         // When the card is grown (for many switch cases OR many button
@@ -263,6 +263,12 @@ export function GenericNodeRenderer({
       data-debug-status={debugStatus || undefined}
       style={sizeStyle}
     >
+      {/* Hover tint covering the WHOLE card (incl. grown empty space),
+          instead of only the centered header. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-[inherit] bg-muted/40 opacity-0 transition-opacity duration-150 group-hover/card:opacity-100"
+      />
       {cardHandles.map((handle, index) =>
         renderHandleFromManifest(handle, id, `${manifest.type}-${index}`, manifest.accessoryPorts)
       )}
@@ -282,7 +288,7 @@ export function GenericNodeRenderer({
       {!isCollapsed ? (
         <>
           {manifest.content?.length ? (
-            <CardContent className={getContentClassName(manifest.content[0].type)}>
+            <CardContent className={cn("relative z-[1]", getContentClassName(manifest.content[0].type))}>
               {manifest.content
                 .filter((field) => isFieldVisible(data as Record<string, unknown>, field))
                 .map((field, index) => (
@@ -310,7 +316,7 @@ export function GenericNodeRenderer({
           ) : null}
 
           {manifest.footer?.some((footer) => footer.type === "actionPanel") ? (
-            <CardFooter className="flex flex-col gap-2">
+            <CardFooter className="relative z-[1] flex flex-col gap-2">
               {manifest.footer.map((footer, index) =>
                 footer.type === "actionPanel" ? (
                   <ActionPanel
