@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Position, useUpdateNodeInternals } from "reactflow";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useIsInNodePanel } from "@/features/bot-constructor/hooks/NodePanelContext";
@@ -21,7 +21,6 @@ interface HandlersListProps {
 export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
   const inPanel = useIsInNodePanel();
   const nodes = useFlowStore((state) => state.nodes);
-  const edges = useFlowStore((state) => state.edges);
   const defaultLanguage = useFlowStore((state) => state.defaultLanguage);
   const languages = useFlowStore((state) => state.languages);
   const updateNodeInternals = useUpdateNodeInternals();
@@ -68,64 +67,74 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
     if (sourceNodeId) updateNodeInternals(sourceNodeId);
   }, [sourceNodeId, handleSignature, updateNodeInternals]);
 
-  /**
-   * Handle uchun pozitsiyani aniqlash:
-   * Agar ulangan target node source node dan chap tarafda bo'lsa → Left
-   * Aks holda → Right (default)
-   */
-  const getHandlePosition = useCallback(
-    (handleId: string): Position => {
-      if (!sourceNode) return Position.Right;
-
-      // Shu handle dan chiqqan edge ni topamiz
-      const edge = edges.find(
-        (e) => e.source === sourceNodeId && e.sourceHandle === handleId
-      );
-      if (!edge) return Position.Right;
-
-      // Target node ni topamiz
-      const targetNode = nodes.find((n) => n.id === edge.target);
-      if (!targetNode) return Position.Right;
-
-      const sourceX = sourceNode.position.x;
-      const targetX = targetNode.position.x;
-
-      // Agar target node chap tarafda bo'lsa, handle ham chap tarafga o'tadi
-      return targetX < sourceX ? Position.Left : Position.Right;
-    },
-    [sourceNode, edges, nodes, sourceNodeId]
-  );
+  // Faqat unikal (birinchi marta uchragan) tugmalar — tashqi handle uchun
+  const uniqueButtons = routableButtons.filter((b) => b.isFirstOccurrence);
+  const totalHandles = uniqueButtons.length;
 
   return (
     <div className="space-y-2 w-full">
       <div className="space-y-2">
         {routableButtons.length > 0 && (
           <div className="flex flex-col gap-2 mb-3 pb-3 border-b">
-            {routableButtons.map(({ button, canonicalLabel, displayLabel, isFirstOccurrence }: { button: any; canonicalLabel: string; displayLabel: string; isFirstOccurrence: boolean }) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-              const handleId = `target-handler-${sourceNodeId}-${canonicalLabel}`;
-              const pos = getHandlePosition(handleId);
-              return (
-                <Button
-                  key={button.id}
-                  variant="outline"
-                  className="w-full text-xs px-2 py-1 relative overflow-visible"
-                >
-                  <span className="truncate">{displayLabel}</span>
-                  {!inPanel && isFirstOccurrence && (
-                    <PillHandle
-                      id={handleId}
-                      type="source"
-                      position={pos}
-                      tone="primary"
-                      title={displayLabel}
-                    />
-                  )}
-                </Button>
-              );
-            })}
+            {routableButtons.map(({ button, displayLabel }: { button: any; canonicalLabel: string; displayLabel: string; isFirstOccurrence: boolean }) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
+              <Button
+                key={button.id}
+                variant="outline"
+                className="w-full text-xs px-2 py-1"
+              >
+                <span className="truncate">{displayLabel}</span>
+              </Button>
+            ))}
           </div>
         )}
       </div>
+
+      {/* Tashqi labeled source handle'lar — SwitchNode uslubida.
+          position:absolute bo'lgani uchun eng yaqin positioned ancestor'ga
+          (React Flow node wrapper) nisbatan joylashadi: right:0 = node o'ng
+          chetida, top:X% = node balandligining X foizi. */}
+      {!inPanel && sourceNodeId && uniqueButtons.map(({ canonicalLabel, displayLabel }, index) => {
+        const topPct = ((index + 1) / (totalHandles + 1)) * 100;
+        const handleId = `target-handler-${sourceNodeId}-${canonicalLabel}`;
+        return (
+          <div
+            key={canonicalLabel}
+            className="group/bh"
+            style={{
+              position: "absolute",
+              right: 0,
+              top: `${topPct}%`,
+              transform: "translateY(-50%)",
+            }}
+          >
+            <PillHandle
+              id={handleId}
+              type="source"
+              position={Position.Right}
+              tone="neutral"
+              title={displayLabel}
+              style={{ top: 0, transform: "translate(calc(100% + 8px), -50%)" }}
+            />
+            <span
+              style={{
+                position: "absolute",
+                top: "50%",
+                transform: "translateY(-50%)",
+                transformOrigin: "-24px center",
+                left: "calc(100% + 40px)",
+                whiteSpace: "nowrap",
+                fontSize: 9,
+                lineHeight: "12px",
+                pointerEvents: "none",
+                userSelect: "none",
+              }}
+              className="text-muted-foreground font-medium transition-transform duration-150 group-hover/bh:scale-125"
+            >
+              {displayLabel}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
