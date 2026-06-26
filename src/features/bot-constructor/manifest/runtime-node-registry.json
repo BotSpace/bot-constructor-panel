@@ -7214,5 +7214,45 @@
       "cases": [],
       "default": false
     }
+  },
+  {
+    "type": "SetLanguageNode",
+    "status": "runtime",
+    "category": "customLogic",
+    "titleKey": "constructor.customLogic.setLanguage.name",
+    "descriptionKey": "constructor.customLogic.setLanguage.description",
+    "titleFallback": "Tilni o'rnatish",
+    "descriptionFallback": "Foydalanuvchining tilini o'rnatadi va loyiha til ro'yxatini ochib beradi.",
+    "iconName": "globe",
+    "colorToken": "custom-yellow",
+    "size": {
+      "width": 200
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "customLogic",
+      "sortOrder": 60,
+      "elementType": "set-language"
+    },
+    "handles": [
+      {
+        "preset": "target-default"
+      },
+      {
+        "preset": "source-default"
+      }
+    ],
+    "content": [
+      {
+        "type": "text",
+        "key": "language",
+        "label": "Til (kodi)",
+        "placeholder": "uz",
+        "helpText": "Foydalanuvchi uchun o'rnatiladigan til kodini kiriting (masalan: uz, ru, en) yoki {{callback_data}} kabi o'zgaruvchi. Bo'sh qoldirilsa, til o'rnatilmaydi — lekin til ro'yxati kontekstga yuklanadi.\n\nEngine chiqaruvchi o'zgaruvchilar:\n• {{public_lang}} — o'rnatilgan til kodi\n• {{languages}} — barcha tillar ro'yxati (kodlar massivi)\n• {{language_options}} — [{code, name, flag}] formatida tillar (menyu qurish uchun)\n• {{current_lang}} — hozirgi faol til kodi\n\nMenyu misoli (CustomCode yoki SendText ichida):\n{{#each language_options}}{{this.flag}} {{this.name}}|set_lang_{{this.code}}\n{{/each}}"
+      }
+    ],
+    "defaults": {
+      "language": ""
+    }
   }
 ]
