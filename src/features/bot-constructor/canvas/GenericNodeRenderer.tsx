@@ -254,9 +254,11 @@ export function GenericNodeRenderer({
         "shadow-lg transition-shadow",
         selected && "ring-2 ring-primary",
         isTrigger && "rounded-tl-[2.5rem] rounded-bl-[2.5rem] rounded-tr-xl rounded-br-xl",
-        // When the card is grown for many case handles, vertically center the
-        // icon/title/badge instead of pinning them to the top.
-        isGrownCard && "flex flex-col justify-center",
+        // When the card is grown (for many switch cases OR many button
+        // handles), vertically center the icon/title/badge instead of
+        // pinning them to the top.
+        (isGrownCard || (hasHandlersList && handlerButtonCount > 0)) &&
+          "flex flex-col justify-center",
       )}
       data-debug-status={debugStatus || undefined}
       style={sizeStyle}
