@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { KeyboardConfig } from "@/features/bot-constructor/panels";
 import { PillHandle } from "@/features/bot-constructor/canvas/handles/PillHandle";
 import { getNodeKeyboard } from "@/features/bot-constructor/lib/keyboard-compat";
-import { localizedToString } from "@/features/bot-constructor/fields/generic-fields/i18n-helpers";
+import { canonicalLocalized, localizedToString } from "@/features/bot-constructor/fields/generic-fields/i18n-helpers";
 
 interface HandlersListProps {
   /** Node ID to get handlers from */
@@ -22,6 +22,8 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
   const inPanel = useIsInNodePanel();
   const nodes = useFlowStore((state) => state.nodes);
   const edges = useFlowStore((state) => state.edges);
+  const defaultLanguage = useFlowStore((state) => state.defaultLanguage);
+  const languages = useFlowStore((state) => state.languages);
   const updateNodeInternals = useUpdateNodeInternals();
 
   // Source node ni topish
@@ -32,21 +34,27 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
   // Routable tugmalar ro'yxati — handle chiqaradigan (callback) tugmalar, matn bo'yicha
   // dedup qilingan (faqat birinchi takror handle oladi). Bitta joyda hisoblanadi:
   // ro'yxat ham, handle re-measure ham shundan.
+  //
+  // canonicalLabel — handle ID uchun ishlatiladi (engine bilan mos, deterministik).
+  // displayLabel  — foydalanuvchiga ko'rsatiladigan matn (har qanday til).
   const routableButtons = useMemo(() => {
     const NON_ROUTABLE = ["url", "web_app", "login_url", "switch_inline_query", "switch_inline_query_current_chat"];
-    const seenText = new Set<string>();
+    const seenCanonical = new Set<string>();
     const normalized = getNodeKeyboard(sourceNode?.data ?? { keyboard });
     return (normalized[normalized.active] as any[][]) // eslint-disable-line @typescript-eslint/no-explicit-any
       .flat()
       .filter((b: any) => b?.handler !== false && !NON_ROUTABLE.includes(b?.type)) // eslint-disable-line @typescript-eslint/no-explicit-any
       .map((button: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-        const label: string =
-          localizedToString(button.text) || (button.collectionData?.collection ? button.collectionData.collection : "");
-        const isFirstOccurrence = !seenText.has(label);
-        if (isFirstOccurrence) seenText.add(label);
-        return { button, label, isFirstOccurrence };
+        const fallback = button.collectionData?.collection ?? "";
+        const canonicalLabel: string =
+          canonicalLocalized(button.text, defaultLanguage, languages) || fallback;
+        const displayLabel: string =
+          localizedToString(button.text) || fallback;
+        const isFirstOccurrence = !seenCanonical.has(canonicalLabel);
+        if (isFirstOccurrence) seenCanonical.add(canonicalLabel);
+        return { button, canonicalLabel, displayLabel, isFirstOccurrence };
       });
-  }, [sourceNode?.data, keyboard]);
+  }, [sourceNode?.data, keyboard, defaultLanguage, languages]);
 
   // React Flow dinamik handle'larni avtomatik qayta o'lchamaydi. Tugma qo'shil/o'chsa
   // yoki nomi o'zgarsa, mavjud handle ID'lar to'plami o'zgaradi — shu paytda
@@ -54,7 +62,7 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
   // qo'shilgan tugmaning handle pozitsiyasi stale qolib, undan chiqqan edge ko'rinmaydi.
   const handleSignature = routableButtons
     .filter((b) => b.isFirstOccurrence)
-    .map((b) => b.label)
+    .map((b) => b.canonicalLabel)
     .join("|");
   useEffect(() => {
     if (sourceNodeId) updateNodeInternals(sourceNodeId);
@@ -93,8 +101,8 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
       <div className="space-y-2">
         {routableButtons.length > 0 && (
           <div className="flex flex-col gap-2 mb-3 pb-3 border-b">
-            {routableButtons.map(({ button, label, isFirstOccurrence }: { button: any; label: string; isFirstOccurrence: boolean }) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-              const handleId = `target-handler-${sourceNodeId}-${label}`;
+            {routableButtons.map(({ button, canonicalLabel, displayLabel, isFirstOccurrence }: { button: any; canonicalLabel: string; displayLabel: string; isFirstOccurrence: boolean }) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+              const handleId = `target-handler-${sourceNodeId}-${canonicalLabel}`;
               const pos = getHandlePosition(handleId);
               return (
                 <Button
@@ -102,14 +110,14 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
                   variant="outline"
                   className="w-full text-xs px-2 py-1 relative overflow-visible"
                 >
-                  <span className="truncate">{label}</span>
+                  <span className="truncate">{displayLabel}</span>
                   {!inPanel && isFirstOccurrence && (
                     <PillHandle
                       id={handleId}
                       type="source"
                       position={pos}
                       tone="primary"
-                      title={label}
+                      title={displayLabel}
                     />
                   )}
                 </Button>
