@@ -170,19 +170,49 @@ export function GenericNodeRenderer({
     manifest.descriptionKey,
     manifest.descriptionFallback
   );
-  // Nodes with dynamic case outputs (Switch — "switch-case-sources" handles) grow
-  // taller as cases are added, so the per-case handles spread vertically (topPct)
-  // instead of overlapping on a fixed-height card. React Flow re-measures the DOM
-  // height, so edges/handles reroute automatically.
+  // ── SwitchNode height growth ─────────────────────────────────────────────
+  // Nodes with dynamic case outputs grow taller as cases are added so the
+  // per-case handles spread vertically (topPct) instead of overlapping.
+  // React Flow re-measures the DOM height → edges/handles reroute automatically.
   const hasDynamicCases = manifest.handles?.some((h) => h.preset === "switch-case-sources");
   const sw = data as { cases?: unknown[]; default?: boolean };
   const caseHandleCount = hasDynamicCases
     ? (Array.isArray(sw.cases) ? sw.cases.length : 0) + (sw.default ? 1 : 0)
     : 0;
   const isGrownCard = caseHandleCount > 3;
+
+  // ── HandlersList (inline-button) height growth ────────────────────────────
+  // HandlersList nodes spread button handles using (N+2) vertical slots.
+  // Each slot needs ~34 px (same constant as SwitchNode) so handles never
+  // overlap. Compute routable button count from keyboard data directly here;
+  // HandlersList deduplicates by label, but raw count is a safe over-estimate
+  // for height purposes (node grows slightly more than strictly needed — fine).
+  const hasHandlersList = manifest.footer?.some((f) => f.type === "handlersList") ?? false;
+  const NON_ROUTABLE_KB = new Set([
+    "url", "web_app", "login_url", "switch_inline_query", "switch_inline_query_current_chat",
+  ]);
+  let handlerButtonCount = 0;
+  if (hasHandlersList) {
+    const kbRaw = (data as Record<string, unknown>).keyboard;
+    if (kbRaw != null && typeof kbRaw === "object") {
+      const kb = kbRaw as { inline?: unknown[][]; reply?: unknown[][]; active?: string };
+      const rows = (kb.active === "reply" ? kb.reply : kb.inline) ?? [];
+      const flat = (rows as unknown[][]).flat();
+      handlerButtonCount = flat.filter((b: unknown) => {
+        if (b == null || typeof b !== "object") return false;
+        const btn = b as { type?: string; handler?: unknown };
+        return btn.handler !== false && !NON_ROUTABLE_KB.has(btn.type ?? "");
+      }).length;
+    }
+  }
+
+  // Combined min-height: SwitchNode wins when grown; HandlersList grows for
+  // button handles; otherwise the manifest value is the floor.
   const dynamicMinHeight = isGrownCard
     ? Math.max(manifest.size.minHeight ?? 0, (caseHandleCount + 1) * 34)
-    : manifest.size.minHeight;
+    : hasHandlersList && handlerButtonCount > 0
+      ? Math.max(manifest.size.minHeight ?? 0, (handlerButtonCount + 2) * 34)
+      : manifest.size.minHeight;
 
   const sizeStyle = {
     width: manifest.size.width,
@@ -203,13 +233,6 @@ export function GenericNodeRenderer({
       />
     );
   }
-
-  // Nodes that render handler-button rows (handlersList footer) can have
-  // their source-handler overlap with the button handles on the right edge.
-  // Fix: when hasHandlersList, HandlersList takes full ownership of the
-  // source-handler position (renders it below all button handles).
-  // The NodeHeader handleSlot is unused in that case.
-  const hasHandlersList = manifest.footer?.some((f) => f.type === "handlersList") ?? false;
 
   // All other handles rendered at the Card level as usual.
   // When hasHandlersList, source-default is excluded (HandlersList renders it).
