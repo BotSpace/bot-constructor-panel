@@ -67,6 +67,41 @@ export function localizedToString(raw: unknown, preferLang?: string): string {
   return "";
 }
 
+/**
+ * Deterministic canonical string for an i18n value — used to build stable
+ * handle IDs (`target-handler-<nodeId>-<canonical>`) that must match the
+ * engine's routing logic regardless of JS object key order.
+ *
+ * Rules (must mirror the Go engine):
+ *   1. plain string  → that string unchanged.
+ *   2. i18n marker   → marker[defaultLang] if non-empty;
+ *                      else first non-empty value from `languages` in order;
+ *                      else "".
+ *   3. anything else → "".
+ *
+ * Compatibility: canonicalLocalized("Salom", "en", ["en"]) === "Salom"
+ *   so legacy plain-string handle IDs are preserved.
+ */
+export function canonicalLocalized(
+  value: unknown,
+  defaultLang: string,
+  languages: string[]
+): string {
+  if (typeof value === "string") return value;
+  if (isI18nValue(value)) {
+    const m = value as Record<string, unknown>;
+    // a. prefer defaultLanguage
+    const defVal = m[defaultLang];
+    if (typeof defVal === "string" && defVal) return defVal;
+    // b. iterate languages in declaration order
+    for (const lang of languages) {
+      const v = m[lang];
+      if (typeof v === "string" && v) return v;
+    }
+  }
+  return "";
+}
+
 export const LANG_LABELS: Record<string, string> = {
   en: "EN",
   ru: "RU",
