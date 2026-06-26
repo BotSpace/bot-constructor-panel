@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ConstructorData } from "@/features/bot-constructor/lib";
+import { localizedToString } from "@/features/bot-constructor/fields/generic-fields/i18n-helpers";
 import { MessageTriggerValueTypes } from "@/features/bot-constructor/lib/messages";
 import { ButtonGenerator } from "@/features/bot-constructor/panels/ButtonGenerator/ButtonGenerator";
 import { Combobox } from "@/components/ui/combobox";
@@ -153,7 +154,7 @@ function CallbackQueryTriggerWidget({ nodeId, data }: WidgetProps) {
       if (button.type === "callback" && button.value && !button.collectionData) {
         return [{
           id: button.id,
-          text: button.text ?? "",
+          text: localizedToString(button.text),
           value: button.value,
           isCollection: false,
         }];
@@ -163,7 +164,7 @@ function CallbackQueryTriggerWidget({ nodeId, data }: WidgetProps) {
         const { collection, text } = button.collectionData;
         return [{
           id: button.id,
-          text: button.text?.replace("📦 ", "") ?? collection ?? "",
+          text: localizedToString(button.text).replace("📦 ", "") || collection || "",
           value: `collection:${collection}:${text}`,
           isCollection: true,
           collectionName: collection,
@@ -212,7 +213,7 @@ function CallbackQueryTriggerWidget({ nodeId, data }: WidgetProps) {
                   .filter((button: any) => !button.isCollection)
                   .map((button: any) => (
                     <SelectItem key={button.id} value={button.value}>
-                      {button.text}
+                      {localizedToString(button.text)}
                     </SelectItem>
                   ))}
               </SelectContent>
@@ -323,7 +324,7 @@ function ReplyButtonTriggerWidget({ nodeId, data }: WidgetProps) {
                       }
                     }}
                   />
-                  <Label>{button.text}</Label>
+                  <Label>{localizedToString(button.text)}</Label>
                 </div>
               ))}
             </div>

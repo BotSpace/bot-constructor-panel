@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { KeyboardConfig } from "@/features/bot-constructor/panels";
 import { PillHandle } from "@/features/bot-constructor/canvas/handles/PillHandle";
 import { getNodeKeyboard } from "@/features/bot-constructor/lib/keyboard-compat";
+import { localizedToString } from "@/features/bot-constructor/fields/generic-fields/i18n-helpers";
 
 interface HandlersListProps {
   /** Node ID to get handlers from */
@@ -40,7 +41,7 @@ export function HandlersList({ sourceNodeId, keyboard }: HandlersListProps) {
       .filter((b: any) => b?.handler !== false && !NON_ROUTABLE.includes(b?.type)) // eslint-disable-line @typescript-eslint/no-explicit-any
       .map((button: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         const label: string =
-          button.text || (button.collectionData?.collection ? button.collectionData.collection : "");
+          localizedToString(button.text) || (button.collectionData?.collection ? button.collectionData.collection : "");
         const isFirstOccurrence = !seenText.has(label);
         if (isFirstOccurrence) seenText.add(label);
         return { button, label, isFirstOccurrence };

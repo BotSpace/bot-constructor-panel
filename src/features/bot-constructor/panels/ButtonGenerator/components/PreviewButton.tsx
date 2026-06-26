@@ -4,6 +4,7 @@ import { Trash2, Database, Edit2, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ButtonConfig } from "@/features/bot-constructor/panels/ButtonGenerator/types";
 import { getIconForButton } from "@/features/bot-constructor/panels/ButtonGenerator/utils";
+import { localizedToString } from "@/features/bot-constructor/fields/generic-fields/i18n-helpers";
 import { Badge } from "@/components/ui/badge";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -69,7 +70,7 @@ export const PreviewButton = ({
         )}
 
         {getIconForButton(button)}
-        <span className="truncate">{button.text}</span>
+        <span className="truncate">{localizedToString(button.text)}</span>
 
         {isCollectionButton && button.collectionData?.layout && (
           <Badge

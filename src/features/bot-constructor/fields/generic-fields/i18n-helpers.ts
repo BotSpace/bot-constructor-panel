@@ -49,6 +49,24 @@ export function setLangValue(
   return { ...base, [lang]: nextStr };
 }
 
+/**
+ * Coerce a possibly-localized value to a plain display string. Use at ANY
+ * read-only render site (canvas previews, button labels, selects) where the
+ * value may be an i18n marker object — rendering the object directly crashes
+ * React (#31). Prefers `preferLang`, then any non-empty language value.
+ */
+export function localizedToString(raw: unknown, preferLang?: string): string {
+  if (typeof raw === "string") return raw;
+  if (isI18nValue(raw)) {
+    const m = raw as Record<string, unknown>;
+    if (preferLang && typeof m[preferLang] === "string") return m[preferLang] as string;
+    for (const [k, v] of Object.entries(m)) {
+      if (k !== "__i18n" && typeof v === "string" && v) return v;
+    }
+  }
+  return "";
+}
+
 export const LANG_LABELS: Record<string, string> = {
   en: "EN",
   ru: "RU",

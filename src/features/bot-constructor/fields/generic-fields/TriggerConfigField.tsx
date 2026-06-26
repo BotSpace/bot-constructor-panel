@@ -16,6 +16,7 @@ import { FilterSelector } from "@/features/bot-constructor/nodes/bespoke/Message
 import { ValueInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/ParameterInput/ValueInput";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { getNodeKeyboard } from "@/features/bot-constructor/lib/keyboard-compat";
+import { localizedToString } from "@/features/bot-constructor/fields/generic-fields/i18n-helpers";
 
 // ---------------------------------------------------------------------------
 // Public interface
@@ -80,7 +81,7 @@ function CallbackQueryTriggerConfig({
         return [
           {
             id: btn.id as string,
-            text: (btn.text as string) ?? "",
+            text: localizedToString(btn.text),
             value: btn.value as string,
             isCollection: false,
           },
@@ -96,8 +97,8 @@ function CallbackQueryTriggerConfig({
           {
             id: btn.id as string,
             text:
-              ((btn.text as string) ?? "").replace("📦 ", "") ??
-              cd.collection ??
+              localizedToString(btn.text).replace("📦 ", "") ||
+              cd.collection ||
               "",
             value: `collection:${cd.collection}:${cd.text}`,
             isCollection: true,
@@ -267,7 +268,7 @@ function ReplyButtonTriggerConfig({
                       }
                     }}
                   />
-                  <Label className="cursor-pointer text-sm">{button.text}</Label>
+                  <Label className="cursor-pointer text-sm">{localizedToString(button.text)}</Label>
                 </div>
               ))}
             </div>
