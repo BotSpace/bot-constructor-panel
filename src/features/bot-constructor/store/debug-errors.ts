@@ -37,6 +37,17 @@ function normLevel(v: unknown): FlowAlertLevel {
 /** Incoming raw alert: level may be any/absent value — the store coerces it. */
 type RawAlert = Omit<FlowError, "id" | "read" | "level"> & { level?: unknown };
 
+/** Shape accepted by syncValidationWarnings — stable id is caller's responsibility. */
+export type ValidationWarning = {
+  /** Must start with "cv-" and be stable across re-runs (e.g. "cv-payment-<nodeId>-paid"). */
+  id: string;
+  project: string | number;
+  node_id?: string;
+  node_type?: string;
+  message: string;
+  ts: number;
+};
+
 interface DebugErrorsState {
   errors: FlowError[];
   /** Number of errors that arrived while the panel was closed */
@@ -46,6 +57,12 @@ interface DebugErrorsState {
   clearErrors: () => void;
   /** Seed errors from initial GET /api/debug/errors/ response */
   seedErrors: (raws: Array<RawAlert>) => void;
+  /**
+   * Replace the current set of client-side validation warnings (id prefix "cv-").
+   * Preserves read state for already-seen warnings; increments unreadCount only
+   * for genuinely new ones. Pass an empty array to clear all validation warnings.
+   */
+  syncValidationWarnings: (warnings: ValidationWarning[]) => void;
 }
 
 export const useDebugErrorsStore = create<DebugErrorsState>((set, get) => ({
@@ -78,5 +95,34 @@ export const useDebugErrorsStore = create<DebugErrorsState>((set, get) => ({
       .slice(0, MAX_ERRORS)
       .map((r) => ({ ...r, level: normLevel(r.level), id: nextId(), read: true }));
     set({ errors, unreadCount: 0 });
+  },
+
+  syncValidationWarnings(warnings) {
+    set((state) => {
+      // Index current validation warnings by their stable id.
+      const prevById = new Map<string, FlowError>(
+        state.errors.filter((e) => e.id.startsWith("cv-")).map((e) => [e.id, e])
+      );
+      // Keep non-validation errors untouched.
+      const nonValidation = state.errors.filter((e) => !e.id.startsWith("cv-"));
+
+      const next: FlowError[] = warnings.map((w) => {
+        const prev = prevById.get(w.id);
+        return {
+          ...w,
+          level: "warning" as FlowAlertLevel,
+          // Preserve read state if this exact warning was already shown.
+          read: prev?.read ?? false,
+        };
+      });
+
+      // Only count warnings that did not exist before as "unread".
+      const newlyAdded = next.filter((w) => !prevById.has(w.id)).length;
+
+      return {
+        errors: [...next, ...nonValidation].slice(0, MAX_ERRORS),
+        unreadCount: state.unreadCount + newlyAdded,
+      };
+    });
   },
 }));
