@@ -204,32 +204,22 @@ export function GenericNodeRenderer({
     );
   }
 
-  // Nodes that render handler-button rows (handlersList footer) grow the card
-  // vertically below the header.  If the main source handle stays at "top: 50%"
-  // of the card it drifts down into / on-top-of the button handles.  Fix: move
-  // the source-default handle into the NodeHeader slot so React Flow measures it
-  // against the header element (whose own top:50% is the correct midpoint).
+  // Nodes that render handler-button rows (handlersList footer) can have
+  // their source-handler overlap with the button handles on the right edge.
+  // Fix: when hasHandlersList, HandlersList takes full ownership of the
+  // source-handler position (renders it below all button handles).
+  // The NodeHeader handleSlot is unused in that case.
   const hasHandlersList = manifest.footer?.some((f) => f.type === "handlersList") ?? false;
 
-  // Handles that should be lifted into the NodeHeader slot.
-  const headerHandles = hasHandlersList
-    ? manifest.handles?.filter((h) => h.preset === "source-default") ?? []
-    : [];
-
   // All other handles rendered at the Card level as usual.
+  // When hasHandlersList, source-default is excluded (HandlersList renders it).
   const cardHandles = hasHandlersList
     ? manifest.handles?.filter((h) => h.preset !== "source-default") ?? []
     : (manifest.handles ?? []);
 
-  // Build the JSX for the header slot (null when not needed).
-  const headerHandleSlot =
-    headerHandles.length > 0 ? (
-      <>
-        {headerHandles.map((handle, index) =>
-          renderHandleFromManifest(handle, id, `${manifest.type}-header-${index}`, manifest.accessoryPorts)
-        )}
-      </>
-    ) : undefined;
+  // NodeHeader handle slot is always empty — HandlersList manages source-handler
+  // positioning for handlersList nodes; non-handlersList nodes never used this slot.
+  const headerHandleSlot = undefined;
 
   // Trigger nodes get an asymmetric border-radius so they stand out visually
   // on the canvas: the left side (entry side) is more rounded than the right.
