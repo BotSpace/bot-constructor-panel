@@ -14,6 +14,7 @@ import { toast } from "react-hot-toast";
 import { useParams } from "next/navigation";
 
 import { instanceAuth } from "@/services/instance";
+import { track } from "@/components/common/analitics";
 import type { ProjectRetrive } from "@/types/http/project";
 import type { APIDetailCreateResponse } from "@/types/http/response";
 
@@ -171,6 +172,7 @@ export default function DebugingButtons() {
         status: "initializing",
       });
 
+    track("bot-debug-run", { projectId: id });
     instanceAuth
       .get(`/project/${id}/debug/`)
       .then(() => {
