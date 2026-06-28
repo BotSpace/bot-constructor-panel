@@ -8,7 +8,9 @@
 import Script from "next/script";
 import { useEffect } from "react";
 
-const WEBSITE_ID = "5593ff21-f352-4598-9eb1-981bd9693334";
+// Constructor botspace.uz/constructor/* da — landing/app bilan BIR XIL domen,
+// shuning uchun bitta Umami website (botspace.uz); /constructor/* path o'zi ajratadi.
+const WEBSITE_ID = "2699cd62-0385-4c4a-9d52-2c47e5512e53";
 
 type UmamiApi = { track: (event?: string, data?: Record<string, unknown>) => void };
 declare global {
