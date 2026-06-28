@@ -1,15 +1,12 @@
 "use client";
 
 // Self-hosted Umami analytics (Amplitude o'rnini bosadi).
-// Asosiy script pageview'larni avtomatik yig'adi; useEffect esa har bosish
-// (tugma/link), forma yuborish va tashqi linkni global ushlaydi —
-// Amplitude'ning elementInteractions autocapture'iga ekvivalent.
+// Script `beforeInteractive` bilan ERTA yuklanadi — pageview + web-vitals
+// (LCP/FCP/CLS — Performance sahifasi) to'g'ri yig'ilishi uchun. Generic
+// "click" tracking YO'Q — aniq nomli eventlar `track()` orqali yuboriladi.
 
 import Script from "next/script";
-import { useEffect } from "react";
 
-// Constructor botspace.uz/constructor/* da — landing/app bilan BIR XIL domen,
-// shuning uchun bitta Umami website (botspace.uz); /constructor/* path o'zi ajratadi.
 const WEBSITE_ID = "2699cd62-0385-4c4a-9d52-2c47e5512e53";
 
 type UmamiApi = { track: (event?: string, data?: Record<string, unknown>) => void };
@@ -19,74 +16,17 @@ declare global {
   }
 }
 
-function track(event: string, data?: Record<string, unknown>) {
-  window.umami?.track(event, data);
-}
-
-function clean(s: string): string {
-  return s.replace(/\s+/g, " ").trim().slice(0, 80);
+/** Aniq nomli event yuborish — call-site'larda ishlatiladi. */
+export function track(event: string, data?: Record<string, unknown>) {
+  if (typeof window !== "undefined") window.umami?.track(event, data);
 }
 
 function Analytics() {
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      const el = (e.target as Element)?.closest?.(
-        'a,button,[role="button"],input[type="submit"],input[type="button"]'
-      ) as HTMLElement | null;
-      if (!el) return;
-      const label = clean(
-        el.getAttribute("aria-label") ||
-          (el as HTMLInputElement).value ||
-          el.textContent ||
-          ""
-      );
-      const href = el.getAttribute("href") || undefined;
-      const data: Record<string, unknown> = {
-        label: label || el.tagName.toLowerCase(),
-        tag: el.tagName.toLowerCase(),
-        path: location.pathname,
-      };
-      if (href) {
-        data.href = href;
-        try {
-          const u = new URL(href, location.href);
-          if (u.host && u.host !== location.host) {
-            track("outbound", { href: u.href, path: location.pathname });
-          }
-        } catch {
-          /* relative/hash — e'tiborsiz */
-        }
-      }
-      track("click", data);
-    };
-
-    const onSubmit = (e: SubmitEvent) => {
-      const form = e.target as HTMLElement | null;
-      if (!form || form.tagName !== "FORM") return;
-      track("form-submit", {
-        form:
-          form.getAttribute("id") ||
-          form.getAttribute("name") ||
-          form.getAttribute("aria-label") ||
-          "form",
-        path: location.pathname,
-      });
-    };
-
-    document.addEventListener("click", onClick, true);
-    document.addEventListener("submit", onSubmit, true);
-    return () => {
-      document.removeEventListener("click", onClick, true);
-      document.removeEventListener("submit", onSubmit, true);
-    };
-  }, []);
-
   return (
     <Script
-      defer
       src="https://umami.botspace.uz/script.js"
       data-website-id={WEBSITE_ID}
-      strategy="afterInteractive"
+      strategy="beforeInteractive"
     />
   );
 }
