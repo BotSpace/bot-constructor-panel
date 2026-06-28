@@ -1,13 +1,9 @@
-"use client";
-
 // Self-hosted Umami analytics (Amplitude o'rnini bosadi).
-// Script `afterInteractive` bilan yuklanadi (Next nested layout'da
-// beforeInteractive ishonchsiz — script umuman yuklanmasdi). Tracker
-// PerformanceObserver'ni `buffered:true` bilan ishlatadi, shuning uchun
-// web-vitals (Performance sahifasi) kech yuklansa ham buffer'dan olinadi.
-// Generic "click" YO'Q — aniq nomli eventlar `track()` orqali.
-
-import Script from "next/script";
+// MUHIM: bu SERVER component (no "use client") — plain <script> SSR HTML'ga
+// chiqadi va HAR sahifa yuklanganda ishonchli yuklanadi. next/script
+// (afterInteractive/beforeInteractive) client-side inject qilardi va
+// constructor'da yuklanmasdi (cache'langan chunk + nested layout muammosi).
+// `track()` esa client component'lardan chaqiriladigan oddiy funksiya.
 
 const WEBSITE_ID = "2699cd62-0385-4c4a-9d52-2c47e5512e53";
 
@@ -25,11 +21,10 @@ export function track(event: string, data?: Record<string, unknown>) {
 
 function Analytics() {
   return (
-    <Script
+    <script
       defer
       src="https://umami.botspace.uz/script.js"
       data-website-id={WEBSITE_ID}
-      strategy="afterInteractive"
     />
   );
 }
