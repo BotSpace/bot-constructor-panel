@@ -1,9 +1,11 @@
 "use client";
 
 // Self-hosted Umami analytics (Amplitude o'rnini bosadi).
-// Script `beforeInteractive` bilan ERTA yuklanadi — pageview + web-vitals
-// (LCP/FCP/CLS — Performance sahifasi) to'g'ri yig'ilishi uchun. Generic
-// "click" tracking YO'Q — aniq nomli eventlar `track()` orqali yuboriladi.
+// Script `afterInteractive` bilan yuklanadi (Next nested layout'da
+// beforeInteractive ishonchsiz — script umuman yuklanmasdi). Tracker
+// PerformanceObserver'ni `buffered:true` bilan ishlatadi, shuning uchun
+// web-vitals (Performance sahifasi) kech yuklansa ham buffer'dan olinadi.
+// Generic "click" YO'Q — aniq nomli eventlar `track()` orqali.
 
 import Script from "next/script";
 
@@ -24,9 +26,10 @@ export function track(event: string, data?: Record<string, unknown>) {
 function Analytics() {
   return (
     <Script
+      defer
       src="https://umami.botspace.uz/script.js"
       data-website-id={WEBSITE_ID}
-      strategy="beforeInteractive"
+      strategy="afterInteractive"
     />
   );
 }
