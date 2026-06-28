@@ -30,6 +30,7 @@ import {
 import { Plus, Text, RotateCcw, Key, Database, Shield, Puzzle, Keyboard, Braces, AlertTriangle } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
+import { track } from "@/components/common/analitics";
 import { useTranslations } from "next-intl";
 import { useBottomPanelStore, type BottomPanelKey } from "@/features/bot-constructor/store/bottom-panel-store";
 import { useDebugControlStore } from "@/features/bot-constructor/store/debug-control";
@@ -544,6 +545,7 @@ export default function Constructor() {
           status: "initializing",
         });
 
+        track("bot-debug-run", { projectId: id });
         instanceAuth
           .get(`/project/${id}/debug/`)
           .then(() => {
