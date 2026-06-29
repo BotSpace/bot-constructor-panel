@@ -401,10 +401,10 @@
       }
     },
     "aiTools": {
-      "title": "🛠️ AI Asboblar"
+      "title": "🛠️ AI toolar"
     },
     "customLogic": {
-      "title": "🧩 Maxsus Mantiq",
+      "title": "🧩 Maxsus",
       "code": {
         "name": "Maxsus Kod",
         "description": "Murakkab amallar va shartlar uchun Python kodi yozish imkonini beradi."
