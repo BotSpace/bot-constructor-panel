@@ -387,6 +387,17 @@
           "topK": "Top-K結果数",
           "topKHelp": "エージェントに返される最も類似したチャンクの数。"
         }
+      },
+      "paymentLinkTool": {
+        "name": "支払いリンク",
+        "description": "エージェントが支払いリンクを生成できるようにします。",
+        "fields": {
+          "maxAmount": "最大金額 (UZS)"
+        }
+      },
+      "paymentStatusTool": {
+        "name": "支払いステータス",
+        "description": "エージェントが支払いステータスを確認できるようにします（paid/pending/failed）。"
       }
     },
     "aiTools": {

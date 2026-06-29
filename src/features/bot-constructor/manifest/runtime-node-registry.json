@@ -7132,11 +7132,59 @@
           }
         ],
         "variant": "tabs"
+      },
+      {
+        "type": "number",
+        "key": "maxAmount",
+        "label": "Max Amount (UZS)",
+        "placeholder": "100000000",
+        "optional": true,
+        "defaultVisible": false,
+        "min": 1
       }
     ],
     "defaults": {
       "tool": "payment_link",
-      "paymentType": "click"
+      "paymentType": "click",
+      "maxAmount": 100000000
+    }
+  },
+  {
+    "type": "AIPaymentStatusToolNode",
+    "status": "runtime",
+    "category": "ai",
+    "accessory": true,
+    "accessoryAttachesTo": [
+      "ai_tool"
+    ],
+    "titleKey": "constructor.ai.paymentStatusTool.name",
+    "descriptionKey": "constructor.ai.paymentStatusTool.description",
+    "titleFallback": "Payment Status",
+    "descriptionFallback": "AI to'lov statusini tekshira oladi (paid/pending/failed).",
+    "iconName": "credit-card",
+    "colorToken": "ai-emerald",
+    "size": {
+      "width": 180
+    },
+    "sidebar": {
+      "enabled": true,
+      "groupId": "ai_tools",
+      "sortOrder": 37,
+      "elementType": "ai_tool_payment_status"
+    },
+    "handles": [
+      {
+        "preset": "source-top"
+      }
+    ],
+    "content": [
+      {
+        "type": "description",
+        "textFallback": "AI checks payment status (paid/pending/failed). The order_id is determined by the AI agent; project_id is provided automatically by the engine."
+      }
+    ],
+    "defaults": {
+      "tool": "payment_status"
     }
   },
   {

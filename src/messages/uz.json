@@ -379,6 +379,17 @@
           "topK": "Top-K natijalar",
           "topKHelp": "Agentga qaytariladigan eng o'xshash parchalar soni."
         }
+      },
+      "paymentLinkTool": {
+        "name": "To'lov havolasi",
+        "description": "Agentga to'lov havolasi yaratishga imkon beradi.",
+        "fields": {
+          "maxAmount": "Maksimal summa (UZS)"
+        }
+      },
+      "paymentStatusTool": {
+        "name": "To'lov statusi",
+        "description": "AI to'lov statusini tekshira oladi (paid/pending/failed)."
       }
     },
     "aiTools": {
