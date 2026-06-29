@@ -467,6 +467,20 @@
         }
       },
       {
+        "type": "number",
+        "key": "ttl",
+        "label": "Fayl TTL (sekund)",
+        "placeholder": "Masalan: 86400",
+        "helpText": "Bo'sh qoldirilsa fayl avtomatik o'chmaydi",
+        "min": 1,
+        "step": 1,
+        "optional": true,
+        "visibleWhen": {
+          "key": "upload_file",
+          "equals": true
+        }
+      },
+      {
         "type": "switch",
         "key": "global",
         "label": "Global"
