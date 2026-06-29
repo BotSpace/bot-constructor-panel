@@ -391,6 +391,14 @@
         "name": "Payment Status",
         "description": "Lets the agent check the payment status (paid/pending/failed).",
         "info": "AI checks payment status (paid/pending/failed). The order_id is determined by the AI agent; project_id is provided automatically by the engine."
+      },
+      "paramConfig": {
+        "paramsLabel": "Parameters",
+        "aiFills": "AI fills",
+        "fixedValue": "Fixed",
+        "aiDescriptionPlaceholder": "Hint for AI: what is this value",
+        "fixedValuePlaceholder": "Value or {{variable}}",
+        "noParams": "No parameters defined"
       }
     },
     "aiTools": {

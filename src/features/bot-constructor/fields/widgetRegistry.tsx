@@ -57,6 +57,7 @@ import {
   RichTextMessageField,
 } from "@/features/bot-constructor/fields/shared-message-fields";
 import { CredentialSelectField } from "@/features/bot-constructor/fields/generic-fields/CredentialSelectField";
+import { useTranslations } from "next-intl";
 
 interface WidgetProps {
   nodeId: string;
@@ -2940,6 +2941,151 @@ function SortBuilderWidget({ fields, sorts, onChange }: SortBuilderWidgetProps) 
   );
 }
 
+// ── AIToolParamConfigWidget ───────────────────────────────────────────────────
+// Engine kontrakt: data.paramConfig = { "<param>": { source, value, aiDescription } }
+// Param paramConfig'da yo'q → default (AI, schema desc).
+//
+// Parametr manbalari:
+//   - Static tool'lar (payment_link, payment_status): STATIC_TOOL_PARAMS map
+//   - Modul tool'lar: data.parametersSchema.properties (manifest defaults orqali keladi)
+
+interface AiToolParamDef {
+  key: string;
+  label: string;
+  type: string;
+  description?: string;
+}
+
+interface AiToolParamConfigEntry {
+  source: "ai" | "fixed";
+  value: string;
+  aiDescription: string;
+}
+
+const STATIC_TOOL_PARAMS: Record<string, AiToolParamDef[]> = {
+  payment_link: [
+    { key: "amount",      label: "To'lov summasi", type: "number",  description: "Payment amount in UZS" },
+    { key: "description", label: "Izoh",           type: "string",  description: "Payment description" },
+  ],
+  payment_status: [
+    { key: "order_id", label: "Order ID", type: "integer", description: "The order ID to check status for" },
+  ],
+};
+
+function parseSchemaToParamDefs(schema: unknown): AiToolParamDef[] {
+  const s = schema as Record<string, unknown> | undefined;
+  if (!s || typeof s !== "object") return [];
+  const properties = s.properties as Record<string, Record<string, unknown>> | undefined;
+  if (!properties) return [];
+  return Object.entries(properties).map(([key, prop]) => ({
+    key,
+    label: typeof prop.title === "string" ? prop.title : key,
+    type:  typeof prop.type  === "string" ? prop.type  : "string",
+    description: typeof prop.description === "string" ? prop.description : undefined,
+  }));
+}
+
+function AIToolParamConfigWidget({ nodeId, data }: WidgetProps) {
+  const updateNodeData = useFlowStore((s) => s.updateNodeData);
+  const t = useTranslations("constructor.ai.paramConfig");
+
+  const tool = typeof data.tool === "string" ? data.tool : "";
+
+  // Param definitions: static tools first, then schema-driven (module tools)
+  const params: AiToolParamDef[] =
+    STATIC_TOOL_PARAMS[tool] ?? parseSchemaToParamDefs(data.parametersSchema);
+
+  const paramConfig =
+    data.paramConfig && typeof data.paramConfig === "object"
+      ? (data.paramConfig as Record<string, AiToolParamConfigEntry>)
+      : {};
+
+  function setEntry(key: string, patch: Partial<AiToolParamConfigEntry>) {
+    const prev = paramConfig[key] ?? { source: "ai" as const, value: "", aiDescription: "" };
+    updateNodeData(nodeId, {
+      paramConfig: { ...paramConfig, [key]: { ...prev, ...patch } },
+    });
+  }
+
+  if (params.length === 0) return null;
+
+  return (
+    <div className="grid gap-2">
+      <Label className="text-xs text-muted-foreground">{t("paramsLabel")}</Label>
+      {params.map((param) => {
+        const entry: AiToolParamConfigEntry =
+          paramConfig[param.key] ?? { source: "ai", value: "", aiDescription: "" };
+        const isFixed = entry.source === "fixed";
+        return (
+          <div
+            key={param.key}
+            className="grid gap-1 rounded-md border border-white/[0.07] bg-white/[0.02] px-2 py-1.5"
+          >
+            {/* Row 1: param label + type badge + source toggle */}
+            <div className="flex items-center gap-1.5">
+              <span className="truncate text-[11px] font-mono text-zinc-300">{param.label}</span>
+              <span
+                className="shrink-0 rounded px-1 py-0 text-[9px] text-zinc-500"
+                style={{ background: "rgba(255,255,255,0.05)" }}
+              >
+                {param.type}
+              </span>
+              {/* Source toggle */}
+              <div className="ml-auto flex shrink-0 overflow-hidden rounded border border-white/[0.08]">
+                <button
+                  type="button"
+                  onClick={() => setEntry(param.key, { source: "fixed" })}
+                  className={cn(
+                    "px-2 py-0.5 text-[10px] font-medium transition-colors",
+                    isFixed
+                      ? "bg-amber-500/20 text-amber-300"
+                      : "text-zinc-500 hover:text-zinc-300"
+                  )}
+                >
+                  {t("fixedValue")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEntry(param.key, { source: "ai" })}
+                  className={cn(
+                    "px-2 py-0.5 text-[10px] font-medium transition-colors",
+                    !isFixed
+                      ? "bg-blue-500/20 text-blue-300"
+                      : "text-zinc-500 hover:text-zinc-300"
+                  )}
+                >
+                  {t("aiFills")}
+                </button>
+              </div>
+            </div>
+
+            {/* Row 2: value input (fixed) or ai description input (ai) */}
+            {isFixed ? (
+              <Input
+                className="h-7 text-[11px]"
+                placeholder={t("fixedValuePlaceholder")}
+                value={entry.value}
+                onChange={(e) => setEntry(param.key, { value: e.target.value })}
+              />
+            ) : (
+              <Input
+                className="h-7 text-[11px]"
+                placeholder={
+                  param.description
+                    ? `${t("aiDescriptionPlaceholder")}: ${param.description}`
+                    : t("aiDescriptionPlaceholder")
+                }
+                value={entry.aiDescription}
+                onChange={(e) => setEntry(param.key, { aiDescription: e.target.value })}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 const widgetRegistry: Record<string, (props: WidgetProps) => ReactNode> = {
   messageTrigger: MessageTriggerWidget,
   callbackQueryTrigger: CallbackQueryTriggerWidget,
@@ -2964,6 +3110,7 @@ const widgetRegistry: Record<string, (props: WidgetProps) => ReactNode> = {
   aiAgentAdvanced: AIAgentAdvancedWidget,
   aiCollectionToolConfig: AICollectionToolConfigWidget,
   aiKnowledgeToolConfig: AIKnowledgeToolConfigWidget,
+  aiToolParamConfig: AIToolParamConfigWidget,
 };
 
 export function renderCustomWidget(props: WidgetProps) {

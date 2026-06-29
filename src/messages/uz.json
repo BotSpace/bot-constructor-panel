@@ -391,6 +391,14 @@
         "name": "To'lov statusi",
         "description": "AI to'lov statusini tekshira oladi (paid/pending/failed).",
         "info": "AI to'lov statusini tekshiradi (paid/pending/failed). order_id'ni AI agent aniqlaydi; project_id'ni engine avtomatik beradi."
+      },
+      "paramConfig": {
+        "paramsLabel": "Parametrlar",
+        "aiFills": "AI to'ldiradi",
+        "fixedValue": "Qat'iy",
+        "aiDescriptionPlaceholder": "AI uchun tavsif: bu qiymat nima",
+        "fixedValuePlaceholder": "Qiymat yoki {{o'zgaruvchi}}",
+        "noParams": "Parametrlar aniqlanmagan"
       }
     },
     "aiTools": {
