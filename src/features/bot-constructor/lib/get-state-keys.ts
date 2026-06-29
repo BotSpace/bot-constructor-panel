@@ -150,6 +150,10 @@ export function getAvailableStateKeys(
       if (key) {
         stateKeys.add(key);
       }
+      const data = node.data as Record<string, unknown>;
+      if (data.upload_file === true && typeof data.file_key === "string" && data.file_key.trim() !== "") {
+        stateKeys.add(data.file_key.trim());
+      }
     }
   });
 

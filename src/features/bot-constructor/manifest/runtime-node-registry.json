@@ -225,6 +225,18 @@
             "label": "Audio"
           },
           {
+            "value": "voice",
+            "label": "Voice"
+          },
+          {
+            "value": "video_note",
+            "label": "Video note"
+          },
+          {
+            "value": "animation",
+            "label": "Animatsiya"
+          },
+          {
             "value": "sticker",
             "label": "Stiker"
           }
@@ -292,7 +304,11 @@
           "oneOf": [
             "photo",
             "video",
-            "audio"
+            "audio",
+            "voice",
+            "video_note",
+            "animation",
+            "sticker"
           ]
         }
       },
@@ -418,6 +434,36 @@
           "oneOf": [
             "size"
           ]
+        }
+      },
+      {
+        "type": "switch",
+        "key": "upload_file",
+        "label": "Faylni yuklash",
+        "optional": true,
+        "visibleWhen": {
+          "key": "type",
+          "oneOf": [
+            "photo",
+            "video",
+            "audio",
+            "document",
+            "sticker",
+            "voice",
+            "video_note",
+            "animation"
+          ]
+        }
+      },
+      {
+        "type": "text",
+        "key": "file_key",
+        "label": "File key",
+        "placeholder": "Masalan: user_audio",
+        "helpText": "Yuklangan fayl shu kalitga saqlanadi",
+        "visibleWhen": {
+          "key": "upload_file",
+          "equals": true
         }
       },
       {

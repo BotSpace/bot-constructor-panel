@@ -519,7 +519,7 @@ function DownloadFileWidget({ nodeId, data }: WidgetProps) {
     const parentNode = nodes.find((node) => node.id === incomingEdge.source);
     if (!parentNode || parentNode.type !== "MessageTriggerNode") return null;
     const messageType = parentNode.data?.type;
-    if (!["photo", "video", "audio", "document"].includes(messageType)) return null;
+    if (!["photo", "video", "audio", "document", "voice", "video_note", "animation", "sticker"].includes(messageType)) return null;
     return messageType;
   }, [edges, nodeId, nodes]);
 
