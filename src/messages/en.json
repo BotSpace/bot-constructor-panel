@@ -379,6 +379,17 @@
           "topK": "Top-K Results",
           "topKHelp": "Number of most-similar chunks returned to the agent."
         }
+      },
+      "paymentLinkTool": {
+        "name": "Payment Link",
+        "description": "Lets the agent generate a payment link.",
+        "fields": {
+          "maxAmount": "Max Amount (UZS)"
+        }
+      },
+      "paymentStatusTool": {
+        "name": "Payment Status",
+        "description": "Lets the agent check the payment status (paid/pending/failed)."
       }
     },
     "aiTools": {

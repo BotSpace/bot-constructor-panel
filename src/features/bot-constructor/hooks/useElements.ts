@@ -141,10 +141,33 @@ export function useElements(): ElementTypes[] {
   }
 
   // Module groups — grouped by moduleSlug; each unique slug = one sidebar section.
+  // Module AI tool accessories (accessory=true, accessoryAttachesTo includes "ai_tool")
+  // are collected separately and merged into the static ai_tools group so they appear
+  // alongside built-in tools in the NodeSelectionDialog.
   const moduleGroups: ElementTypes[] = [];
+  const moduleToolElements: ElementItemType[] = [];
+
   if (moduleManifests.length > 0) {
     const bySlug = new Map<string, typeof moduleManifests>();
     for (const entry of moduleManifests) {
+      // AI tool accessories go into the shared ai_tools group, not a module section.
+      if (
+        entry.accessory &&
+        entry.accessoryAttachesTo?.includes("ai_tool") &&
+        entry.sidebar?.enabled
+      ) {
+        moduleToolElements.push({
+          type: (entry.sidebar?.elementType ?? entry.type) as ElementItemType["type"],
+          name: translate(t, entry.titleKey, entry.titleFallback),
+          description: translate(t, entry.descriptionKey, entry.descriptionFallback),
+          icon: resolveNodeIcon(entry.iconName),
+          color: SIDEBAR_COLOR_CLASS_REGISTRY[entry.colorToken] || "",
+          triggerId: entry.type,
+          defaultData: entry.defaults,
+          role: "Tool",
+        });
+        continue;
+      }
       if (!entry.sidebar?.enabled) continue;
       const slug = entry.moduleSlug ?? "module-unknown";
       if (!bySlug.has(slug)) bySlug.set(slug, []);
@@ -175,6 +198,25 @@ export function useElements(): ElementTypes[] {
                 ? "Integration"
                 : "Action",
         })) as ElementItemType[],
+      });
+    }
+  }
+
+  // Merge module tool accessories into the ai_tools manifest group.
+  // If no static ai_tools group exists yet (unlikely), create one on the fly.
+  if (moduleToolElements.length > 0) {
+    const aiToolsGroup = manifestGroups.find((g) => g.id === "sidebar-ai_tools");
+    if (aiToolsGroup) {
+      aiToolsGroup.elements = [...aiToolsGroup.elements, ...moduleToolElements];
+    } else {
+      manifestGroups.push({
+        title: translate(
+          t,
+          SIDEBAR_GROUP_META.ai_tools.titleKey,
+          SIDEBAR_GROUP_META.ai_tools.titleFallback
+        ),
+        id: "sidebar-ai_tools",
+        elements: moduleToolElements,
       });
     }
   }
