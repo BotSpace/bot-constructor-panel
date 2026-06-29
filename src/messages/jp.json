@@ -397,7 +397,8 @@
       },
       "paymentStatusTool": {
         "name": "支払いステータス",
-        "description": "エージェントが支払いステータスを確認できるようにします（paid/pending/failed）。"
+        "description": "エージェントが支払いステータスを確認できるようにします（paid/pending/failed）。",
+        "info": "AIが支払いステータスを確認します（paid/pending/failed）。order_idはAIエージェントが決定し、project_idはエンジンが自動的に提供します。"
       }
     },
     "aiTools": {

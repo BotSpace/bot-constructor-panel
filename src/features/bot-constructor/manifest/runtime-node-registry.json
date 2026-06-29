@@ -7181,6 +7181,7 @@
     "content": [
       {
         "type": "description",
+        "textKey": "constructor.ai.paymentStatusTool.info",
         "textFallback": "AI checks payment status (paid/pending/failed). The order_id is determined by the AI agent; project_id is provided automatically by the engine."
       }
     ],

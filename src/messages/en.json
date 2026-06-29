@@ -389,7 +389,8 @@
       },
       "paymentStatusTool": {
         "name": "Payment Status",
-        "description": "Lets the agent check the payment status (paid/pending/failed)."
+        "description": "Lets the agent check the payment status (paid/pending/failed).",
+        "info": "AI checks payment status (paid/pending/failed). The order_id is determined by the AI agent; project_id is provided automatically by the engine."
       }
     },
     "aiTools": {
