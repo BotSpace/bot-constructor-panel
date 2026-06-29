@@ -248,12 +248,11 @@ export function ModalNodeFormRenderer({
         : {}),
     }));
 
-  const requiredFields = allFields.filter((f) => !f.optional);
-
   // Auto-revealed optional fields: optional + visibleWhen — condition-driven,
   // managed automatically. Shown/hidden by isFieldVisible above; no manual add.
   const autoRevealedFields = allFields.filter((f) => f.optional && f.visibleWhen);
   const autoRevealedKeys = new Set(autoRevealedFields.map(fieldKey));
+  const inlineFields = allFields.filter((f) => !f.optional || f.visibleWhen);
 
   // Manually activated optional fields (no visibleWhen), in activation order.
   // Source of truth is activeOptionalKeys (stored in node data).
@@ -261,23 +260,14 @@ export function ModalNodeFormRenderer({
     .map((key) => allFields.find((f) => fieldKey(f) === key && !f.visibleWhen))
     .filter((f): f is NodeFieldManifest => Boolean(f));
 
-  // Dedupe across auto-revealed + manually added (edge case: field has both).
-  const seenOptional = new Set<string>();
-  const addedOptionalFields = [...autoRevealedFields, ...manuallyAddedFields].filter((f) => {
-    const k = fieldKey(f);
-    if (seenOptional.has(k)) return false;
-    seenOptional.add(k);
-    return true;
-  });
-
-  const shownOptionalKeys = new Set(addedOptionalFields.map(fieldKey));
+  const shownOptionalKeys = new Set([...autoRevealedFields, ...manuallyAddedFields].map(fieldKey));
 
   // Dropdown shows only fields not yet active and not condition-driven.
   const availableOptionalFields = allFields.filter(
     (f) => f.optional && !f.visibleWhen && !shownOptionalKeys.has(fieldKey(f))
   );
 
-  const shownFields = [...requiredFields, ...addedOptionalFields];
+  const shownFields = [...inlineFields, ...manuallyAddedFields];
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
