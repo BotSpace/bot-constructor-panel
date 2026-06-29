@@ -397,7 +397,8 @@
       },
       "paymentStatusTool": {
         "name": "Статус платежа",
-        "description": "Позволяет агенту проверить статус платежа (paid/pending/failed)."
+        "description": "Позволяет агенту проверить статус платежа (paid/pending/failed).",
+        "info": "ИИ проверяет статус платежа (paid/pending/failed). order_id определяет ИИ-агент; project_id предоставляется движком автоматически."
       }
     },
     "aiTools": {
