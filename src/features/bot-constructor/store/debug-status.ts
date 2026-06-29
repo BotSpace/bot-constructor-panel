@@ -129,25 +129,9 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
           return isNewRun ? { ...base, currentRunId: runId } : state;
         }
 
-        // Terminal guard: do not let waiting/running override success/error on
-        // the same run (e.g. a late trigger event after the node already ran).
-        // EXCEPTION: a strictly NEWER "running" (higher seq) is a legitimate
-        // re-execution — an AI agent's provider/tool accessory runs
-        // running→success MULTIPLE times within one run (the agent loop), so
-        // the 2nd "running" must flip the node back to spinning.
-        // Only "running" qualifies — NOT "waiting": the engine emits a
-        // higher-seq "waiting" for downstream nodes when a node finishes, and
-        // that must never un-finish an already-succeeded node.
-        const isReexecRunning =
-          status === "running" &&
-          typeof seq === "number" &&
-          prevSeq !== undefined &&
-          seq > prevSeq;
-        if (
-          !isNewRun &&
-          !isReexecRunning &&
-          terminalGuard(base.statuses[nodeId], status)
-        ) {
+        // Terminal guard: do not let waiting/running override success/error
+        // on the same run (e.g. a late trigger event after node already ran).
+        if (!isNewRun && terminalGuard(base.statuses[nodeId], status)) {
           return state;
         }
 
