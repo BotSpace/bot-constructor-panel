@@ -21,8 +21,8 @@ type Condition = Record<string, unknown>;
 
 export interface ConditionListFieldConfig {
   type: "condition-list";
-  operatorKey?: string;       // default "operator" → "AND" | "OR"
-  conditionsKey?: string;     // default "conditions" → [{...}]
+  operatorKey?: string; // default "operator" → "AND" | "OR"
+  conditionsKey?: string; // default "conditions" → [{...}]
   label?: string;
   /** Sub-field key for the column/variable name inside each condition item.
    *  Default: "variable". Use "field" for engine-compatible filter conditions. */
@@ -50,41 +50,46 @@ export interface ConditionListFieldProps {
 // ---------------------------------------------------------------------------
 
 const DEFAULT_OPERATORS = [
-  { value: "equals",       label: "Teng (=)" },
-  { value: "not_equals",   label: "Teng emas (≠)" },
+  { value: "equals", label: "Teng (=)" },
+  { value: "not_equals", label: "Teng emas (≠)" },
   { value: "greater_than", label: "Katta (>)" },
-  { value: "less_than",    label: "Kichik (<)" },
-  { value: "greater_equal",label: "Katta yoki teng (≥)" },
-  { value: "less_equal",   label: "Kichik yoki teng (≤)" },
-  { value: "contains",     label: "O'z ichiga oladi" },
+  { value: "less_than", label: "Kichik (<)" },
+  { value: "greater_equal", label: "Katta yoki teng (≥)" },
+  { value: "less_equal", label: "Kichik yoki teng (≤)" },
+  { value: "contains", label: "O'z ichiga oladi" },
   { value: "not_contains", label: "O'z ichiga olmaydi" },
-  { value: "starts_with",  label: "Boshlanadi" },
-  { value: "ends_with",    label: "Tugaydi" },
-  { value: "is_empty",     label: "Bo'sh" },
-  { value: "not_empty",    label: "Bo'sh emas" },
-  { value: "exists",       label: "Mavjud" },
-  { value: "not_exists",   label: "Mavjud emas" },
-  { value: "in",           label: "Ro'yxatda bor" },
-  { value: "not_in",       label: "Ro'yxatda yo'q" },
+  { value: "starts_with", label: "Boshlanadi" },
+  { value: "ends_with", label: "Tugaydi" },
+  { value: "is_empty", label: "Bo'sh" },
+  { value: "not_empty", label: "Bo'sh emas" },
+  { value: "exists", label: "Mavjud" },
+  { value: "not_exists", label: "Mavjud emas" },
+  { value: "in", label: "Ro'yxatda bor" },
+  { value: "not_in", label: "Ro'yxatda yo'q" },
 ] as const;
 
 /** Engine-compatible operators for GoogleSheetsNode filter / collection filter. */
 const ENGINE_OPERATORS = [
-  { value: "eq",       label: "= (teng)" },
-  { value: "ne",       label: "≠ (teng emas)" },
-  { value: "gt",       label: "> (katta)" },
-  { value: "gte",      label: "≥ (katta yoki teng)" },
-  { value: "lt",       label: "< (kichik)" },
-  { value: "lte",      label: "≤ (kichik yoki teng)" },
-  { value: "in",       label: "ichida (vergul bilan)" },
-  { value: "nin",      label: "ichida emas" },
+  { value: "eq", label: "= (teng)" },
+  { value: "ne", label: "≠ (teng emas)" },
+  { value: "gt", label: "> (katta)" },
+  { value: "gte", label: "≥ (katta yoki teng)" },
+  { value: "lt", label: "< (kichik)" },
+  { value: "lte", label: "≤ (kichik yoki teng)" },
+  { value: "in", label: "ichida (vergul bilan)" },
+  { value: "nin", label: "ichida emas" },
   { value: "contains", label: "o'z ichiga oladi" },
-  { value: "exists",   label: "mavjud" },
+  { value: "exists", label: "mavjud" },
 ] as const;
 
 /** Operators that do not require a value input. */
-const NO_VALUE_OPS_DEFAULT = new Set(["is_empty", "not_empty", "exists", "not_exists"]);
-const NO_VALUE_OPS_ENGINE  = new Set(["exists"]);
+const NO_VALUE_OPS_DEFAULT = new Set([
+  "is_empty",
+  "not_empty",
+  "exists",
+  "not_exists",
+]);
+const NO_VALUE_OPS_ENGINE = new Set(["exists"]);
 
 // ---------------------------------------------------------------------------
 // Inner editor (stateless, driven by parent)
@@ -107,12 +112,17 @@ function ConditionListEditor({
   fieldPlaceholder,
   onChange,
 }: ConditionListEditorProps) {
-  const operators = operatorSet === "engine" ? ENGINE_OPERATORS : DEFAULT_OPERATORS;
-  const noValueOps = operatorSet === "engine" ? NO_VALUE_OPS_ENGINE : NO_VALUE_OPS_DEFAULT;
+  const operators =
+    operatorSet === "engine" ? ENGINE_OPERATORS : DEFAULT_OPERATORS;
+  const noValueOps =
+    operatorSet === "engine" ? NO_VALUE_OPS_ENGINE : NO_VALUE_OPS_DEFAULT;
   const defaultOp = operatorSet === "engine" ? "eq" : "equals";
 
   const addCondition = () => {
-    onChange([...conditions, { [fieldKey]: "", [opKey]: defaultOp, value: "" }]);
+    onChange([
+      ...conditions,
+      { [fieldKey]: "", [opKey]: defaultOp, value: "" },
+    ]);
   };
 
   return (
@@ -137,9 +147,18 @@ function ConditionListEditor({
       ) : null}
 
       {conditions.map((condition, index) => {
-        const currentOp = typeof condition[opKey] === "string" ? (condition[opKey] as string) : defaultOp;
-        const currentField = typeof condition[fieldKey] === "string" ? (condition[fieldKey] as string) : "";
-        const currentValue = condition.value !== undefined && condition.value !== null ? String(condition.value) : "";
+        const currentOp =
+          typeof condition[opKey] === "string"
+            ? (condition[opKey] as string)
+            : defaultOp;
+        const currentField =
+          typeof condition[fieldKey] === "string"
+            ? (condition[fieldKey] as string)
+            : "";
+        const currentValue =
+          condition.value !== undefined && condition.value !== null
+            ? String(condition.value)
+            : "";
         const hideValue = noValueOps.has(currentOp);
 
         return (
@@ -148,12 +167,18 @@ function ConditionListEditor({
             className="flex flex-col gap-2 rounded-md border border-white/10 bg-zinc-950/60 p-3"
           >
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-white/60">Shart {index + 1}</span>
+              <span className="text-sm font-medium text-white/60">
+                Shart {index + 1}
+              </span>
               <button
                 type="button"
                 aria-label="O'chirish"
                 onClick={() =>
-                  onChange(conditions.filter((_, currentIndex) => currentIndex !== index))
+                  onChange(
+                    conditions.filter(
+                      (_, currentIndex) => currentIndex !== index,
+                    ),
+                  )
                 }
                 className="flex h-6 w-6 items-center justify-center rounded text-white/30 transition-colors hover:text-red-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400"
               >
@@ -168,8 +193,10 @@ function ConditionListEditor({
               onChange={(e) =>
                 onChange(
                   conditions.map((item, currentIndex) =>
-                    currentIndex === index ? { ...item, [fieldKey]: e.target.value } : item
-                  )
+                    currentIndex === index
+                      ? { ...item, [fieldKey]: e.target.value }
+                      : item,
+                  ),
                 )
               }
             />
@@ -179,8 +206,8 @@ function ConditionListEditor({
               onValueChange={(op) =>
                 onChange(
                   conditions.map((item, currentIndex) =>
-                    currentIndex === index ? { ...item, [opKey]: op } : item
-                  )
+                    currentIndex === index ? { ...item, [opKey]: op } : item,
+                  ),
                 )
               }
             >
@@ -204,8 +231,10 @@ function ConditionListEditor({
                 onChange={(e) =>
                   onChange(
                     conditions.map((item, currentIndex) =>
-                      currentIndex === index ? { ...item, value: e.target.value } : item
-                    )
+                      currentIndex === index
+                        ? { ...item, value: e.target.value }
+                        : item,
+                    ),
                   )
                 }
               />
@@ -221,18 +250,24 @@ function ConditionListEditor({
 // Main export
 // ---------------------------------------------------------------------------
 
-export function ConditionListField({ nodeId, data, field }: ConditionListFieldProps) {
+export function ConditionListField({
+  nodeId,
+  data,
+  field,
+}: ConditionListFieldProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
 
-  const operatorKey    = field.operatorKey     ?? "operator";
-  const conditionsKey  = field.conditionsKey   ?? "conditions";
-  const fieldKey       = field.conditionFieldKey ?? "variable";
-  const opKey          = field.conditionOpKey   ?? "operator";
-  const operatorSet    = field.operatorSet      ?? "default";
+  const operatorKey = field.operatorKey ?? "operator";
+  const conditionsKey = field.conditionsKey ?? "conditions";
+  const fieldKey = field.conditionFieldKey ?? "variable";
+  const opKey = field.conditionOpKey ?? "operator";
+  const operatorSet = field.operatorSet ?? "default";
   const fieldPlaceholder = field.fieldPlaceholder ?? "O'zgaruvchi nomi";
 
   const matchValue =
-    typeof data[operatorKey] === "string" ? (data[operatorKey] as string) : "and";
+    typeof data[operatorKey] === "string"
+      ? (data[operatorKey] as string)
+      : "and";
   const conditions: Condition[] = Array.isArray(data[conditionsKey])
     ? (data[conditionsKey] as Condition[])
     : [];
@@ -243,7 +278,9 @@ export function ConditionListField({ nodeId, data, field }: ConditionListFieldPr
   return (
     <div className="grid gap-3">
       {field.label ? (
-        <Label className="text-xs font-bold uppercase text-white/40">{field.label}</Label>
+        <Label className="text-xs font-bold uppercase text-white/40">
+          {field.label}
+        </Label>
       ) : null}
 
       <div className="grid gap-2">
@@ -258,7 +295,9 @@ export function ConditionListField({ nodeId, data, field }: ConditionListFieldPr
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="and">AND — barcha shartlar bajarilsin</SelectItem>
+            <SelectItem value="and">
+              AND — barcha shartlar bajarilsin
+            </SelectItem>
             <SelectItem value="or">OR — biror shart bajarilsin</SelectItem>
           </SelectContent>
         </Select>

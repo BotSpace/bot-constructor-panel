@@ -51,7 +51,9 @@ export function CredentialSelectField({
   onPatch,
 }: CredentialSelectFieldProps) {
   const updateNodeData = useFlowStore((s) => s.updateNodeData);
-  const [credentials, setCredentials] = useState<CredentialListItem[] | null>(null);
+  const [credentials, setCredentials] = useState<CredentialListItem[] | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
 
@@ -90,14 +92,16 @@ export function CredentialSelectField({
       .then(({ data: raw }) => {
         // Support both paginated { results: [...] } and plain array responses
         const r = (raw ?? {}) as Record<string, unknown>;
-        const results: CredentialListItem[] =
-          Array.isArray(r.results)
-            ? (r.results as CredentialListItem[])
-            : Array.isArray((r.data as Record<string, unknown> | undefined)?.results)
-              ? ((r.data as Record<string, unknown>).results as CredentialListItem[])
-              : Array.isArray(raw)
-                ? (raw as CredentialListItem[])
-                : [];
+        const results: CredentialListItem[] = Array.isArray(r.results)
+          ? (r.results as CredentialListItem[])
+          : Array.isArray(
+                (r.data as Record<string, unknown> | undefined)?.results,
+              )
+            ? ((r.data as Record<string, unknown>)
+                .results as CredentialListItem[])
+            : Array.isArray(raw)
+              ? (raw as CredentialListItem[])
+              : [];
         _cache.set(cacheKey, results);
         setCredentials(results);
       })
@@ -132,9 +136,7 @@ export function CredentialSelectField({
         <Label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
           <Shield className="h-3 w-3" />
           {label}
-          {required ? (
-            <span className="ml-0.5 text-destructive">*</span>
-          ) : null}
+          {required ? <span className="ml-0.5 text-destructive">*</span> : null}
         </Label>
 
         <Select value={selectedId || "__none__"} onValueChange={handleChange}>
