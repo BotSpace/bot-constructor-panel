@@ -4724,8 +4724,8 @@
         "type": "text",
         "key": "historyKey",
         "label": "History Key",
-        "placeholder": "Leave empty to disable",
-        "helpText": "Context key for conversation history.",
+        "placeholder": "{{chat_id}} = per-user memory; empty = disable",
+        "helpText": "Conversation memory key. Default {{chat_id}} keeps a separate history per user (the agent remembers earlier turns). Clear it to make the agent stateless.",
         "optional": true
       },
       {
@@ -4744,7 +4744,7 @@
       "temperature": null,
       "maxTokens": null,
       "returnMode": "text",
-      "historyKey": "",
+      "historyKey": "{{chat_id}}",
       "errorOutputKey": "agent_error",
       "structuredOutput": false,
       "jsonSchema": ""
