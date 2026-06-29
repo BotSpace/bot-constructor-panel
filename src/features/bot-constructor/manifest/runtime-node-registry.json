@@ -4641,7 +4641,8 @@
           "AIKnowledgeToolNode",
           "AIDateTimeToolNode",
           "AIGoogleSheetsToolNode",
-          "AIPaymentLinkToolNode"
+          "AIPaymentLinkToolNode",
+          "AIPaymentStatusToolNode"
         ],
         "styleVariant": "success"
       }

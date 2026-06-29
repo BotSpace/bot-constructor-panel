@@ -107,10 +107,16 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
         );
 
         if (portConfig) {
-          // Validate source node type is accepted by this port
+          // Validate source node type is accepted by this port.
           const sourceNode = nodes.find((n) => n.id === connection.source);
           const sourceNodeType = sourceNode?.type ?? "";
-          if (!portConfig.accepts.includes(sourceNodeType)) {
+          // Static accepts list OR the source manifest declares it attaches to
+          // this port (accessoryAttachesTo) — the latter covers DYNAMIC module
+          // tools, whose node types aren't in the static accepts list.
+          const sourceManifest = getNodeManifestByType(sourceNodeType);
+          const acceptedByManifest =
+            sourceManifest?.accessoryAttachesTo?.includes(portType) ?? false;
+          if (!portConfig.accepts.includes(sourceNodeType) && !acceptedByManifest) {
             return; // Reject: source type not allowed on this port
           }
 
