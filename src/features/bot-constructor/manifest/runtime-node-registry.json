@@ -483,7 +483,8 @@
       {
         "type": "switch",
         "key": "global",
-        "label": "Global"
+        "label": "Global",
+        "optional": true
       },
       {
         "type": "switch",
@@ -3974,7 +3975,32 @@
             "label": "Kanal",
             "placeholder": "@username yoki -100123456789"
           }
-        ]
+        ],
+        "optional": true
+      },
+      {
+        "type": "text",
+        "key": "channelsCollection",
+        "label": "Kanallar kolleksiyasi (dinamik)",
+        "placeholder": "channels",
+        "optional": true,
+        "helpText": "Kanallarni collection'dan dinamik o'qish — flow'ni tahrirlamasdan"
+      },
+      {
+        "type": "text",
+        "key": "channelsField",
+        "label": "Kanal ustuni",
+        "placeholder": "value",
+        "optional": true,
+        "helpText": "channelsCollection hujjatlaridagi kanal ustuni (default: value)"
+      },
+      {
+        "type": "text",
+        "key": "chatId",
+        "label": "Kanal (legacy)",
+        "placeholder": "@channel yoki -100...",
+        "optional": true,
+        "helpText": "LEGACY: bitta kanal. Yangi flow'da channels ishlating"
       }
     ],
     "defaults": {
@@ -4461,7 +4487,8 @@
       {
         "type": "switch",
         "key": "global",
-        "label": "Global"
+        "label": "Global",
+        "optional": true
       },
       {
         "type": "switch",
@@ -4575,7 +4602,8 @@
       {
         "type": "switch",
         "key": "global",
-        "label": "Global"
+        "label": "Global",
+        "optional": true
       },
       {
         "type": "switch",
@@ -5457,7 +5485,8 @@
       {
         "type": "switch",
         "key": "global",
-        "label": "Global"
+        "label": "Global",
+        "optional": true
       },
       {
         "type": "switch",
