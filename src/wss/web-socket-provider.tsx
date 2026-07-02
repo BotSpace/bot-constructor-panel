@@ -45,9 +45,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       switch (event) {
         case "release_status": {
           const version = Number(data.version);
+          // project id int yoki string kelishi mumkin — loose solishtiramiz
+          // (context/node_execution case'laridagi bilan bir xil sabab).
           if (
             version > (project.release?.version || 0) &&
-            project.id === data.project
+            String(data.project) === String(project.id)
           ) {
             store.changeProject({ ...project, release_bot: true });
             store.changeRelease(data as never);
@@ -55,7 +57,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
           break;
         }
         case "debug_status":
-          if (project.id === data.project) store.changeDebug(data as never);
+          if (String(data.project) === String(project.id)) store.changeDebug(data as never);
           break;
         case "context": {
           // Variable inspector snapshot — backend: {project, chat_id, variables, ts}
