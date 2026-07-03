@@ -33,6 +33,7 @@ jobs:
           cp .env.example .env
           sed -i "s|^NEXTAUTH_SECRET=.*|NEXTAUTH_SECRET=${{ secrets.NEXT_SECRET }}|" .env
           sed -i "s|^NEXT_PUBLIC_API=.*|NEXT_PUBLIC_API=${{ secrets.API_URL }}|" .env
+          sed -i "s|^NEXT_PUBLIC_API_PREFIX=.*|NEXT_PUBLIC_API_PREFIX=${{ vars.NEXT_PUBLIC_API_PREFIX || '/api/v2' }}|" .env
           sed -i "s|^NEXT_PUBLIC_AGENT_API=.*|NEXT_PUBLIC_AGENT_API=https://api.botspace.uz/api/agentv2|" .env
 
       - name: Set up Docker Buildx

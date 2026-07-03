@@ -144,14 +144,18 @@ export function DynamicSelectField({
     // module_slug so the backend knows which module handles the resource.
     const body: Record<string, unknown> = { params: depValues };
     if (requiresCredential && credentialIdStr) {
-      body.credential_id = Number(credentialIdStr);
+      // Credential ids are UUID strings on the Go backend — do not coerce to Number.
+      body.credential_id = credentialIdStr;
     }
     if (moduleSlug) {
       body.module_slug = moduleSlug;
     }
 
+    // NOTE: /credentials/options/:resource does not exist on the Go backend
+    // (internal/modules/credential/routes.go has no such route) — this call
+    // will 404 until it's ported. Kept wired so the UI compiles.
     instanceAuth
-      .post(`/v1/credentials/options/${resource}/`, body)
+      .post(`/credentials/options/${resource}`, body)
       .then(({ data: raw }) => {
         const r = (raw ?? {}) as Record<string, unknown>;
         // Support {options:[...]} and {data:{options:[...]}} envelopes

@@ -15,6 +15,32 @@ export interface APIDetailCreateResponse<T> {
   data: T;
 }
 
+/**
+ * New Go backend (api/v1) list envelope. Every list endpoint
+ * (projects, credentials, cms collections, modules, ...) returns this raw
+ * shape — no `{status, data}` wrapper, offset/limit pagination instead of
+ * page/page_size.
+ */
+export interface ListEnvelope<T> {
+  items: T[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+/**
+ * New Go backend error body: `{ error: { code, message, details } }`.
+ * Replaces the old DRF-style `{status:false, data:{detail}}` / flat
+ * `{message, code}` shapes.
+ */
+export interface ApiErrorEnvelope {
+  error: {
+    code: string;
+    message: string;
+    details?: Record<string, unknown>;
+  };
+}
+
 export interface Links {
   previous: string | null;
   next: string | null;

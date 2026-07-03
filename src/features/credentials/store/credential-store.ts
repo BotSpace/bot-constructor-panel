@@ -16,6 +16,7 @@ function extractResults<T>(raw: unknown): T[] {
   const r = (raw ?? {}) as Record<string, unknown>;
   const data = r.data as Record<string, unknown> | T[] | undefined;
   const candidates: unknown[] = [
+    r.items, // Go backend list envelope: { items, total, limit, offset }
     r.results,
     (data as Record<string, unknown> | undefined)?.results,
     data,
@@ -57,7 +58,7 @@ export const useCredentialTypesStore = create<CredentialTypesStore>((set, get) =
     set({ typesLoading: true });
 
     instanceAuth
-      .get("/v1/credentials/types/")
+      .get("/credentials/types")
       .then(({ data }) => {
         set({ types: extractResults<CredentialType>(data) });
       })
@@ -84,9 +85,9 @@ type CredentialStore = {
   setPage: (page: number) => void;
   setTypeFilter: (type: string) => void;
   createCredential: (payload: CreateCredentialPayload) => Promise<CredentialListItem>;
-  updateCredential: (id: number, payload: PatchCredentialPayload) => Promise<CredentialListItem>;
-  deleteCredential: (id: number) => Promise<void>;
-  testCredential: (id: number) => Promise<{ ok: boolean }>;
+  updateCredential: (id: string, payload: PatchCredentialPayload) => Promise<CredentialListItem>;
+  deleteCredential: (id: string) => Promise<void>;
+  testCredential: (id: string) => Promise<{ ok: boolean }>;
 };
 
 export const useCredentialStore = create<CredentialStore>((set, get) => ({
@@ -104,19 +105,23 @@ export const useCredentialStore = create<CredentialStore>((set, get) => ({
 
     set({ loading: true });
 
-    const params: Record<string, string | number> = { page, page_size: pageSize };
+    // Go backend paginates with limit/offset, not page/page_size.
+    const params: Record<string, string | number> = {
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    };
     if (type) params.type_key = type;
 
     instanceAuth
-      .get(`/v1/credentials/`, { params })
+      .get(`/credentials`, { params })
       .then(({ data }) => {
         const results = extractResults<CredentialListItem>(data);
         const raw = (data ?? {}) as Record<string, unknown>;
         const total =
-          typeof raw.count === "number"
-            ? raw.count
-            : typeof (raw.data as Record<string, unknown> | undefined)?.count === "number"
-              ? ((raw.data as Record<string, unknown>).count as number)
+          typeof raw.total === "number"
+            ? raw.total
+            : typeof raw.count === "number"
+              ? (raw.count as number)
               : results.length;
         set({ credentials: results, total, page, typeFilter: type });
       })
@@ -135,7 +140,7 @@ export const useCredentialStore = create<CredentialStore>((set, get) => ({
   },
 
   async createCredential(payload) {
-    const { data } = await instanceAuth.post(`/v1/credentials/`, payload);
+    const { data } = await instanceAuth.post(`/credentials`, payload);
     const created: CredentialListItem = unwrapCredential(data);
     set((s) => ({
       credentials: [created, ...(s.credentials ?? [])],
@@ -145,7 +150,7 @@ export const useCredentialStore = create<CredentialStore>((set, get) => ({
   },
 
   async updateCredential(id, payload) {
-    const { data } = await instanceAuth.patch(`/v1/credentials/${id}/`, payload);
+    const { data } = await instanceAuth.patch(`/credentials/${id}`, payload);
     const updated: CredentialListItem = unwrapCredential(data);
     set((s) => ({
       credentials: (s.credentials ?? []).map((c) => (c.id === id ? updated : c)),
@@ -154,15 +159,19 @@ export const useCredentialStore = create<CredentialStore>((set, get) => ({
   },
 
   async deleteCredential(id) {
-    await instanceAuth.delete(`/v1/credentials/${id}/`);
+    await instanceAuth.delete(`/credentials/${id}`);
     set((s) => ({
       credentials: (s.credentials ?? []).filter((c) => c.id !== id),
       total: Math.max(0, s.total - 1),
     }));
   },
 
+  // NOTE: the Go backend has no POST /credentials/:id/test route (verified
+  // against internal/modules/credential/routes.go) — this will 404 until
+  // the backend adds a connection-test endpoint. Left wired so the UI
+  // compiles; see report for the full list of unported credential routes.
   async testCredential(id) {
-    const { data } = await instanceAuth.post(`/v1/credentials/${id}/test/`);
+    const { data } = await instanceAuth.post(`/credentials/${id}/test`);
     return data?.data ?? data;
   },
 }));

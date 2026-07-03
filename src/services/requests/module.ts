@@ -3,110 +3,102 @@ import { NodeManifest } from "@/features/bot-constructor/manifest/types";
 import { ProjectModule, AvailableModule, ModuleDetail } from "@/types/http/module";
 
 // ---------------------------------------------------------------------------
-// GET /api/project/{id}/module-manifests/
+// GET /api/v1/projects/{id}/module-manifests
 // Returns the merged NodeManifest[] for all modules enabled on this project.
-// Response shape: { data: NodeManifest[] }
+// Go response shape: { manifests: NodeManifest[] }
 // ---------------------------------------------------------------------------
 export async function getProjectModuleManifests(
-  projectId: string | number
+  projectId: string
 ): Promise<NodeManifest[]> {
   const { data } = await instanceAuth.get(
-    `/project/${projectId}/module-manifests/`
+    `/projects/${projectId}/module-manifests`
   );
-  // Shapes seen in the wild:
-  //   { manifests: [...] }                      (raw view)
-  //   { status, data: { manifests: [...] } }    (envelope renderer)
-  const body = (data as any)?.data ?? data;
-  const manifests = body?.manifests ?? body;
+  const manifests = (data as any)?.manifests;
   return Array.isArray(manifests) ? manifests : [];
 }
 
 // ---------------------------------------------------------------------------
-// GET /api/project/{id}/modules/
+// GET /api/v1/projects/{id}/modules
 // Returns the list of enabled modules with their deployment status.
+// Go response is a plain array.
 // ---------------------------------------------------------------------------
 export async function getProjectModules(
-  projectId: string | number
+  projectId: string
 ): Promise<ProjectModule[]> {
-  const { data } = await instanceAuth.get(`/project/${projectId}/modules/`);
-  // Project endpoints come wrapped: { status, data: [...] }; tolerate plain array.
+  const { data } = await instanceAuth.get(`/projects/${projectId}/modules`);
   if (Array.isArray(data)) return data;
   const d = data as any;
-  if (Array.isArray(d?.data)) return d.data;
-  if (Array.isArray(d?.results)) return d.results;
+  if (Array.isArray(d?.items)) return d.items;
   return [];
 }
 
 // ---------------------------------------------------------------------------
-// POST /api/project/{id}/modules/  { module_slug }
+// POST /api/v1/projects/{id}/modules  { module_slug }
 // Enable (deploy) a module for this project.
 // ---------------------------------------------------------------------------
 export async function enableModule(
-  projectId: string | number,
+  projectId: string,
   moduleSlug: string
 ): Promise<ProjectModule> {
   const { data } = await instanceAuth.post(
-    `/project/${projectId}/modules/`,
+    `/projects/${projectId}/modules`,
     { module_slug: moduleSlug }
   );
-  return ((data as any)?.data ?? data) as ProjectModule;
+  return data as ProjectModule;
 }
 
 // ---------------------------------------------------------------------------
-// DELETE /api/project/{id}/modules/{slug}/
+// DELETE /api/v1/projects/{id}/modules/{slug}
 // Disable (undeploy) a module for this project.
 // ---------------------------------------------------------------------------
 export async function disableModule(
-  projectId: string | number,
+  projectId: string,
   moduleSlug: string
 ): Promise<void> {
-  await instanceAuth.delete(`/project/${projectId}/modules/${moduleSlug}/`);
+  await instanceAuth.delete(`/projects/${projectId}/modules/${moduleSlug}`);
 }
 
 // ---------------------------------------------------------------------------
-// GET /api/modules/
+// GET /api/v1/modules
 // Returns the global catalog of all available modules.
+// Go backend paginates: { items: [...], total, limit, offset }.
 // ---------------------------------------------------------------------------
 export async function listAvailableModules(): Promise<AvailableModule[]> {
-  // Backend paginates: { results: [...] }; tolerate a plain array too.
   const { data } = await instanceAuth.get<
-    AvailableModule[] | { results: AvailableModule[] }
-  >(`/modules/`);
+    AvailableModule[] | { items: AvailableModule[] }
+  >(`/modules`);
   if (Array.isArray(data)) return data;
-  return Array.isArray(data?.results) ? data.results : [];
+  return Array.isArray((data as any)?.items) ? (data as any).items : [];
 }
 
 // ---------------------------------------------------------------------------
-// GET /api/modules/{id}/
+// GET /api/v1/modules/{slug}
 // Returns the full detail for one module (docs, nodes, etc.)
 // ---------------------------------------------------------------------------
 export async function getModuleDetail(
-  moduleId: number | string
+  moduleId: string
 ): Promise<ModuleDetail> {
-  const { data } = await instanceAuth.get(`/modules/${moduleId}/`);
-  return ((data as any)?.data ?? data) as ModuleDetail;
+  const { data } = await instanceAuth.get(`/modules/${moduleId}`);
+  return data as ModuleDetail;
 }
 
 // ---------------------------------------------------------------------------
-// POST /api/project/{id}/modules/register-self-hosted/
+// POST /api/v1/projects/{id}/modules/register-self-hosted
 // Register the caller's own self-hosted module for this project.
-// Backend creates (or reuses) a private ModuleModel and links it via
-// ProjectModuleModel.  Only the owner of the project may call this.
 //
-// NOTE: This endpoint does NOT exist yet on the backend.  When it is added
-// the shape below must be honoured.  The frontend is already wired up so
-// the UI can be demoed / reviewed before the backend lands.
-//
-// Request body: { endpoint: string; name?: string; auth_token?: string }
-// Response:     ProjectModule  (same shape as /project/{id}/modules/ items)
+// NOTE: This endpoint does NOT exist on the Go backend (verified against
+// internal/modules/plugin/routes.go — only modules/module-manifests/
+// node-manifests/modules-for-engine are mounted under /projects/:id). Kept
+// wired up so the UI compiles/demos; calling it will 404 until the backend
+// adds it.
 // ---------------------------------------------------------------------------
 export async function registerSelfHostedModule(
-  projectId: string | number,
+  projectId: string,
   payload: { endpoint: string; name?: string; auth_token?: string }
 ): Promise<ProjectModule> {
   const { data } = await instanceAuth.post(
-    `/project/${projectId}/modules/register-self-hosted/`,
+    `/projects/${projectId}/modules/register-self-hosted`,
     payload
   );
-  return ((data as any)?.data ?? data) as ProjectModule;
+  return data as ProjectModule;
 }

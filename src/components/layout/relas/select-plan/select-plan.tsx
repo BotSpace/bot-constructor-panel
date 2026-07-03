@@ -5,13 +5,12 @@ import {
     BILLING_PERIODS,
     type Plan,
 } from "@/components/layout/relas/select-plan/types";
-import { APIListResponse } from "@/types/http/response";
 import { Loader2 } from "lucide-react";
 import { PlanCard } from "@/components/layout/relas/select-plan/plan-card";
 import SaleForLongTime from "@/components/layout/relas/select-plan/sale-for-long-time";
 
 type Props = {
-    onSelectPlan: (plan_id: number, months: number) => void;
+    onSelectPlan: (plan_id: string, months: number) => void;
     header: React.ReactNode;
     isUserUseFreePlan?: boolean;
 };
@@ -28,13 +27,10 @@ function SelectPlan({ onSelectPlan, header, isUserUseFreePlan = false }: Props) 
         (p) => p.key === billingPeriod,
     )!;
 
-    const { data: plansResponse, isLoading } = useReactQueryAction<
-        APIListResponse<Plan[]>
-    >({
-        url: "plans/",
+    // Go backend: GET /api/v1/plans -> plain Plan[] (public, no envelope).
+    const { data: plans, isLoading } = useReactQueryAction<Plan[]>({
+        url: "plans",
     });
-
-    const plans = plansResponse?.data?.results ?? [];
 
     return (
         <>
@@ -51,14 +47,14 @@ function SelectPlan({ onSelectPlan, header, isUserUseFreePlan = false }: Props) 
                 </div>
             )}
 
-            {!isLoading && !plans.length && (
+            {!isLoading && !plans?.length && (
                 <div className="rounded-2xl border border-border bg-card/60 p-8 text-center text-sm text-muted-foreground">
                     Tariflar ro&apos;yxatini yuklashda muammo yuz berdi. Iltimos,
                     birozdan so&apos;ng qayta urinib ko&apos;ring.
                 </div>
             )}
 
-            {!isLoading && !!plans.length && (
+            {!isLoading && !!plans?.length && (
                 <div className="grid gap-4 grid-cols-3">
                     {plans.map((plan) => (
                         <PlanCard

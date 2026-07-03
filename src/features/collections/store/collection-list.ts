@@ -19,7 +19,8 @@ function extractCollections(raw: unknown): CollectionListItem[] {
   const r = (raw ?? {}) as Record<string, unknown>;
   const data = r.data as Record<string, unknown> | unknown[] | undefined;
   const candidates: unknown[] = [
-    r.results, // { results: [...] }  (paginated body, the actual shape)
+    r.items, // { items: [...] }  (Go backend list envelope, the actual shape)
+    r.results, // { results: [...] }  (old Django paginated body)
     (data as Record<string, unknown> | undefined)?.results, // { data: { results: [...] } }
     data, // { data: [...] }
     raw, // bare array

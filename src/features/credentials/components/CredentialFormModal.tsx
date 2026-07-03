@@ -433,18 +433,21 @@ function OAuthConnect({ type, accountEmail, onSuccess }: OAuthConnectProps) {
     };
 
     const fetchList = async (): Promise<CredentialListItem[]> => {
-      const { data } = await instanceAuth.get(`/v1/credentials/`, {
-        params: { type_key: type.key, page: 1, page_size: 50 },
+      const { data } = await instanceAuth.get(`/credentials`, {
+        params: { type_key: type.key, limit: 50, offset: 0 },
       });
       const raw = (data ?? {}) as Record<string, unknown>;
       const inner = raw.data as Record<string, unknown> | undefined;
-      const candidates: unknown[] = [raw.results, inner?.results, inner, data];
+      const candidates: unknown[] = [raw.items, raw.results, inner?.results, inner, data];
       return (candidates.find(Array.isArray) as CredentialListItem[] | undefined) ?? [];
     };
 
     try {
+      // NOTE: /credentials/oauth/:provider/start does not exist on the Go
+      // backend (no OAuth routes in internal/modules/credential/routes.go)
+      // — this call will 404 until OAuth credentials are ported.
       const { data } = await instanceAuth.post(
-        `/v1/credentials/oauth/${type.provider}/start/`,
+        `/credentials/oauth/${type.provider}/start`,
         { type_key: type.key }
       );
       const payload = (data?.data ?? data) as { authorize_url?: string };

@@ -1,5 +1,3 @@
-import { APIDetailCreateResponse } from "@/types/http/response";
-
 export type FileType = "file" | "photo" | "video" | "audio";
 
 export interface CreateFileRequest {
@@ -7,12 +5,18 @@ export interface CreateFileRequest {
   filetype: FileType;
 }
 
+// Raw response from POST /api/v1/file (Go backend — no envelope).
 export interface FileData {
-  file: string; // URI
+  id: string;
   uuid: string;
-  filesize?: number | null;
+  project_id?: string;
+  name?: string;
+  url: string;
+  size?: number;
   filetype: FileType;
+  expires_at?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export interface CreateFileResponse extends APIDetailCreateResponse<FileData> {}
-
+export type CreateFileResponse = FileData;

@@ -35,7 +35,34 @@ const CONNECT_TIMEOUT_MS = 10_000;
 const BACKOFF_BASE_MS = 500;
 const BACKOFF_MAX_MS = 5_000;
 
-export const WS_URL = "wss://api.botspace.uz/ws/events";
+// Derived from NEXT_PUBLIC_API so local/staging/prod all point at their own
+// backend. Go backend mounts the socket at GET /api/v1/ws (see
+// internal/modules/ws/routes.go) — NOT /ws/events.
+//
+// IMPORTANT (see report): the Go backend's /ws is currently a generic
+// room-based chat scaffold ({type, from, room, body}); it does not emit the
+// domain events this hub expects ("release_status", "debug_status",
+// "context", "node_execution", "error" as {event, data}). Connecting here
+// will succeed but no real-time debug/release updates will arrive until the
+// backend adds that broadcasting.
+function resolveWsUrl(): string {
+  const api = process.env.NEXT_PUBLIC_API || "";
+  // Prod gateway rewrites /api/v2 -> the new Go backend's /api/v1, so this
+  // reads the same NEXT_PUBLIC_API_PREFIX as instance.ts/middleware.ts.
+  // Localhost keeps hitting /api/v1 directly (unset -> default).
+  const prefix = process.env.NEXT_PUBLIC_API_PREFIX || "/api/v1";
+  try {
+    const u = new URL(api);
+    u.protocol = u.protocol === "https:" ? "wss:" : "ws:";
+    u.pathname = `${prefix}/ws`;
+    u.search = "";
+    return u.toString();
+  } catch {
+    return "wss://api.botspace.uz/ws/events";
+  }
+}
+
+export const WS_URL = resolveWsUrl();
 
 class WsHub {
   private ws: WebSocket | null = null;

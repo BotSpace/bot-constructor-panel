@@ -16,7 +16,7 @@ import { detectFileType } from "@/lib/file-utils";
 export async function uploadFile(
   file: File,
   filetype?: FileType,
-  projectId?: number
+  projectId?: string
 ): Promise<CreateFileResponse> {
   // Agar filetype berilmagan bo'lsa, avtomatik aniqlash
   const detectedFileType = filetype || detectFileType(file);
@@ -25,13 +25,13 @@ export async function uploadFile(
   formData.append("file", file);
   formData.append("filetype", detectedFileType);
 
-  // Agar projectId berilgan bo'lsa, FormData'ga qo'shamiz
+  // Go backend requires project_id (multipart field name — NOT "project").
   if (projectId) {
-    formData.append("project", String(projectId));
+    formData.append("project_id", projectId);
   }
 
   const response = await instanceAuth.post<CreateFileResponse>(
-    "/file/",
+    "/file",
     formData,
     {
       headers: {

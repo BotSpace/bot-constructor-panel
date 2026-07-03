@@ -240,7 +240,7 @@ export function MediaMessageField({ nodeId, data, kind }: MediaMessageFieldProps
     setUploadedFileName(file.name);
     try {
       const response = await uploadFile(file, undefined, project?.id);
-      updateNodeData(nodeId, { uploadedFileUuid: response.data.uuid });
+      updateNodeData(nodeId, { uploadedFileUuid: response.uuid });
       setUploadedFileName(file.name);
     } catch {
       setUploadedFileName(null);

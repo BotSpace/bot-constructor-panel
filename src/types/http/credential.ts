@@ -44,7 +44,7 @@ export interface CredentialType {
 
 // List / detail: secret fields are masked as "••••last4" or null
 export interface CredentialListItem {
-  id: number;
+  id: string;
   name: string;
   type_key: string;
   type: Pick<CredentialType, "key" | "label" | "icon" | "mode">;

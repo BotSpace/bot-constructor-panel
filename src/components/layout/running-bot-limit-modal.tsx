@@ -23,10 +23,10 @@ import { cn } from "@/lib/utils";
 // ------------------------------------------------------------------
 
 export interface RunningBot {
-  project_id: number;
+  project_id: string;
   name: string;
   kind: "debug" | "release";
-  release_id?: number;
+  release_id?: string;
 }
 
 export interface RunningBotLimitError {
@@ -80,14 +80,14 @@ export function RunningBotLimitModal({
     setStopping(true);
     try {
       if (bot.kind === "debug") {
-        await instanceAuth.get(`/project/${bot.project_id}/stop/`);
+        await instanceAuth.get(`/projects/${bot.project_id}/debug/stop`);
       } else {
         const releaseId = bot.release_id;
         if (!releaseId) {
           toast.error("Release ID topilmadi.");
           return;
         }
-        await instanceAuth.get(`/relase/${releaseId}/stop/`);
+        await instanceAuth.get(`/relase/${releaseId}/stop`);
       }
 
       toast.success(`"${bot.name}" to'xtatildi.`);

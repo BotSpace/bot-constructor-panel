@@ -4,7 +4,6 @@ import type { Edge, Node } from "reactflow";
 import { FlowStoreState, Actions } from "@/features/bot-constructor/store/types";
 import { ElementItemType } from "@/types/element-types";
 import { instanceAuth } from "@/services/instance";
-import { compressFlow } from "@/lib/flow-compress";
 import { getFormatFlow } from "@/features/bot-constructor/lib/format-flow";
 import { generateId } from "@/lib/utils";
 import { getNodeManifestByType } from "@/features/bot-constructor/manifest";
@@ -316,20 +315,15 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     set({ isLoading: true });
 
     try {
-      // flow_gz: gzip + base64 (backend kontrakt: PATCH flow_gz → backend ochib saqlaydi).
-      // Compress xato bersa — plain flow bilan fallback (flow yo'qotilmasin).
-      // languages va defaultLanguage flow top-level'da saqlanadi (engine reads them).
+      // Go backend's UpdateRequest only accepts a raw `flow` (json.RawMessage) —
+      // it has no flow_gz field, so the old gzip+base64 compression trick is a
+      // silent no-op against it (unknown JSON keys are ignored). Always send
+      // plain flow. languages/defaultLanguage stay at the flow top-level
+      // (engine reads them from there).
       const flowPayload = { nodes, edges, languages, defaultLanguage };
-      let payload: Record<string, unknown>;
-      try {
-        const flow_gz = compressFlow(flowPayload);
-        payload = { flow_gz };
-      } catch (compressErr) {
-        console.warn("[saveFlow] compress xatolik, plain flow yuboriladi:", compressErr);
-        payload = { flow: flowPayload };
-      }
+      const payload = { flow: flowPayload };
 
-      const response = await instanceAuth.patch(`/project/${project_id}/`, payload);
+      const response = await instanceAuth.patch(`/projects/${project_id}`, payload);
       if (response.status !== 200) {
         throw new Error("Serverda saqlashda xatolik.");
       }

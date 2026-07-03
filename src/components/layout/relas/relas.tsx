@@ -50,11 +50,11 @@ function ReleasePanel() {
   );
   // Remembers plan args so we can retry after stopping a bot
   const [pendingRelease, setPendingRelease] = useState<{
-    plan_id?: number;
+    plan_id?: string;
     months?: number;
   } | null>(null);
 
-  async function handleCreateRelease(plan_id?: number, months?: number) {
+  async function handleCreateRelease(plan_id?: string, months?: number) {
     const toastId = toast.loading("Release qilinmoqda...");
 
     // Saqlanmagan o'zgarishlar bo'lsa, release'dan OLDIN majburiy saqlaymiz —
@@ -69,12 +69,14 @@ function ReleasePanel() {
       }
     }
 
-    const body: Record<string, unknown> = { project: id };
-    if (plan_id !== undefined) body.plan_id = plan_id;
-    if (months !== undefined) body.months = months;
+    // Go backend's CreateReleaseRequest only takes {project_id} — plan/months
+    // are no longer part of release creation (subscriptions live under
+    // /subscription now, decoupled from deploys). Kept here as a harmless
+    // no-op for now; see report for the plan-gate UX gap.
+    const body: Record<string, unknown> = { project_id: id };
 
     instanceAuth
-      .post("/relase/", body)
+      .post("/relase", body)
       .then(() => {
         toast.success("Telegram bot release qilindi", { id: toastId });
         setPlanDialogOpen(false);
@@ -96,6 +98,7 @@ function ReleasePanel() {
             d?.plan_id?.[0] ??
             d?.detail ??
             data?.detail ??
+            raw?.error?.message ??
             "Xatolik yuz berdi";
           toast.error(message, { id: toastId });
         }
@@ -226,7 +229,7 @@ function PlanSelectionDialog({
   onOpenChange: (open: boolean) => void;
   title: string;
   description: string;
-  onSelectPlan: (plan_id: number, months: number) => void;
+  onSelectPlan: (plan_id: string, months: number) => void;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -269,10 +272,14 @@ function ReleaseDropDown({
     onClick: (e) => console.log("Clicked!"),
   });
 
-  function handleUpgradePlan(plan_id: number, months: number) {
+  function handleUpgradePlan(plan_id: string, months: number) {
     const toastId = toast.loading("Tarif o'zgartirilmoqda...");
+    // NOTE: not ported — the Go backend has no project-scoped plan/upgrade
+    // endpoint. Subscriptions are user-scoped now (`POST /subscription/upgrade`,
+    // no `months`/per-project binding). This call will 404 until product
+    // decides how plan upgrades map onto the new subscription model.
     instanceAuth
-      .post(`/project/${id}/plan/upgrade/`, { plan_id, months })
+      .post(`/projects/${id}/plan/upgrade`, { plan_id, months })
       .then(() => {
         toast.success("Tarif muvaffaqiyatli o'zgartirildi", { id: toastId });
         setChangePlanOpen(false);
