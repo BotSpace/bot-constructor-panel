@@ -97,9 +97,13 @@ export function DynamicInputsField({
     }
     setLoading(true);
     setError(null);
+    // NOTE: /credentials/options/:resource does not exist on the Go backend
+    // (internal/modules/credential/routes.go has no such route) — this call
+    // will 404 until it's ported. Kept wired so the UI compiles.
     instanceAuth
-      .post(`/v1/credentials/options/${resource}/`, {
-        credential_id: Number(credentialIdStr),
+      .post(`/credentials/options/${resource}`, {
+        // Credential ids are UUID strings on the Go backend — do not coerce to Number.
+        credential_id: credentialIdStr,
         params: depValues,
       })
       .then(({ data: raw }) => {

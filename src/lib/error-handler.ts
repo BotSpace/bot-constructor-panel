@@ -11,7 +11,16 @@ export function handleApiError(error: unknown): ApiError {
     const status = error.response?.status;
     const data = error.response?.data;
 
-    // Server error response
+    // Go backend error envelope: { error: { code, message, details } }.
+    if (data?.error?.message) {
+      return {
+        message: data.error.message,
+        status,
+        code: data.error.code,
+      };
+    }
+
+    // Old Django-style flat error response
     if (data?.message) {
       return {
         message: data.message,

@@ -1,59 +1,38 @@
 import { instanceAuth } from "@/services/instance";
 import { Env } from "@/types/http/env";
 
-export interface PaginatedEnvResponse {
-  links: {
-    previous: string | null;
-    next: string | null;
-  };
-  total_items: number;
-  total_pages: number;
-  page_size: number;
-  current_page: number;
-  results: Env[];
+// GET /api/v1/enviroment?project=<uuid> — plain array, no pagination envelope.
+export async function getEnvList(projectId: string): Promise<Env[]> {
+  const { data } = await instanceAuth.get<Env[]>("/enviroment", {
+    params: { project: projectId },
+  });
+  return Array.isArray(data) ? data : [];
 }
 
-interface ApiResponse<T> {
-  status: boolean;
-  data: T;
-}
-
-export async function getEnvList(
-  projectId: string | number,
-  page = 1,
-  pageSize = 50
-): Promise<PaginatedEnvResponse> {
-  const { data } = await instanceAuth.get<ApiResponse<PaginatedEnvResponse>>(
-    "/enviroment/",
-    { params: { project: projectId, page, page_size: pageSize } }
-  );
-  return data.data;
-}
-
+// POST /api/v1/enviroment {project_id, key, value, secret} — upsert: a
+// second call with the same project_id+key overwrites the value. There is
+// no separate update endpoint.
 export async function createEnv(payload: {
   key: string;
   value: string;
   secret: boolean;
-  project: number | string;
+  project: string;
 }): Promise<Env> {
-  const { data } = await instanceAuth.post<ApiResponse<Env>>(
-    "/enviroment/",
-    payload
-  );
-  return data.data;
+  const { data } = await instanceAuth.post<Env>("/enviroment", {
+    key: payload.key,
+    value: payload.value,
+    secret: payload.secret,
+    project_id: payload.project,
+  });
+  return data;
 }
 
-export async function updateEnv(
-  id: number,
-  payload: { key?: string; value?: string; secret?: boolean }
-): Promise<Env> {
-  const { data } = await instanceAuth.patch<ApiResponse<Env>>(
-    `/enviroment/${id}/`,
-    payload
-  );
-  return data.data;
-}
+// There is no PATCH /enviroment/:id on the new backend — updating a value
+// means POSTing the same key again (see createEnv above). Kept as an alias
+// so existing call sites compile; callers should prefer createEnv.
+export const updateEnv = createEnv;
 
-export async function deleteEnv(id: number): Promise<void> {
-  await instanceAuth.delete(`/enviroment/${id}/`);
+// DELETE /api/v1/enviroment/:key — keyed by the env var's KEY, not its id.
+export async function deleteEnv(key: string): Promise<void> {
+  await instanceAuth.delete(`/enviroment/${key}`);
 }

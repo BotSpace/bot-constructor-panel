@@ -1,8 +1,14 @@
 import axios from "axios";
 import { getSession } from "@/lib/session-client";
 
+// Backend paths in the codebase are hardcoded as "/api/v1/...". In prod the
+// gateway rewrites "/api/v2" -> the new Go backend's "/api/v1", so this
+// prefix is read from env instead of being hardcoded here. Localhost keeps
+// hitting the Go backend's real "/api/v1" directly (unset -> default).
+const API_PREFIX = process.env.NEXT_PUBLIC_API_PREFIX || "/api/v1";
+
 export const instanceAuth = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API + "/api",
+  baseURL: process.env.NEXT_PUBLIC_API + API_PREFIX,
 });
 
 export const instance = axios.create({

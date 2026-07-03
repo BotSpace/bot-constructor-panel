@@ -88,20 +88,23 @@ export function CredentialSelectField({
     if (typeKey) params.type_key = typeKey;
 
     instanceAuth
-      .get("/v1/credentials/", { params })
+      .get("/credentials", { params })
       .then(({ data: raw }) => {
-        // Support both paginated { results: [...] } and plain array responses
+        // Support the Go backend's { items: [...] } envelope, the old
+        // paginated { results: [...] } shape, and a plain array.
         const r = (raw ?? {}) as Record<string, unknown>;
-        const results: CredentialListItem[] = Array.isArray(r.results)
-          ? (r.results as CredentialListItem[])
-          : Array.isArray(
-                (r.data as Record<string, unknown> | undefined)?.results,
-              )
-            ? ((r.data as Record<string, unknown>)
-                .results as CredentialListItem[])
-            : Array.isArray(raw)
-              ? (raw as CredentialListItem[])
-              : [];
+        const results: CredentialListItem[] = Array.isArray(r.items)
+          ? (r.items as CredentialListItem[])
+          : Array.isArray(r.results)
+            ? (r.results as CredentialListItem[])
+            : Array.isArray(
+                  (r.data as Record<string, unknown> | undefined)?.results,
+                )
+              ? ((r.data as Record<string, unknown>)
+                  .results as CredentialListItem[])
+              : Array.isArray(raw)
+                ? (raw as CredentialListItem[])
+                : [];
         _cache.set(cacheKey, results);
         setCredentials(results);
       })

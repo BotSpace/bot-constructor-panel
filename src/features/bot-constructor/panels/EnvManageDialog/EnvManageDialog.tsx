@@ -15,7 +15,6 @@ import { Switch } from "@/components/ui/switch";
 import {
   getEnvList,
   createEnv,
-  updateEnv,
   deleteEnv,
 } from "@/services/requests/enviroment";
 import { Env } from "@/types/http/env";
@@ -40,7 +39,7 @@ interface EnvManageDialogProps {
 }
 
 interface EditingEnv {
-  id: number | null;
+  id: string | null;
   key: string;
   value: string;
   secret: boolean;
@@ -57,16 +56,16 @@ export function EnvManageDialog({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState<EditingEnv | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [visibleIds, setVisibleIds] = useState<Set<number>>(new Set());
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
   const [showEditValue, setShowEditValue] = useState(false);
 
   const fetchEnvs = useCallback(async () => {
     if (!projectId) return;
     setLoading(true);
     try {
-      const res = await getEnvList(projectId);
-      setEnvList(res.results);
+      const res = await getEnvList(String(projectId));
+      setEnvList(res);
     } catch {
       toast.error("Kalitlarni yuklashda xatolik yuz berdi");
     } finally {
@@ -109,30 +108,27 @@ export function EnvManageDialog({
       return;
     }
 
-    if (editing.id === null && !trimmedValue) {
+    // The new backend has no PATCH — POST is upsert-only and requires a
+    // value every time (it never echoes back a secret's plaintext to
+    // prefill from), so both create and edit must supply a fresh value.
+    if (!trimmedValue) {
       toast.error("Qiymat bo'sh bo'lishi mumkin emas");
       return;
     }
 
     setSaving(true);
     try {
-      if (editing.id === null) {
-        await createEnv({
-          key: trimmedKey,
-          value: trimmedValue,
-          secret: editing.secret,
-          project: projectId,
-        });
-        toast.success("Kalit muvaffaqiyatli qo'shildi");
-      } else {
-        const payload: { key?: string; value?: string; secret?: boolean } = {
-          key: trimmedKey,
-          secret: editing.secret,
-        };
-        if (trimmedValue) payload.value = trimmedValue;
-        await updateEnv(editing.id, payload);
-        toast.success("Kalit muvaffaqiyatli yangilandi");
-      }
+      await createEnv({
+        key: trimmedKey,
+        value: trimmedValue,
+        secret: editing.secret,
+        project: String(projectId),
+      });
+      toast.success(
+        editing.id === null
+          ? "Kalit muvaffaqiyatli qo'shildi"
+          : "Kalit muvaffaqiyatli yangilandi"
+      );
       setEditing(null);
       setShowEditValue(false);
       await fetchEnvs();
@@ -147,13 +143,13 @@ export function EnvManageDialog({
     }
   };
 
-  const handleDelete = async (id: number) => {
-    setDeletingId(id);
+  const handleDelete = async (env: Env) => {
+    setDeletingId(env.id);
     try {
-      await deleteEnv(id);
+      await deleteEnv(env.key);
       toast.success("Kalit muvaffaqiyatli o'chirildi");
-      setEnvList((prev) => prev.filter((e) => e.id !== id));
-      if (editing?.id === id) setEditing(null);
+      setEnvList((prev) => prev.filter((e) => e.id !== env.id));
+      if (editing?.id === env.id) setEditing(null);
     } catch {
       toast.error("Kalitni o'chirishda xatolik yuz berdi");
     } finally {
@@ -161,7 +157,7 @@ export function EnvManageDialog({
     }
   };
 
-  const toggleVisible = (id: number) => {
+  const toggleVisible = (id: string) => {
     setVisibleIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -228,11 +224,7 @@ export function EnvManageDialog({
                 />
                 <div className="relative">
                   <Input
-                    placeholder={
-                      editing.id !== null
-                        ? "Yangi qiymat (o'zgartirmaslik uchun bo'sh qoldiring)"
-                        : "Qiymati"
-                    }
+                    placeholder="Qiymati"
                     type={showEditValue ? "text" : "password"}
                     value={editing.value}
                     onChange={(e) =>
@@ -292,11 +284,7 @@ export function EnvManageDialog({
                 <Button
                   size="sm"
                   onClick={handleSave}
-                  disabled={
-                    saving ||
-                    !editing.key.trim() ||
-                    (editing.id === null && !editing.value.trim())
-                  }
+                  disabled={saving || !editing.key.trim() || !editing.value.trim()}
                 >
                   {saving ? (
                     <Loader2 className="w-4 h-4 mr-1 animate-spin" />
@@ -372,7 +360,7 @@ export function EnvManageDialog({
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        onClick={() => handleDelete(env.id)}
+                        onClick={() => handleDelete(env)}
                         disabled={deletingId === env.id}
                         title="O'chirish"
                         className="text-destructive hover:text-destructive"

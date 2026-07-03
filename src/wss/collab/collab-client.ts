@@ -129,9 +129,13 @@ export class CollabClient {
   }
 
   private async fetchToken(): Promise<string | null> {
+    // NOTE: /projects/:id/collab-token does not exist on the Go backend
+    // (no such route in internal/modules/project/routes.go) — this call
+    // 404s and real-time multi-editor collaboration silently stays off
+    // until the backend adds it. See report.
     try {
       const { data } = await instanceAuth.get<CollabTokenResponse>(
-        `/project/${this.projectId}/collab-token/`
+        `/projects/${this.projectId}/collab-token`
       );
       return data?.data?.token ?? null;
     } catch {

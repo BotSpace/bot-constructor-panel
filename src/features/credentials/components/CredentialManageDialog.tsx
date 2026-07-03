@@ -60,7 +60,7 @@ export function CredentialManageDialog({
 
   const [pendingDelete, setPendingDelete] = useState<CredentialListItem | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [testing, setTesting] = useState<number | null>(null);
+  const [testing, setTesting] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editItem, setEditItem] = useState<CredentialListItem | null>(null);
 

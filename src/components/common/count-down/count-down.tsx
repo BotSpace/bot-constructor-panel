@@ -6,7 +6,7 @@ import { CountdownItem } from "@/components/common/count-down/count-down-item";
 import { useNotificationContext } from "@/components/common/notification-provider";
 import { createSimpleNotification } from "@/lib/notification-utils";
 
-export default function CountdownComponent({ updated_at }: { updated_at: Date }) {
+export default function CountdownComponent({ updated_at }: { updated_at: Date | string }) {
     const { sendNotification } = useNotificationContext();
 
     // 1. Maqsadli vaqt: updated_at + 30 daqiqa

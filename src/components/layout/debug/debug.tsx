@@ -15,8 +15,7 @@ import { useParams } from "next/navigation";
 
 import { instanceAuth } from "@/services/instance";
 import { track } from "@/components/common/analitics";
-import type { ProjectRetrive } from "@/types/http/project";
-import type { APIDetailCreateResponse } from "@/types/http/response";
+import type { DebugInfo } from "@/types/http/project";
 
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { useFlowStore } from "@/features/bot-constructor/store";
@@ -91,25 +90,26 @@ export default function DebugingButtons() {
 
       pollingRef.current = setInterval(() => {
         instanceAuth
-          .get<APIDetailCreateResponse<ProjectRetrive>>(`/project/${id}`)
-          .then(({ data }) => {
-            const debug = data?.data?.debug;
+          .get<DebugInfo>(`/projects/${id}/info`)
+          .then(({ data: debug }) => {
             const current = useProjectStore.getState().project?.debug;
-            if (!debug) {
-              // While starting, a missing debug record just means the pod isn't
-              // up yet — keep loading. Otherwise (e.g. after stop) mark stopped.
+            // Faqat status o'zgargan bo'lsagina yangilaymiz
+            if (debug && debug.status !== current?.status) {
+              changeDebug(debug);
+            }
+          })
+          .catch((err) => {
+            // 404 (debug.not_found) — no debug record yet / it was torn down.
+            // While starting, that just means the pod isn't up — keep loading.
+            // Otherwise mark stopped so the UI doesn't spin forever.
+            if (err?.response?.status === 404) {
+              const current = useProjectStore.getState().project?.debug;
               if (!starting && current && current.status !== "stopped") {
                 changeDebug({ ...current, status: "stopped" });
               }
               return;
             }
-            // Faqat status o'zgargan bo'lsagina yangilaymiz
-            if (debug.status !== current?.status) {
-              changeDebug(debug);
-            }
-          })
-          .catch(() => {
-            // Silent — WS asosiy kanal, polling faqat fallback
+            // Other errors — silent, WS is the primary channel, polling is fallback.
           });
       }, 3000);
     } else {
@@ -174,7 +174,7 @@ export default function DebugingButtons() {
 
     track("bot-debug-run", { projectId: id });
     instanceAuth
-      .get(`/project/${id}/debug/`)
+      .get(`/projects/${id}/debug`)
       .then(() => {
         toast.success("Bot ishga tushirilmoqda...");
       })
@@ -206,7 +206,7 @@ export default function DebugingButtons() {
       });
 
     instanceAuth
-      .get(`/project/${id}/stop/`)
+      .get(`/projects/${id}/debug/stop`)
       .then(() => {
         toast.success("Bot muvaffaqiyatli to'xtatildi!");
       })

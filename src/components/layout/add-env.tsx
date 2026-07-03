@@ -60,24 +60,18 @@ export function AddEditEnvDialog({
 
     setLoading(true);
     try {
-      if (isEdit) {
-        // update existing env
-        await instanceAuth.patch(
-          `/enviroment/${env_name}/?project=${project_id}`,
-          {
-            value: trimmed,
-          }
-        );
-        toast.success("Bot token muvaffaqiyatli yangilandi!");
-      } else {
-        // create new env
-        await instanceAuth.post("/enviroment/", {
-          key: env_name,
-          value: trimmed,
-          project: project_id,
-        });
-        toast.success("Bot muvaffaqiyatli qo'shildi!");
-      }
+      // Go backend has no PATCH /enviroment/:key — POST is an upsert
+      // (same project_id+key overwrites the value), so create and edit share
+      // the same call.
+      await instanceAuth.post("/enviroment", {
+        key: env_name,
+        value: trimmed,
+        project_id: project_id,
+        secret: true,
+      });
+      toast.success(
+        isEdit ? "Bot token muvaffaqiyatli yangilandi!" : "Bot muvaffaqiyatli qo'shildi!"
+      );
       onSuccess?.();
       setOpen(false);
     } catch (err) {
