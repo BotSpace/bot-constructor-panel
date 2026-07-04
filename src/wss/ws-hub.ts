@@ -1,3 +1,4 @@
+// cutover: api.botspace.uz (API + WS bir host, /ws/events -> alohida websocket service)
 "use client";
 
 /**
