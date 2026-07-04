@@ -47,14 +47,15 @@ const BACKOFF_MAX_MS = 5_000;
 // backend adds that broadcasting.
 function resolveWsUrl(): string {
   const api = process.env.NEXT_PUBLIC_API || "";
-  // Prod gateway rewrites /api/v2 -> the new Go backend's /api/v1, so this
-  // reads the same NEXT_PUBLIC_API_PREFIX as instance.ts/middleware.ts.
-  // Localhost keeps hitting /api/v1 directly (unset -> default).
-  const prefix = process.env.NEXT_PUBLIC_API_PREFIX || "/api/v1";
+  // Real-time WS is a SEPARATE service (`websocket`, gateway PathPrefix /ws ->
+  // websocket:8080, endpoint /ws/events) — NOT the Go backend. It must NOT use
+  // the /api/v2 prefix (that routes to backend-golang's unused ws module). Same
+  // host as the API, fixed /ws/events path. The service validates ?token= with
+  // jwt-secret's key and reads the project_id claim (collab-token) to pick the room.
   try {
     const u = new URL(api);
     u.protocol = u.protocol === "https:" ? "wss:" : "ws:";
-    u.pathname = `${prefix}/ws`;
+    u.pathname = "/ws/events";
     u.search = "";
     return u.toString();
   } catch {
