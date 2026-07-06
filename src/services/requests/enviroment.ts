@@ -33,6 +33,8 @@ export async function createEnv(payload: {
 export const updateEnv = createEnv;
 
 // DELETE /api/v1/enviroment/:key — keyed by the env var's KEY, not its id.
-export async function deleteEnv(key: string): Promise<void> {
-  await instanceAuth.delete(`/enviroment/${key}`);
+export async function deleteEnv(projectId: string, key: string): Promise<void> {
+  await instanceAuth.delete(`/enviroment/${encodeURIComponent(key)}`, {
+    params: { project: projectId },
+  });
 }

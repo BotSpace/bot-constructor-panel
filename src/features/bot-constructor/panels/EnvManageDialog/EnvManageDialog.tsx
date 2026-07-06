@@ -146,7 +146,7 @@ export function EnvManageDialog({
   const handleDelete = async (env: Env) => {
     setDeletingId(env.id);
     try {
-      await deleteEnv(env.key);
+      await deleteEnv(String(projectId), env.key);
       toast.success("Kalit muvaffaqiyatli o'chirildi");
       setEnvList((prev) => prev.filter((e) => e.id !== env.id));
       if (editing?.id === env.id) setEditing(null);

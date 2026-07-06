@@ -37,7 +37,7 @@ import { useDebugControlStore } from "@/features/bot-constructor/store/debug-con
 import { useSearchStore } from "@/features/bot-constructor/panels/search/search-store";
 import { debugConsoleStore } from "@/components/layout/debug-console/store";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import { instanceAuth } from "@/services/instance";
+import { API_BASE_URL, instanceAuth } from "@/services/instance";
 import { getNodeManifestByType } from "@/features/bot-constructor/manifest";
 import { useTheme } from "next-themes";
 import { NodeSelectionDialog } from "@/features/bot-constructor/panels/NodeSelectionDialog";
@@ -329,7 +329,7 @@ export default function Constructor() {
         const session = await getSession();
         const access = session?.user?.access;
         if (!access) return;
-        await fetch(`${process.env.NEXT_PUBLIC_API}/api/project/${id}/`, {
+        await fetch(`${API_BASE_URL}/projects/${id}`, {
           method: "PATCH",
           keepalive: true,
           headers: {
@@ -530,7 +530,7 @@ export default function Constructor() {
         });
 
         instanceAuth
-          .get(`/project/${id}/stop/`)
+          .get(`/projects/${id}/debug/stop`)
           .then(() => {
             toast.success("Bot muvaffaqiyatli to'xtatildi!");
           })
@@ -547,7 +547,7 @@ export default function Constructor() {
 
         track("bot-debug-run", { projectId: id });
         instanceAuth
-          .get(`/project/${id}/debug/`)
+          .get(`/projects/${id}/debug`)
           .then(() => {
             toast.success("Bot ishga tushirilmoqda...");
           })

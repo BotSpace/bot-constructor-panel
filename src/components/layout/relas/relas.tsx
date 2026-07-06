@@ -273,26 +273,10 @@ function ReleaseDropDown({
   });
 
   function handleUpgradePlan(plan_id: string, months: number) {
-    const toastId = toast.loading("Tarif o'zgartirilmoqda...");
-    // NOTE: not ported — the Go backend has no project-scoped plan/upgrade
-    // endpoint. Subscriptions are user-scoped now (`POST /subscription/upgrade`,
-    // no `months`/per-project binding). This call will 404 until product
-    // decides how plan upgrades map onto the new subscription model.
-    instanceAuth
-      .post(`/projects/${id}/plan/upgrade`, { plan_id, months })
-      .then(() => {
-        toast.success("Tarif muvaffaqiyatli o'zgartirildi", { id: toastId });
-        setChangePlanOpen(false);
-      })
-      .catch((err) => {
-        const d = err?.response?.data?.data;
-        const message =
-          d?.detail ??
-          d?.plan_id?.[0] ??
-          err?.response?.data?.detail ??
-          "Xatolik yuz berdi";
-        toast.error(message, { id: toastId });
-      });
+    void plan_id;
+    void months;
+    toast.error("Tarifni loyiha ichidan o'zgartirish hozircha Go backendda qo'llab-quvvatlanmaydi.");
+    setChangePlanOpen(false);
   }
 
   return (

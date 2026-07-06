@@ -8,7 +8,7 @@ export type { NodeManifest } from "@/features/bot-constructor/manifest/types";
 /** Status of a module deployment for a specific project. */
 export type ModuleStatus = "pending" | "running" | "failed" | "stopped";
 
-/** One enabled module entry returned by GET /api/project/{id}/modules/ */
+/** One enabled module entry returned by GET /api/v1/projects/{id}/modules. */
 export interface ProjectModule {
   id: number;
   module: {
@@ -30,7 +30,7 @@ export interface AvailableModule {
   image: string;
 }
 
-/** Response shape for GET /api/project/{id}/module-manifests/ */
+/** Response shape for GET /api/v1/projects/{id}/module-manifests. */
 export interface ProjectModuleManifestsResponse {
   data: import("@/features/bot-constructor/manifest/types").NodeManifest[];
 }
