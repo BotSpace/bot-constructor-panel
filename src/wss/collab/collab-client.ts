@@ -31,6 +31,12 @@ interface CollabTokenResponse {
   room: string;
 }
 
+interface CollabTokenEnvelope {
+  data?: CollabTokenResponse;
+  token?: string;
+  room?: string;
+}
+
 export type RemoteOpHandler = (op: CollabOp) => void;
 
 export class CollabClient {
@@ -130,10 +136,10 @@ export class CollabClient {
 
   private async fetchToken(): Promise<string | null> {
     try {
-      const { data } = await instanceAuth.get<CollabTokenResponse>(
+      const { data } = await instanceAuth.get<CollabTokenEnvelope>(
         `/projects/${this.projectId}/collab-token`
       );
-      return data?.token ?? null;
+      return data?.data?.token ?? data?.token ?? null;
     } catch {
       return null;
     }
