@@ -56,8 +56,8 @@ async function refreshTokens(
     // {access_token, refresh_token, access_expires_at, refresh_expires_at, token_type}.
     // NEXT_PUBLIC_API_PREFIX lets prod rewrite this to /api/v2 (gateway ->
     // new Go backend) while localhost keeps hitting /api/v1 directly.
-    const url =
-      env.NEXT_PUBLIC_API.replace(/\/$/, "") + env.NEXT_PUBLIC_API_PREFIX + "/auth/refresh";
+    const apiRoot = env.NEXT_PUBLIC_API.replace(/\/+$/, "").replace(/\/api(?:\/v\d+)?$/, "");
+    const url = apiRoot + env.NEXT_PUBLIC_API_PREFIX + "/auth/refresh";
     const r = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json", accept: "application/json" },

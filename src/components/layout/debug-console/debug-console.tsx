@@ -5,6 +5,7 @@ import { X, Terminal, Trash2, Copy, TerminalIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { debugConsoleStore } from "@/components/layout/debug-console/store";
+import { instanceAuth } from "@/services/instance";
 
 interface LogEntry {
   id: string;
@@ -23,15 +24,10 @@ export function DebugConsole() {
   const [isConnected, setIsConnected] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const resizeStartRef = useRef({ y: 0, height: 0 });
   const logsContainerRef = useRef<HTMLDivElement>(null);
   const shouldAutoScrollRef = useRef(true);
-  /** ID of the single "reconnecting…" sentinel log entry, or null. */
-  const reconnectingLogIdRef = useRef<string | null>(null);
-  /** Whether we were in a reconnecting state (to show "Reconnected" on open). */
-  const wasReconnectingRef = useRef(false);
 
   // Ctrl + ` bilan toggle
   useEffect(() => {
@@ -115,128 +111,65 @@ export function DebugConsole() {
     };
   }, [isResizing]);
 
-  // SSE connection
+  // Log polling
   useEffect(() => {
     if (!isOpen) {
-      // Console yopilganda connection ni yopamiz
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-        setIsConnected(false);
-      }
+      setIsConnected(false);
       return;
     }
 
     // Bot type o'zgarganda loglarni tozalaymiz va auto scroll ni yoqamiz
     setLogs([]);
     shouldAutoScrollRef.current = true;
-    reconnectingLogIdRef.current = null;
-    wasReconnectingRef.current = false;
 
-    // Bot type ga qarab service_id ni olamiz
-    const serviceId =
+    const path =
       selectedBot === "debug"
-        ? project?.debug?.service_id
-        : project?.release?.service_id;
+        ? project?.id
+          ? `/projects/${project.id}/debug/logs`
+          : null
+        : project?.release?.id
+          ? `/relase/${project.release.id}/logs`
+          : null;
 
-    if (!serviceId) {
+    if (!path) {
       setIsConnected(false);
       return;
     }
 
-    // SSE connection
-    const url = `https://api.botspace.uz/sse/api/project/${serviceId}/logs/`;
-    eventSourceRef.current = new EventSource(url);
-
-    eventSourceRef.current.onopen = () => {
-      setIsConnected(true);
-      if (wasReconnectingRef.current) {
-        // Remove the reconnecting sentinel and add a single "reconnected" line
-        const sentinelId = reconnectingLogIdRef.current;
-        if (sentinelId) {
-          setLogs((prev) => prev.filter((l) => l.id !== sentinelId));
-        }
-        reconnectingLogIdRef.current = null;
-        wasReconnectingRef.current = false;
-        addLog("info", "Reconnected.");
-      } else {
-        addLog("info", `Connected to ${selectedBot} bot logs`);
-      }
-    };
-
-    eventSourceRef.current.onmessage = (event) => {
-      // Any incoming message means we are connected — clear reconnecting state
-      if (wasReconnectingRef.current) {
-        const sentinelId = reconnectingLogIdRef.current;
-        if (sentinelId) {
-          setLogs((prev) => prev.filter((l) => l.id !== sentinelId));
-        }
-        reconnectingLogIdRef.current = null;
-        wasReconnectingRef.current = false;
-      }
+    let cancelled = false;
+    let seen = 0;
+    const loadLogs = async () => {
       try {
-        const data = JSON.parse(event.data);
-        const level = data.level || "info";
-        const message = data.message || event.data;
-        addLog(level, message);
+        const { data } = await instanceAuth.get<{ lines?: string[] }>(path, {
+          params: { tail: 200 },
+        });
+        if (cancelled) return;
+        const lines = data.lines ?? [];
+        setIsConnected(true);
+        for (const line of lines.slice(seen)) {
+          addLog("log", line);
+        }
+        seen = lines.length;
       } catch {
-        // Plain text log
-        addLog("info", event.data);
+        if (cancelled) return;
+        setIsConnected(false);
+        addLog("error", "Loglarni olishda xatolik yuz berdi.");
       }
     };
 
-    eventSourceRef.current.onerror = () => {
-      setIsConnected(false);
-      if (!wasReconnectingRef.current) {
-        // First error: insert a single sentinel "Reconnecting…" entry
-        wasReconnectingRef.current = true;
-        const id = `reconnect-${Date.now()}`;
-        reconnectingLogIdRef.current = id;
-        const now = new Date();
-        const ts = [now.getHours(), now.getMinutes(), now.getSeconds()]
-          .map((v) => String(v).padStart(2, "0"))
-          .join(":") +
-          "." +
-          String(now.getMilliseconds()).padStart(3, "0");
-        const sentinel: LogEntry = {
-          id,
-          timestamp: ts,
-          level: "warning",
-          message: "Connection lost — reconnecting…",
-        };
-        setLogs((prev) => [...prev, sentinel]);
-      } else {
-        // Subsequent errors: silently update the sentinel's timestamp in-place
-        // so the log doesn't grow with repeated "Reconnecting" lines.
-        const sentinelId = reconnectingLogIdRef.current;
-        if (sentinelId) {
-          const now = new Date();
-          const ts = [now.getHours(), now.getMinutes(), now.getSeconds()]
-            .map((v) => String(v).padStart(2, "0"))
-            .join(":") +
-            "." +
-            String(now.getMilliseconds()).padStart(3, "0");
-          setLogs((prev) =>
-            prev.map((l) =>
-              l.id === sentinelId ? { ...l, timestamp: ts } : l
-            )
-          );
-        }
-      }
-    };
+    void loadLogs();
+    const interval = window.setInterval(() => void loadLogs(), 3000);
 
     return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-        setIsConnected(false);
-      }
+      cancelled = true;
+      window.clearInterval(interval);
+      setIsConnected(false);
     };
   }, [
     isOpen,
     selectedBot,
-    project?.debug?.service_id,
-    project?.release?.service_id,
+    project?.id,
+    project?.release?.id,
   ]);
 
   const addLog = useCallback((level: LogEntry["level"], message: string) => {

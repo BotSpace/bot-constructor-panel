@@ -27,8 +27,8 @@ const BACKOFF_MAX_MS = 5_000;
 const PING_FRAME = encodeOp({ t: "nd", id: "__collab_ping__" });
 
 interface CollabTokenResponse {
-  status: boolean;
-  data: { token: string; room: string };
+  token: string;
+  room: string;
 }
 
 export type RemoteOpHandler = (op: CollabOp) => void;
@@ -129,15 +129,11 @@ export class CollabClient {
   }
 
   private async fetchToken(): Promise<string | null> {
-    // NOTE: /projects/:id/collab-token does not exist on the Go backend
-    // (no such route in internal/modules/project/routes.go) — this call
-    // 404s and real-time multi-editor collaboration silently stays off
-    // until the backend adds it. See report.
     try {
       const { data } = await instanceAuth.get<CollabTokenResponse>(
         `/projects/${this.projectId}/collab-token`
       );
-      return data?.data?.token ?? null;
+      return data?.token ?? null;
     } catch {
       return null;
     }

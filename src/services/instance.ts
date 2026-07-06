@@ -7,8 +7,16 @@ import { getSession } from "@/lib/session-client";
 // hitting the Go backend's real "/api/v1" directly (unset -> default).
 const API_PREFIX = process.env.NEXT_PUBLIC_API_PREFIX || "/api/v1";
 
+function apiRoot() {
+  return (process.env.NEXT_PUBLIC_API ?? "")
+    .replace(/\/+$/, "")
+    .replace(/\/api(?:\/v\d+)?$/, "");
+}
+
+export const API_BASE_URL = `${apiRoot()}${API_PREFIX}`;
+
 export const instanceAuth = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API + API_PREFIX,
+  baseURL: API_BASE_URL,
 });
 
 export const instance = axios.create({

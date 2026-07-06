@@ -20,7 +20,7 @@ service:
 configMaps:
   config:
     DEBUG: "false"
-    NEXT_PUBLIC_API: "https://api.botspace.uz/api"
+    NEXT_PUBLIC_API: "https://api.botspace.uz"
     CONSTRUCTOR_URL: "http://constructor:3000"
     ADMIN_PANEL: "https://botspace.uz"
     DASHBOARD_URL: "https://botspace.uz"
