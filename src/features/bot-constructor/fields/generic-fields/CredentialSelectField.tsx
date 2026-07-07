@@ -65,7 +65,7 @@ export function CredentialSelectField({
     }
   };
 
-  // Current value — stored as a number (or null/undefined)
+  // Current value — Go backend credential IDs are UUID strings.
   const currentId = data[dataKey];
   const selectedId =
     typeof currentId === "number"
@@ -118,7 +118,7 @@ export function CredentialSelectField({
     if (value === "__none__") {
       write({ [dataKey]: null });
     } else {
-      write({ [dataKey]: Number(value) });
+      write({ [dataKey]: value });
     }
   };
 
@@ -180,7 +180,7 @@ export function CredentialSelectField({
         onSuccess={(created) => {
           if (!created) return;
           // Auto-select the newly created credential
-          updateNodeData(nodeId, { [dataKey]: created.id });
+          write({ [dataKey]: created.id });
           // Invalidate local cache and refresh
           _cache.delete(cacheKey);
           setCredentials((prev) => (prev ? [created, ...prev] : [created]));
