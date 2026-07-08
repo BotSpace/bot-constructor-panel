@@ -113,7 +113,7 @@ export function LocalizedField({ nodeId, data, field }: LocalizedFieldProps) {
             value={plainStr}
             onChange={(e) => handlePlainChange(e.target.value)}
             suggestions={suggestions}
-            className="min-h-20 border-white/10 bg-zinc-950/60"
+            className="border-white/10 bg-zinc-950/60"
           />
         ) : (
           <HighlightedInput
@@ -227,7 +227,7 @@ export function LocalizedField({ nodeId, data, field }: LocalizedFieldProps) {
             value={currentValue}
             onChange={(e) => handleChange(e.target.value)}
             suggestions={suggestions}
-            className="min-h-20 border-white/10 bg-zinc-950/60"
+            className="border-white/10 bg-zinc-950/60"
           />
         ) : (
           <HighlightedInput

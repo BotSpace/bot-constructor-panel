@@ -626,11 +626,18 @@ export const HighlightedTextarea = forwardRef<
     mirrorRef.current.scrollLeft = textareaRef.current.scrollLeft;
   }, []);
 
+  // Runs after every render (value is controlled, so this fires on each edit).
+  // Deterministic auto-grow: size the textarea to its content, then match the
+  // mirror. Replaces CSS field-sizing (which ignored min-height in some
+  // browsers and left an empty gap under the box).
   useEffect(() => {
     if (!textareaRef.current || !mirrorRef.current) return;
     syncMirrorFont(textareaRef.current, mirrorRef.current);
-    mirrorRef.current.style.height = `${textareaRef.current.offsetHeight}px`;
-    mirrorRef.current.style.width = `${textareaRef.current.offsetWidth}px`;
+    const ta = textareaRef.current;
+    ta.style.height = "auto";
+    ta.style.height = `${ta.scrollHeight}px`;
+    mirrorRef.current.style.height = `${ta.offsetHeight}px`;
+    mirrorRef.current.style.width = `${ta.offsetWidth}px`;
   });
 
   const { state, checkTriggerFromArgs, close, selectItem, handleKeyDown } =
@@ -670,7 +677,7 @@ export const HighlightedTextarea = forwardRef<
     <div
       ref={wrapperRef}
       className={cn(
-        "relative flex w-full flex-col overflow-visible rounded-md border border-input shadow-xs",
+        "relative w-full overflow-visible rounded-md border border-input shadow-xs",
         className,
       )}
       style={style}
@@ -708,7 +715,7 @@ export const HighlightedTextarea = forwardRef<
         className={cn(
           "placeholder:text-muted-foreground",
           "selection:bg-primary/30",
-          "min-h-16 w-full flex-1 bg-transparent",
+          "flex min-h-16 w-full overflow-hidden bg-transparent",
           "px-3 py-2 text-base outline-none",
           "transition-[color,box-shadow]",
           "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
@@ -721,7 +728,7 @@ export const HighlightedTextarea = forwardRef<
           backgroundColor: "transparent",
           color: "transparent",
           caretColor: "var(--foreground)",
-          resize: "vertical",
+          resize: "none",
           wordBreak: "break-word",
           overflowWrap: "break-word",
         }}
