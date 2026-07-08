@@ -670,7 +670,7 @@ export const HighlightedTextarea = forwardRef<
     <div
       ref={wrapperRef}
       className={cn(
-        "relative w-full overflow-visible rounded-md border border-input shadow-xs",
+        "relative flex w-full flex-col overflow-visible rounded-md border border-input shadow-xs",
         className,
       )}
       style={style}
@@ -708,7 +708,7 @@ export const HighlightedTextarea = forwardRef<
         className={cn(
           "placeholder:text-muted-foreground",
           "selection:bg-primary/30",
-          "flex field-sizing-content min-h-16 w-full bg-transparent",
+          "min-h-16 w-full flex-1 bg-transparent",
           "px-3 py-2 text-base outline-none",
           "transition-[color,box-shadow]",
           "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
