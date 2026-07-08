@@ -549,7 +549,7 @@ export function ModalFieldWidget({ nodeId, data, field, valueOverride, onPatch }
           rows={field.rows}
           value={typeof value === "string" ? value : ""}
           onChange={(event) => write(buildNestedPatch(data, fieldKey, event.target.value))}
-          className="min-h-28 border-white/10 bg-zinc-950/60"
+          className="border-white/10 bg-zinc-950/60"
           suggestions={suggestions}
         />
       </FieldShell>
