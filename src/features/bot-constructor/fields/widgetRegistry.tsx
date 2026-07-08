@@ -544,7 +544,7 @@ function DownloadFileWidget({ nodeId, data }: WidgetProps) {
   );
 }
 
-function HTTPRequestWidget({ nodeId, data }: WidgetProps) {
+function HTTPRequestWidget({ nodeId, data, field }: WidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const typedData = data as {
     method?: string;
@@ -554,13 +554,21 @@ function HTTPRequestWidget({ nodeId, data }: WidgetProps) {
     responseVariable?: string;
     timeout?: number;
     storeHeaders?: boolean;
-    credential_id?: number | null;
+    // Go backend credential IDs are UUID strings, not ints.
+    credential_id?: string | null;
   };
 
   return (
     <div className="space-y-3">
-      {/* Credential selector — id stored as credential_id in node data */}
-      <CredentialSelectField nodeId={nodeId} data={data} dataKey="credential_id" />
+      {/* Credential selector — id stored as credential_id (UUID string) in node
+          data. HTTP accepts any auth mode, so typeKey is only set when the
+          manifest constrains it via field.credentialType (otherwise all shown). */}
+      <CredentialSelectField
+        nodeId={nodeId}
+        data={data}
+        dataKey="credential_id"
+        typeKey={field.credentialType}
+      />
 
       <div className="flex flex-col gap-2">
         <Label>HTTP Metod</Label>

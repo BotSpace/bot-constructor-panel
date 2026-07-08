@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 import { getSession } from "@/lib/session-client";
 
 // Backend paths in the codebase are hardcoded as "/api/v1/...". In prod the
@@ -36,15 +36,61 @@ instanceAuth.interceptors.request.use(
   (error: unknown) => Promise.reject(error)
 );
 
-// If we still get a 401 (token died between middleware and this fetch), force
-// the page to reload so the next middleware pass refreshes — or redirect to
-// dashboard /login if refresh is impossible.
+// `basePath` is applied by Next.js routing but NOT by raw fetch() URLs, so we
+// prepend it explicitly — otherwise `/api/session` resolves at the origin root
+// (which serves a different app). Mirrors session-client.tsx.
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+// Marks a request we've already retried once after a refresh, so a request that
+// still 401s post-refresh does NOT loop forever.
+type RetriableConfig = AxiosRequestConfig & { _retried?: boolean };
+
+// Single-flight refresh: concurrent 401s share one /api/session POST instead of
+// firing a refresh storm. Resolves to the fresh access token, or null on failure.
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  if (!refreshPromise) {
+    refreshPromise = fetch(`${BASE_PATH}/api/session`, {
+      method: "POST",
+      cache: "no-store",
+    })
+      .then(async (r) => {
+        if (!r.ok) return null;
+        const json = (await r.json()) as { access?: string };
+        return json?.access ?? null;
+      })
+      .catch(() => null)
+      .finally(() => {
+        // Clear so a later 401 can trigger a fresh refresh.
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
+// On a 401 (token died between the middleware pass and this fetch) do a SINGLE
+// silent refresh + retry — no full page reload, so unsaved canvas state is
+// preserved. Only if the refresh itself fails do we fall back to reloading the
+// page (which sends the user through middleware → dashboard /login).
 instanceAuth.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error?.response?.status === 401 && typeof window !== "undefined") {
-      // Reload triggers middleware → refresh → cookie updated → retry succeeds.
-      // We don't auto-retry here to avoid request storms.
+    const status = error?.response?.status;
+    const config = error?.config as RetriableConfig | undefined;
+
+    if (status === 401 && config && !config._retried && typeof window !== "undefined") {
+      config._retried = true;
+      const access = await refreshAccessToken();
+      if (access) {
+        // Retry the original request with the refreshed bearer. The request
+        // interceptor re-reads the (now-rotated) cookie too, but set it here
+        // explicitly so we don't race the cookie propagation.
+        config.headers = config.headers ?? {};
+        config.headers["Authorization"] = `Bearer ${access}`;
+        return instanceAuth(config);
+      }
+      // Refresh impossible — reload so middleware redirects to dashboard /login.
       window.location.reload();
     }
     return Promise.reject(error);
