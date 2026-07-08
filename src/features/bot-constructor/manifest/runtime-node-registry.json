@@ -6068,7 +6068,7 @@
       "width": 200
     },
     "sidebar": {
-      "enabled": true,
+      "enabled": false,
       "groupId": "actions",
       "sortOrder": 145,
       "elementType": "invoice"
