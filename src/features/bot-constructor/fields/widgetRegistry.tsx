@@ -3015,6 +3015,29 @@ function AIToolParamConfigWidget({ nodeId, data }: WidgetProps) {
     });
   }
 
+  // Seed each AI-filled param's own description as the default aiDescription,
+  // so the textarea opens pre-populated (and editable) instead of empty.
+  // Runs once per node/tool; skips params that already have a value set.
+  useEffect(() => {
+    const seed: Record<string, AiToolParamConfigEntry> = {};
+    for (const param of params) {
+      if (!param.description) continue;
+      const entry = paramConfig[param.key];
+      const source = entry?.source ?? "ai";
+      if (source === "ai" && !entry?.aiDescription) {
+        seed[param.key] = {
+          source: "ai",
+          value: entry?.value ?? "",
+          aiDescription: param.description,
+        };
+      }
+    }
+    if (Object.keys(seed).length > 0) {
+      updateNodeData(nodeId, { paramConfig: { ...paramConfig, ...seed } });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodeId, tool]);
+
   if (params.length === 0) return null;
 
   return (
@@ -3076,13 +3099,10 @@ function AIToolParamConfigWidget({ nodeId, data }: WidgetProps) {
                 onChange={(e) => setEntry(param.key, { value: e.target.value })}
               />
             ) : (
-              <Input
-                className="h-7 text-[11px]"
-                placeholder={
-                  param.description
-                    ? `${t("aiDescriptionPlaceholder")}: ${param.description}`
-                    : t("aiDescriptionPlaceholder")
-                }
+              <Textarea
+                className="min-h-[56px] resize-y text-[11px] leading-snug"
+                rows={2}
+                placeholder={t("aiDescriptionPlaceholder")}
                 value={entry.aiDescription}
                 onChange={(e) => setEntry(param.key, { aiDescription: e.target.value })}
               />
