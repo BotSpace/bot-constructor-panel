@@ -5269,13 +5269,6 @@
     ],
     "content": [
       {
-        "type": "text",
-        "key": "toolName",
-        "label": "Tool nomi",
-        "placeholder": "masalan: search_products",
-        "helpText": "LLM shu nom bilan tool'ni chaqiradi (snake_case)."
-      },
-      {
         "type": "textarea",
         "key": "description",
         "label": "Tavsif (LLM uchun)",
@@ -5290,7 +5283,6 @@
     ],
     "defaults": {
       "tool": "collection",
-      "toolName": "collection",
       "collection": "",
       "action": "create",
       "createFields": [],
