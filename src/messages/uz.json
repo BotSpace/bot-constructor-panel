@@ -393,6 +393,8 @@
       },
       "paramConfig": {
         "paramsLabel": "Parametrlar",
+        "toolDescriptionLabel": "Tool tavsifi (AI uchun)",
+        "toolDescriptionPlaceholder": "Bu tool nima qilishini yozing — AI qachon ishlatishni shunga qarab hal qiladi",
         "aiFills": "AI to'ldiradi",
         "fixedValue": "Qat'iy",
         "aiDescriptionPlaceholder": "AI uchun tavsif: bu qiymat nima",

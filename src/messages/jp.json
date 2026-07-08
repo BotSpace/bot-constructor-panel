@@ -402,6 +402,8 @@
       },
       "paramConfig": {
         "paramsLabel": "パラメータ",
+        "toolDescriptionLabel": "ツールの説明（AI用）",
+        "toolDescriptionPlaceholder": "このツールの機能を記述します — AIはこれを見て呼び出すか判断します",
         "aiFills": "AIが入力",
         "fixedValue": "固定値",
         "aiDescriptionPlaceholder": "AIへのヒント: この値は何か",

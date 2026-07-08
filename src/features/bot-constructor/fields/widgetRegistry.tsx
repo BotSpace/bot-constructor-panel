@@ -38,6 +38,7 @@ import { FormItem } from "@/features/bot-constructor/nodes/bespoke/FormNode/comp
 import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 import { CollectionDetail, CollectionListItem } from "@/types/http/collection";
 import { NodeFieldManifest } from "@/features/bot-constructor/manifest/types";
+import { getNodeManifestByType } from "@/features/bot-constructor/manifest";
 import {
   DndContext,
   PointerSensor,
@@ -2995,9 +2996,22 @@ function parseSchemaToParamDefs(schema: unknown): AiToolParamDef[] {
 
 function AIToolParamConfigWidget({ nodeId, data }: WidgetProps) {
   const updateNodeData = useFlowStore((s) => s.updateNodeData);
+  const nodes = useFlowStore((s) => s.nodes);
   const t = useTranslations("constructor.ai.paramConfig");
+  const tRoot = useTranslations();
 
   const tool = typeof data.tool === "string" ? data.tool : "";
+
+  // The tool's built-in description (from its node manifest) is the default the
+  // user starts editing from. Resolved via i18n key with fallback.
+  const nodeType = nodes.find((n) => n.id === nodeId)?.type ?? "";
+  const manifest = nodeType ? getNodeManifestByType(nodeType) : undefined;
+  const defaultToolDescription =
+    manifest?.descriptionKey && tRoot.has(manifest.descriptionKey)
+      ? tRoot(manifest.descriptionKey)
+      : manifest?.descriptionFallback ?? "";
+  const toolDescription =
+    typeof data.toolDescription === "string" ? data.toolDescription : "";
 
   // Param definitions: static tools first, then schema-driven (module tools)
   const params: AiToolParamDef[] =
@@ -3038,11 +3052,32 @@ function AIToolParamConfigWidget({ nodeId, data }: WidgetProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodeId, tool]);
 
-  if (params.length === 0) return null;
+  // Seed the tool's built-in description as the editable default (once per
+  // node/tool, only while empty) so the box opens pre-populated.
+  useEffect(() => {
+    if (!defaultToolDescription) return;
+    if (typeof data.toolDescription === "string" && data.toolDescription.trim() !== "") return;
+    updateNodeData(nodeId, { toolDescription: defaultToolDescription });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodeId, tool]);
 
   return (
     <div className="grid gap-2">
-      <Label className="text-xs text-muted-foreground">{t("paramsLabel")}</Label>
+      {/* Tool description — what this tool does, shown to the AI agent */}
+      <div className="grid gap-1">
+        <Label className="text-xs text-muted-foreground">{t("toolDescriptionLabel")}</Label>
+        <Textarea
+          className="min-h-[56px] resize-y text-[11px] leading-snug"
+          rows={2}
+          placeholder={t("toolDescriptionPlaceholder")}
+          value={toolDescription}
+          onChange={(e) => updateNodeData(nodeId, { toolDescription: e.target.value })}
+        />
+      </div>
+
+      {params.length > 0 && (
+        <Label className="text-xs text-muted-foreground">{t("paramsLabel")}</Label>
+      )}
       {params.map((param) => {
         const entry: AiToolParamConfigEntry =
           paramConfig[param.key] ?? { source: "ai", value: "", aiDescription: "" };

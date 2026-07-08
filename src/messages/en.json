@@ -394,6 +394,8 @@
       },
       "paramConfig": {
         "paramsLabel": "Parameters",
+        "toolDescriptionLabel": "Tool description (for AI)",
+        "toolDescriptionPlaceholder": "Describe what this tool does — the AI uses this to decide when to call it",
         "aiFills": "AI fills",
         "fixedValue": "Fixed",
         "aiDescriptionPlaceholder": "Hint for AI: what is this value",
