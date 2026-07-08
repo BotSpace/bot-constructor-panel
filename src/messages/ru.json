@@ -402,6 +402,8 @@
       },
       "paramConfig": {
         "paramsLabel": "Параметры",
+        "toolDescriptionLabel": "Описание инструмента (для ИИ)",
+        "toolDescriptionPlaceholder": "Опишите, что делает этот инструмент — ИИ по нему решает, когда его вызвать",
         "aiFills": "ИИ заполняет",
         "fixedValue": "Фиксированно",
         "aiDescriptionPlaceholder": "Подсказка для ИИ: что это значение",
