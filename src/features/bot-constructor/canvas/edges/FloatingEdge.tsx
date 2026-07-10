@@ -5,7 +5,7 @@ import {
     type EdgeProps,
     Position,
     getBezierPath,
-    useNodes,
+    useStore,
     EdgeLabelRenderer,
 } from "reactflow";
 import { useEdgeColor } from "@/features/bot-constructor/canvas/edges/useEdgeColor";
@@ -40,9 +40,18 @@ function FloatingEdge({
     selected,
     label,
 }: Omit<EdgeProps, "markerEnd">) {
-    const nodes = useNodes();
+    // Subscribe to ONLY the target node (via React Flow's store), not the whole
+    // node array. useNodes() returns a fresh array on every store change — incl.
+    // viewport/zoom — which re-rendered every edge on each zoom frame and froze
+    // the canvas for seconds on larger flows. nodeInternals.get(target) is a
+    // stable reference that changes only when THAT node moves/resizes, so edges
+    // no longer re-render on zoom/pan.
+    const targetNode = useStore(useCallback((s) => s.nodeInternals.get(target), [target]));
     const { stroke: defaultColor, selectedStroke, neutralStroke } = useEdgeColor(sourceHandleId);
-    const { onEdgesChange, setPendingEdgeInsert } = useFlowStore();
+    // Targeted selectors — the whole-store useFlowStore() subscription re-rendered
+    // every edge on any store change. These action refs are stable.
+    const onEdgesChange = useFlowStore((s) => s.onEdgesChange);
+    const setPendingEdgeInsert = useFlowStore((s) => s.setPendingEdgeInsert);
     const [hovered, setHovered] = useState(false);
 
     const handleDelete = useCallback(
@@ -76,8 +85,7 @@ function FloatingEdge({
       ? neutralStroke
       : (style as any)?.stroke || defaultColor;
 
-    // Find target node for entry-side selection and label
-    const targetNode = nodes.find((node) => node.id === target);
+    // targetNode (above) drives entry-side geometry and the fallback label.
 
     // Get target node name for label
     const targetNodeTitle = (targetNode?.data as any)?.title || targetNode?.type?.replace('Node', '') || 'Node';
