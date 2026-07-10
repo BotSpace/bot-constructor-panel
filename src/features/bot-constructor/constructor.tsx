@@ -821,10 +821,15 @@ export default function Constructor() {
             <ReactFlow
               isValidConnection={isValidConnection}
               id="canvas-area"
-              // Perf: only render nodes/edges inside the viewport (virtualization),
-              // and don't lift selected nodes to a new layer (avoids reflow). Big win
-              // once the canvas has many nodes.
-              onlyRenderVisibleElements
+              // Perf: virtualization (only render nodes in the viewport) is a NET
+              // LOSS on zoom for normal flows — React Flow mounts/unmounts nodes as
+              // they enter/leave the viewport, so zooming OUT mounts every node at
+              // once (an expensive mount-storm that froze the canvas for seconds at
+              // 20+ nodes, confirmed by profiling). With it OFF, all nodes mount once
+              // and zoom is a pure CSS transform on already-mounted, memoized nodes —
+              // smooth. Keep virtualization only for very large flows where the
+              // one-time render of every node would itself be costly.
+              onlyRenderVisibleElements={nodes.length > 150}
               elevateNodesOnSelect={false}
               nodeTypes={nodeTypes}
               edgeTypes={CustomEdge}
