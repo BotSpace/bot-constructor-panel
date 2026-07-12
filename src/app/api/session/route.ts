@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { SignJWT } from "jose";
+import { SignJWT } from "jose/jwt/sign";
 import { readSession } from "@/lib/session";
 import env from "@/lib/env";
 
