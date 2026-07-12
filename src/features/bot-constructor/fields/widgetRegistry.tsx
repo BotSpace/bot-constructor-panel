@@ -1426,10 +1426,13 @@ function CollectionWidget({ nodeId, data }: WidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
   const nodes = useFlowStore((state) => state.nodes);
   const edges = useFlowStore((state) => state.edges);
-  const fieldMappings =
-    data.fieldMappings && typeof data.fieldMappings === "object"
-      ? (data.fieldMappings as Record<string, string>)
-      : {};
+  const fieldMappings = useMemo(
+    () =>
+      data.fieldMappings && typeof data.fieldMappings === "object"
+        ? (data.fieldMappings as Record<string, string>)
+        : {},
+    [data.fieldMappings],
+  );
 
   const { data: collections } = useCollectionStore();
 
@@ -2654,10 +2657,13 @@ function buildParametersSchema(
 
 function SubFlowWidget({ nodeId, data }: WidgetProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
-  const params =
-    data.params && typeof data.params === "object"
-      ? (data.params as Record<string, unknown>)
-      : {};
+  const params = useMemo(
+    () =>
+      data.params && typeof data.params === "object"
+        ? (data.params as Record<string, unknown>)
+        : {},
+    [data.params],
+  );
   const paramFields =
     data.paramsSchema && typeof data.paramsSchema === "object"
       ? getSchemaFields(data.paramsSchema as Record<string, unknown>)

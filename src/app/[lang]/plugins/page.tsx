@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getSubFlows } from "@/services/requests/plugin";
@@ -27,7 +27,7 @@ export default function PluginsPage() {
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState("");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await getSubFlows({
@@ -44,11 +44,11 @@ export default function PluginsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [category, page]);
 
   useEffect(() => {
     load();
-  }, [page, category]);
+  }, [load]);
 
   return (
     <div className="min-h-screen bg-background">

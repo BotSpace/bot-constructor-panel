@@ -40,7 +40,7 @@ export function DebugConsole() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [toggle]);
 
   // Scroll position ni kuzatish
   useEffect(() => {
@@ -109,7 +109,24 @@ export function DebugConsole() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isResizing]);
+  }, [isResizing, setHeight]);
+
+  const addLog = useCallback((level: LogEntry["level"], message: string) => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const milliseconds = String(now.getMilliseconds()).padStart(3, "0");
+    const timestamp = `${hours}:${minutes}:${seconds}.${milliseconds}`;
+
+    const newLog: LogEntry = {
+      id: `${Date.now()}-${Math.random()}`,
+      timestamp,
+      level,
+      message,
+    };
+    setLogs((prev) => [...prev, newLog]);
+  }, []);
 
   // Log polling
   useEffect(() => {
@@ -170,24 +187,8 @@ export function DebugConsole() {
     selectedBot,
     project?.id,
     project?.release?.id,
+    addLog,
   ]);
-
-  const addLog = useCallback((level: LogEntry["level"], message: string) => {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const seconds = String(now.getSeconds()).padStart(2, "0");
-    const milliseconds = String(now.getMilliseconds()).padStart(3, "0");
-    const timestamp = `${hours}:${minutes}:${seconds}.${milliseconds}`;
-
-    const newLog: LogEntry = {
-      id: `${Date.now()}-${Math.random()}`,
-      timestamp,
-      level,
-      message,
-    };
-    setLogs((prev) => [...prev, newLog]);
-  }, []);
 
   const clearLogs = () => {
     setLogs([]);

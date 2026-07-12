@@ -209,7 +209,10 @@ export function ModalNodeFormRenderer({
   // Backward-compat: when the key is absent (existing flows) we derive the
   // initial list from value presence (same heuristic as before) and persist it
   // once — after that the list is the source of truth.
-  const allManifestFields = manifest.content || [];
+  const allManifestFields = useMemo(
+    () => manifest.content || [],
+    [manifest.content],
+  );
 
   const storedActive = useMemo(() => {
     const v = data.activeOptionalFields;

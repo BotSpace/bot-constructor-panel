@@ -78,20 +78,20 @@ export function ButtonGenerator({
     [nodes, edges, node_id]
   );
 
-  const handleUpdate = (update: Record<string, unknown>) => {
+  const handleUpdate = useCallback((update: Record<string, unknown>) => {
     if (node_id) {
       updateNodeData(node_id, update);
     }
-  };
+  }, [node_id, updateNodeData]);
 
-  const saveCurrentState = () => {
+  const saveCurrentState = useCallback(() => {
     const finalConfig = getFinalKeyboardConfig();
     if (onChange) {
       onChange(finalConfig);
     } else if (node_id) {
       handleUpdate({ keyboard: finalConfig });
     }
-  };
+  }, [getFinalKeyboardConfig, handleUpdate, node_id, onChange]);
 
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -102,7 +102,7 @@ export function ButtonGenerator({
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [isOpen, currentButtons, activeTab, replyOptions, onChange, node_id]);
+  }, [activeTab, currentButtons, isOpen, replyOptions, saveCurrentState]);
 
   const handleOpenChange = (open: boolean) => {
     if (!open && isOpen) {

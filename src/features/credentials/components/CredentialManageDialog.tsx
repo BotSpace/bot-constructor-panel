@@ -78,14 +78,14 @@ export function CredentialManageDialog({
   useEffect(() => {
     if (!open) return;
     loadCredentials({ page, type: typeFilter });
-  }, [open, page, typeFilter]);
+  }, [loadCredentials, open, page, typeFilter]);
 
   // Load types for filter dropdown
   useEffect(() => {
     if (open && !types) {
       loadTypes();
     }
-  }, [open]);
+  }, [loadTypes, open, types]);
 
   const handleFilterChange = (value: string) => {
     setTypeFilter(value === "all" ? "" : value);
