@@ -6,29 +6,29 @@ import { CountdownItem } from "@/components/common/count-down/count-down-item";
 import { useNotificationContext } from "@/components/common/notification-provider";
 import { createSimpleNotification } from "@/lib/notification-utils";
 
+function calculateTimeLeft(targetTime: number) {
+    const difference = targetTime - Date.now();
+    if (difference <= 0) return { hours: 0, minutes: 0, seconds: 0, isCompleted: true };
+
+    return {
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+        isCompleted: false
+    };
+}
+
 export default function CountdownComponent({ updated_at }: { updated_at: Date | string }) {
     const { sendNotification } = useNotificationContext();
 
     // 1. Maqsadli vaqt: updated_at + 30 daqiqa
-    const targetDate = new Date(new Date(updated_at).getTime() + 30 * 60 * 1000);
+    const targetTime = new Date(updated_at).getTime() + 30 * 60 * 1000;
 
-    const calculateTimeLeft = () => {
-        const difference = +targetDate - +new Date();
-        if (difference <= 0) return { hours: 0, minutes: 0, seconds: 0, isCompleted: true };
-
-        return {
-            hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-            minutes: Math.floor((difference / 1000 / 60) % 60),
-            seconds: Math.floor((difference / 1000) % 60),
-            isCompleted: false
-        };
-    };
-
-    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+    const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft(targetTime));
 
     useEffect(() => {
         const timer = setInterval(() => {
-            const newTimeLeft = calculateTimeLeft();
+            const newTimeLeft = calculateTimeLeft(targetTime);
             setTimeLeft(newTimeLeft);
 
             // 2. Vaqt tugaganda bildirishnoma yuborish logikasi
@@ -46,7 +46,7 @@ export default function CountdownComponent({ updated_at }: { updated_at: Date | 
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [updated_at]); // updated_at o'zgarsa taymer qayta hisoblanadi
+    }, [sendNotification, targetTime]);
 
     // 3. Agar vaqt tugagan bo'lsa, hech narsa ko'rsatmaslik (null qaytarish)
     if (timeLeft.isCompleted) return null;

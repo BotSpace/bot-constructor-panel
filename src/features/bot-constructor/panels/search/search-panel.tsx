@@ -43,7 +43,7 @@ function SearchPanel({ }: Props) {
       if (!!value) return false;
       return value.toLowerCase().includes(search.toLowerCase());
     });
-  }, [search, nodes, searchPanelIsOpen]);
+  }, [search, nodes]);
 
   return (
     <Drawer direction="right" open={searchPanelIsOpen} onOpenChange={toggleSearchPanel}>
