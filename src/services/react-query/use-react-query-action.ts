@@ -24,19 +24,8 @@ export const useReactQueryAction = <T>({
 }) => {
   const params = useParams();
 
-  // Handle undefined url early - return disabled query if no URL
-  if (!url) {
-    return useQuery<T>({
-      queryKey: ["disabled"],
-      queryFn: async () => {
-        throw new Error("URL is required");
-      },
-      enabled: false,
-    });
-  }
-
   // Process URL with params
-  let processedUrl = url;
+  let processedUrl = url ?? "";
 
   Object.keys(params).forEach((key) => {
     const regex = new RegExp(`\\[${key}\\]`, "g");
@@ -49,24 +38,14 @@ export const useReactQueryAction = <T>({
     }
   });
 
-  // Safety check: if processedUrl is still undefined or became empty, return disabled query
-  if (!processedUrl) {
-    return useQuery<T>({
-      queryKey: ["disabled-no-url"],
-      queryFn: async () => {
-        throw new Error("Processed URL is empty");
-      },
-      enabled: false,
-    });
-  }
-
   // ✅ Agar query object bo'lsa, uni stringga qo'shamiz
-  if (query) {
+  if (query && processedUrl) {
     processedUrl += queryGenerator(query);
   }
 
-  // ✅ Debounce ishlatish (ixtiyoriy)
-  const debouncedUrl = debounceTime ? useDebounces(processedUrl, debounceTime) : processedUrl;
+  // Hooks must run in the same order even while the URL is not available yet.
+  const debouncedValue = useDebounces(processedUrl, debounceTime ?? 0);
+  const debouncedUrl = debounceTime ? debouncedValue : processedUrl;
 
   return useQuery<T>({
     queryKey: [debouncedUrl],
@@ -95,7 +74,7 @@ export const useReactQueryAction = <T>({
       }
     },
     // ✅ Debounce bo'lsa, URL tayyor bo'lganda ishga tushsin
-    enabled: enabled && (!debounceTime || debouncedUrl === processedUrl),
+    enabled: Boolean(processedUrl) && enabled && (!debounceTime || debouncedUrl === processedUrl),
     retry: (failureCount, error) => {
       // 401, 403, 404 kabi error'larda retry qilmaslik
       if (error && typeof error === "object" && "status" in error) {

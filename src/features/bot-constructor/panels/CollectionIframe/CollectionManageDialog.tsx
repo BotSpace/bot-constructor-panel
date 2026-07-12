@@ -62,7 +62,7 @@ export function CollectionManageDialog({
     if (open && projectId) {
       loadCollections(projectId);
     }
-  }, [open, projectId]);
+  }, [loadCollections, open, projectId]);
 
   const handleDeleteClick = (item: CollectionListItem) => {
     if (item.system) return; // UI guard — system collections are not deletable

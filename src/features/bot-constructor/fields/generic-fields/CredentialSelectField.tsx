@@ -85,7 +85,7 @@ export function CredentialSelectField({
 
     setLoading(true);
     const params: Record<string, string> = {};
-    if (typeKey) params.type_key = typeKey;
+    if (cacheKey !== "__all__") params.type_key = cacheKey;
 
     instanceAuth
       .get("/credentials", { params })

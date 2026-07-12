@@ -1,4 +1,4 @@
-export default {
+const env = {
   DEBUG: process.env.DEBUG === "true",
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
@@ -20,3 +20,5 @@ export default {
   DASHBOARD_URL: process.env.DASHBOARD_URL ?? process.env.ADMIN_PANEL ?? "http://localhost:3000",
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
 };
+
+export default env;
