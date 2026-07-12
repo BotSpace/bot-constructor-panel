@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { GripVertical, PlusIcon, Trash2 } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -307,10 +307,13 @@ export function DynamicParamsField({ nodeId, data, field }: DynamicParamsFieldPr
   const outputsKey = field.outputsKey ?? "outputs";
   const descriptionKey = field.descriptionKey ?? "pluginDescription";
 
-  const params =
-    data[paramsKey] && typeof data[paramsKey] === "object"
-      ? (data[paramsKey] as Record<string, unknown>)
-      : {};
+  const params = useMemo(
+    () =>
+      data[paramsKey] && typeof data[paramsKey] === "object"
+        ? (data[paramsKey] as Record<string, unknown>)
+        : {},
+    [data, paramsKey],
+  );
 
   const paramFields =
     data[schemaKey] && typeof data[schemaKey] === "object"
