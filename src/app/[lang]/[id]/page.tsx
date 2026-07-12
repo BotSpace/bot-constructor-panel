@@ -33,12 +33,12 @@ function PageInner() {
     if (project) {
       document.title = `${project.name} | BotSpace.uz`;
     }
-  }, [project?.id]);
+  }, [project]);
 
   useEffect(() => {
     loadProject(id);
     loadCollections(id);
-  }, []);
+  }, [id, loadCollections, loadProject]);
 
   const isMobile = useIsMobile();
 

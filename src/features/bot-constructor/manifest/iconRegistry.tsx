@@ -21,7 +21,7 @@ import {
   FolderOpen,
   GitBranch,
   Globe,
-  Image,
+  Image as ImageIcon,
   Images,
   KeyRound,
   LayoutList,
@@ -93,7 +93,7 @@ const LUCIDE_ICONS: Record<string, ReactNode> = {
   /** SendTextMessageNode / AnswerInlineQueryNode */
   "arrow-right": <Send className="text-primary" strokeWidth={2} />,
   /** SendPhotoNode */
-  photo: <Image className="text-primary" strokeWidth={2} />,
+  photo: <ImageIcon className="text-primary" strokeWidth={2} />,
   /** SendVideoNode / SendVideoNoteNode */
   video: <Video className="text-primary" strokeWidth={2} />,
   /** SendAudioNode */
