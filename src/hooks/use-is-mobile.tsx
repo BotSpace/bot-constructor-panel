@@ -12,7 +12,7 @@ export const useIsMobile = () => {
       );
 
       // 2. Ekran o'lchami orqali tekshirish (masalan, 768px dan kichik bo'lsa)
-      const isSmallScreen = window.innerWidth <= 768;
+      const isSmallScreen = window.innerWidth <= 600;
 
       setIsMobile(isMobileUA || isSmallScreen);
     };
