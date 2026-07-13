@@ -12,17 +12,8 @@ import SearchPanel from "@/features/bot-constructor/panels/search/search-panel";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import BottomPanel from "@/features/bot-constructor/panels/bottom-panel";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Key, MoreVertical } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ArrowLeft } from "lucide-react";
 import { useLinkToParent } from "@/components/common/link-to-parrent";
-import { ReleasePanel } from "@/components/layout/relas/relas";
-import { EnvManageDialog } from "@/features/bot-constructor/panels/EnvManageDialog/EnvManageDialog";
-import DebugingButtons from "@/components/layout/debug/debug";
 import { SaveStatusBadge } from "@/features/bot-constructor/panels/save-status-badge";
 import { Separator } from "@/components/ui/separator";
 import { NodeEditDialog } from "@/features/bot-constructor/panels/NodeEditPanel";
@@ -98,10 +89,9 @@ function N8nTopBar({
   const t = useTranslations("editor.topBar");
   const { lang } = useParams<{ lang: string }>();
   const { handleClick: backToHome } = useLinkToParent({ href: `/${lang}/app/bots/${id}` });
-  const [envOpen, setEnvOpen] = useState(false);
 
   return (
-    <div className="h-[62px] shrink-0 flex items-center gap-1.5 px-2 sm:px-3 border-b border-border z-10" style={{ backgroundColor: "#212121" }}>
+    <div className="h-[62px] shrink-0 flex items-center gap-2 px-3 border-b border-border z-10" style={{ backgroundColor: "#212121" }}>
       {/* Back */}
       <Button
         variant="ghost"
@@ -113,38 +103,23 @@ function N8nTopBar({
         <ArrowLeft className="h-4 w-4" />
       </Button>
 
-      <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20 hidden sm:block" />
+      <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20" />
 
-      {/* Project name — shrinks on narrow screens */}
-      <span className="min-w-0 flex-1 truncate text-sm font-semibold text-white">
+      {/* Project name */}
+      <span className="min-w-0 truncate text-sm font-semibold text-white">
         {project.name}
       </span>
 
       {/* Save status */}
       <SaveStatusBadge />
 
-      {/* Debug controls — icon-sized, always available */}
-      <DebugingButtons />
+      <div className="flex-1" />
 
-      {/* Publish — always visible (primary action) */}
-      <ReleasePanel />
-
-      {/* Env / secondary — inline on wide screens */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="hidden md:inline-flex h-9 w-9 shrink-0 text-white/70 hover:text-white hover:bg-white/10"
-        onClick={() => setEnvOpen(true)}
-        title={t("env")}
-      >
-        <Key className="h-4 w-4" />
-      </Button>
-
-      {/* Add node */}
+      {/* Add node — n8n style */}
       <Button
         variant="default"
         size="sm"
-        className="h-9 shrink-0 gap-1.5 px-3 text-sm"
+        className="h-9 shrink-0 gap-1.5 text-sm px-4"
         onClick={onAddNode}
         title={t("addNodeTitle")}
       >
@@ -152,27 +127,7 @@ function N8nTopBar({
         <span className="hidden sm:inline">{t("addNode")}</span>
       </Button>
 
-      {/* Overflow kebab — narrow screens: hidden actions live here */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden h-9 w-9 shrink-0 text-white/70 hover:text-white hover:bg-white/10"
-            title={t("env")}
-          >
-            <MoreVertical className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setEnvOpen(true)}>
-            <Key className="mr-2 h-4 w-4" />
-            {t("env")}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <EnvManageDialog open={envOpen} onOpenChange={setEnvOpen} projectId={id} />
+      <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20" />
     </div>
   );
 }
@@ -186,7 +141,6 @@ function MobileView({
   project: { name: string };
 }) {
   const t = useTranslations("editor.topBar");
-  const [envOpen, setEnvOpen] = useState(false);
   const { lang } = useParams<{ lang: string }>();
   const { handleClick: backToHome } = useLinkToParent({ href: `/${lang}/app/bots/${id}` });
 
@@ -195,32 +149,24 @@ function MobileView({
       className="flex flex-col h-[100dvh] bg-background overflow-hidden"
       style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
     >
-      {/* ── Top bar ── */}
-      <div className="shrink-0 flex items-center gap-2 px-3 py-2 border-b border-border bg-background">
-        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={backToHome} title={t("back")}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold truncate">{project.name}</p>
-          <p className="text-[10px] text-muted-foreground leading-none">{t("subtitle")}</p>
-        </div>
+      {/* ── Top bar — same clean desktop style (no run/publish clutter) ── */}
+      <div
+        className="h-[62px] shrink-0 flex items-center gap-2 px-3 border-b border-border z-10"
+        style={{ backgroundColor: "#212121" }}
+      >
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 shrink-0"
-          onClick={() => setEnvOpen(true)}
-          title={t("env")}
+          className="h-9 w-9 shrink-0 text-white/70 hover:text-white hover:bg-white/10"
+          onClick={backToHome}
+          title={t("back")}
         >
-          <Key className="h-4 w-4" />
+          <ArrowLeft className="h-4 w-4" />
         </Button>
-      </div>
-
-      {/* ── Debug + Publish strip ── */}
-      <div className="shrink-0 px-3 py-1.5 border-b border-border bg-background overflow-x-auto">
-        <div className="flex items-center gap-2 w-max">
-          <DebugingButtons />
-          <ReleasePanel />
-        </div>
+        <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20" />
+        <span className="min-w-0 flex-1 truncate text-sm font-semibold text-white">
+          {project.name}
+        </span>
       </div>
 
       <div className="relative flex-1 overflow-hidden">
@@ -231,8 +177,6 @@ function MobileView({
           <NodeEditDialog />
         </ReactFlowProvider>
       </div>
-
-      <EnvManageDialog open={envOpen} onOpenChange={setEnvOpen} projectId={id} />
     </div>
   );
 }
