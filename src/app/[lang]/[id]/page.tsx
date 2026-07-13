@@ -12,7 +12,13 @@ import SearchPanel from "@/features/bot-constructor/panels/search/search-panel";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import BottomPanel from "@/features/bot-constructor/panels/bottom-panel";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Key } from "lucide-react";
+import { ArrowLeft, Key, MoreVertical } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useLinkToParent } from "@/components/common/link-to-parrent";
 import { ReleasePanel } from "@/components/layout/relas/relas";
 import { EnvManageDialog } from "@/features/bot-constructor/panels/EnvManageDialog/EnvManageDialog";
@@ -92,9 +98,10 @@ function N8nTopBar({
   const t = useTranslations("editor.topBar");
   const { lang } = useParams<{ lang: string }>();
   const { handleClick: backToHome } = useLinkToParent({ href: `/${lang}/app/bots/${id}` });
+  const [envOpen, setEnvOpen] = useState(false);
 
   return (
-    <div className="h-[62px] shrink-0 flex items-center gap-2 px-3 border-b border-border z-10" style={{ backgroundColor: "#212121" }}>
+    <div className="h-[62px] shrink-0 flex items-center gap-1.5 px-2 sm:px-3 border-b border-border z-10" style={{ backgroundColor: "#212121" }}>
       {/* Back */}
       <Button
         variant="ghost"
@@ -106,31 +113,66 @@ function N8nTopBar({
         <ArrowLeft className="h-4 w-4" />
       </Button>
 
-      <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20" />
+      <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20 hidden sm:block" />
 
-      {/* Project name */}
-      <span className="text-sm font-semibold truncate max-w-[220px] text-white">
+      {/* Project name — shrinks on narrow screens */}
+      <span className="min-w-0 flex-1 truncate text-sm font-semibold text-white">
         {project.name}
       </span>
 
       {/* Save status */}
       <SaveStatusBadge />
 
-      <div className="flex-1" />
+      {/* Debug controls — icon-sized, always available */}
+      <DebugingButtons />
 
-      {/* Add node — n8n style */}
+      {/* Publish — always visible (primary action) */}
+      <ReleasePanel />
+
+      {/* Env / secondary — inline on wide screens */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="hidden md:inline-flex h-9 w-9 shrink-0 text-white/70 hover:text-white hover:bg-white/10"
+        onClick={() => setEnvOpen(true)}
+        title={t("env")}
+      >
+        <Key className="h-4 w-4" />
+      </Button>
+
+      {/* Add node */}
       <Button
         variant="default"
         size="sm"
-        className="h-9 gap-1.5 text-sm px-4"
+        className="h-9 shrink-0 gap-1.5 px-3 text-sm"
         onClick={onAddNode}
         title={t("addNodeTitle")}
       >
         <Plus className="h-4 w-4" />
-        {t("addNode")}
+        <span className="hidden sm:inline">{t("addNode")}</span>
       </Button>
 
-      <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20" />
+      {/* Overflow kebab — narrow screens: hidden actions live here */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden h-9 w-9 shrink-0 text-white/70 hover:text-white hover:bg-white/10"
+            title={t("env")}
+          >
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setEnvOpen(true)}>
+            <Key className="mr-2 h-4 w-4" />
+            {t("env")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <EnvManageDialog open={envOpen} onOpenChange={setEnvOpen} projectId={id} />
     </div>
   );
 }
