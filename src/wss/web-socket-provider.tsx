@@ -7,6 +7,7 @@ import { getNodeManifestByType } from "@/features/bot-constructor/manifest/manif
 import { useDebugContextStore } from "@/components/layout/debug-console/debug-context-store";
 import { useDebugErrorsStore } from "@/features/bot-constructor/store/debug-errors";
 import { getSession, useSession } from "@/lib/session-client";
+import { instanceAuth } from "@/services/instance";
 import { useEffect, useRef } from "react";
 import { wsHub } from "@/wss/ws-hub";
 import toast from "react-hot-toast";
@@ -166,6 +167,34 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
               }
             }
           }
+          break;
+        }
+        case "flow_changed": {
+          // The AI agent updated this project's flow out-of-band. Reload the
+          // canvas from the backend — unless the user has unsaved local edits,
+          // which we must not clobber.
+          if (String(data.project_id) !== String(project.id)) break;
+          const flowStore = useFlowStore.getState();
+          if (flowStore.isDirty) {
+            toast(
+              "🤖 Agent flow'ni yangiladi. Saqlanmagan o'zgarishlaringiz borligi uchun avtomatik yangilanmadi.",
+              { icon: "⚠️", duration: 5000, id: "agent-flow-changed" },
+            );
+            break;
+          }
+          instanceAuth
+            .get(`/projects/${project.id}`)
+            .then((res) => {
+              const flow = (res.data as { flow?: unknown })?.flow;
+              if (flow) {
+                useFlowStore.getState().loadFlow(flow as never);
+                toast("🤖 Agent flow'ni yangiladi ✨", {
+                  duration: 3000,
+                  id: "agent-flow-changed",
+                });
+              }
+            })
+            .catch(() => {});
           break;
         }
         default:
