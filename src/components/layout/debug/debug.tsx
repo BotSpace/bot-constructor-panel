@@ -217,7 +217,7 @@ export default function DebugingButtons() {
 
   /* --------------------------- Share bot link actions --------------------------- */
   const botLink = project?.debug_uuid
-    ? `https://t.me/botmother_test_robot?start=${project.debug_uuid}`
+    ? `https://telegram.me/botmother_test_robot?start=${project.debug_uuid}`
     : "";
 
   function handleCopyLink() {
@@ -252,7 +252,7 @@ export default function DebugingButtons() {
 
     const text = encodeURIComponent(`Debug bot link: ${botLink}`);
     window.open(
-      `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${text}`,
+      `https://telegram.me/share/url?url=${encodeURIComponent(botLink)}&text=${text}`,
       "_blank"
     );
   }
