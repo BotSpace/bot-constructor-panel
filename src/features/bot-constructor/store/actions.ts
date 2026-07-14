@@ -8,6 +8,18 @@ import { getFormatFlow } from "@/features/bot-constructor/lib/format-flow";
 import { generateId } from "@/lib/utils";
 import { getNodeManifestByType } from "@/features/bot-constructor/manifest";
 
+// Debounced auto-layout: a burst of node/edge additions (e.g. the AI agent
+// building a flow, or pasting) collapses into a SINGLE re-layout after the last
+// change, instead of re-arranging on every add.
+let _autoLayoutTimer: ReturnType<typeof setTimeout> | null = null;
+export function scheduleAutoLayout(run: () => void, delay = 500): void {
+  if (_autoLayoutTimer) clearTimeout(_autoLayoutTimer);
+  _autoLayoutTimer = setTimeout(() => {
+    _autoLayoutTimer = null;
+    run();
+  }, delay);
+}
+
 interface DownloadFileNodeData {
   messageType?: string;
 }
@@ -308,6 +320,9 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
 
     // Collab: broadcast the new node (full object) to other editors.
     get().emitCollabOp({ t: "na", node: newNode });
+
+    // Auto-arrange after adding (debounced — a burst of adds = one layout).
+    scheduleAutoLayout(() => get().formatFlow());
   },
 
   saveFlow: async (project_id: string) => {
