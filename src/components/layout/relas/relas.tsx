@@ -293,7 +293,7 @@ function ReleaseDropDown({
         <DropdownMenuContent className="w-56" align="end">
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <Link href={"https://t.me/" + project?.username}>
+              <Link href={"https://telegram.me/" + project?.username}>
                 <Bot />
                 <span className="text-muted-foreground">
                   @{project?.username}
