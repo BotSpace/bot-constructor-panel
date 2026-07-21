@@ -171,6 +171,10 @@ export interface NodeFieldManifest {
   variant?: "commandTrigger" | "tabs";
   /** true = field value is auto-saved to flow context as state_<key>; shown read-only in the variable panel */
   is_state?: boolean;
+  /** Fallback state key when an is_state field is empty but runtime uses a default. */
+  stateDefault?: string;
+  /** Additional runtime keys derived from the configured state key. Empty string includes the base key. */
+  stateSuffixes?: string[];
   /** For richTextMessage: intro text shown above the editor */
   intro?: string;
   /**
@@ -312,4 +316,3 @@ export interface NodeManifest {
   /** Human-readable module name used as the sidebar group title. */
   moduleName?: string;
 }
-

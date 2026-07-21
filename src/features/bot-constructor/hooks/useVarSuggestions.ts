@@ -13,15 +13,18 @@
 import { useMemo } from "react";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { getAvailableStateKeys } from "@/features/bot-constructor/lib/get-state-keys";
+import { GLOBAL_CONTEXT_VARIABLE_GROUPS } from "@/features/bot-constructor/lib/global-context-variables";
 import { useDebugContextStore } from "@/components/layout/debug-console/debug-context-store";
 
 /** Standard auto-context variables always available in any bot flow */
 export const STANDARD_VAR_SUGGESTIONS = [
+  ...GLOBAL_CONTEXT_VARIABLE_GROUPS.flatMap((group) =>
+    group.variables.map((variable) => variable.key),
+  ),
   "user.id",
   "user.first_name",
   "user.last_name",
   "user.username",
-  "message.text",
   "webhook.body",
   "webhook.query",
   "private.",

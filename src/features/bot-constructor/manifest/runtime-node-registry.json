@@ -46,21 +46,13 @@
         "optional": true
       },
       {
-        "type": "switch",
-        "key": "save_state",
-        "label": "Ma'lumotni saqlash",
-        "optional": true
-      },
-      {
         "type": "text",
         "key": "state_key",
-        "label": "State Key",
+        "label": "Ma'lumotni saqlash — State Key",
         "placeholder": "Masalan: user_message, phone, etc.",
         "helpText": "Ma'lumot shu kalitga saqlanadi",
-        "visibleWhen": {
-          "key": "save_state",
-          "equals": true
-        }
+        "optional": true,
+        "is_state": true
       },
       {
         "type": "select",
@@ -93,8 +85,8 @@
           }
         ],
         "visibleWhen": {
-          "key": "save_state",
-          "equals": true
+          "key": "state_key",
+          "notEquals": ""
         }
       },
       {
@@ -104,8 +96,8 @@
         "helpText": "Yoqilsa, bu qiymat {{private.key}} sifatida saqlanadi",
         "optional": true,
         "visibleWhen": {
-          "key": "save_state",
-          "equals": true
+          "key": "state_key",
+          "notEquals": ""
         }
       }
     ],
@@ -487,21 +479,13 @@
         "optional": true
       },
       {
-        "type": "switch",
-        "key": "save_state",
-        "label": "Ma'lumotni saqlash",
-        "optional": true
-      },
-      {
         "type": "text",
         "key": "state_key",
-        "label": "State Key",
+        "label": "Ma'lumotni saqlash — State Key",
         "placeholder": "Masalan: user_message, phone, etc.",
         "helpText": "Ma'lumot shu kalitga saqlanadi",
-        "visibleWhen": {
-          "key": "save_state",
-          "equals": true
-        }
+        "optional": true,
+        "is_state": true
       },
       {
         "type": "select",
@@ -534,8 +518,8 @@
           }
         ],
         "visibleWhen": {
-          "key": "save_state",
-          "equals": true
+          "key": "state_key",
+          "notEquals": ""
         }
       },
       {
@@ -545,8 +529,8 @@
         "helpText": "Yoqilsa, bu qiymat {{private.key}} sifatida saqlanadi",
         "optional": true,
         "visibleWhen": {
-          "key": "save_state",
-          "equals": true
+          "key": "state_key",
+          "notEquals": ""
         }
       }
     ],
@@ -737,7 +721,8 @@
       },
       "keyboard_kind": "inline",
       "rows": []
-    }
+    },
+    "producesState": ["message_id_{{nodeId}}"]
   },
   {
     "type": "SendPhotoNode",
@@ -895,7 +880,8 @@
       },
       "keyboard_kind": "inline",
       "rows": []
-    }
+    },
+    "producesState": ["message_id_{{nodeId}}"]
   },
   {
     "type": "SendVideoNode",
@@ -1053,7 +1039,8 @@
       },
       "keyboard_kind": "inline",
       "rows": []
-    }
+    },
+    "producesState": ["message_id_{{nodeId}}"]
   },
   {
     "type": "SendAudioNode",
@@ -2828,7 +2815,8 @@
       },
       "keyboard_kind": "inline",
       "rows": []
-    }
+    },
+    "producesState": ["message_id_{{nodeId}}"]
   },
   {
     "type": "ForwardMessageNode",
@@ -2870,7 +2858,8 @@
       "recipientIds": [
         ""
       ]
-    }
+    },
+    "producesState": ["forward_message_id", "message_id_ForwardMessageNode"]
   },
   {
     "type": "SendToAdminNode",
@@ -2955,7 +2944,8 @@
           "is_persistent": false
         }
       }
-    }
+    },
+    "producesState": ["copy_message_id", "message_id_CopyMessageNode"]
   },
   {
     "type": "PinMessageNode",
@@ -3212,7 +3202,9 @@
         "key": "key",
         "label": "Saqlash nomi (state)",
         "placeholder": "yuklangan_fayl",
-        "helpText": "Yuklangan fayl shu nom bilan saqlanadi: {{state_NOM}} = fayl UUID, {{state_NOM_file_url}} = yuklab olish URL'i (masalan Gemini STT audio uchun)."
+        "helpText": "Yuklangan fayl shu nom bilan saqlanadi: {{state_NOM}} = fayl UUID, {{state_NOM_file_url}} = yuklab olish URL'i (masalan Gemini STT audio uchun).",
+        "is_state": true,
+        "stateSuffixes": ["", "_file_url", "_file_size", "_file_type"]
       },
       {
         "type": "description",
@@ -3343,7 +3335,8 @@
     "defaults": {
       "collection_name": "",
       "fieldMappings": {}
-    }
+    },
+    "producesState": ["inserted_id"]
   },
   {
     "type": "LoadCollectionItemNode",
@@ -3395,7 +3388,11 @@
       "collection": null,
       "contextKey": "",
       "filters": []
-    }
+    },
+    "producesState": [
+      "collection_{{contextKey}}",
+      "collection_{{contextKey}}_found"
+    ]
   },
   {
     "type": "SubFlowNode",
@@ -3531,7 +3528,8 @@
     "defaults": {
       "operator": "AND",
       "conditions": []
-    }
+    },
+    "producesState": ["condition_result", "condition_matched", "matched_branch"]
   },
   {
     "type": "ElseIfNode",
@@ -3587,7 +3585,8 @@
     "defaults": {
       "operator": "AND",
       "conditions": []
-    }
+    },
+    "producesState": ["condition_result", "condition_matched"]
   },
   {
     "type": "ElseNode",
@@ -3630,7 +3629,8 @@
         "textFallback": "If yoki Else If shartlari bajarilmasa, bu yo'nalish ishga tushadi."
       }
     ],
-    "defaults": {}
+    "defaults": {},
+    "producesState": ["condition_result", "condition_matched"]
   },
   {
     "type": "DelayNode",
@@ -3811,7 +3811,8 @@
     "defaults": {
       "keyboard_kind": "inline",
       "rows": []
-    }
+    },
+    "producesState": ["random_selected_index"]
   },
   {
     "type": "VariableNode",
@@ -3885,7 +3886,8 @@
         "key": "variableName",
         "label": "O'zgaruvchi nomi",
         "placeholder": "my_variable",
-        "helpText": "Keyingi node'larda {{vars.my_variable}} yoki {{my_variable}} sifatida o'qiladi."
+        "helpText": "Keyingi node'larda {{vars.my_variable}} yoki {{my_variable}} sifatida o'qiladi.",
+        "is_state": true
       },
       {
         "type": "text",
@@ -4006,7 +4008,14 @@
     "defaults": {
       "channels": [],
       "inputType": "username"
-    }
+    },
+    "producesState": [
+      "is_member",
+      "membership_status",
+      "non_member_channel",
+      "membership_statuses",
+      "checked_channels_count"
+    ]
   },
   {
     "type": "FormNode",
@@ -4148,13 +4157,22 @@
         "type": "text",
         "key": "itemVariable",
         "label": "Element o'zgaruvchisi",
-        "placeholder": "item"
+        "placeholder": "item",
+        "is_state": true
       }
     ],
     "defaults": {
       "dataKey": "",
       "itemVariable": "item"
-    }
+    },
+    "producesState": [
+      "loop_has_items",
+      "loop_total_items",
+      "loop_current_index",
+      "loop_is_first",
+      "loop_is_last",
+      "loop_has_more"
+    ]
   },
   {
     "type": "ForLoopContinueNode",
@@ -4281,7 +4299,10 @@
         "key": "responseVariable",
         "label": "Javob o'zgaruvchisi",
         "placeholder": "response",
-        "helpText": "API javobi shu nom bilan saqlanadi. Keyingi node'larda {{vars.response}} yoki {{response}} sifatida ishlatiladi."
+        "helpText": "API javobi shu nom bilan saqlanadi. Keyingi node'larda {{vars.response}} yoki {{response}} sifatida ishlatiladi.",
+        "is_state": true,
+        "stateDefault": "http_response",
+        "stateSuffixes": ["", "_status", "_success", "_headers"]
       },
       {
         "type": "number",
@@ -4308,8 +4329,8 @@
       "storeHeaders": false
     },
     "producesState": [
-      "http_response",
-      "http_success"
+      "http_success",
+      "http_error"
     ]
   },
   {
@@ -4491,21 +4512,13 @@
         "optional": true
       },
       {
-        "type": "switch",
-        "key": "save_state",
-        "label": "Ma'lumotni saqlash",
-        "optional": true
-      },
-      {
         "type": "text",
         "key": "state_key",
-        "label": "State Key",
+        "label": "Ma'lumotni saqlash — State Key",
         "placeholder": "Masalan: user_message, phone, etc.",
         "helpText": "Ma'lumot shu kalitga saqlanadi",
-        "visibleWhen": {
-          "key": "save_state",
-          "equals": true
-        }
+        "optional": true,
+        "is_state": true
       },
       {
         "type": "select",
@@ -4542,8 +4555,8 @@
           }
         ],
         "visibleWhen": {
-          "key": "save_state",
-          "equals": true
+          "key": "state_key",
+          "notEquals": ""
         }
       },
       {
@@ -4553,8 +4566,8 @@
         "helpText": "Yoqilsa, bu qiymat {{private.key}} sifatida saqlanadi",
         "optional": true,
         "visibleWhen": {
-          "key": "save_state",
-          "equals": true
+          "key": "state_key",
+          "notEquals": ""
         }
       }
     ],
@@ -4606,21 +4619,13 @@
         "optional": true
       },
       {
-        "type": "switch",
-        "key": "save_state",
-        "label": "Ma'lumotni saqlash",
-        "optional": true
-      },
-      {
         "type": "text",
         "key": "state_key",
-        "label": "State Key",
+        "label": "Ma'lumotni saqlash — State Key",
         "placeholder": "Masalan: user_message, phone, etc.",
         "helpText": "Ma'lumot shu kalitga saqlanadi",
-        "visibleWhen": {
-          "key": "save_state",
-          "equals": true
-        }
+        "optional": true,
+        "is_state": true
       },
       {
         "type": "select",
@@ -4653,8 +4658,8 @@
           }
         ],
         "visibleWhen": {
-          "key": "save_state",
-          "equals": true
+          "key": "state_key",
+          "notEquals": ""
         }
       },
       {
@@ -4664,8 +4669,8 @@
         "helpText": "Yoqilsa, bu qiymat {{private.key}} sifatida saqlanadi",
         "optional": true,
         "visibleWhen": {
-          "key": "save_state",
-          "equals": true
+          "key": "state_key",
+          "notEquals": ""
         }
       }
     ],
@@ -4760,27 +4765,18 @@
         "label": "Output Variable",
         "placeholder": "agent_output",
         "helpText": "Context key where the agent's reply will be stored.",
-        "is_state": true
-      },
-      {
-        "type": "switch",
-        "key": "structuredOutput",
-        "labelKey": "constructor.ai.agent.fields.structuredOutput",
-        "label": "Structured Output (JSON Schema)",
-        "optional": true
+        "is_state": true,
+        "stateDefault": "agent_output",
+        "stateSuffixes": ["", "_json"]
       },
       {
         "type": "textarea",
         "key": "jsonSchema",
         "labelKey": "constructor.ai.agent.fields.jsonSchema",
-        "label": "JSON Schema",
+        "label": "Structured Output (JSON Schema)",
         "placeholder": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"answer\": { \"type\": \"string\" }\n  }\n}",
         "rows": 5,
-        "helpText": "JSON Schema the agent must conform to when structuredOutput is enabled.",
-        "visibleWhen": {
-          "key": "structuredOutput",
-          "equals": true
-        },
+        "helpText": "Schema kiritilsa Structured Output avtomatik yoqiladi. Maydonni olib tashlasangiz oddiy text output ishlaydi.",
         "optional": true
       },
       {
@@ -4821,7 +4817,9 @@
         "key": "errorOutputKey",
         "label": "Error Output Key",
         "placeholder": "agent_error",
-        "optional": true
+        "optional": true,
+        "is_state": true,
+        "stateDefault": "agent_error"
       }
     ],
     "defaults": {
@@ -4836,7 +4834,8 @@
       "errorOutputKey": "agent_error",
       "structuredOutput": false,
       "jsonSchema": ""
-    }
+    },
+    "producesState": ["agent_tool_build_errors"]
   },
   {
     "type": "AIOpenAIProviderNode",
@@ -5532,21 +5531,13 @@
         "optional": true
       },
       {
-        "type": "switch",
-        "key": "save_state",
-        "label": "Ma'lumotni saqlash",
-        "optional": true
-      },
-      {
         "type": "text",
         "key": "state_key",
-        "label": "State Key",
+        "label": "Ma'lumotni saqlash — State Key",
         "placeholder": "Masalan: user_message, phone, etc.",
         "helpText": "Ma'lumot shu kalitga saqlanadi",
-        "visibleWhen": {
-          "key": "save_state",
-          "equals": true
-        }
+        "optional": true,
+        "is_state": true
       },
       {
         "type": "select",
@@ -5583,8 +5574,8 @@
           }
         ],
         "visibleWhen": {
-          "key": "save_state",
-          "equals": true
+          "key": "state_key",
+          "notEquals": ""
         }
       },
       {
@@ -5594,8 +5585,8 @@
         "helpText": "Yoqilsa, bu qiymat {{private.key}} sifatida saqlanadi",
         "optional": true,
         "visibleWhen": {
-          "key": "save_state",
-          "equals": true
+          "key": "state_key",
+          "notEquals": ""
         }
       }
     ],
@@ -5864,7 +5855,12 @@
       "sorts": [],
       "limit": 10,
       "resultKey": "collection_results"
-    }
+    },
+    "producesState": [
+      "{{resultKey}}",
+      "{{resultKey}}_found",
+      "{{resultKey}}_count"
+    ]
   },
   {
     "type": "UpdateCollectionNode",
@@ -5920,7 +5916,12 @@
       "collection_name": "",
       "filter": "{}",
       "update": "{\"$set\": {}}"
-    }
+    },
+    "producesState": [
+      "update_matched_count",
+      "update_modified_count",
+      "update_success"
+    ]
   },
   {
     "type": "DeleteCollectionNode",
@@ -5968,7 +5969,8 @@
     "defaults": {
       "collection_name": "",
       "filter": "{}"
-    }
+    },
+    "producesState": ["delete_count", "delete_success"]
   },
   {
     "type": "DownloadNode",
@@ -6010,7 +6012,9 @@
         "key": "saveAs",
         "label": "Saqlash kaliti",
         "placeholder": "downloaded_file",
-        "helpText": "State ichida URL saqlanadigan kalit nomi"
+        "helpText": "State ichida URL saqlanadigan kalit nomi",
+        "is_state": true,
+        "stateSuffixes": ["", "_file_url", "_file_size", "_file_type"]
       }
     ],
     "defaults": {
@@ -6249,7 +6253,8 @@
           "amount": 1
         }
       ]
-    }
+    },
+    "producesState": ["message_id_{{nodeId}}"]
   },
   {
     "type": "PreCheckoutTriggerNode",
@@ -6646,7 +6651,8 @@
     "defaults": {
       "paymentType": "click",
       "buttonText": "💳 To'lash"
-    }
+    },
+    "producesState": ["payment_error"]
   },
   {
     "type": "ApproveChatJoinRequestNode",
@@ -6811,7 +6817,8 @@
     ],
     "defaults": {
       "resultVar": "invite_link"
-    }
+    },
+    "producesState": ["invite_link_error"]
   },
   {
     "type": "GoogleSheetsNode",
@@ -6918,7 +6925,10 @@
         "key": "responseVariable",
         "label": "Natija o'zgaruvchisi",
         "placeholder": "sheets_response",
-        "optional": true
+        "optional": true,
+        "is_state": true,
+        "stateDefault": "sheets_response",
+        "stateSuffixes": ["", "_status", "_rows"]
       },
       {
         "type": "text",
@@ -6926,7 +6936,8 @@
         "label": "Qatorlar o'zgaruvchisi (rows)",
         "placeholder": "sheets_response_rows",
         "helpText": "Toza qatorlar (array-of-objects) shu context kalitiga saqlanadi. Default: <responseVariable>_rows. Xabarda {{#each shu_kalit}}{{ustun_nomi}}{{/each}} bilan ishlatiladi.",
-        "optional": true
+        "optional": true,
+        "is_state": true
       },
       {
         "type": "condition-list",
@@ -6953,9 +6964,8 @@
       "filterConditions": []
     },
     "producesState": [
-      "sheets_response",
-      "sheets_response_rows",
-      "sheets_success"
+      "sheets_success",
+      "google_error"
     ]
   },
   {
@@ -7080,7 +7090,10 @@
         "key": "responseVariable",
         "label": "Natija o'zgaruvchisi",
         "placeholder": "drive_response",
-        "optional": true
+        "optional": true,
+        "is_state": true,
+        "stateDefault": "drive_response",
+        "stateSuffixes": ["", "_status"]
       }
     ],
     "defaults": {
@@ -7093,8 +7106,8 @@
       "responseVariable": "drive_response"
     },
     "producesState": [
-      "drive_response",
-      "drive_success"
+      "drive_success",
+      "google_error"
     ]
   },
   {
@@ -7414,7 +7427,8 @@
       "value": "",
       "cases": [],
       "default": false
-    }
+    },
+    "producesState": ["exit_output"]
   },
   {
     "type": "SetLanguageNode",
@@ -7454,6 +7468,13 @@
     ],
     "defaults": {
       "language": ""
-    }
+    },
+    "producesState": [
+      "lang",
+      "languages",
+      "language_options",
+      "current_lang",
+      "set_language_error"
+    ]
   }
 ]
