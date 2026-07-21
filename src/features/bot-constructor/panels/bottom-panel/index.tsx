@@ -67,7 +67,7 @@ const ALL_COUNT = 9
 
 function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const t = useTranslations('editor.toolbar')
-    const { isOpen, height, toggle } = debugConsoleStore()
+    const { isOpen, height, toggleExecutions } = debugConsoleStore()
     const { toggleSearchPanel } = useSearchStore()
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false)
     // Sync external open state (from top bar button)
@@ -138,7 +138,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
             key: 'terminal',
             inline: (
                 <BottomPanelButton
-                    onClick={toggle}
+                    onClick={toggleExecutions}
                     title={executionId
                         ? `${t('terminal')} · ${executionId.slice(0, 8)} · ${activeNodeId ?? ''} · ${executionStatus ?? ''}`
                         : t('terminal')}
@@ -170,7 +170,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 </BottomPanelButton>
             ),
             overflow: (
-                <DropdownMenuItem key="terminal" onClick={toggle}>
+                <DropdownMenuItem key="terminal" onClick={toggleExecutions}>
                     <SquareCommandIcon className="mr-2 h-4 w-4" />
                     {t('terminal')}
                     {executionStatus ? (
