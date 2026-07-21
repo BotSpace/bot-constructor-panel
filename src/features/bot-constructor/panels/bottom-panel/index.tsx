@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from '@/features/bot-constructor/panels/bottom-panel/components/button'
-import { Database, Key, Keyboard, Languages, MoreHorizontal, Search, Eye, EyeOff, Shield, Braces, AlertTriangle, Puzzle } from 'lucide-react'
+import { Activity, Database, Keyboard, Languages, MoreHorizontal, Search, Shield, Braces, AlertTriangle, Puzzle } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -49,6 +49,7 @@ import useProjectStore from '@/features/bot-constructor/store/project'
 import { useDebugErrorsStore } from '@/features/bot-constructor/store/debug-errors'
 import { ErrorsPanel } from '@/features/bot-constructor/panels/ErrorsPanel'
 import { useBottomPanelStore } from '@/features/bot-constructor/store/bottom-panel-store'
+import { useDebugStatusStore } from '@/features/bot-constructor/store/debug-status'
 
 interface Props {
     addNodeOpen?: boolean;
@@ -62,11 +63,11 @@ interface Props {
 const FIXED_W = 227
 const SLOT = 48
 const MORE_W = 48
-const ALL_COUNT = 11
+const ALL_COUNT = 10
 
 function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const t = useTranslations('editor.toolbar')
-    const { isOpen, height, toggle } = debugConsoleStore()
+    const { isOpen, height, toggle, openExecutions } = debugConsoleStore()
     const { toggleSearchPanel } = useSearchStore()
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false)
     // Sync external open state (from top bar button)
@@ -87,10 +88,16 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     } = useBottomPanelStore()
     const { snapshots } = useDebugContextStore()
     const { unreadCount: errorsUnread, markAllRead } = useDebugErrorsStore()
+    const executionId = useDebugStatusStore((state) => state.currentExecutionId)
+    const activeNodeId = useDebugStatusStore((state) => state.activeNodeId)
+    const executionStatus = useDebugStatusStore((state) => state.lastStatus)
+    const activeAttempt = useDebugStatusStore((state) =>
+        state.activeNodeId ? state.attempts[state.activeNodeId] : undefined
+    )
     const { project } = useProjectStore()
     const debugActive = project?.debug?.status === 'running'
     const hasSnapshots = snapshots.size > 0
-    const { addNode, edgesVisible, toggleEdgesVisibility } = useFlowStore()
+    const { addNode } = useFlowStore()
     const { getViewport } = useReactFlow()
     const { id } = useParams()
 
@@ -128,38 +135,6 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     // Visible items = slice(0, visibleCount); overflowed = slice(visibleCount).
     const items = [
         {
-            key: 'edges',
-            inline: (
-                <BottomPanelButton
-                    onClick={toggleEdgesVisibility}
-                    title={edgesVisible ? t('hideEdges') : t('showEdges')}
-                    aria-label={edgesVisible ? t('hideEdges') : t('showEdges')}
-                >
-                    {edgesVisible ? <Eye size={20} /> : <EyeOff size={20} />}
-                </BottomPanelButton>
-            ),
-            overflow: (
-                <DropdownMenuItem key="edges" onClick={toggleEdgesVisibility}>
-                    {edgesVisible ? <Eye size={16} className="mr-2" /> : <EyeOff size={16} className="mr-2" />}
-                    {edgesVisible ? t('hideEdges') : t('showEdges')}
-                </DropdownMenuItem>
-            ),
-        },
-        {
-            key: 'env',
-            inline: (
-                <BottomPanelButton onClick={() => setEnvManageOpen(true)} title={t('env')} aria-label={t('env')}>
-                    <Key size={20} />
-                </BottomPanelButton>
-            ),
-            overflow: (
-                <DropdownMenuItem key="env" onClick={() => setEnvManageOpen(true)}>
-                    <Key size={16} className="mr-2" />
-                    {t('env')}
-                </DropdownMenuItem>
-            ),
-        },
-        {
             key: 'terminal',
             inline: (
                 <BottomPanelButton onClick={toggle} title={t('terminal')} aria-label={t('terminal')}>
@@ -170,6 +145,51 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 <DropdownMenuItem key="terminal" onClick={toggle}>
                     <SquareCommandIcon className="mr-2 h-4 w-4" />
                     {t('terminal')}
+                </DropdownMenuItem>
+            ),
+        },
+        {
+            key: 'executions',
+            inline: (
+                <BottomPanelButton
+                    onClick={openExecutions}
+                    title={executionId
+                        ? `Execution ${executionId.slice(0, 8)} · ${activeNodeId ?? ''} · ${executionStatus ?? ''}`
+                        : 'Executions'}
+                    aria-label="Executions"
+                    className={cn(
+                        executionStatus === 'running' && 'border-orange-500/50 text-orange-400',
+                        executionStatus === 'waiting' && 'border-amber-500/50 text-amber-400',
+                        executionStatus === 'success' && 'border-emerald-500/50 text-emerald-400',
+                        executionStatus === 'error' && 'border-red-500/50 text-red-400',
+                    )}
+                >
+                    <span className="relative">
+                        <Activity size={20} />
+                        {executionStatus && (
+                            <span className={cn(
+                                'absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-background',
+                                executionStatus === 'running' && 'animate-pulse bg-orange-500',
+                                executionStatus === 'waiting' && 'animate-pulse bg-amber-500',
+                                executionStatus === 'success' && 'bg-emerald-500',
+                                executionStatus === 'error' && 'bg-red-500',
+                            )} />
+                        )}
+                        {activeAttempt && activeAttempt > 1 ? (
+                            <span className="absolute -bottom-2 -right-2 rounded bg-background px-1 text-[8px] font-bold leading-3 text-foreground shadow">
+                                {activeAttempt}
+                            </span>
+                        ) : null}
+                    </span>
+                </BottomPanelButton>
+            ),
+            overflow: (
+                <DropdownMenuItem key="executions" onClick={openExecutions}>
+                    <Activity size={16} className="mr-2" />
+                    Executions
+                    {executionStatus ? (
+                        <span className="ml-auto text-xs capitalize">{executionStatus}</span>
+                    ) : null}
                 </DropdownMenuItem>
             ),
         },
@@ -428,11 +448,13 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                     showOverlay={false}
                     showCloseButton={false}
                     onInteractOutside={() => setErrorsOpen(false)}
-                    className="w-full sm:max-w-[480px] flex flex-col gap-0 p-0 overflow-hidden"
+                    className="w-full gap-0 overflow-hidden border-l border-white/10 bg-[#141414] p-0 text-white shadow-2xl sm:max-w-[480px]"
                 >
-                    <SheetHeader className="shrink-0 border-b px-5 py-4 gap-0 space-y-0">
+                    <SheetHeader className="shrink-0 gap-0 space-y-0 border-b border-white/10 bg-[#171717] px-5 py-4">
                         <div className="flex items-center gap-3">
-                            <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
+                                <AlertTriangle className="h-4 w-4 text-destructive" />
+                            </div>
                             <div className="flex-1 min-w-0">
                                 <SheetTitle className="text-base font-semibold leading-tight">
                                     {t('errors')}

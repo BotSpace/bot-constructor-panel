@@ -107,12 +107,14 @@ export function CollectionManageDialog({
             }
             onOpenChange(false);
           }}
-          className="w-full sm:max-w-[480px] flex flex-col gap-0 p-0 overflow-hidden"
+          className="flex w-full flex-col gap-0 overflow-hidden border-l border-white/10 bg-[#141414] p-0 text-white shadow-2xl sm:max-w-[480px]"
         >
           {/* Header */}
-          <SheetHeader className="shrink-0 border-b px-5 py-4 gap-0 space-y-0">
+          <SheetHeader className="shrink-0 gap-0 space-y-0 border-b border-white/10 bg-[#171717] px-5 py-4">
             <div className="flex items-center gap-3">
-              <Database className="w-5 h-5 text-muted-foreground shrink-0" />
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
+                <Database className="h-4 w-4 text-zinc-400" />
+              </div>
               <div className="flex-1 min-w-0">
                 <SheetTitle className="text-base font-semibold leading-tight">
                   {t("title")}
@@ -140,7 +142,7 @@ export function CollectionManageDialog({
                   {collections.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center gap-3 rounded-lg border px-4 py-3 group hover:bg-muted/40 transition-colors"
+                      className="group flex items-center gap-3 rounded-lg border border-white/10 bg-white/3 px-4 py-3 transition-colors hover:bg-white/5"
                     >
                       <Database className="w-4 h-4 shrink-0 text-muted-foreground" />
 
@@ -178,7 +180,7 @@ export function CollectionManageDialog({
           </div>
 
           {/* Footer */}
-          <div className="shrink-0 border-t px-5 py-3">
+          <div className="shrink-0 border-t border-white/10 px-5 py-3">
             <Button variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
               {t("close")}
             </Button>

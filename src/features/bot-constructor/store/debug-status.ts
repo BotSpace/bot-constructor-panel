@@ -42,13 +42,22 @@ interface DebugStatusState {
    * a newer run resets all state. null = no run-aware event seen yet.
    */
   currentRunId: number | null;
+  /** Durable execution ledger UUID carried by engine 3.5.148+ events. */
+  currentExecutionId: string | null;
+  /** nodeId → current retry attempt within the execution. */
+  attempts: Record<string, number>;
+  /** Most recently updated node, used by the compact status-bar indicator. */
+  activeNodeId: string | null;
+  lastStatus: DebugNodeStatus | null;
   setNodeStatus: (
     nodeId: string,
     status: DebugNodeStatus,
     ts?: number,
     error?: string,
     runId?: number,
-    seq?: number
+    seq?: number,
+    executionId?: string,
+    attempt?: number
   ) => void;
   /**
    * LEGACY (engines without run_id): call when a trigger fires. Clears all
@@ -69,6 +78,10 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
   timestamps: {},
   seqs: {},
   currentRunId: null,
+  currentExecutionId: null,
+  attempts: {},
+  activeNodeId: null,
+  lastStatus: null,
 
   startNewRun: (triggerNodeIds) => {
     armAutoClear(get);
@@ -80,10 +93,19 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
       newStatuses[id] = "waiting";
       newTimestamps[id] = 0;
     }
-    set({ statuses: newStatuses, errors: {}, timestamps: newTimestamps, seqs: {} });
+    set({
+      statuses: newStatuses,
+      errors: {},
+      timestamps: newTimestamps,
+      seqs: {},
+      currentExecutionId: null,
+      attempts: {},
+      activeNodeId: triggerNodeIds[0] ?? null,
+      lastStatus: triggerNodeIds.length > 0 ? "waiting" : null,
+    });
   },
 
-  setNodeStatus: (nodeId, status, ts, error, runId, seq) => {
+  setNodeStatus: (nodeId, status, ts, error, runId, seq, executionId, attempt) => {
     const now = Date.now();
     armAutoClear(get);
 
@@ -100,12 +122,13 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
 
         const isNewRun = state.currentRunId === null || runId > state.currentRunId;
         const base = isNewRun
-          ? { statuses: {}, errors: {}, timestamps: {}, seqs: {} }
+          ? { statuses: {}, errors: {}, timestamps: {}, seqs: {}, attempts: {} }
           : {
               statuses: state.statuses,
               errors: state.errors,
               timestamps: state.timestamps,
               seqs: state.seqs,
+              attempts: state.attempts,
             };
 
         // Bir node ichida seq bo'yicha: eski seq yangisini yenga olmaydi.
@@ -126,7 +149,15 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
           prevSeq !== undefined &&
           seq <= prevSeq
         ) {
-          return isNewRun ? { ...base, currentRunId: runId } : state;
+          return isNewRun
+            ? {
+                ...base,
+                currentRunId: runId,
+                currentExecutionId: executionId ?? null,
+                activeNodeId: null,
+                lastStatus: null,
+              }
+            : state;
         }
 
         // Terminal guard: do not let waiting/running override success/error
@@ -137,12 +168,20 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
 
         return {
           currentRunId: runId,
+          currentExecutionId:
+            executionId ?? (isNewRun ? null : state.currentExecutionId),
+          activeNodeId: nodeId,
+          lastStatus: status,
           statuses: { ...base.statuses, [nodeId]: status },
           timestamps: { ...base.timestamps, [nodeId]: ts ?? now },
           seqs:
             typeof seq === "number"
               ? { ...base.seqs, [nodeId]: seq }
               : base.seqs,
+          attempts:
+            typeof attempt === "number" && attempt > 0
+              ? { ...base.attempts, [nodeId]: attempt }
+              : base.attempts,
           errors:
             status === "error" && error
               ? { ...base.errors, [nodeId]: error }
@@ -173,8 +212,15 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
       }
 
       return {
+        currentExecutionId: executionId ?? state.currentExecutionId,
+        activeNodeId: nodeId,
+        lastStatus: status,
         statuses: { ...state.statuses, [nodeId]: status },
         timestamps: { ...state.timestamps, [nodeId]: incomingTs },
+        attempts:
+          typeof attempt === "number" && attempt > 0
+            ? { ...state.attempts, [nodeId]: attempt }
+            : state.attempts,
         errors:
           status === "error" && error
             ? { ...state.errors, [nodeId]: error }
@@ -188,6 +234,16 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
       clearTimeout(autoClearTimer);
       autoClearTimer = null;
     }
-    set({ statuses: {}, errors: {}, timestamps: {}, seqs: {}, currentRunId: null });
+    set({
+      statuses: {},
+      errors: {},
+      timestamps: {},
+      seqs: {},
+      currentRunId: null,
+      currentExecutionId: null,
+      attempts: {},
+      activeNodeId: null,
+      lastStatus: null,
+    });
   },
 }));

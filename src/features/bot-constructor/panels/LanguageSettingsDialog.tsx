@@ -75,12 +75,15 @@ export function LanguageSettingsDialog({
       <SheetContent
         side="right"
         showOverlay={false}
+        showCloseButton={false}
         onInteractOutside={() => onOpenChange(false)}
-        className="w-full sm:max-w-[420px] flex flex-col gap-0 p-0 overflow-hidden"
+        className="flex w-full flex-col gap-0 overflow-hidden border-l border-white/10 bg-[#141414] p-0 text-white shadow-2xl sm:max-w-[420px]"
       >
-        <SheetHeader className="shrink-0 border-b px-5 py-4 gap-0 space-y-0">
+        <SheetHeader className="shrink-0 gap-0 space-y-0 border-b border-white/10 bg-[#171717] px-5 py-4">
           <div className="flex items-center gap-3">
-            <Languages className="h-5 w-5 shrink-0" />
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
+              <Languages className="h-4 w-4 text-zinc-400" />
+            </div>
             <div className="flex-1 min-w-0">
               <SheetTitle className="text-base font-semibold leading-tight">
                 Bot tillari
@@ -100,7 +103,7 @@ export function LanguageSettingsDialog({
             return (
               <div
                 key={code}
-                className="flex items-center gap-3 rounded-lg border px-4 py-3 hover:bg-muted/40 transition-colors"
+                className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/3 px-4 py-3 transition-colors hover:bg-white/5"
               >
                 <Switch
                   id={`lang-${code}`}
@@ -134,7 +137,7 @@ export function LanguageSettingsDialog({
         </div>
 
         {languages.length > 1 ? (
-          <div className="shrink-0 border-t px-5 py-3 text-xs text-muted-foreground">
+          <div className="shrink-0 border-t border-white/10 px-5 py-3 text-xs text-muted-foreground">
             {languages.length} ta til tanlangan. Xabar matnlari har bir til uchun
             alohida saqlanadi.
           </div>

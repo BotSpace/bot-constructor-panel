@@ -11,7 +11,13 @@ import { useReactFlow } from "reactflow";
 import { useSearchStore } from "@/features/bot-constructor/panels/search/search-store";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 type Props = {};
 
@@ -40,19 +46,43 @@ function SearchPanel({ }: Props) {
 
     return nodes.filter((item) => {
       const value = getItemTextConten(item);
-      if (!!value) return false;
+      if (!value) return false;
       return value.toLowerCase().includes(search.toLowerCase());
     });
   }, [search, nodes]);
 
   return (
-    <Drawer direction="right" open={searchPanelIsOpen} onOpenChange={toggleSearchPanel}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Search</DrawerTitle>
-        </DrawerHeader>
+    <Sheet
+      open={searchPanelIsOpen}
+      onOpenChange={(open) => {
+        if (open !== searchPanelIsOpen) toggleSearchPanel();
+      }}
+      modal={false}
+    >
+      <SheetContent
+        side="right"
+        showOverlay={false}
+        showCloseButton={false}
+        onInteractOutside={() => toggleSearchPanel()}
+        className="w-full gap-0 overflow-hidden border-l border-white/10 bg-[#141414] p-0 text-white shadow-2xl sm:max-w-[420px]"
+      >
+        <SheetHeader className="shrink-0 gap-0 space-y-0 border-b border-white/10 bg-[#171717] px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
+              <SearchIcon className="h-4 w-4 text-zinc-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <SheetTitle className="text-base font-semibold leading-tight text-white">
+                Search
+              </SheetTitle>
+              <SheetDescription className="mt-0.5 text-xs text-zinc-500">
+                Flow ichidagi node va matnlarni toping
+              </SheetDescription>
+            </div>
+          </div>
+        </SheetHeader>
         <div
-          className="px-4"
+          className="flex-1 overflow-y-auto px-4 py-3"
         >
           {/* Header */}
           <InputGroup>
@@ -85,7 +115,7 @@ function SearchPanel({ }: Props) {
                   setCenter(x, y, { zoom, duration: 1000 }); // 1 soniya davomida silliq boradi
                 }}
                 key={item.id}
-                className="p-3 rounded-xl bg-card shadow-sm border hover:bg-accent hover:text-accent-foreground transition cursor-pointer"
+                className="cursor-pointer rounded-xl border border-white/10 bg-white/3 p-3 text-zinc-200 transition-colors hover:bg-white/5"
               >
                 <p className="text-sm font-medium line-clamp-2">
                   {getItemTextConten(item)}
@@ -94,8 +124,8 @@ function SearchPanel({ }: Props) {
             ))}
           </div>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 

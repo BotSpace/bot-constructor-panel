@@ -96,6 +96,14 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
                 ? (data.run_id as number)
                 : undefined;
             const seq = typeof data.seq === "number" ? (data.seq as number) : undefined;
+            const executionId =
+              typeof data.execution_id === "string" && data.execution_id.length > 0
+                ? data.execution_id
+                : undefined;
+            const attempt =
+              typeof data.attempt === "number" && data.attempt > 0
+                ? data.attempt
+                : undefined;
 
             const debugStore = useDebugStatusStore.getState();
             const { nodes } = useFlowStore.getState();
@@ -121,7 +129,16 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
               }
             }
 
-            debugStore.setNodeStatus(nodeId, status, ts, error, runId, seq);
+            debugStore.setNodeStatus(
+              nodeId,
+              status,
+              ts,
+              error,
+              runId,
+              seq,
+              executionId,
+              attempt
+            );
 
             // Trigger ishlaganda u ham yashil bo'lib QOLADI (avval 1.5s dan
             // keyin sariqqa qaytarilardi) — keyingi run kelganda reset bo'ladi.

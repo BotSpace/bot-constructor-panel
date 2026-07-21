@@ -73,7 +73,7 @@ function ErrorRow({ error }: { error: FlowError }) {
   const Icon = style.icon;
 
   return (
-    <div className="border-b border-border last:border-b-0">
+    <div className="border-b border-white/10 last:border-b-0 hover:bg-white/3">
       <div className="flex items-start gap-3 px-4 py-3">
         {/* Level icon */}
         <Icon className={cn("w-4 h-4 shrink-0 mt-0.5", style.text)} />
@@ -147,15 +147,15 @@ function FilterTab({
       className={cn(
         "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
         active
-          ? "bg-muted text-foreground"
-          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          ? "bg-white/10 text-white"
+          : "text-zinc-400 hover:bg-white/5 hover:text-white"
       )}
     >
       <span className={cn(active && className)}>{label}</span>
       <span
         className={cn(
           "rounded px-1 text-[10px] tabular-nums",
-          active ? "bg-background/60" : "bg-muted/60"
+          active ? "bg-black/30" : "bg-white/5"
         )}
       >
         {count}
@@ -194,7 +194,7 @@ export function ErrorsPanel() {
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* Toolbar: level filters + clear */}
-      <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border shrink-0">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-white/10 bg-[#171717] px-3 py-2">
         <div className="flex items-center gap-1 overflow-x-auto">
           <FilterTab
             active={filter === "all"}

@@ -15,8 +15,6 @@ interface LogEntry {
 }
 
 type BotType = "debug" | "release";
-type ConsoleView = "logs" | "executions";
-
 interface ExecutionSummary {
   id: string;
   chat_id: number;
@@ -42,10 +40,9 @@ interface ExecutionNodeRun {
 
 export function DebugConsole() {
   const { project } = useProjectStore();
-  const { isOpen, open, close, toggle, height, setHeight } = debugConsoleStore();
+  const { isOpen, open, close, toggle, height, setHeight, view, setView } = debugConsoleStore();
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [selectedBot, setSelectedBot] = useState<BotType>("debug");
-  const [view, setView] = useState<ConsoleView>("logs");
   const [executions, setExecutions] = useState<ExecutionSummary[]>([]);
   const [selectedExecution, setSelectedExecution] = useState<string | null>(null);
   const [nodeRuns, setNodeRuns] = useState<ExecutionNodeRun[]>([]);
