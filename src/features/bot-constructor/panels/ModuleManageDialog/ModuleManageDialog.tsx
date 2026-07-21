@@ -107,7 +107,7 @@ export function ModuleManageDialog({
     onSuccess: () => {
       toast.success("Modul yoqildi");
       void queryClient.invalidateQueries({ queryKey: ["project-modules", projectId] });
-      void queryClient.invalidateQueries({ queryKey: ["module-manifests", projectId] });
+      void queryClient.invalidateQueries({ queryKey: ["node-manifests", projectId] });
       startPoll();
     },
     onError: () => {
@@ -121,7 +121,7 @@ export function ModuleManageDialog({
     onSuccess: () => {
       toast.success("Modul o'chirildi");
       void queryClient.invalidateQueries({ queryKey: ["project-modules", projectId] });
-      void queryClient.invalidateQueries({ queryKey: ["module-manifests", projectId] });
+      void queryClient.invalidateQueries({ queryKey: ["node-manifests", projectId] });
       startPoll();
     },
     onError: () => {

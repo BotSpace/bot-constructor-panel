@@ -53,7 +53,8 @@ function translate(
 export function useElements(): ElementTypes[] {
   const t = useTranslations();
   const runtimeNodeRegistry = getRuntimeNodeRegistry();
-  const moduleManifests = useModuleManifestStore((s) => s.manifests);
+  const manifests = useModuleManifestStore((s) => s.manifests);
+  const moduleManifests = manifests.filter((entry) => Boolean(entry.moduleSlug));
 
   const { data: pluginsData } = useQuery({
     queryKey: ["active-subflows"],

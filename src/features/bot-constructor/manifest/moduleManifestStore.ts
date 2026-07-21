@@ -1,21 +1,21 @@
 import { create } from "zustand";
 import { NodeManifest } from "@/features/bot-constructor/manifest/types";
 import {
-  registerModuleManifests,
-  clearModuleManifests,
+  registerNodeManifests,
+  clearNodeManifests,
 } from "@/features/bot-constructor/manifest/manifestStore";
 
 interface ModuleManifestState {
-  /** Currently registered module manifests (triggers React re-renders). */
+  /** Backend-provided unified manifests (triggers React re-renders). */
   manifests: NodeManifest[];
   /**
-   * Set the full list of module manifests.
+   * Set the full built-in + module manifest list.
    * Updates both the fast synchronous Map (for render-time lookups) and
    * this Zustand store (for React re-renders / nodeTypes diffing).
    */
   setManifests: (manifests: NodeManifest[]) => void;
   /**
-   * When true, the constructor polls the module-manifests endpoint every few
+   * When true, the constructor polls the node-manifests endpoint every few
    * seconds.  Set to true after install/enable/disable so newly deployed
    * modules appear in the sidebar without a full page reload.
    * The constructor resets this to false once it detects the manifest count
@@ -28,16 +28,10 @@ interface ModuleManifestState {
   stopPoll: () => void;
 }
 
-// Cheap signature of the module node-type set. The canvas remounts ALL nodes when
-// `manifests` (and thus nodeTypes) changes reference. The manifest poll runs every 3s
-// for ~90s after a module op and returns a NEW array each time — even when the type set
-// is unchanged. Compare signatures so we keep the SAME reference (no remount) unless the
-// node types actually changed.
+// Preserve the array reference while the backend payload is unchanged so ReactFlow
+// does not remount every node during module deployment polling.
 const manifestSignature = (arr: NodeManifest[]): string =>
-  arr
-    .map((m) => m.type)
-    .sort()
-    .join("|");
+  JSON.stringify(arr);
 
 export const useModuleManifestStore = create<ModuleManifestState>((set, get) => ({
   manifests: [],
@@ -50,8 +44,8 @@ export const useModuleManifestStore = create<ModuleManifestState>((set, get) => 
       // node) does not remount. The lookup Map already holds these from the prior call.
       return;
     }
-    clearModuleManifests();
-    registerModuleManifests(safe);
+    clearNodeManifests();
+    registerNodeManifests(safe);
     set({ manifests: safe });
   },
   pendingPoll: false,

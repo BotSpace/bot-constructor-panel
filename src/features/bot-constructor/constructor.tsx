@@ -13,7 +13,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { ElementItemType } from "@/types/element-types";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { CustomNodes, buildModuleNodeTypes } from "@/features/bot-constructor/nodes";
+import { buildNodeTypes } from "@/features/bot-constructor/nodes";
 import { useModuleManifestStore } from "@/features/bot-constructor/manifest/moduleManifestStore";
 import { CustomEdge, FloatingConnectionLine } from "@/features/bot-constructor/canvas/edges";
 import { useFlowKeyboardShortcuts } from "@/features/bot-constructor/hooks/useFlowKeyboardShortcuts";
@@ -46,8 +46,8 @@ import { useCollab } from "@/wss/collab/use-collab";
 import { useDebugContextStore } from "@/components/layout/debug-console/debug-context-store";
 import { useDebugErrorsStore } from "@/features/bot-constructor/store/debug-errors";
 import { useQuery } from "@tanstack/react-query";
-import { getProjectModuleManifests } from "@/services/requests/module";
-import { clearModuleManifests } from "@/features/bot-constructor/manifest/manifestStore";
+import { getProjectNodeManifests } from "@/services/requests/module";
+import { clearNodeManifests } from "@/features/bot-constructor/manifest/manifestStore";
 import { useFlowValidation } from "@/features/bot-constructor/hooks/useFlowValidation";
 
 export default function Constructor() {
@@ -77,16 +77,16 @@ export default function Constructor() {
   const { toggleSearchPanel } = useSearchStore();
   const debugToggle = debugConsoleStore.getState().toggle;
 
-  // Module manifest store — triggers re-render when module list changes.
-  const moduleManifests = useModuleManifestStore((s) => s.manifests);
+  // Unified backend manifest store — triggers re-render when the catalog changes.
+  const nodeManifests = useModuleManifestStore((s) => s.manifests);
   const setManifests = useModuleManifestStore((s) => s.setManifests);
   const pendingPoll = useModuleManifestStore((s) => s.pendingPoll);
   const stopPoll = useModuleManifestStore((s) => s.stopPoll);
 
-  // Fetch module manifests from backend.
+  // Fetch the canonical built-in + enabled-module manifest catalog from backend.
   // Runs as soon as `id` is available (parallel to loadFlow below).
   // If the backend returns 404 / empty, gracefully shows an empty list.
-  // On project change, clear stale manifests immediately (clearModuleManifests)
+  // On project change, clear stale manifests immediately
   // so old module nodes from the previous project never render on the new canvas.
   const prevProjectIdRef = useRef<string | null>(null);
   // Tracks the manifest count across refetches to detect when polling can stop.
@@ -102,9 +102,9 @@ export default function Constructor() {
   const MAX_MANIFEST_POLLS = 30; // ~90s at the 3s interval — covers module deploy
   useEffect(() => {
     if (prevProjectIdRef.current !== null && prevProjectIdRef.current !== id) {
-      // Project switched — wipe stale module manifests immediately so the
+      // Project switched — wipe stale manifests immediately so the
       // canvas nodeTypes map never contains types from a different project.
-      clearModuleManifests();
+      clearNodeManifests();
       setManifests([]);
       // Reset the manifest count tracker so stale counts from the previous
       // project do not prematurely stop polling for the new project.
@@ -123,8 +123,8 @@ export default function Constructor() {
   }, [pendingPoll]);
 
   const { data: fetchedManifests, isFetched: manifestsFetched } = useQuery({
-    queryKey: ["module-manifests", id],
-    queryFn: () => getProjectModuleManifests(id),
+    queryKey: ["node-manifests", id],
+    queryFn: () => getProjectNodeManifests(id),
     enabled: !!id,
     // Stale time: 30s — avoids hammering the backend on every re-mount while
     // still reflecting newly enabled modules within a reasonable window.
@@ -157,12 +157,12 @@ export default function Constructor() {
     prevManifestCountRef.current = count;
   }, [fetchedManifests, setManifests, pendingPoll, stopPoll]);
 
-  // Merge static node types with module node types.
-  // Only recomputes when moduleManifests list reference changes —
+  // Build all ReactFlow node types from the backend catalog.
+  // Only recomputes when nodeManifests list reference changes —
   // prevents ReactFlow from re-mounting the entire canvas on unrelated renders.
   const nodeTypes = useMemo(
-    () => ({ ...CustomNodes, ...buildModuleNodeTypes(moduleManifests) }),
-    [moduleManifests]
+    () => buildNodeTypes(nodeManifests),
+    [nodeManifests]
   );
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);

@@ -3,15 +3,15 @@ import { NodeManifest } from "@/features/bot-constructor/manifest/types";
 import { ProjectModule, AvailableModule, ModuleDetail } from "@/types/http/module";
 
 // ---------------------------------------------------------------------------
-// GET /api/v1/projects/{id}/module-manifests
-// Returns the merged NodeManifest[] for all modules enabled on this project.
+// GET /api/v1/projects/{id}/node-manifests
+// Returns the canonical built-in catalog merged with enabled project modules.
 // Go response shape: { manifests: NodeManifest[] }
 // ---------------------------------------------------------------------------
-export async function getProjectModuleManifests(
+export async function getProjectNodeManifests(
   projectId: string
 ): Promise<NodeManifest[]> {
   const { data } = await instanceAuth.get(
-    `/projects/${projectId}/module-manifests`
+    `/projects/${projectId}/node-manifests`
   );
   const manifests = (data as any)?.manifests;
   return Array.isArray(manifests) ? manifests : [];
