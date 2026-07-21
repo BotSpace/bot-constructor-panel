@@ -5197,6 +5197,14 @@
         ]
       },
       {
+        "type": "credential",
+        "key": "credential_id",
+        "credentialType": "http_api",
+        "label": "HTTP API Credential",
+        "optional": true,
+        "defaultVisible": false
+      },
+      {
         "type": "text",
         "key": "urlTemplate",
         "label": "URL Template",
@@ -5223,6 +5231,32 @@
         "emptyHint": "Qo'shimcha parametr yo'q. URL bo'sh bo'lsa AI uchun url parametri avtomatik yaratiladi."
       },
       {
+        "type": "array-editor",
+        "key": "headerItems",
+        "label": "Headers",
+        "addLabel": "Header qo'shish",
+        "optional": true,
+        "defaultVisible": false,
+        "defaultItem": {
+          "name": "",
+          "value": ""
+        },
+        "itemFields": [
+          {
+            "key": "name",
+            "type": "text",
+            "label": "Header",
+            "placeholder": "X-Custom-Header"
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "label": "Value",
+            "placeholder": "{{args.value}}"
+          }
+        ]
+      },
+      {
         "type": "number",
         "key": "timeout",
         "label": "Timeout (s)",
@@ -5236,8 +5270,10 @@
       "toolName": "http_request",
       "description": "Make an HTTP request to a given URL.",
       "method": "GET",
+      "credential_id": "",
       "urlTemplate": "",
       "headers": {},
+      "headerItems": [],
       "bodyTemplate": "",
       "timeout": 30,
       "parametersSchema": {
@@ -5380,8 +5416,15 @@
       "jsCode": "// return value becomes the tool result\nreturn args.input;",
       "parametersSchema": {
         "type": "object",
-        "properties": {},
-        "required": []
+        "properties": {
+          "input": {
+            "type": "string",
+            "description": "Input value passed to the custom script as args.input."
+          }
+        },
+        "required": [
+          "input"
+        ]
       }
     }
   },
@@ -7094,8 +7137,8 @@
         "type": "text",
         "key": "format",
         "label": "Date Format",
-        "placeholder": "2006-01-02 15:04:05",
-        "helpText": "Go time layout or leave empty for ISO 8601."
+        "placeholder": "DD.MM.YYYY HH:mm",
+        "helpText": "Tokenlar: YYYY, MM, DD, HH, mm, ss. Bo'sh qolsa YYYY-MM-DD HH:mm:ss."
       }
     ],
     "defaults": {
@@ -7165,6 +7208,22 @@
           {
             "value": "append",
             "label": "Append"
+          },
+          {
+            "value": "update",
+            "label": "Update"
+          },
+          {
+            "value": "clear",
+            "label": "Clear"
+          },
+          {
+            "value": "list_tabs",
+            "label": "List tabs"
+          },
+          {
+            "value": "list_spreadsheets",
+            "label": "List spreadsheets"
           }
         ],
         "variant": "tabs"

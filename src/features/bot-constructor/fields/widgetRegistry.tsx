@@ -2582,6 +2582,8 @@ function AIKnowledgeToolConfigWidget({ nodeId, data }: WidgetProps) {
       <div className="grid gap-1.5">
         <Label className="text-xs text-muted-foreground">Embedding API Key</Label>
         <Input
+          type="password"
+          autoComplete="new-password"
           className="h-8 text-xs"
           placeholder="sk-... or {{env.EMBEDDING_KEY}}"
           value={embeddingApiKey}
@@ -2612,6 +2614,8 @@ function AIKnowledgeToolConfigWidget({ nodeId, data }: WidgetProps) {
       <div className="grid gap-1.5">
         <Label className="text-xs text-muted-foreground">Qdrant API Key</Label>
         <Input
+          type="password"
+          autoComplete="new-password"
           className="h-8 text-xs"
           placeholder="qdrant-api-key (optional)"
           value={vectorDbApiKey}
