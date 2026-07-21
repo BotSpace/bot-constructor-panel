@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FieldHelp } from "@/features/bot-constructor/components/FieldHelp";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { cn } from "@/lib/utils";
 import { Plus, Trash2 } from "lucide-react";
@@ -99,15 +100,17 @@ export function ToolParamsField({ nodeId, data, field }: ToolParamsFieldProps) {
 
   return (
     <div className="space-y-2">
-      {field.label ? <Label className="text-sm text-zinc-200">{field.label}</Label> : null}
-      <p className="text-xs leading-relaxed text-zinc-500">
-        {field.hint ?? (
-          <>
-            AI shu parametrlarni bilib chaqiradi. Kodda{" "}
-            <code className="text-zinc-400">args.&lt;nom&gt;</code> orqali olasiz.
-          </>
-        )}
-      </p>
+      {field.label ? (
+        <div className="flex items-center gap-1.5">
+          <Label className="text-sm text-zinc-200">{field.label}</Label>
+          <FieldHelp
+            text={
+              field.hint ??
+              "AI toolni chaqirganda beradigan parametrlar. Kodda args.<nom> orqali olasiz."
+            }
+          />
+        </div>
+      ) : null}
 
       {rows.length === 0 ? (
         <div className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] p-3 text-center text-xs text-zinc-500">

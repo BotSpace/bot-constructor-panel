@@ -5217,7 +5217,7 @@
         "label": "Payload (Body)",
         "placeholder": "{\"key\": \"{{args.value}}\"}",
         "rows": 4,
-        "helpText": "JSON yoki matn. {{args.x}} va {{context}} o'zgaruvchilar ishlatiladi. GET uchun bo'sh qoldiring.",
+        "helpText": "HTTP serverga yuboriladigan request body. Oddiy JSON/matn yozing yoki AI parametrlarini {{args.nom}} orqali joylashtiring. GET uchun bo'sh qoldiring.",
         "visibleWhen": {
           "key": "method",
           "notEquals": "GET"
@@ -5226,9 +5226,9 @@
       {
         "type": "tool-params",
         "key": "parametersSchema",
-        "label": "AI beradigan qo'shimcha parametrlar",
-        "hint": "URL yoki body template'dagi {{args.param_nomi}} qiymatlarini shu yerda tariflang. URL bo'sh bo'lsa url parametri engine tomonidan avtomatik qo'shiladi.",
-        "emptyHint": "Qo'shimcha parametr yo'q. URL bo'sh bo'lsa AI uchun url parametri avtomatik yaratiladi."
+        "label": "AI to'ldiradigan parametrlar",
+        "hint": "Bu HTTP body emas. Bular AI toolni chaqirganda yuboradigan argumentlar. Ularni URL, Payload (Body) va Headers ichida {{args.param_nomi}} ko'rinishida ishlating. URL bo'sh bo'lsa url parametri engine tomonidan avtomatik qo'shiladi.",
+        "emptyHint": "AI uchun qo'shimcha parametr kiritilmagan."
       },
       {
         "type": "array-editor",
