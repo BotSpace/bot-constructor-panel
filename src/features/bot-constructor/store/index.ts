@@ -6,7 +6,7 @@ import { createFlowSlice } from "@/features/bot-constructor/store/flowSlice";
 import { createClipboardSlice } from "@/features/bot-constructor/store/clipboardSlice";
 import { createHistorySlice } from "@/features/bot-constructor/store/historySlice";
 import { createCollabSlice } from "@/features/bot-constructor/store/collabSlice";
-import { createActions, scheduleAutoLayout } from "@/features/bot-constructor/store/actions";
+import { createActions } from "@/features/bot-constructor/store/actions";
 import { Connection, addEdge } from "reactflow";
 import { getNodeManifestByType } from "@/features/bot-constructor/manifest/manifestStore";
 import { KeyboardConfig } from "@/features/bot-constructor/panels";
@@ -198,8 +198,6 @@ export const useFlowStore = create<FlowStoreState>()((set, get) => {
         const prevIds = new Set(prevEdges.map((e) => e.id));
         const added = newEdges.find((e) => !prevIds.has(e.id));
         if (added) get().emitCollabOp({ t: "ea", edge: added });
-        // Auto-arrange after a new connection (debounced).
-        scheduleAutoLayout(() => get().formatFlow());
       }
 
       // EditMessage nodedan boshqa nodega ulanish holatini tekshirish
