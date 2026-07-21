@@ -20,6 +20,7 @@ import type { DebugInfo } from "@/types/http/project";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useDebugControlStore } from "@/features/bot-constructor/store/debug-control";
+import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -165,6 +166,10 @@ export default function DebugingButtons() {
       toast.error("Flow saqlanmadi — debug bekor qilindi, qayta urinib ko'ring.");
       return;
     }
+
+    // A restarted engine begins run_id from 1 again. Drop the previous pod's
+    // run ordering here so live node events from the new pod are accepted.
+    useDebugStatusStore.getState().clearStatuses();
 
     if (project)
       changeDebug({

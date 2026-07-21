@@ -10,6 +10,7 @@ type DebugConsoleStore = {
   openExecutions: () => void;
   close: () => void;
   toggle: () => void;
+  toggleExecutions: () => void;
   setView: (view: DebugConsoleView) => void;
   setHeight: (height: number) => void;
 };
@@ -26,6 +27,11 @@ export const debugConsoleStore = create<DebugConsoleStore>((set) => ({
   toggle: () =>
     set((state) => ({
       isOpen: !state.isOpen,
+    })),
+  toggleExecutions: () =>
+    set((state) => ({
+      isOpen: !(state.isOpen && state.view === "executions"),
+      view: "executions",
     })),
   setHeight: (height: number) => set({ height }),
   setView: (view) => set({ view }),
