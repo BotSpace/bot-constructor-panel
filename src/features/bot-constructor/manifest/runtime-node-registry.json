@@ -5200,7 +5200,8 @@
         "type": "text",
         "key": "urlTemplate",
         "label": "URL Template",
-        "placeholder": "https://api.example.com/{{id}}"
+        "placeholder": "https://api.example.com/{{args.id}}",
+        "helpText": "Fixed URL kiriting. Bo'sh qoldirilsa, AI har chaqiruvda public URL'ni url parametri orqali beradi. Parametrlar uchun {{args.param_nomi}} ishlating."
       },
       {
         "type": "textarea",
@@ -5213,6 +5214,13 @@
           "key": "method",
           "notEquals": "GET"
         }
+      },
+      {
+        "type": "tool-params",
+        "key": "parametersSchema",
+        "label": "AI beradigan qo'shimcha parametrlar",
+        "hint": "URL yoki body template'dagi {{args.param_nomi}} qiymatlarini shu yerda tariflang. URL bo'sh bo'lsa url parametri engine tomonidan avtomatik qo'shiladi.",
+        "emptyHint": "Qo'shimcha parametr yo'q. URL bo'sh bo'lsa AI uchun url parametri avtomatik yaratiladi."
       },
       {
         "type": "number",
