@@ -16,7 +16,10 @@ import { renderHandleFromManifest } from "@/features/bot-constructor/manifest/ha
 import { FieldWidget, getContentClassName, isFieldVisible } from "@/features/bot-constructor/manifest/fieldWidgetRegistry";
 import { NodeManifest } from "@/features/bot-constructor/manifest/types";
 import { NODE_COLOR_CLASS_REGISTRY } from "@/features/bot-constructor/manifest/colorRegistry";
-import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
+import {
+  DebugNodeStatus,
+  useDebugStatusStore,
+} from "@/features/bot-constructor/store/debug-status";
 
 // Debug status is surfaced via a `data-debug-status` attribute on the wrapper.
 // For accessory (circle) nodes the visible status ring is applied to the inner
@@ -36,6 +39,59 @@ const CIRCLE_SIZE = 76;
 // title: 2 × 13px line-height ≈ 28px, gap 6px, badge 16px, gap 4px + padding 8px
 const LABEL_AREA_H = 64;
 
+const STATUS_BADGE_STYLE: Record<
+  DebugNodeStatus,
+  { label: string; className: string; dot: string }
+> = {
+  waiting: {
+    label: "Kutilmoqda",
+    className: "border-amber-500/30 bg-amber-500/15 text-amber-300",
+    dot: "bg-amber-400",
+  },
+  running: {
+    label: "Ishlamoqda",
+    className: "border-orange-500/30 bg-orange-500/15 text-orange-300",
+    dot: "animate-pulse bg-orange-400",
+  },
+  success: {
+    label: "Tayyor",
+    className: "border-emerald-500/30 bg-emerald-500/15 text-emerald-300",
+    dot: "bg-emerald-400",
+  },
+  error: {
+    label: "Xato",
+    className: "border-red-500/30 bg-red-500/15 text-red-300",
+    dot: "bg-red-400",
+  },
+};
+
+function ExecutionBadge({
+  status,
+  attempt,
+  compact = false,
+}: {
+  status?: DebugNodeStatus;
+  attempt?: number;
+  compact?: boolean;
+}) {
+  if (!status) return null;
+  const visual = STATUS_BADGE_STYLE[status];
+
+  return (
+    <span
+      className={cn(
+        "pointer-events-none absolute z-20 flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[8px] font-semibold shadow-lg backdrop-blur-sm",
+        compact ? "right-1 top-0" : "-top-2.5 right-2",
+        visual.className
+      )}
+    >
+      <span className={cn("h-1.5 w-1.5 rounded-full", visual.dot)} />
+      {!compact ? visual.label : null}
+      {attempt && attempt > 1 ? `#${attempt}` : null}
+    </span>
+  );
+}
+
 // Total bounding-box dimensions fed to React Flow.
 const ACCESSORY_W = CIRCLE_SIZE + 24; // 24px horizontal padding keeps the circle centred with room for the handle overhang
 const ACCESSORY_H = CIRCLE_SIZE + LABEL_AREA_H;
@@ -52,6 +108,7 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
   const colorClass = NODE_COLOR_CLASS_REGISTRY[manifest.colorToken] || "bg-zinc-600";
   const icon = resolveNodeIcon(manifest.iconName);
   const debugStatus = useDebugStatusStore((s) => s.statuses[id]);
+  const attempt = useDebugStatusStore((s) => s.attempts[id]);
 
   const isTool = manifest.accessoryAttachesTo?.includes("ai_tool");
   const isProvider = manifest.accessoryAttachesTo?.includes("ai_model");
@@ -67,6 +124,7 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
       data-accessory-selected={selected || undefined}
       style={{ width: ACCESSORY_W, height: ACCESSORY_H }}
     >
+      <ExecutionBadge status={debugStatus} attempt={attempt} compact />
       {/* Handles rendered from manifest — id/preset UNCHANGED so edges survive. */}
       {manifest.handles?.map((handle, index) =>
         renderHandleFromManifest(handle, id, `${manifest.type}-${index}`, manifest.accessoryPorts)
@@ -160,6 +218,7 @@ export function GenericNodeRenderer({
   const t = useTranslations();
   const [isCollapsed, setIsCollapsed] = useNodeCollapsed();
   const debugStatus = useDebugStatusStore((s) => s.statuses[id]);
+  const attempt = useDebugStatusStore((s) => s.attempts[id]);
   const translatedTitle = resolveTranslation(
     t,
     manifest.titleKey,
@@ -263,6 +322,7 @@ export function GenericNodeRenderer({
       data-debug-status={debugStatus || undefined}
       style={sizeStyle}
     >
+      <ExecutionBadge status={debugStatus} attempt={attempt} />
       {/* Hover tint covering the WHOLE card (incl. grown empty space),
           instead of only the centered header. */}
       <div
