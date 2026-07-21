@@ -232,7 +232,31 @@ export function ModalNodeFormRenderer({
   // Use storedActive when available, fall back to derived for the current
   // render while the useEffect above hasn't fired yet.
   const activeOptionalKeys: string[] = useMemo(() => {
-    if (storedActive !== null) return storedActive;
+    if (storedActive !== null) {
+      const availableKeys = new Set(allManifestFields.map(fieldKey));
+      const normalized = storedActive.filter((key) => availableKeys.has(key));
+
+      // Migrate removed enable-switches to their actual configuration fields.
+      // This keeps existing flows visible after Structured Output and trigger
+      // state were converted to direct optional fields.
+      if (
+        (storedActive.includes("structuredOutput") || data.structuredOutput === true) &&
+        availableKeys.has("jsonSchema") &&
+        !normalized.includes("jsonSchema")
+      ) {
+        normalized.push("jsonSchema");
+      }
+      if (
+        (storedActive.includes("save_state") ||
+          (typeof data.state_key === "string" && data.state_key.trim() !== "")) &&
+        availableKeys.has("state_key") &&
+        !normalized.includes("state_key")
+      ) {
+        normalized.push("state_key");
+      }
+
+      return normalized;
+    }
     return deriveActiveOptionalKeys(allManifestFields, data, manifest.defaults);
   }, [storedActive, allManifestFields, data, manifest.defaults]);
 

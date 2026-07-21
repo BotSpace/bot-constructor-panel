@@ -22,23 +22,43 @@ function getManifestStateKeys(node: Node): string[] {
   if (!manifest) return [];
 
   const keys: string[] = [];
+  const data = (node.data ?? {}) as Record<string, unknown>;
+
+  const resolveTemplate = (template: string): string => {
+    let unresolved = false;
+    const resolved = template.replace(/\{\{([^{}]+)\}\}/g, (_match, rawKey: string) => {
+      const key = rawKey.trim();
+      if (key === "nodeId") return node.id;
+      const value = data[key] ?? manifest.defaults?.[key];
+      if (typeof value === "string" && value.trim() !== "") return value.trim();
+      if (typeof value === "number") return String(value);
+      unresolved = true;
+      return "";
+    });
+    return unresolved ? "" : resolved.trim();
+  };
 
   // Node-level auto state keys: produced just by using the node (no field).
   if (Array.isArray(manifest.producesState)) {
     for (const key of manifest.producesState) {
-      if (typeof key === "string" && key.trim() !== "") {
-        keys.push(key);
+      if (typeof key === "string") {
+        const resolved = resolveTemplate(key);
+        if (resolved !== "") keys.push(resolved);
       }
     }
   }
 
   // Field-level is_state: the field's current value becomes a state key.
-  const data = (node.data ?? {}) as Record<string, unknown>;
   for (const field of manifest.content ?? []) {
     if (field.is_state && field.key) {
-      const value = data[field.key];
+      const value = data[field.key] ?? field.stateDefault ?? manifest.defaults?.[field.key];
       if (typeof value === "string" && value.trim() !== "") {
-        keys.push(value);
+        const rawBase = value.trim();
+        const base = field.key === "state_key" && data.private === true
+          ? `private.${rawBase}`
+          : rawBase;
+        const suffixes = field.stateSuffixes?.length ? field.stateSuffixes : [""];
+        for (const suffix of suffixes) keys.push(`${base}${suffix}`);
       }
     }
   }
@@ -138,7 +158,7 @@ export function getAvailableStateKeys(
       getManifestStateKeys(node).forEach((key) => stateKeys.add(key));
     }
 
-    if (!ancestorIds.has(node.id)) return;
+    if (!ancestorIds.has(node.id) && node.id !== currentNodeId) return;
 
     if (node.type === "StateNode") {
       const nodeData = node.data as StateNodeDataLocal;
