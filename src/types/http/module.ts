@@ -30,8 +30,8 @@ export interface AvailableModule {
   image: string;
 }
 
-/** Response shape for GET /api/v1/projects/{id}/module-manifests. */
-export interface ProjectModuleManifestsResponse {
+/** Response shape for GET /api/v1/projects/{id}/node-manifests. */
+export interface ProjectNodeManifestsResponse {
   data: import("@/features/bot-constructor/manifest/types").NodeManifest[];
 }
 

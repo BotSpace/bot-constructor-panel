@@ -1,11 +1,5 @@
 import { Edge, Node } from "reactflow";
-import { runtimeNodeRegistry } from "@/features/bot-constructor/manifest/manifestStore";
-
-const ACTION_NODE_TYPES = new Set(
-  runtimeNodeRegistry
-    .filter((entry) => entry.status === "runtime" && entry.category === "actions")
-    .map((entry) => entry.type)
-);
+import { getRuntimeNodeRegistry } from "@/features/bot-constructor/manifest";
 
 /**
  * Berilgan tugundan (startNodeId) boshlab tepaga (source tomonga) qarab yuradi
@@ -16,6 +10,11 @@ export const findNearestParentAction = (
   nodes: Node[],
   edges: Edge[]
 ): Node | null => {
+  const actionNodeTypes = new Set(
+    getRuntimeNodeRegistry()
+      .filter((entry) => entry.status === "runtime" && entry.category === "actions")
+      .map((entry) => entry.type)
+  );
   let currentId = startNodeId;
 
   // Cheksiz sikl (infinite loop) bo'lib qolmasligi uchun himoya
@@ -40,7 +39,7 @@ export const findNearestParentAction = (
     if (!parentNode) return null;
 
     // 3. Tekshiramiz: Bu tugun biz qidirayotgan Action tugunmi?
-    if (ACTION_NODE_TYPES.has(parentNode.type || "")) {
+    if (actionNodeTypes.has(parentNode.type || "")) {
       return parentNode; // Topildi!
     }
 

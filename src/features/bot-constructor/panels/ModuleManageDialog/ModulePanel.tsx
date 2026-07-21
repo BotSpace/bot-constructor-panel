@@ -683,7 +683,7 @@ function SelfHostedForm({ projectId, onSuccess }: SelfHostedFormProps) {
       setName("");
       setAuthToken("");
       void queryClient.invalidateQueries({ queryKey: ["project-modules", projectId] });
-      void queryClient.invalidateQueries({ queryKey: ["module-manifests", projectId] });
+      void queryClient.invalidateQueries({ queryKey: ["node-manifests", projectId] });
       startPoll();
       onSuccess();
     },
@@ -865,7 +865,7 @@ export function ModulePanel({ open, onOpenChange, projectId }: ModulePanelProps)
       toast.success("Modul o'rnatildi");
       setEnablingSlug(null);
       void queryClient.invalidateQueries({ queryKey: ["project-modules", projectId] });
-      void queryClient.invalidateQueries({ queryKey: ["module-manifests", projectId] });
+      void queryClient.invalidateQueries({ queryKey: ["node-manifests", projectId] });
       void queryClient.invalidateQueries({ queryKey: ["available-modules"] });
       // Start polling so the constructor re-fetches manifests until the newly
       // deployed module transitions from "pending" to "running" and its node
@@ -885,7 +885,7 @@ export function ModulePanel({ open, onOpenChange, projectId }: ModulePanelProps)
       toast.success("Modul o'chirildi");
       setPendingDisable(null);
       void queryClient.invalidateQueries({ queryKey: ["project-modules", projectId] });
-      void queryClient.invalidateQueries({ queryKey: ["module-manifests", projectId] });
+      void queryClient.invalidateQueries({ queryKey: ["node-manifests", projectId] });
       void queryClient.invalidateQueries({ queryKey: ["available-modules"] });
       // Poll after disable so node types disappear from the sidebar promptly.
       startPoll();
