@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomPanelButton } from '@/features/bot-constructor/panels/bottom-panel/components/button'
-import { Activity, Database, Keyboard, Languages, MoreHorizontal, Search, Shield, Braces, AlertTriangle, Puzzle } from 'lucide-react'
+import { Database, Keyboard, Languages, MoreHorizontal, Search, Shield, Braces, AlertTriangle, Puzzle } from 'lucide-react'
 import { debugConsoleStore } from '@/components/layout/debug-console/store'
 import { cn } from '@/lib/utils'
 import { SquareCommandIcon } from '@/components/icons/terminal'
@@ -63,11 +63,11 @@ interface Props {
 const FIXED_W = 227
 const SLOT = 48
 const MORE_W = 48
-const ALL_COUNT = 10
+const ALL_COUNT = 9
 
 function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
     const t = useTranslations('editor.toolbar')
-    const { isOpen, height, toggle, openExecutions } = debugConsoleStore()
+    const { isOpen, height, toggle } = debugConsoleStore()
     const { toggleSearchPanel } = useSearchStore()
     const [nodeDialogOpen, setNodeDialogOpen] = useState(false)
     // Sync external open state (from top bar button)
@@ -137,26 +137,12 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
         {
             key: 'terminal',
             inline: (
-                <BottomPanelButton onClick={toggle} title={t('terminal')} aria-label={t('terminal')}>
-                    <SquareCommandIcon />
-                </BottomPanelButton>
-            ),
-            overflow: (
-                <DropdownMenuItem key="terminal" onClick={toggle}>
-                    <SquareCommandIcon className="mr-2 h-4 w-4" />
-                    {t('terminal')}
-                </DropdownMenuItem>
-            ),
-        },
-        {
-            key: 'executions',
-            inline: (
                 <BottomPanelButton
-                    onClick={openExecutions}
+                    onClick={toggle}
                     title={executionId
-                        ? `Execution ${executionId.slice(0, 8)} · ${activeNodeId ?? ''} · ${executionStatus ?? ''}`
-                        : 'Executions'}
-                    aria-label="Executions"
+                        ? `${t('terminal')} · ${executionId.slice(0, 8)} · ${activeNodeId ?? ''} · ${executionStatus ?? ''}`
+                        : t('terminal')}
+                    aria-label={t('terminal')}
                     className={cn(
                         executionStatus === 'running' && 'border-orange-500/50 text-orange-400',
                         executionStatus === 'waiting' && 'border-amber-500/50 text-amber-400',
@@ -165,7 +151,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                     )}
                 >
                     <span className="relative">
-                        <Activity size={20} />
+                        <SquareCommandIcon />
                         {executionStatus && (
                             <span className={cn(
                                 'absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-background',
@@ -184,9 +170,9 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 </BottomPanelButton>
             ),
             overflow: (
-                <DropdownMenuItem key="executions" onClick={openExecutions}>
-                    <Activity size={16} className="mr-2" />
-                    Executions
+                <DropdownMenuItem key="terminal" onClick={toggle}>
+                    <SquareCommandIcon className="mr-2 h-4 w-4" />
+                    {t('terminal')}
                     {executionStatus ? (
                         <span className="ml-auto text-xs capitalize">{executionStatus}</span>
                     ) : null}
