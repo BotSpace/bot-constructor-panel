@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { X, Terminal, Trash2, Copy, TerminalIcon } from "lucide-react";
+import { X, Terminal, Trash2, Copy, Activity, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { debugConsoleStore } from "@/components/layout/debug-console/store";
@@ -15,12 +15,41 @@ interface LogEntry {
 }
 
 type BotType = "debug" | "release";
+type ConsoleView = "logs" | "executions";
+
+interface ExecutionSummary {
+  id: string;
+  chat_id: number;
+  trigger_type: string;
+  runtime_mode: BotType;
+  status: "running" | "waiting" | "succeeded" | "failed" | "cancelled";
+  current_node_id?: string;
+  error?: string;
+  started_at: string;
+  finished_at?: string;
+}
+
+interface ExecutionNodeRun {
+  id: string;
+  node_id: string;
+  node_type: string;
+  attempt: number;
+  status: ExecutionSummary["status"];
+  error?: string;
+  started_at: string;
+  finished_at?: string;
+}
 
 export function DebugConsole() {
   const { project } = useProjectStore();
   const { isOpen, open, close, toggle, height, setHeight } = debugConsoleStore();
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [selectedBot, setSelectedBot] = useState<BotType>("debug");
+  const [view, setView] = useState<ConsoleView>("logs");
+  const [executions, setExecutions] = useState<ExecutionSummary[]>([]);
+  const [selectedExecution, setSelectedExecution] = useState<string | null>(null);
+  const [nodeRuns, setNodeRuns] = useState<ExecutionNodeRun[]>([]);
+  const [executionsLoading, setExecutionsLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
@@ -130,7 +159,7 @@ export function DebugConsole() {
 
   // Log polling
   useEffect(() => {
-    if (!isOpen) {
+    if (!isOpen || view !== "logs") {
       setIsConnected(false);
       return;
     }
@@ -188,7 +217,48 @@ export function DebugConsole() {
     project?.id,
     project?.release?.id,
     addLog,
+    view,
   ]);
+
+  // Durable execution timeline. This remains useful after a pod restart,
+  // unlike raw container logs, and links each Telegram update to node attempts.
+  useEffect(() => {
+    if (!isOpen || view !== "executions" || !project?.id) return;
+    let cancelled = false;
+    const load = async () => {
+      setExecutionsLoading(true);
+      try {
+        const { data } = await instanceAuth.get<ExecutionSummary[]>("/executions", {
+          params: { project_id: project.id, runtime_mode: selectedBot, limit: 100 },
+        });
+        if (!cancelled) setExecutions(data ?? []);
+      } finally {
+        if (!cancelled) setExecutionsLoading(false);
+      }
+    };
+    void load();
+    const interval = window.setInterval(() => void load(), 3000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [isOpen, view, project?.id, selectedBot]);
+
+  useEffect(() => {
+    if (!selectedExecution || view !== "executions") {
+      setNodeRuns([]);
+      return;
+    }
+    let cancelled = false;
+    void instanceAuth
+      .get<{ node_runs?: ExecutionNodeRun[] }>(`/executions/${selectedExecution}`)
+      .then(({ data }) => {
+        if (!cancelled) setNodeRuns(data.node_runs ?? []);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedExecution, view]);
 
   const clearLogs = () => {
     setLogs([]);
@@ -265,8 +335,49 @@ export function DebugConsole() {
             Debug Console
           </span>
 
-          {/* Bot type selector */}
           <div className="flex items-center gap-1 ml-2">
+            <button
+              onClick={() => setView("logs")}
+              className={cn(
+                "px-2 py-0.5 text-xs rounded",
+                view === "logs" ? "bg-[#3e3e3e] text-white" : "text-[#aaaaaa] hover:bg-[#333333]"
+              )}
+            >
+              Logs
+            </button>
+            <button
+              onClick={() => setView("executions")}
+              className={cn(
+                "px-2 py-0.5 text-xs rounded",
+                view === "executions" ? "bg-[#3e3e3e] text-white" : "text-[#aaaaaa] hover:bg-[#333333]"
+              )}
+            >
+              Executions
+            </button>
+          </div>
+
+          {view === "executions" ? (
+            <div className="ml-2 flex items-center gap-1">
+              {(["debug", "release"] as BotType[]).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => {
+                    setSelectedBot(mode);
+                    setSelectedExecution(null);
+                  }}
+                  className={cn(
+                    "rounded px-2 py-0.5 text-xs capitalize",
+                    selectedBot === mode ? "bg-[#007acc] text-white" : "text-[#aaaaaa] hover:bg-[#333333]"
+                  )}
+                >
+                  {mode}
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {/* Bot type selector */}
+          <div className={cn("items-center gap-1 ml-2", view === "logs" ? "flex" : "hidden")}>
             <button
               onClick={() => setSelectedBot("debug")}
               className={cn(
@@ -296,7 +407,7 @@ export function DebugConsole() {
           </div>
 
           {/* Connection status */}
-          <div className="flex items-center gap-2 ml-2">
+          <div className={cn("items-center gap-2 ml-2", view === "logs" ? "flex" : "hidden")}>
             <div
               className={cn(
                 "w-2 h-2 rounded-full",
@@ -310,20 +421,20 @@ export function DebugConsole() {
         </div>
 
         <div className="flex items-center gap-1">
-          <button
+          {view === "logs" && <button
             onClick={copyLogs}
             className="p-1.5 hover:bg-[#3e3e3e] rounded transition-colors"
             title="Copy logs"
           >
             <Copy className="w-4 h-4 text-[#cccccc]" />
-          </button>
-          <button
+          </button>}
+          {view === "logs" && <button
             onClick={clearLogs}
             className="p-1.5 hover:bg-[#3e3e3e] rounded transition-colors"
             title="Clear logs"
           >
             <Trash2 className="w-4 h-4 text-[#cccccc]" />
-          </button>
+          </button>}
           <button
             onClick={close}
             className="p-1.5 hover:bg-[#3e3e3e] rounded transition-colors"
@@ -335,7 +446,7 @@ export function DebugConsole() {
       </div>
 
       {/* Logs area */}
-      <div
+      {view === "logs" ? <div
         ref={logsContainerRef}
         className="h-[calc(100%-40px)] overflow-y-auto overflow-x-auto px-4 py-2 font-mono text-xs leading-relaxed"
       >
@@ -377,7 +488,72 @@ export function DebugConsole() {
             <div ref={logsEndRef} />
           </div>
         )}
-      </div>
+      </div> : (
+        <div className="grid h-[calc(100%-40px)] grid-cols-[minmax(280px,38%)_1fr] overflow-hidden font-mono text-xs">
+          <div className="overflow-y-auto border-r border-[#3e3e3e]">
+            {executionsLoading && executions.length === 0 ? (
+              <div className="p-4 text-[#858585]">Executionlar yuklanmoqda…</div>
+            ) : executions.length === 0 ? (
+              <div className="p-4 text-[#858585]">Hali execution yozilmagan.</div>
+            ) : executions.map((execution) => (
+              <button
+                key={execution.id}
+                onClick={() => setSelectedExecution(execution.id)}
+                className={cn(
+                  "flex w-full items-start gap-2 border-b border-[#333] px-3 py-2 text-left hover:bg-[#2a2d2e]",
+                  selectedExecution === execution.id && "bg-[#37373d]"
+                )}
+              >
+                <Activity className={cn(
+                  "mt-0.5 h-3.5 w-3.5 shrink-0",
+                  execution.status === "failed" ? "text-red-400" :
+                    execution.status === "waiting" ? "text-yellow-400" :
+                      execution.status === "running" ? "text-blue-400" : "text-green-400"
+                )} />
+                <span className="min-w-0 flex-1">
+                  <span className="flex justify-between gap-2 text-[#cccccc]">
+                    <span>chat:{execution.chat_id}</span>
+                    <span className="text-[#858585]">{new Date(execution.started_at).toLocaleTimeString()}</span>
+                  </span>
+                  <span className="mt-1 block truncate text-[#9cdcfe]">
+                    {execution.trigger_type} · {execution.status}
+                    {execution.current_node_id ? ` · ${execution.current_node_id}` : ""}
+                  </span>
+                </span>
+                <ChevronRight className="mt-1 h-3.5 w-3.5 text-[#858585]" />
+              </button>
+            ))}
+          </div>
+          <div className="overflow-y-auto p-3">
+            {!selectedExecution ? (
+              <div className="flex h-full items-center justify-center text-[#858585]">
+                Node timeline uchun execution tanlang.
+              </div>
+            ) : nodeRuns.length === 0 ? (
+              <div className="text-[#858585]">Bu execution uchun node run topilmadi.</div>
+            ) : (
+              <div className="space-y-1">
+                {nodeRuns.map((run) => (
+                  <div key={run.id} className="grid grid-cols-[20px_1fr_auto] gap-2 rounded px-2 py-1.5 hover:bg-[#2a2d2e]">
+                    <span className={cn(
+                      "mt-1 h-2 w-2 rounded-full",
+                      run.status === "failed" ? "bg-red-400" :
+                        run.status === "waiting" ? "bg-yellow-400" :
+                          run.status === "running" ? "bg-blue-400" : "bg-green-400"
+                    )} />
+                    <span className="min-w-0">
+                      <span className="block truncate text-[#cccccc]">{run.node_id}</span>
+                      <span className="block truncate text-[#858585]">{run.node_type} · attempt {run.attempt}</span>
+                      {run.error ? <span className="block whitespace-pre-wrap text-red-400">{run.error}</span> : null}
+                    </span>
+                    <span className="text-[#858585]">{run.status}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
