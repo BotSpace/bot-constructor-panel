@@ -22,6 +22,8 @@ export type StateType =
   | "longitude"
   | "location_latitude"
   | "location_longitude"
+  // Literal value written by StateNode / callback capture.
+  | "static"
   // Custom — engine reads data.customType when type === "Custom"
   | "Custom";
 
