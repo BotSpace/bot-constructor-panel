@@ -67,6 +67,10 @@ export function CollectionSelectField({
   // The collection name is stored as a plain string in data[field.key]
   const collectionName =
     typeof data[field.key] === "string" ? (data[field.key] as string) : "";
+  const collectionListLoaded = Array.isArray(collections);
+  const collectionExists = Boolean(
+    collectionName && collections?.some((collection) => collection.name === collectionName)
+  );
 
   const { data: collectionDetail } = useReactQueryAction<CollectionDetail>({
     url: collectionName
@@ -147,6 +151,11 @@ export function CollectionSelectField({
             <SelectValue placeholder="Collection tanlang" />
           </SelectTrigger>
           <SelectContent>
+            {collectionName && collectionListLoaded && !collectionExists ? (
+              <SelectItem value={collectionName} disabled>
+                Noma&apos;lum collection: {collectionName}
+              </SelectItem>
+            ) : null}
             {collections?.map((c) => (
               <SelectItem key={c.id} value={c.name}>
                 {c.name}
@@ -154,6 +163,11 @@ export function CollectionSelectField({
             ))}
           </SelectContent>
         </Select>
+        {collectionName && collectionListLoaded && !collectionExists ? (
+          <p className="text-xs text-destructive">
+            Saqlangan qiymat mavjud collectionlardan biri emas. Ro&apos;yxatdan qayta tanlang.
+          </p>
+        ) : null}
       </div>
 
       {/* Context key + Filter builder (LoadCollectionItem) */}
