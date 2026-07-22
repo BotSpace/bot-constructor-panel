@@ -440,6 +440,30 @@ export default function Constructor() {
   // Bottom panel open states — shared with context menu
   const { openPanel } = useBottomPanelStore();
   const reloadDebug = useDebugControlStore((s) => s.reloadDebug);
+  const setRunNode = useDebugControlStore((s) => s.setRunNode);
+
+  useEffect(() => {
+    setRunNode(async (nodeId: string) => {
+      if (!project || project.debug?.status !== "running") {
+        toast.error("Avval debug botni ishga tushiring.");
+        throw new Error("debug is not running");
+      }
+      try {
+        const { data } = await instanceAuth.post<{ chat_id: number; node_id: string; queued: boolean }>(
+          "/debug/run-node/",
+          { project_id: String(project.id), node_id: nodeId }
+        );
+        toast.success(`Node oxirgi debug chat (${data.chat_id}) bilan ishga tushirildi.`);
+      } catch (error: unknown) {
+        const response = (error as { response?: { data?: { error?: { message?: string }; message?: string } } })
+          .response?.data;
+        const message = response?.error?.message || response?.message || "Nodeni ishga tushirib bo'lmadi.";
+        toast.error(message);
+        throw error;
+      }
+    });
+    return () => setRunNode(null);
+  }, [project, setRunNode]);
 
   // Single click only selects the node (React Flow handles selection itself);
   // the edit modal opens on double click.
