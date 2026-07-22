@@ -123,6 +123,7 @@ const PANEL_ONLY_FIELD_TYPES = new Set([
   "action-recipients",
   "code-editor",
   "collection-select",
+	"board-select",
   "condition-list",
   "cron-editor",
   "trigger-config",

@@ -25,6 +25,7 @@ import {
   Images,
   KeyRound,
   LayoutList,
+	Kanban,
   Link,
   LogOut,
   Megaphone,
@@ -160,6 +161,7 @@ const LUCIDE_ICONS: Record<string, ReactNode> = {
   database: <Database className="text-primary" strokeWidth={2} />,
   /** CollectionNode / LoadCollectionListNode */
   collection: <LayoutList className="text-primary" strokeWidth={2} />,
+	kanban: <Kanban className="text-primary" strokeWidth={2} />,
   /** VariableNode */
   variable: <Variable className="text-primary" strokeWidth={2} />,
 
