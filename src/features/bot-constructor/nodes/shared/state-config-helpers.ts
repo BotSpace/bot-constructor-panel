@@ -9,30 +9,30 @@ export function getStateTypesForMessageTrigger(
 ): StateType[] {
   switch (messageType) {
     case "text":
-      return ["text", "Custom"];
+      return ["text", "static"];
     case "photo":
-      return ["file_id", "caption", "Custom"];
+      return ["file_id", "caption", "static"];
     case "video":
-      return ["file_id", "caption", "Custom"];
+      return ["file_id", "caption", "static"];
     case "document":
-      return ["file_id", "caption", "Custom"];
+      return ["file_id", "caption", "static"];
     case "audio":
-      return ["file_id", "caption", "Custom"];
+      return ["file_id", "caption", "static"];
     case "voice":
-      return ["file_id", "caption", "Custom"];
+      return ["file_id", "caption", "static"];
     case "video_note":
-      return ["file_id", "Custom"];
+      return ["file_id", "static"];
     case "animation":
-      return ["file_id", "caption", "Custom"];
+      return ["file_id", "caption", "static"];
     case "sticker":
-      return ["file_id", "Custom"];
+      return ["file_id", "static"];
     case "contact":
       return [
         "phone_number",
         "contact_phone_number",
         "contact_first_name",
         "contact_last_name",
-        "Custom",
+        "static",
       ];
     case "location":
       return [
@@ -41,13 +41,13 @@ export function getStateTypesForMessageTrigger(
         "longitude",
         "location_latitude",
         "location_longitude",
-        "Custom",
+        "static",
       ];
     case "any":
     case "any_text":
-      return ["text", "caption", "Custom"];
+      return ["text", "caption", "static"];
     default:
-      return ["text", "Custom"];
+      return ["text", "static"];
   }
 }
 
@@ -57,21 +57,21 @@ export function getStateTypesForMessageTrigger(
  */
 export function getStateTypesForCallbackQueryTrigger(isCollectionButton: boolean = false): StateType[] {
   if (isCollectionButton) {
-    return ["callback", "data", "collection_id", "full_data", "Custom"];
+    return ["callback", "data", "collection_id", "full_data", "static"];
   }
-  return ["callback", "data", "Custom"];
+  return ["callback", "data", "static"];
 }
 
 /**
  * Get available state types for CommandTrigger
  */
 export function getStateTypesForCommandTrigger(): StateType[] {
-  return ["text", "Custom"];
+  return ["text", "static"];
 }
 
 /**
  * Get available state types for ReplyButtonTrigger
  */
 export function getStateTypesForReplyButtonTrigger(): StateType[] {
-  return ["text", "Custom"];
+  return ["text", "static"];
 }
