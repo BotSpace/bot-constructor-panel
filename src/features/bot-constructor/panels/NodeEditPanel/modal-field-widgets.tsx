@@ -24,6 +24,7 @@ import { ArrayEditorField } from "@/features/bot-constructor/fields/generic-fiel
 import { CodeEditorField } from "@/features/bot-constructor/fields/generic-fields/CodeEditorField";
 import { ToolParamsField } from "@/features/bot-constructor/fields/generic-fields/ToolParamsField";
 import { CollectionSelectField } from "@/features/bot-constructor/fields/generic-fields/CollectionSelectField";
+import { BoardSelectField } from "@/features/bot-constructor/fields/generic-fields/BoardSelectField";
 import { CredentialSelectField } from "@/features/bot-constructor/fields/generic-fields/CredentialSelectField";
 import { NodeSelectField } from "@/features/bot-constructor/fields/generic-fields/NodeSelectField";
 import { LocalizedField } from "@/features/bot-constructor/fields/generic-fields/LocalizedField";
@@ -293,6 +294,10 @@ export function ModalFieldWidget({ nodeId, data, field, valueOverride, onPatch }
       />
     );
   }
+
+	if (field.type === "board-select" && field.key) {
+		return <BoardSelectField nodeId={nodeId} data={data} field={field} onPatch={onPatch} />;
+	}
 
   if (field.type === "condition-list") {
     return (

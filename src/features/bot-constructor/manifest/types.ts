@@ -112,6 +112,7 @@ export interface NodeFieldManifest {
     | "array-editor"
     | "code-editor"
     | "collection-select"
+	| "board-select"
     | "state-type-select"
     | "condition-list"
     | "cron-editor"
@@ -199,6 +200,8 @@ export interface NodeFieldManifest {
   withFilters?: boolean;
   withSorts?: boolean;
   contextKeyField?: string;
+	// board-select: destination column is stored in this sibling data key.
+	columnKey?: string;
   // state-type-select
   keyField?: string;
   typeField?: string;
