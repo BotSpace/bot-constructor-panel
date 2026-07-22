@@ -226,7 +226,7 @@ const migrateNodeKeyboard = (node: Node): Node => {
 
 /**
  * Eski format (data.state = {key, type}) bo'lsa, flat formatga o'tkaz.
- * Yangi format: save_state=true, state_key, state_type flat fieldlar.
+ * State keyning mavjudligi saqlashni yoqadi; alohida save_state switchi yo'q.
  */
 const migrateTriggerState = (node: Node): Node => {
   const data = node.data as Record<string, unknown> | undefined;
@@ -237,13 +237,25 @@ const migrateTriggerState = (node: Node): Node => {
     state &&
     typeof state === "object" &&
     typeof state.key === "string" &&
-    data.save_state === undefined
+    data.state_key === undefined
   ) {
     const nextData = { ...data };
-    nextData.save_state = true;
     nextData.state_key = state.key;
-    nextData.state_type = typeof state.type === "string" ? state.type : "text";
+    nextData.state_type = typeof state.type === "string"
+      ? state.type
+      : node.type === "CallbackQueryTriggerNode"
+        ? "callback"
+        : "text";
     delete nextData.state;
+    delete nextData.save_state;
+    return { ...node, data: nextData };
+  }
+
+  // The engine has treated state_key as the source of truth since the enable
+  // switch was removed. Do not keep serializing the obsolete flag.
+  if ("save_state" in data) {
+    const nextData = { ...data };
+    delete nextData.save_state;
     return { ...node, data: nextData };
   }
 

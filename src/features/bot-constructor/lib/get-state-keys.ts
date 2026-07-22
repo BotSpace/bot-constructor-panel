@@ -67,7 +67,7 @@ function getManifestStateKeys(node: Node): string[] {
 }
 
 /**
- * Node types that support flat state configuration (save_state / state_key / state_type)
+ * Node types that support flat state configuration (state_key / state_type)
  */
 const TRIGGER_TYPES_WITH_STATE = [
   "MessageTriggerNode",
@@ -88,12 +88,12 @@ function isTriggerTypeWithState(
 
 /**
  * Extract the state key from a trigger node.
- * Supports both new flat format (save_state + state_key) and
+ * Supports both new flat format (state_key) and
  * legacy nested format (data.state.key) as fallback.
  */
 function getTriggerStateKey(data: Record<string, unknown>): string | null {
   // New flat format
-  if (data.save_state === true && typeof data.state_key === "string") {
+  if (typeof data.state_key === "string") {
     const key = data.state_key.trim();
     return key !== "" ? key : null;
   }
