@@ -11,6 +11,23 @@ import { HandlersList } from "@/features/bot-constructor/nodes/shared/HandlerBui
 import { useTranslations } from "next-intl";
 import { NodeProps } from "reactflow";
 import { cn } from "@/lib/utils";
+import {
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  Files,
+  MoreHorizontal,
+  Pencil,
+  Play,
+  Trash2,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { resolveNodeIcon } from "@/features/bot-constructor/manifest/iconRegistry";
 import { renderHandleFromManifest } from "@/features/bot-constructor/manifest/handlePresetRegistry";
 import { FieldWidget, getContentClassName, isFieldVisible } from "@/features/bot-constructor/manifest/fieldWidgetRegistry";
@@ -20,6 +37,8 @@ import {
   DebugNodeStatus,
   useDebugStatusStore,
 } from "@/features/bot-constructor/store/debug-status";
+import { useFlowStore } from "@/features/bot-constructor/store";
+import { useDebugControlStore } from "@/features/bot-constructor/store/debug-control";
 
 // Debug status is surfaced via a `data-debug-status` attribute on the wrapper.
 // For accessory (circle) nodes the visible status ring is applied to the inner
@@ -38,6 +57,128 @@ const CIRCLE_SIZE = 76;
 // Extra space below the circle for the title (2 lines) + badge.
 // title: 2 × 13px line-height ≈ 28px, gap 6px, badge 16px, gap 4px + padding 8px
 const LABEL_AREA_H = 64;
+
+function selectOnlyNode(nodeId: string) {
+  const store = useFlowStore.getState();
+  store.onNodesChange(
+    store.nodes.map((node) => ({
+      id: node.id,
+      type: "select" as const,
+      selected: node.id === nodeId,
+    }))
+  );
+}
+
+function NodeActionsToolbar({
+  nodeId,
+  selected,
+  collapsed,
+  onToggleCollapse,
+}: {
+  nodeId: string;
+  selected?: boolean;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+}) {
+  const reloadDebug = useDebugControlStore((state) => state.reloadDebug);
+
+  const openNode = () => {
+    selectOnlyNode(nodeId);
+    useFlowStore.getState().setEditingNodeId(nodeId);
+  };
+  const copyNode = () => {
+    selectOnlyNode(nodeId);
+    useFlowStore.getState().copySelection();
+  };
+  const duplicateNode = () => {
+    selectOnlyNode(nodeId);
+    useFlowStore.getState().duplicateSelection();
+  };
+  const deleteNode = () => {
+    selectOnlyNode(nodeId);
+    useFlowStore.getState().deleteSelectedElements();
+  };
+
+  const buttonClass =
+    "nodrag nopan grid h-7 w-7 place-items-center rounded-md text-zinc-300 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary";
+
+  return (
+    <div
+      className={cn(
+        "nodrag nopan nowheel absolute bottom-full left-1/2 z-50 -translate-x-1/2 pb-2 transition-opacity duration-150",
+        selected
+          ? "pointer-events-auto opacity-100"
+          : "pointer-events-none opacity-0 group-hover/card:pointer-events-auto group-hover/card:opacity-100"
+      )}
+      onPointerDown={(event) => event.stopPropagation()}
+      onDoubleClick={(event) => event.stopPropagation()}
+    >
+      <div className="flex items-center gap-0.5 rounded-lg border border-white/10 bg-[#202020]/95 p-1 shadow-xl backdrop-blur-sm">
+        <button
+          type="button"
+          className={buttonClass}
+          title="Debug botni ishga tushirish yoki qayta yuklash"
+          onClick={() => reloadDebug?.()}
+        >
+          <Play className="h-3.5 w-3.5 fill-current" />
+        </button>
+        <button
+          type="button"
+          className={buttonClass}
+          title="Node sozlamalarini ochish"
+          onClick={openNode}
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </button>
+        <button
+          type="button"
+          className={cn(buttonClass, "hover:bg-red-500/15 hover:text-red-300")}
+          title="Nodeni o'chirish"
+          onClick={deleteNode}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button type="button" className={buttonClass} title="Boshqa amallar">
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="start"
+            side="bottom"
+            className="nodrag nopan min-w-52 border-white/10 bg-[#252525] text-zinc-100"
+            onPointerDown={(event) => event.stopPropagation()}
+          >
+            <DropdownMenuItem onSelect={openNode}>
+              <Pencil />
+              Sozlamalarni ochish
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={copyNode}>
+              <Copy />
+              Nusxa olish
+              <span className="ml-auto text-[10px] text-zinc-500">Ctrl C</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={duplicateNode}>
+              <Files />
+              Dublikat qilish
+            </DropdownMenuItem>
+            {onToggleCollapse ? (
+              <>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem onSelect={onToggleCollapse}>
+                  {collapsed ? <ChevronDown /> : <ChevronUp />}
+                  {collapsed ? "Nodeni yoyish" : "Nodeni yig'ish"}
+                </DropdownMenuItem>
+              </>
+            ) : null}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  );
+}
 
 const STATUS_BADGE_STYLE: Record<
   DebugNodeStatus,
@@ -119,11 +260,12 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
     // .acc-node-wrapper class + data-debug-status/data-accessory-selected drive
     // CSS status ring on the inner .acc-node-circle (see globals.css).
     <div
-      className="acc-node-wrapper relative flex flex-col items-center select-none"
+      className="acc-node-wrapper group/card relative flex flex-col items-center select-none"
       data-debug-status={debugStatus || undefined}
       data-accessory-selected={selected || undefined}
       style={{ width: ACCESSORY_W, height: ACCESSORY_H }}
     >
+      <NodeActionsToolbar nodeId={id} selected={selected} />
       <ExecutionBadge status={debugStatus} attempt={attempt} compact />
       {/* Handles rendered from manifest — id/preset UNCHANGED so edges survive. */}
       {manifest.handles?.map((handle, index) =>
@@ -322,6 +464,12 @@ export function GenericNodeRenderer({
       data-debug-status={debugStatus || undefined}
       style={sizeStyle}
     >
+      <NodeActionsToolbar
+        nodeId={id}
+        selected={selected}
+        collapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+      />
       <ExecutionBadge status={debugStatus} attempt={attempt} />
       {/* Hover tint covering the WHOLE card (incl. grown empty space),
           instead of only the centered header. */}
