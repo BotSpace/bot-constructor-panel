@@ -17,6 +17,7 @@ const CALLBACK_FILTERS: DynamicFilterOption[] = [
 ];
 
 const BASE_FILTERS: DynamicFilterOption[] = [
+  { value: "static", label: "Doimiy qiymat", group: "Qiymat" },
   { value: "user_id", label: "User ID", group: "User" },
   { value: "first_name", label: "First Name", group: "User" },
   { value: "last_name", label: "Last Name", group: "User" },

@@ -63,6 +63,8 @@ export function StateTypeSelectField({
     typeof data[typeField] === "string" ? (data[typeField] as string) : "";
   const customType =
     typeof data.customType === "string" ? (data.customType as string) : "";
+  const staticValue =
+    typeof data.value === "string" ? (data.value as string) : "";
   const isPrivate = data.private === true;
 
   return (
@@ -122,6 +124,18 @@ export function StateTypeSelectField({
             onChange={(e) =>
               updateNodeData(nodeId, { customType: e.target.value })
             }
+          />
+        </div>
+      ) : null}
+
+      {stateType === "static" ? (
+        <div className="grid gap-2">
+          <Label>Doimiy qiymat</Label>
+          <Input
+            className="border-white/10 bg-zinc-950/60"
+            value={staticValue}
+            onChange={(e) => updateNodeData(nodeId, { value: e.target.value })}
+            placeholder="Masalan: premium"
           />
         </div>
       ) : null}
