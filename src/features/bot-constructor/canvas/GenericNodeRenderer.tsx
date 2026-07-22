@@ -80,7 +80,18 @@ function NodeActionsToolbar({
   collapsed?: boolean;
   onToggleCollapse?: () => void;
 }) {
-  const reloadDebug = useDebugControlStore((state) => state.reloadDebug);
+  const runNode = useDebugControlStore((state) => state.runNode);
+  const [isRunning, setIsRunning] = useState(false);
+
+  const executeNode = async () => {
+    if (!runNode || isRunning) return;
+    setIsRunning(true);
+    try {
+      await runNode(nodeId);
+    } finally {
+      setIsRunning(false);
+    }
+  };
 
   const openNode = () => {
     selectOnlyNode(nodeId);
@@ -117,10 +128,11 @@ function NodeActionsToolbar({
         <button
           type="button"
           className={buttonClass}
-          title="Debug botni ishga tushirish yoki qayta yuklash"
-          onClick={() => reloadDebug?.()}
+          title="Shu nodeni oxirgi debug user contexti bilan ishga tushirish"
+          onClick={() => void executeNode()}
+          disabled={!runNode || isRunning}
         >
-          <Play className="h-3.5 w-3.5 fill-current" />
+          <Play className={cn("h-3.5 w-3.5 fill-current", isRunning && "animate-pulse")} />
         </button>
         <button
           type="button"
