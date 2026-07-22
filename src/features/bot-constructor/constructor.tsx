@@ -27,10 +27,9 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Plus, Text, RotateCcw, Key, Database, Shield, Puzzle, Keyboard, Braces, AlertTriangle } from "lucide-react";
+import { Plus, Text, Database, Shield, Puzzle, Keyboard, Braces, AlertTriangle } from "lucide-react";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import toast from "react-hot-toast";
-import { track } from "@/components/common/analitics";
 import { useTranslations } from "next-intl";
 import { useBottomPanelStore, type BottomPanelKey } from "@/features/bot-constructor/store/bottom-panel-store";
 import { useDebugControlStore } from "@/features/bot-constructor/store/debug-control";
@@ -439,15 +438,11 @@ export default function Constructor() {
 
   // Bottom panel open states — shared with context menu
   const { openPanel } = useBottomPanelStore();
-  const reloadDebug = useDebugControlStore((s) => s.reloadDebug);
   const setRunNode = useDebugControlStore((s) => s.setRunNode);
 
   useEffect(() => {
     setRunNode(async (nodeId: string) => {
-      if (!project || project.debug?.status !== "running") {
-        toast.error("Avval debug botni ishga tushiring.");
-        throw new Error("debug is not running");
-      }
+      if (!project) throw new Error("project is not loaded");
       try {
         const { data } = await instanceAuth.post<{ chat_id: number; node_id: string; queued: boolean }>(
           "/debug/run-node/",
@@ -521,65 +516,6 @@ export default function Constructor() {
   useKeyboardShortcut(
     ["Control", "`"],
     () => { debugToggle(); },
-    { preventDefault: true }
-  );
-
-  // Debug botni reload qilish — keyboard shortcut va context menu uchun umumiy.
-  // DebugingButtons registratsiya qilgan AYNAN o'sha run/reload oqimini chaqiramiz
-  // (starting flag + loading, save'ni kutish, limit/error). Dublikat logika yo'q —
-  // shu sabab statusbar tugmasi bilan bir xil ishlaydi (loading ko'rinadi).
-  function handleReloadDebug() {
-    reloadDebug?.();
-  }
-
-  // Ctrl+R - Debug botni reload qilish
-  useKeyboardShortcut(
-    ["Control", "r"],
-    () => { handleReloadDebug(); },
-    { preventDefault: true }
-  );
-
-  // Ctrl+D - Debug botni run/stop qilish (toggle)
-  useKeyboardShortcut(
-    ["Control", "d"],
-    () => {
-      if (!project) return;
-
-      const { changeDebug } = useProjectStore.getState();
-
-      if (project.debug.status === "running") {
-        changeDebug({
-          ...project.debug,
-          status: "stopped",
-        });
-
-        instanceAuth
-          .get(`/projects/${id}/debug/stop`)
-          .then(() => {
-            toast.success("Bot muvaffaqiyatli to'xtatildi!");
-          })
-          .catch(() => {
-            toast.error("Botni to'xtatishda xatolik yuz berdi.");
-          });
-      } else {
-        saveFlow(id);
-
-        changeDebug({
-          ...project.debug,
-          status: "initializing",
-        });
-
-        track("bot-debug-run", { projectId: id });
-        instanceAuth
-          .get(`/projects/${id}/debug`)
-          .then(() => {
-            toast.success("Bot ishga tushirilmoqda...");
-          })
-          .catch(() => {
-            toast.error("Botni ishga tushirishda xatolik yuz berdi.");
-          });
-      }
-    },
     { preventDefault: true }
   );
 
@@ -936,12 +872,6 @@ export default function Constructor() {
             <Text size={16} />
             {t("format")}
             <ContextMenuShortcut>⌘ i</ContextMenuShortcut>
-          </ContextMenuItem>
-          {/* Reload debug bot */}
-          <ContextMenuItem onClick={handleReloadDebug}>
-            <RotateCcw size={16} />
-            {t("reload")}
-            <ContextMenuShortcut>⌘ r</ContextMenuShortcut>
           </ContextMenuItem>
           {/* Collections */}
           <ContextMenuItem onSelect={() => { pendingPanelRef.current = "collection"; }}>
