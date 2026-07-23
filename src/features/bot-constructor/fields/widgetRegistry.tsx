@@ -2991,6 +2991,25 @@ const STATIC_TOOL_PARAMS: Record<string, AiToolParamDef[]> = {
   ],
 };
 
+function googleSheetsParams(operation: string): AiToolParamDef[] {
+  const range: AiToolParamDef = {
+    key: "range",
+    label: "Range",
+    type: "string",
+    description: "A1 notation range, for example A1:D10. Leave empty to use the selected tab.",
+  };
+  const values: AiToolParamDef = {
+    key: "values",
+    label: "Qiymatlar",
+    type: "array",
+    description: "Rows as a two-dimensional JSON array, for example [[\"Ali\", \"+998...\"]].",
+  };
+  if (operation === "append") return [range, values];
+  if (operation === "update") return [range, values];
+  if (operation === "clear") return [range];
+  return [range];
+}
+
 function parseSchemaToParamDefs(schema: unknown): AiToolParamDef[] {
   const s = schema as Record<string, unknown> | undefined;
   if (!s || typeof s !== "object") return [];
@@ -3025,7 +3044,9 @@ function AIToolParamConfigWidget({ nodeId, data }: WidgetProps) {
 
   // Param definitions: static tools first, then schema-driven (module tools)
   const params: AiToolParamDef[] =
-    STATIC_TOOL_PARAMS[tool] ?? parseSchemaToParamDefs(data.parametersSchema);
+    tool === "google_sheets"
+      ? googleSheetsParams(typeof data.operation === "string" ? data.operation : "read")
+      : STATIC_TOOL_PARAMS[tool] ?? parseSchemaToParamDefs(data.parametersSchema);
 
   const paramConfig =
     data.paramConfig && typeof data.paramConfig === "object"
@@ -3060,7 +3081,7 @@ function AIToolParamConfigWidget({ nodeId, data }: WidgetProps) {
       updateNodeData(nodeId, { paramConfig: { ...paramConfig, ...seed } });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodeId, tool]);
+  }, [nodeId, tool, data.operation]);
 
   // Seed the tool's built-in description as the editable default (once per
   // node/tool, only while empty) so the box opens pre-populated.

@@ -5,10 +5,20 @@ export interface ContextSnapshot {
   ts: number | string; // Unix ms (number) or ISO string from event
 }
 
+export interface NodeContextSnapshot extends ContextSnapshot {
+  chat_id: string;
+  changes: Record<string, unknown>;
+  removed: string[];
+  run_id?: number;
+}
+
 interface DebugContextState {
   /** chat_id → latest context snapshot */
   snapshots: Map<string, ContextSnapshot>;
+  /** node_id → that node's latest context write diff */
+  nodeSnapshots: Map<string, NodeContextSnapshot>;
   setSnapshot: (chat_id: string, snapshot: ContextSnapshot) => void;
+  setNodeSnapshot: (node_id: string, snapshot: NodeContextSnapshot) => void;
   clearSnapshots: () => void;
   /**
    * Seed initial snapshots from GET /api/debug/context/ on mount.
@@ -20,6 +30,7 @@ interface DebugContextState {
 
 export const useDebugContextStore = create<DebugContextState>((set, get) => ({
   snapshots: new Map(),
+  nodeSnapshots: new Map(),
 
   setSnapshot: (chat_id, snapshot) => {
     set((state) => {
@@ -29,8 +40,16 @@ export const useDebugContextStore = create<DebugContextState>((set, get) => ({
     });
   },
 
+  setNodeSnapshot: (node_id, snapshot) => {
+    set((state) => {
+      const next = new Map(state.nodeSnapshots);
+      next.set(node_id, snapshot);
+      return { nodeSnapshots: next };
+    });
+  },
+
   clearSnapshots: () => {
-    set({ snapshots: new Map() });
+    set({ snapshots: new Map(), nodeSnapshots: new Map() });
   },
 
   seedSnapshots: (entries) => {

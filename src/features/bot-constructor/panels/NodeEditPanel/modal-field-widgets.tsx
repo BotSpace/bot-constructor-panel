@@ -368,6 +368,7 @@ export function ModalFieldWidget({ nodeId, data, field, valueOverride, onPatch }
         dependsOn={field.dependsOn}
         label={field.label}
         placeholder={field.placeholder}
+        allowCustom={field.allowCustom}
       />
     );
   }
