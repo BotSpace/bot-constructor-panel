@@ -7,6 +7,8 @@ type Direction = "TB" | "LR";
 
 const DEFAULT_NODE_WIDTH = 150;
 const DEFAULT_NODE_HEIGHT = 150;
+/** Keeps the node action toolbar clear of the node in the row above. */
+const FLOW_NODE_VERTICAL_GAP = 64;
 
 /** Horizontal gap between sibling accessory nodes placed below their parent. */
 const ACCESSORY_HORIZONTAL_GAP = 20;
@@ -284,7 +286,7 @@ export const getFormatFlow = (
       const parentNode = posById.get(sourceId);
       const parentCenterY =
         (parentNode?.position.y ?? 0) + (parentNode?.height ?? DEFAULT_NODE_HEIGHT) / 2;
-      const BRANCH_GAP = 48;
+      const BRANCH_GAP = FLOW_NODE_VERTICAL_GAP;
       const childHeights = allChildIds.map((cid) => posById.get(cid)?.height ?? DEFAULT_NODE_HEIGHT);
       const stackHeight =
         childHeights.reduce((s, h) => s + h, 0) + BRANCH_GAP * (allChildIds.length - 1);
@@ -395,10 +397,10 @@ export const getFormatFlow = (
   // node is taller than the sibling gap, while preserving the tree order.
   {
     type Node0 = (typeof layoutedNormalNodes)[0];
-    const SIB_GAP = 28; // vertical gap between sibling subtrees (leaf stacking)
+    const SIB_GAP = FLOW_NODE_VERTICAL_GAP; // vertical gap between sibling subtrees
     const ROOT_GAP = 80; // larger gap between separate root trees
     const COLUMN_TOL = 60;
-    const V_MARGIN = 28;
+    const V_MARGIN = FLOW_NODE_VERTICAL_GAP;
     const hOf = (n: Node0) => n.height ?? DEFAULT_NODE_HEIGHT;
 
     const posById = new Map<string, Node0>();

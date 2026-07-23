@@ -58,6 +58,7 @@ export function PillHandle({
 }: PillHandleProps) {
   const isSource = type === "source";
   const shouldShowPlus = showPlus ?? isSource;
+  const hasExpandedStartArea = isSource && position === Position.Right;
 
   return (
     <Handle
@@ -78,6 +79,9 @@ export function PillHandle({
         className
       )}
     >
+      {hasExpandedStartArea && (
+        <span aria-hidden className="absolute -inset-2" />
+      )}
       {shouldShowPlus && (
         <PlusIcon
           className="pointer-events-none text-white"
