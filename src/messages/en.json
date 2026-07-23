@@ -705,6 +705,7 @@
     "notRun": "Values written by this node will appear after it runs in debug mode.",
     "availableHere": "Variables available at this point",
     "noAvailable": "No flow variables were declared before this node.",
+    "valueUnavailable": "Debug value is not available yet",
     "sendDebug": "Send a message to the debug bot to see context here.",
     "globalVars": {
       "groupUser": "User",

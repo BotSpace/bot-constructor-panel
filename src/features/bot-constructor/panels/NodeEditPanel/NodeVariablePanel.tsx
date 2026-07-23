@@ -17,12 +17,37 @@ interface NodeVariablePanelProps {
 }
 
 function displayValue(value: unknown): string {
-  if (typeof value === "string") return value;
+  if (value === undefined) return "—";
+  if (value === null) return "null";
+  if (typeof value === "string") return value === "" ? '""' : value;
   try {
-    return JSON.stringify(value);
+    return JSON.stringify(value) ?? String(value);
   } catch {
     return String(value);
   }
+}
+
+function resolveContextValue(
+  variables: Record<string, unknown> | undefined,
+  key: string,
+): { found: boolean; value?: unknown } {
+  if (!variables) return { found: false };
+  if (Object.prototype.hasOwnProperty.call(variables, key)) {
+    return { found: true, value: variables[key] };
+  }
+
+  const path = key.split(".").filter(Boolean);
+  if (path.length < 2) return { found: false };
+
+  let current: unknown = variables;
+  for (const segment of path) {
+    if (current === null || typeof current !== "object") return { found: false };
+    const record = current as Record<string, unknown>;
+    if (!Object.prototype.hasOwnProperty.call(record, segment)) return { found: false };
+    current = record[segment];
+  }
+
+  return { found: true, value: current };
 }
 
 function timestampValue(value: number | string): number {
@@ -68,6 +93,10 @@ export function NodeVariablePanel({
 
   const changes = nodeSnapshot ? Object.entries(nodeSnapshot.changes) : [];
   const allVariables = activeContext ? Object.entries(activeContext.variables) : [];
+  const availableVariables = stateKeys.map((key) => {
+    const resolved = resolveContextValue(activeContext?.variables, key);
+    return [key, resolved.found ? resolved.value : t("valueUnavailable")] as [string, unknown];
+  });
 
   return (
     <>
@@ -165,10 +194,7 @@ export function NodeVariablePanel({
               {t("availableHere")}
             </p>
             {stateKeys.length > 0 ? (
-              <VariableList
-                entries={stateKeys.map((key) => [key, "upstream state"])}
-                onInsert={insertVariable}
-              />
+              <VariableList entries={availableVariables} onInsert={insertVariable} />
             ) : (
               <EmptyState text={t("noAvailable")} />
             )}
@@ -277,7 +303,10 @@ function VariableList({
             >
               {`{{${key}}}`}
             </span>
-            <span className="mt-0.5 block truncate text-[10px] text-zinc-500">
+            <span
+              className="mt-0.5 block line-clamp-3 break-all text-[10px] leading-4 text-zinc-500"
+              title={displayValue(value)}
+            >
               {displayValue(value)}
             </span>
           </span>
