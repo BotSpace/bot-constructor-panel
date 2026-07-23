@@ -29,7 +29,10 @@ import { ValueInput } from "@/features/bot-constructor/nodes/bespoke/MessageTrig
 import { TypeSelector } from "@/features/bot-constructor/nodes/bespoke/MessageTrigger/components/TypeSelector";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
-import { AlertCircle, ArrowRight, Bot, GripVertical, Key, ListPlus, PlusIcon, Trash2, X } from "lucide-react";
+import useProjectStore from "@/features/bot-constructor/store/project";
+import { instanceAuth } from "@/services/instance";
+import { BoardSelectField } from "@/features/bot-constructor/fields/generic-fields/BoardSelectField";
+import { AlertCircle, ArrowRight, Bot, GripVertical, Key, ListPlus, Loader2, PlusIcon, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { CodeEditorDialog } from "@/features/bot-constructor/nodes/bespoke/CustomCodeNode/components/CodeEditorDialog";
@@ -2981,6 +2984,65 @@ interface AiToolParamConfigEntry {
   aiDescription: string;
 }
 
+type KanbanField = { key: string; label: string; type?: string; description?: string; required?: boolean };
+type KanbanFieldEntry = { source: "ai" | "fixed"; value: string; aiDescription: string };
+
+/**
+ * AI Kanban tool configuration. Board metadata is deliberately fetched only
+ * after a board is selected: the board list stays fast, while its custom
+ * fields are always current.
+ */
+function AIKanbanToolConfigWidget({ nodeId, data }: WidgetProps) {
+  const updateNodeData = useFlowStore((s) => s.updateNodeData);
+  const projectId = useProjectStore((s) => s.project?.id);
+  const [fieldSchema, setFieldSchema] = useState<KanbanField[]>([]);
+  const [loadingFields, setLoadingFields] = useState(false);
+  const boardId = typeof data.boardId === "string" ? data.boardId : "";
+  const titleConfig = (data.titleConfig ?? { source: "ai", value: "", aiDescription: "" }) as KanbanFieldEntry;
+  const descriptionConfig = (data.descriptionConfig ?? { source: "ai", value: "", aiDescription: "" }) as KanbanFieldEntry;
+  const customFieldConfig = (data.customFieldConfig ?? {}) as Record<string, KanbanFieldEntry>;
+
+  useEffect(() => {
+    if (!boardId) { setFieldSchema([]); return; }
+    let active = true;
+    setLoadingFields(true);
+    instanceAuth.get<{ field_schema?: unknown }>(`/boards/${boardId}`).then((response) => {
+      if (!active) return;
+      const raw = response.data.field_schema;
+      const fields = Array.isArray(raw) ? raw : raw && typeof raw === "object" && Array.isArray((raw as { fields?: unknown[] }).fields) ? (raw as { fields: unknown[] }).fields : [];
+      setFieldSchema(fields.flatMap((item) => {
+        if (!item || typeof item !== "object") return [];
+        const field = item as Record<string, unknown>;
+        const key = String(field.key ?? field.name ?? "").trim();
+        return key ? [{ key, label: String(field.label ?? field.name ?? key), type: typeof field.type === "string" ? field.type : "string", description: typeof field.description === "string" ? field.description : undefined, required: field.required === true }] : [];
+      }));
+    }).catch(() => { if (active) setFieldSchema([]); }).finally(() => { if (active) setLoadingFields(false); });
+    return () => { active = false; };
+  }, [boardId, projectId]);
+
+  const write = (patch: Record<string, unknown>) => updateNodeData(nodeId, patch);
+  const setConfig = (key: string, entry: KanbanFieldEntry) => write({ [key]: entry });
+  const renderConfig = (key: "titleConfig" | "descriptionConfig", label: string, multiline = false) => {
+    const entry = key === "titleConfig" ? titleConfig : descriptionConfig;
+    const fixed = entry.source === "fixed";
+    return <div className="grid gap-1.5 rounded-md border border-white/[0.07] bg-white/[0.02] p-2">
+      <div className="flex items-center justify-between gap-2"><Label className="text-xs">{label}</Label><div className="flex overflow-hidden rounded border border-white/[0.08]">
+        {(["fixed", "ai"] as const).map((source) => <button key={source} type="button" onClick={() => setConfig(key, { ...entry, source })} className={cn("px-2 py-0.5 text-[10px]", entry.source === source ? (source === "fixed" ? "bg-amber-500/20 text-amber-300" : "bg-blue-500/20 text-blue-300") : "text-zinc-500")}>{source === "fixed" ? "Static" : "AI izohi"}</button>)}
+      </div></div>
+      {fixed ? <Input className="h-8 text-xs" placeholder="{{message_text}}" value={entry.value} onChange={(e) => setConfig(key, { ...entry, value: e.target.value })} /> : <Textarea className="min-h-[52px] text-xs" rows={multiline ? 2 : 1} placeholder="AI bu qiymatni qanday tanlashini yozing" value={entry.aiDescription} onChange={(e) => setConfig(key, { ...entry, aiDescription: e.target.value })} />}
+    </div>;
+  };
+
+  return <div className="grid gap-3">
+    <div className="grid gap-1.5"><Label className="text-xs">Tool tavsifi (LLM uchun)</Label><Textarea className="min-h-[56px] text-xs" rows={2} placeholder="Qachon karta yaratish kerakligini yozing" value={typeof data.description === "string" ? data.description : ""} onChange={(e) => write({ description: e.target.value })} /></div>
+    <div className="rounded-md border border-primary/20 bg-primary/[0.04] p-2 text-[11px] text-muted-foreground">Kanban karta aynan tanlangan board va ustunga yoziladi. Boardni tanlaganingizdan keyin uning qo‘shimcha fieldlari yuklanadi.</div>
+    <BoardSelectField nodeId={nodeId} data={data} field={{ type: "board-select", key: "boardId", columnKey: "columnId", label: "Board va boshlang‘ich ustun" }} />
+    {renderConfig("titleConfig", "Karta sarlavhasi")}
+    {renderConfig("descriptionConfig", "Karta tavsifi", true)}
+    {loadingFields ? <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Qo‘shimcha fieldlar yuklanmoqda…</div> : fieldSchema.length > 0 ? <div className="grid gap-2"><Label className="text-xs text-muted-foreground">Board qo‘shimcha fieldlari</Label>{fieldSchema.map((field) => { const entry = customFieldConfig[field.key] ?? { source: "ai" as const, value: "", aiDescription: field.description ?? "" }; const fixed = entry.source === "fixed"; return <div key={field.key} className="grid gap-1.5 rounded-md border border-white/[0.07] p-2"><div className="flex items-center justify-between gap-2"><span className="text-xs font-medium">{field.label}{field.required ? " *" : ""}</span><div className="flex overflow-hidden rounded border border-white/[0.08]"><button type="button" onClick={() => write({ customFieldConfig: { ...customFieldConfig, [field.key]: { ...entry, source: "fixed" } } })} className={cn("px-2 py-0.5 text-[10px]", fixed ? "bg-amber-500/20 text-amber-300" : "text-zinc-500")}>Static</button><button type="button" onClick={() => write({ customFieldConfig: { ...customFieldConfig, [field.key]: { ...entry, source: "ai" } } })} className={cn("px-2 py-0.5 text-[10px]", !fixed ? "bg-blue-500/20 text-blue-300" : "text-zinc-500")}>AI izohi</button></div></div>{fixed ? <Input className="h-8 text-xs" value={entry.value} placeholder={field.type ?? "Qiymat"} onChange={(e) => write({ customFieldConfig: { ...customFieldConfig, [field.key]: { ...entry, value: e.target.value } } })} /> : <Textarea className="min-h-[48px] text-xs" rows={2} value={entry.aiDescription} placeholder="AI bu fieldni qanday to‘ldirishini yozing" onChange={(e) => write({ customFieldConfig: { ...customFieldConfig, [field.key]: { ...entry, aiDescription: e.target.value } } })} />}</div>; })}</div> : boardId ? <div className="text-xs text-muted-foreground">Bu boardda qo‘shimcha field yo‘q.</div> : null}
+  </div>;
+}
+
 const STATIC_TOOL_PARAMS: Record<string, AiToolParamDef[]> = {
   payment_link: [
     { key: "amount",      label: "To'lov summasi", type: "number",  description: "Payment amount in UZS" },
@@ -3204,6 +3266,7 @@ const widgetRegistry: Record<string, (props: WidgetProps) => ReactNode> = {
   aiAgentAdvanced: AIAgentAdvancedWidget,
   aiCollectionToolConfig: AICollectionToolConfigWidget,
   aiKnowledgeToolConfig: AIKnowledgeToolConfigWidget,
+  aiKanbanToolConfig: AIKanbanToolConfigWidget,
   aiToolParamConfig: AIToolParamConfigWidget,
 };
 
