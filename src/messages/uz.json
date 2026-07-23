@@ -666,12 +666,12 @@
       "back": "Orqaga",
       "done": "Tayyor",
       "steps": {
-        "canvas": { "title": "Canvasdagi node'lar", "body": "Flow node'lari shu canvasda joylashadi. Node'ni tanlang, bo'sh joyni sudrab ko'rinishni siljiting va g'ildirak bilan zoom qiling." }
+        "canvas": { "title": "Canvasdagi node'lar", "body": "Flow node'lari shu canvasda joylashadi. Node'ni tanlang, bo'sh joyni sudrab ko'rinishni siljiting va g'ildirak bilan zoom qiling." },
         "nodes": { "title": "Node qo'shish", "body": "Node qo'shish tugmasini bosing, kategoriya yoki qidiruvdan kerakli modulni tanlang." },
         "connect": { "title": "Node'larni ulash", "body": "Source nuqtadan keyingi node target nuqtasiga torting. Alohida portlar modulning qo'shimcha ulanishlari uchun ishlatiladi." },
-        "configure": { "title": "Node'ni sozlash", "body": "Node'ni bosing — uning konfiguratsiya paneli ochiladi. Fieldlarni to'ldiring; ? belgisi maydon bo'yicha yordam beradi." }
+        "configure": { "title": "Node'ni sozlash", "body": "Node'ni bosing — uning konfiguratsiya paneli ochiladi. Fieldlarni to'ldiring; ? belgisi maydon bo'yicha yordam beradi." },
         "variables": { "title": "Variable ishlatish", "body": "O'zgaruvchilar panelidan variable'ni inputga sudrang. Object/array ichidan nested qiymatni ham tanlash mumkin." },
-        "debug": { "title": "Debug qilish", "body": "Pastdagi debug tugmalaridan botni ishga tushiring. Xabar yuborgach node holati va context qiymatlarini debug panelida ko'ring." }
+        "debug": { "title": "Debug qilish", "body": "Pastdagi debug tugmalaridan botni ishga tushiring. Xabar yuborgach node holati va context qiymatlarini debug panelida ko'ring." },
         "publish": { "title": "Saqlash va release", "body": "O'zgarishlar avtomatik saqlanadi. Env, credential va modul sozlamalarini tekshirib, keyin botni release qiling." }
       }
     },
