@@ -22,6 +22,9 @@ export interface ProjectResponse {
   name: string;
   description?: string;
   username?: string;
+  bot_mode?: "release" | "debug";
+  bot_username?: string;
+  bot_link?: string;
   owner_id: string;
   /** Raw JSON — either `{nodes,edges,languages,defaultLanguage}` or `[]` for a brand-new project. */
   flow: unknown;
