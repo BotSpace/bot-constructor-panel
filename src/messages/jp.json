@@ -713,6 +713,11 @@
     "availableHere": "この地点で利用可能な変数",
     "noAvailable": "このノードより前にフロー変数は宣言されていません。",
     "valueUnavailable": "デバッグ値はまだ利用できません",
+    "insertVariable": "{variable} を入力欄に挿入",
+    "expandValue": "値を展開",
+    "collapseValue": "値を折りたたむ",
+    "fieldCount": "{count} フィールド",
+    "itemCount": "{count} 要素",
     "sendDebug": "デバッグボットにメッセージを送るとコンテキストが表示されます。",
     "globalVars": {
       "groupUser": "ユーザー",

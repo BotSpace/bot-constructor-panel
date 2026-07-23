@@ -713,6 +713,11 @@
     "availableHere": "Переменные, доступные здесь",
     "noAvailable": "До этого узла переменные потока не объявлены.",
     "valueUnavailable": "Debug-значение пока недоступно",
+    "insertVariable": "Вставить {variable} в поле",
+    "expandValue": "Развернуть значение",
+    "collapseValue": "Свернуть значение",
+    "fieldCount": "Полей: {count}",
+    "itemCount": "Элементов: {count}",
     "sendDebug": "Отправьте сообщение debug-боту, чтобы увидеть контекст.",
     "globalVars": {
       "groupUser": "Пользователь",

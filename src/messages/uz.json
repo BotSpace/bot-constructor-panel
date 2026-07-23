@@ -705,6 +705,11 @@
     "availableHere": "Shu nuqtada mavjud variablelar",
     "noAvailable": "Bu nodegacha e'lon qilingan flow variable topilmadi.",
     "valueUnavailable": "Debug qiymati hali mavjud emas",
+    "insertVariable": "{variable} ni inputga qo'yish",
+    "expandValue": "Qiymatni ochish",
+    "collapseValue": "Qiymatni yopish",
+    "fieldCount": "{count} ta maydon",
+    "itemCount": "{count} ta element",
     "sendDebug": "Debug botga xabar yuborilgach context shu yerda ko'rinadi.",
     "globalVars": {
       "groupUser": "Foydalanuvchi",

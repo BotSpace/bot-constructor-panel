@@ -706,6 +706,11 @@
     "availableHere": "Variables available at this point",
     "noAvailable": "No flow variables were declared before this node.",
     "valueUnavailable": "Debug value is not available yet",
+    "insertVariable": "Insert {variable} into the input",
+    "expandValue": "Expand value",
+    "collapseValue": "Collapse value",
+    "fieldCount": "{count} fields",
+    "itemCount": "{count} items",
     "sendDebug": "Send a message to the debug bot to see context here.",
     "globalVars": {
       "groupUser": "User",
