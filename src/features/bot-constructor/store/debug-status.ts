@@ -59,11 +59,6 @@ interface DebugStatusState {
     executionId?: string,
     attempt?: number
   ) => void;
-  /**
-   * LEGACY (engines without run_id): call when a trigger fires. Clears all
-   * previous execution state, then marks every trigger node as "waiting".
-   */
-  startNewRun: (triggerNodeIds: string[]) => void;
   clearStatuses: () => void;
 }
 
@@ -83,34 +78,13 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
   activeNodeId: null,
   lastStatus: null,
 
-  startNewRun: (triggerNodeIds) => {
-    armAutoClear(get);
-
-    // ts=0 so any real setNodeStatus event (ts > 0) always wins
-    const newStatuses: Record<string, DebugNodeStatus> = {};
-    const newTimestamps: Record<string, number> = {};
-    for (const id of triggerNodeIds) {
-      newStatuses[id] = "waiting";
-      newTimestamps[id] = 0;
-    }
-    set({
-      statuses: newStatuses,
-      errors: {},
-      timestamps: newTimestamps,
-      seqs: {},
-      currentExecutionId: null,
-      attempts: {},
-      activeNodeId: triggerNodeIds[0] ?? null,
-      lastStatus: triggerNodeIds.length > 0 ? "waiting" : null,
-    });
-  },
-
   setNodeStatus: (nodeId, status, ts, error, runId, seq, executionId, attempt) => {
     const now = Date.now();
     armAutoClear(get);
 
     set((state) => {
-      // ── run_id-aware path (engine 3.5.31+) ────────────────────────────────
+      // Engine-assigned run_id + seq order events independently of network
+      // delivery order.
       // Tartibni tarmoq emas, engine'ning o'zi belgilaydi: run_id (har update
       // uchun monotonik) + seq (global atomik). Trigger eventining kechikishi
       // endi holatni buzmaydi: YANGI run_id ko'ringan zahoti (qaysi node
@@ -189,43 +163,7 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
         };
       }
 
-      // ── LEGACY ts path (run_id'siz eski engine'lar) ───────────────────────
-      const incomingTs = typeof ts === "number" ? ts : now;
-      const prevTs = state.timestamps[nodeId];
-      const prevStatus = state.statuses[nodeId];
-
-      // The engine sends running + terminal events in separate goroutines with
-      // no ordering guarantee. Apply ordering: newer ts wins; on an equal ts a
-      // terminal status (success/error) beats a non-terminal one. Re-running a
-      // node (a fresh run) carries a newer ts so it repaints correctly.
-      // Terminal guard: once success/error is set, waiting/running cannot
-      // override it (protects against late trigger events arriving after node ran).
-      if (terminalGuard(prevStatus, status)) return state;
-
-      if (prevTs !== undefined) {
-        if (incomingTs < prevTs) return state;
-        if (incomingTs === prevTs) {
-          const prevTerminal = prevStatus && TERMINAL.includes(prevStatus);
-          const incomingTerminal = TERMINAL.includes(status);
-          if (prevTerminal && !incomingTerminal) return state;
-        }
-      }
-
-      return {
-        currentExecutionId: executionId ?? state.currentExecutionId,
-        activeNodeId: nodeId,
-        lastStatus: status,
-        statuses: { ...state.statuses, [nodeId]: status },
-        timestamps: { ...state.timestamps, [nodeId]: incomingTs },
-        attempts:
-          typeof attempt === "number" && attempt > 0
-            ? { ...state.attempts, [nodeId]: attempt }
-            : state.attempts,
-        errors:
-          status === "error" && error
-            ? { ...state.errors, [nodeId]: error }
-            : state.errors,
-      };
+      return state;
     });
   },
 

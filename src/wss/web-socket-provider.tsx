@@ -1,9 +1,8 @@
 "use client";
 
 import useProjectStore from "@/features/bot-constructor/store/project";
-import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
 import { useFlowStore } from "@/features/bot-constructor/store";
-import { getNodeManifestByType } from "@/features/bot-constructor/manifest/manifestStore";
+import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
 import { useDebugContextStore } from "@/components/layout/debug-console/debug-context-store";
 import { useDebugErrorsStore } from "@/features/bot-constructor/store/debug-errors";
 import { getValidAccessToken, useSession } from "@/lib/session-client";
@@ -91,10 +90,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             // Engine 3.5.31+: run_id (har update uchun monotonik) + seq (atomik) —
             // eventlar tartibini tarmoq emas, engine belgilaydi. Store yangi
             // run_id'da o'zi reset qiladi, eski run eventlarini tashlaydi.
-            const runId =
-              typeof data.run_id === "number" && data.run_id > 0
-                ? (data.run_id as number)
-                : undefined;
+            if (typeof data.run_id !== "number" || data.run_id <= 0) {
+              console.error("node_execution event is missing a valid run_id", data);
+              break;
+            }
+            const runId = data.run_id;
             const seq = typeof data.seq === "number" ? (data.seq as number) : undefined;
             const executionId =
               typeof data.execution_id === "string" && data.execution_id.length > 0
@@ -105,31 +105,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
                 ? data.attempt
                 : undefined;
 
-            const debugStore = useDebugStatusStore.getState();
-            const { nodes } = useFlowStore.getState();
-
-            // LEGACY (run_id'siz eski engine): trigger running kelganda reset.
-            // run_id bor bo'lsa bu shart emas — store o'zi boshqaradi va bu
-            // yo'lning "kechikkan trigger eventi keyin kelgan success'ni
-            // o'chiradi" poygasi ham yo'q.
-            if (runId === undefined && status === "running") {
-              const flowNode = nodes.find((n) => n.id === nodeId);
-              const manifest = flowNode?.type
-                ? getNodeManifestByType(flowNode.type)
-                : undefined;
-              if (manifest?.sidebar?.groupId === "triggers") {
-                const triggerIds = nodes
-                  .filter(
-                    (n) =>
-                      n.type &&
-                      getNodeManifestByType(n.type)?.sidebar?.groupId === "triggers"
-                  )
-                  .map((n) => n.id);
-                debugStore.startNewRun(triggerIds);
-              }
-            }
-
-            debugStore.setNodeStatus(
+            useDebugStatusStore.getState().setNodeStatus(
               nodeId,
               status,
               ts,
