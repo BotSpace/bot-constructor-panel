@@ -31,7 +31,7 @@ import { useFlowStore } from "@/features/bot-constructor/store";
 import { useCollectionStore } from "@/features/collections/store/collection-list";
 import useProjectStore from "@/features/bot-constructor/store/project";
 import { instanceAuth } from "@/services/instance";
-import { BoardSelectField } from "@/features/bot-constructor/fields/generic-fields/BoardSelectField";
+
 import { AlertCircle, ArrowRight, Bot, GripVertical, Key, ListPlus, Loader2, PlusIcon, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
@@ -3036,7 +3036,7 @@ function AIKanbanToolConfigWidget({ nodeId, data }: WidgetProps) {
   return <div className="grid gap-3">
     <div className="grid gap-1.5"><Label className="text-xs">Tool tavsifi (LLM uchun)</Label><Textarea className="min-h-[56px] text-xs" rows={2} placeholder="Qachon karta yaratish kerakligini yozing" value={typeof data.description === "string" ? data.description : ""} onChange={(e) => write({ description: e.target.value })} /></div>
     <div className="rounded-md border border-primary/20 bg-primary/[0.04] p-2 text-[11px] text-muted-foreground">Kanban karta aynan tanlangan board va ustunga yoziladi. Boardni tanlaganingizdan keyin uning qo‘shimcha fieldlari yuklanadi.</div>
-    <BoardSelectField nodeId={nodeId} data={data} field={{ type: "board-select", key: "boardId", columnKey: "columnId", label: "Board va boshlang‘ich ustun" }} />
+
     {renderConfig("titleConfig", "Karta sarlavhasi")}
     {renderConfig("descriptionConfig", "Karta tavsifi", true)}
     {loadingFields ? <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Qo‘shimcha fieldlar yuklanmoqda…</div> : fieldSchema.length > 0 ? <div className="grid gap-2"><Label className="text-xs text-muted-foreground">Board qo‘shimcha fieldlari</Label>{fieldSchema.map((field) => { const entry = customFieldConfig[field.key] ?? { source: "ai" as const, value: "", aiDescription: field.description ?? "" }; const fixed = entry.source === "fixed"; return <div key={field.key} className="grid gap-1.5 rounded-md border border-white/[0.07] p-2"><div className="flex items-center justify-between gap-2"><span className="text-xs font-medium">{field.label}{field.required ? " *" : ""}</span><div className="flex overflow-hidden rounded border border-white/[0.08]"><button type="button" onClick={() => write({ customFieldConfig: { ...customFieldConfig, [field.key]: { ...entry, source: "fixed" } } })} className={cn("px-2 py-0.5 text-[10px]", fixed ? "bg-amber-500/20 text-amber-300" : "text-zinc-500")}>Static</button><button type="button" onClick={() => write({ customFieldConfig: { ...customFieldConfig, [field.key]: { ...entry, source: "ai" } } })} className={cn("px-2 py-0.5 text-[10px]", !fixed ? "bg-blue-500/20 text-blue-300" : "text-zinc-500")}>AI izohi</button></div></div>{fixed ? <Input className="h-8 text-xs" value={entry.value} placeholder={field.type ?? "Qiymat"} onChange={(e) => write({ customFieldConfig: { ...customFieldConfig, [field.key]: { ...entry, value: e.target.value } } })} /> : <Textarea className="min-h-[48px] text-xs" rows={2} value={entry.aiDescription} placeholder="AI bu fieldni qanday to‘ldirishini yozing" onChange={(e) => write({ customFieldConfig: { ...customFieldConfig, [field.key]: { ...entry, aiDescription: e.target.value } } })} />}</div>; })}</div> : boardId ? <div className="text-xs text-muted-foreground">Bu boardda qo‘shimcha field yo‘q.</div> : null}
