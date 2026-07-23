@@ -10,9 +10,17 @@ export function TargetHandles() {
     <Handle
       type="target"
       position={Position.Left}
-      className="customHandle"
       id="target-handler"
       isConnectableStart={false}
+      style={{
+        width: 16,
+        height: 16,
+        left: 0,
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+        opacity: 0,
+        pointerEvents: "auto",
+      }}
     />
   );
 }
