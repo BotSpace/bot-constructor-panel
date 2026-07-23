@@ -662,6 +662,10 @@
       "title": "How to use the constructor",
       "description": "The essential steps from an empty canvas to a running bot.",
       "close": "Got it",
+      "skip": "Skip",
+      "next": "Next",
+      "back": "Back",
+      "done": "Done",
       "steps": {
         "canvas": { "title": "Canvas", "body": "Your flow is shown here. Use the wheel to zoom and drag empty space to pan." },
         "nodes": { "title": "Add nodes", "body": "Click Add node and choose a module from a category or search." },
