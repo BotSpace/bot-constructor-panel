@@ -704,6 +704,7 @@
     "notRun": "Node debug rejimda ishga tushgach yozgan qiymatlari shu yerda chiqadi.",
     "availableHere": "Shu nuqtada mavjud variablelar",
     "noAvailable": "Bu nodegacha e'lon qilingan flow variable topilmadi.",
+    "valueUnavailable": "Debug qiymati hali mavjud emas",
     "sendDebug": "Debug botga xabar yuborilgach context shu yerda ko'rinadi.",
     "globalVars": {
       "groupUser": "Foydalanuvchi",
