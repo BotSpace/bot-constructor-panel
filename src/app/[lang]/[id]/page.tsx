@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { NodeEditDialog } from "@/features/bot-constructor/panels/NodeEditPanel";
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { ConstructorGuide } from "@/features/bot-constructor/components/ConstructorGuide";
 
 function PageInner() {
   const { id }: { id: string } = useParams();
@@ -126,6 +127,8 @@ function N8nTopBar({
         <Plus className="h-4 w-4" />
         <span className="hidden sm:inline">{t("addNode")}</span>
       </Button>
+      <ConstructorGuide />
+      <ConstructorGuide />
 
       <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20" />
     </div>

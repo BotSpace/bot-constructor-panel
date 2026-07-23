@@ -657,6 +657,21 @@
       "env": "Environment variables",
       "subtitle": "Constructor"
     },
+    "guide": {
+      "button": "Guide",
+      "title": "How to use the constructor",
+      "description": "The essential steps from an empty canvas to a running bot.",
+      "close": "Got it",
+      "steps": {
+        "canvas": { "title": "Canvas", "body": "Your flow is shown here. Use the wheel to zoom and drag empty space to pan." },
+        "nodes": { "title": "Add nodes", "body": "Click Add node and choose a module from a category or search." },
+        "connect": { "title": "Connect nodes", "body": "Drag from a source handle to the next node's target handle. Accessory ports are for extra module connections." },
+        "configure": { "title": "Configure", "body": "Select a node and fill its fields in the right panel. The ? icon explains individual fields." },
+        "variables": { "title": "Use variables", "body": "Drag a variable from the variables panel into an input. Nested object and array values can also be selected." },
+        "debug": { "title": "Debug", "body": "Run the debug bot, send a message, then inspect node status and context values in the debug panel." },
+        "publish": { "title": "Save and release", "body": "Changes are saved automatically. Check environment, credentials and modules before releasing the bot." }
+      }
+    },
     "shortcuts": {
       "dialogTitle": "Keyboard shortcuts",
       "dialogDescription": "Keyboard combinations for faster work",
@@ -699,6 +714,7 @@
     "allContext": "All context",
     "latestContext": "Latest debug context",
     "autoContext": "Automatic context",
+    "defaultsHint": "Default variables without a runtime value yet",
     "latestWrites": "Latest written values",
     "removed": "removed from context",
     "noChanges": "This node did not change context during its latest execution.",

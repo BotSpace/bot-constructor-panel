@@ -79,13 +79,10 @@ export function NodeVariablePanel({
 
 
   const activeContext = useMemo(() => {
-    if (nodeSnapshot) {
-      return {
-        chatId: nodeSnapshot.chat_id,
-        variables: nodeSnapshot.variables,
-        ts: nodeSnapshot.ts,
-      };
-    }
+    // The node snapshot is useful for the write diff, but the global snapshot
+    // is the canonical context at the latest execution point. Using the node
+    // snapshot here could hide values produced by an upstream node (for
+    // example sheets_response_rows in Send Message).
     let latest:
       | { chatId: string; variables: Record<string, unknown>; ts: number | string }
       | undefined;
@@ -94,17 +91,37 @@ export function NodeVariablePanel({
         latest = { chatId, variables: snapshot.variables, ts: snapshot.ts };
       }
     }
-    return latest;
+    if (latest) return latest;
+    if (nodeSnapshot) {
+      return {
+        chatId: nodeSnapshot.chat_id,
+        variables: nodeSnapshot.variables,
+        ts: nodeSnapshot.ts,
+      };
+    }
+    return undefined;
   }, [nodeSnapshot, snapshots]);
+  const [defaultsOpen, setDefaultsOpen] = useState(false);
 
   if (!open) return null;
 
   const changes = nodeSnapshot ? Object.entries(nodeSnapshot.changes) : [];
   const allVariables = activeContext ? Object.entries(activeContext.variables) : [];
-  const availableVariables = stateKeys.map((key) => {
-    const resolved = resolveContextValue(activeContext?.variables, key);
-    return [key, resolved.found ? resolved.value : t("valueUnavailable")] as [string, unknown];
-  });
+  const liveKeys = new Set(allVariables.map(([key]) => key));
+  const defaultEntries: Array<[string, unknown]> = [];
+  const seenDefaultKeys = new Set<string>();
+  const addDefault = (key: string, value: unknown) => {
+    if (seenDefaultKeys.has(key) || liveKeys.has(key)) return;
+    seenDefaultKeys.add(key);
+    defaultEntries.push([key, value]);
+  };
+  // Flow state keys are valid defaults even before their producer runs.
+  for (const key of stateKeys) addDefault(key, t("valueUnavailable"));
+  // Static engine context is also available by default, but should not
+  // duplicate a live value already present in the runtime snapshot.
+  for (const group of GLOBAL_CONTEXT_VARIABLE_GROUPS) {
+    for (const variable of group.variables) addDefault(variable.key, variable.descriptionKey);
+  }
 
   return (
     <aside className="fixed inset-y-0 right-[560px] z-40 hidden w-[400px] flex-col border-l border-r border-white/10 bg-[#101011] shadow-2xl lg:flex">
@@ -175,20 +192,31 @@ export function NodeVariablePanel({
               <EmptyState text={t("sendDebug")} />
             )}
 
-            <div className="mt-4 space-y-4">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                {t("autoContext")}
-              </p>
-              {GLOBAL_CONTEXT_VARIABLE_GROUPS.map((group) => (
-                <div key={group.labelKey}>
-                  <p className="mb-1.5 text-[10px] text-zinc-500">{group.labelKey}</p>
-                  <VariableList
-                    entries={group.variables.map((variable) => [variable.key, variable.descriptionKey])}
-                    accent="slate"
-                  />
-                </div>
-              ))}
-            </div>
+            {defaultEntries.length > 0 && (
+              <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-white/[0.02]">
+                <button
+                  type="button"
+                  onClick={() => setDefaultsOpen((current) => !current)}
+                  className="flex w-full items-center justify-between px-3 py-2.5 text-left hover:bg-white/[0.04]"
+                  aria-expanded={defaultsOpen}
+                >
+                  <span>
+                    <span className="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                      {t("autoContext")}
+                    </span>
+                    <span className="mt-0.5 block text-[10px] text-zinc-600">
+                      {defaultEntries.length} · {t("defaultsHint")}
+                    </span>
+                  </span>
+                  {defaultsOpen ? <ChevronDown className="h-4 w-4 text-zinc-500" /> : <ChevronRight className="h-4 w-4 text-zinc-500" />}
+                </button>
+                {defaultsOpen && (
+                  <div className="space-y-4 border-t border-white/10 p-3">
+                    <VariableList entries={defaultEntries} accent="slate" />
+                  </div>
+                )}
+              </div>
+            )}
           </section>
         </div>
       </aside>
