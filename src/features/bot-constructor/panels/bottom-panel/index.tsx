@@ -331,7 +331,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                 style={isOpen ? { bottom: `${height + 20}px` } : {}}
                 className={cn('sticky bottom-[15px] gap-2 flex items-center justify-center pointer-events-none')}
             >
-                <Card className='p-2 pointer-events-auto rounded-2xl'>
+                <Card data-tour='constructor-controls' className='p-2 pointer-events-auto rounded-2xl'>
                     <CardContent className='p-2 flex items-center justify-center gap-2'>
 
                         {/* Home — always visible */}
