@@ -80,7 +80,7 @@ const useProjectStore = create<ProjectState>((set, get) => ({
 
         const project: ProjectRetrive = {
           ...raw,
-          username: raw.username ?? null,
+          username: raw.bot_username ?? raw.username ?? null,
           flow: normalizeProjectFlow(raw.flow),
           debug: debugRes?.data ?? STOPPED_DEBUG_STUB(project_id),
           debug_uuid: raw.debug_webhook_uuid,

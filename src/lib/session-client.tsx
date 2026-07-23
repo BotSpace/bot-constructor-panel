@@ -96,3 +96,48 @@ export function useSession() {
 export async function getSession(): Promise<Session | null> {
   return fetchSession();
 }
+
+let validAccessPromise: Promise<string | null> | null = null;
+
+function tokenExpiresSoon(token: string, leewaySeconds = 60): boolean {
+  try {
+    const payloadPart = token.split(".")[1];
+    if (!payloadPart) return true;
+    const base64 = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+    const normalized = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+    const payload = JSON.parse(atob(normalized)) as { exp?: number };
+    return typeof payload.exp !== "number" || payload.exp <= Date.now() / 1000 + leewaySeconds;
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Returns an access token that is safe to use for a new long-lived connection.
+ * Unlike getSession(), this refreshes an expired/near-expiry access token using
+ * the httpOnly refresh token. WebSocket reconnects must use this helper: after
+ * a tab has stayed open longer than the access-token TTL, repeatedly reading
+ * the old cookie would otherwise make every reconnect fail until page refresh.
+ */
+export function getValidAccessToken(): Promise<string | null> {
+  if (!validAccessPromise) {
+    validAccessPromise = fetchSession()
+      .then(async (session) => {
+        const access = session?.user?.access;
+        if (access && !tokenExpiresSoon(access)) return access;
+
+        const response = await fetch(`${BASE_PATH}/api/session`, {
+          method: "POST",
+          cache: "no-store",
+        });
+        if (!response.ok) return null;
+        const data = (await response.json()) as { access?: string };
+        return data.access ?? null;
+      })
+      .catch(() => null)
+      .finally(() => {
+        validAccessPromise = null;
+      });
+  }
+  return validAccessPromise;
+}
