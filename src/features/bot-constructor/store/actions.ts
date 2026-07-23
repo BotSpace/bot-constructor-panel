@@ -321,6 +321,7 @@ export const createActions: StateCreator<FlowStoreState, [], [], Actions> = (
     // Collab: broadcast the new node (full object) to other editors.
     get().emitCollabOp({ t: "na", node: newNode });
 
+    return newNode;
   },
 
   saveFlow: async (project_id: string) => {

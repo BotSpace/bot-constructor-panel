@@ -43,7 +43,7 @@ export interface Actions {
   addNode: (
     element: ElementItemType,
     position: { x: number; y: number }
-  ) => void;
+  ) => Node;
   saveFlow: (project_id: string) => Promise<void>;
   formatFlow: () => Promise<void>;
   loadFlow: (flow: FlowData["flow"]) => Promise<void>;
