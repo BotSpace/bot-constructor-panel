@@ -41,7 +41,7 @@ const POSITION_TRANSFORM: Record<Position, string> = {
   [Position.Bottom]: "translate(-50%, calc(100% + 8px))",
 };
 
-function stopPropagation(event: MouseEvent) {
+function stopClickPropagation(event: MouseEvent) {
   event.stopPropagation();
 }
 
@@ -68,9 +68,11 @@ export function PillHandle({
       title={title}
       isConnectableStart={isConnectableStart}
       style={{ transform: POSITION_TRANSFORM[position], ...style }}
-      onClick={stopPropagation}
-      onMouseDown={stopPropagation}
-      onMouseUp={stopPropagation}
+      // React Flow starts an edge connection on mousedown. Do not stop that
+      // event here; doing so prevents regular node handles from showing the
+      // connection preview. Only stop click bubbling to avoid selecting the node
+      // after a handle interaction.
+      onClick={stopClickPropagation}
       className={cn(
         "group/handle !rounded-md !border-0 flex items-center justify-center shadow-sm",
         "!transition-colors !duration-150 ease-out",

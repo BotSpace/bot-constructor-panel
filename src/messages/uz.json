@@ -705,7 +705,7 @@
     "availableHere": "Shu nuqtada mavjud variablelar",
     "noAvailable": "Bu nodegacha e'lon qilingan flow variable topilmadi.",
     "valueUnavailable": "Debug qiymati hali mavjud emas",
-    "insertVariable": "{variable} ni inputga qo'yish",
+    "dragVariable": "{variable} ni inputga sudrab olib boring",
     "expandValue": "Qiymatni ochish",
     "collapseValue": "Qiymatni yopish",
     "fieldCount": "{count} ta maydon",
