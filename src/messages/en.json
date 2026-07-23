@@ -706,7 +706,7 @@
     "availableHere": "Variables available at this point",
     "noAvailable": "No flow variables were declared before this node.",
     "valueUnavailable": "Debug value is not available yet",
-    "insertVariable": "Insert {variable} into the input",
+    "dragVariable": "Drag {variable} into the input",
     "expandValue": "Expand value",
     "collapseValue": "Collapse value",
     "fieldCount": "{count} fields",

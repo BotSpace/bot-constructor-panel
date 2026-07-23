@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useDebugContextStore } from "@/components/layout/debug-console/debug-context-store";
 import { GLOBAL_CONTEXT_VARIABLE_GROUPS } from "@/features/bot-constructor/lib/global-context-variables";
-import { useVariableInsertion } from "@/features/bot-constructor/panels/NodeEditPanel/variable-insertion";
+
 import { cn } from "@/lib/utils";
 import {
   Braces,
@@ -73,7 +73,6 @@ export function NodeVariablePanel({
   open,
   onOpenChange,
 }: NodeVariablePanelProps) {
-  const { insertVariable } = useVariableInsertion();
   const t = useTranslations("variablePanel");
   const nodeSnapshot = useDebugContextStore((state) => state.nodeSnapshots.get(nodeId));
   const snapshots = useDebugContextStore((state) => state.snapshots);
@@ -123,7 +122,7 @@ export function NodeVariablePanel({
           />
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4">
             {allVariables.length > 0 ? (
-              <VariableList entries={allVariables} onInsert={insertVariable} accent="violet" />
+              <VariableList entries={allVariables} accent="violet" />
             ) : (
               <EmptyState text={t("sendDebug")} />
             )}
@@ -138,7 +137,6 @@ export function NodeVariablePanel({
                     <p className="mb-1.5 text-[10px] text-zinc-500">{group.labelKey}</p>
                     <VariableList
                       entries={group.variables.map((variable) => [variable.key, variable.descriptionKey])}
-                      onInsert={insertVariable}
                       accent="violet"
                     />
                   </div>
@@ -176,7 +174,7 @@ export function NodeVariablePanel({
 
             {changes.length > 0 || (nodeSnapshot?.removed.length ?? 0) > 0 ? (
               <div className="space-y-2">
-                <VariableList entries={changes} onInsert={insertVariable} />
+                <VariableList entries={changes} />
                 {nodeSnapshot?.removed.map((key) => (
                   <div
                     key={key}
@@ -203,7 +201,7 @@ export function NodeVariablePanel({
               {t("availableHere")}
             </p>
             {stateKeys.length > 0 ? (
-              <VariableList entries={availableVariables} onInsert={insertVariable} />
+              <VariableList entries={availableVariables} />
             ) : (
               <EmptyState text={t("noAvailable")} />
             )}
@@ -331,23 +329,15 @@ function valueCount(inspected: InspectedValue): number {
 
 function VariableList({
   entries,
-  onInsert,
   accent = "cyan",
 }: {
   entries: Array<[string, unknown]>;
-  onInsert: (key: string) => void;
   accent?: "cyan" | "violet";
 }) {
   return (
     <div className="space-y-2">
       {entries.map(([key, value]) => (
-        <VariableCard
-          key={key}
-          variableKey={key}
-          value={value}
-          onInsert={onInsert}
-          accent={accent}
-        />
+        <VariableCard key={key} variableKey={key} value={value} accent={accent} />
       ))}
     </div>
   );
@@ -363,12 +353,10 @@ function setVariableDragData<T extends HTMLElement>(event: DragEvent<T>, variabl
 function VariableCard({
   variableKey,
   value,
-  onInsert,
   accent,
 }: {
   variableKey: string;
   value: unknown;
-  onInsert: (key: string) => void;
   accent: "cyan" | "violet";
 }) {
   const t = useTranslations("variablePanel");
@@ -384,7 +372,7 @@ function VariableCard({
       })
     : displayValue(inspected.value);
 
-  const handleDragStart = (event: DragEvent<HTMLButtonElement>) => {
+  const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
     setVariableDragData(event, variableKey);
   };
 
@@ -400,13 +388,11 @@ function VariableCard({
       <div className="flex items-start gap-2 px-2.5 py-2.5">
         <GripVertical className="mt-0.5 h-4 w-4 shrink-0 cursor-grab text-zinc-600 group-hover:text-zinc-400" />
 
-        <button
-          type="button"
+        <div
           draggable
-          onClick={() => onInsert(variableKey)}
           onDragStart={handleDragStart}
           className="min-w-0 flex-1 cursor-grab text-left active:cursor-grabbing"
-          title={t("insertVariable", { variable: token })}
+          title={t("dragVariable", { variable: token })}
         >
           <span
             className={cn(
@@ -425,7 +411,7 @@ function VariableCard({
               {summary}
             </span>
           </span>
-        </button>
+        </div>
 
         {expandable && (
           <button
@@ -443,7 +429,7 @@ function VariableCard({
       {expanded && (
         <div className="border-t border-white/10 bg-black/20 px-3 py-2.5">
           {complex ? (
-            <SchemaTree value={inspected.value} path={variableKey} onInsert={onInsert} />
+            <SchemaTree value={inspected.value} path={variableKey} />
           ) : (
             <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-words font-mono text-[11px] leading-5 text-emerald-200/80">
               {String(inspected.value)}
@@ -468,15 +454,7 @@ function SchemaKindBadge({ kind, parsedJson }: { kind: SchemaKind; parsedJson?: 
   );
 }
 
-function SchemaTree({
-  value,
-  path,
-  onInsert,
-}: {
-  value: unknown;
-  path: string;
-  onInsert: (key: string) => void;
-}) {
+function SchemaTree({ value, path }: { value: unknown; path: string }) {
   const entries = Array.isArray(value)
     ? value.map((item, index) => [String(index), item] as [string, unknown])
     : Object.entries((value as Record<string, unknown>) ?? {});
@@ -495,7 +473,6 @@ function SchemaTree({
             name={key}
             path={childPath}
             value={child}
-            onInsert={onInsert}
           />
         );
       })}
@@ -507,12 +484,10 @@ function SchemaTreeRow({
   name,
   path,
   value,
-  onInsert,
 }: {
   name: string;
   path: string;
   value: unknown;
-  onInsert: (key: string) => void;
 }) {
   const t = useTranslations("variablePanel");
   const [open, setOpen] = useState(false);
@@ -526,7 +501,7 @@ function SchemaTreeRow({
 
   const token = `{{${path}}}`;
 
-  const handleDragStart = (event: DragEvent<HTMLButtonElement>) => {
+  const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
     event.stopPropagation();
     setVariableDragData(event, path);
   };
@@ -546,13 +521,11 @@ function SchemaTreeRow({
         ) : (
           <span className="h-5 w-5 shrink-0" />
         )}
-        <button
-          type="button"
+        <div
           draggable
-          onClick={() => onInsert(path)}
           onDragStart={handleDragStart}
           className="flex min-w-0 flex-1 cursor-grab items-center gap-1.5 rounded px-1 text-left active:cursor-grabbing"
-          title={t("insertVariable", { variable: token })}
+          title={t("dragVariable", { variable: token })}
         >
           <GripVertical className="h-3.5 w-3.5 shrink-0 text-zinc-700 transition-colors group-hover:text-zinc-500" />
           <span className="min-w-0 truncate text-[11px] text-sky-200">{name}</span>
@@ -571,11 +544,11 @@ function SchemaTreeRow({
           >
             {summary}
           </span>
-        </button>
+        </div>
       </div>
       {complex && open && (
         <div className="ml-3 border-l border-white/10 pl-2">
-          <SchemaTree value={inspected.value} path={path} onInsert={onInsert} />
+          <SchemaTree value={inspected.value} path={path} />
         </div>
       )}
     </div>
