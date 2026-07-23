@@ -90,11 +90,30 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
       // endi holatni buzmaydi: YANGI run_id ko'ringan zahoti (qaysi node
       // bo'lishidan qat'i nazar) reset bo'ladi, eski run eventlari tashlanadi.
       if (typeof runId === "number" && runId > 0) {
-        if (state.currentRunId !== null && runId < state.currentRunId) {
+        // Child process qayta ishga tushganda run_id yana 1 dan boshlanadi,
+        // execution_id esa har execution uchun yangilanadi. Shu sabab yangi
+        // execution kichik run_id bilan kelsa ham uni yangi run deb olamiz.
+        // Timestamp guard kechikkan eski execution eventini qaytarmaydi.
+        const executionChanged =
+          Boolean(executionId) &&
+          Boolean(state.currentExecutionId) &&
+          executionId !== state.currentExecutionId;
+        const latestAppliedTs = Math.max(0, ...Object.values(state.timestamps));
+        if (executionChanged && typeof ts === "number" && ts < latestAppliedTs) {
+          return state;
+        }
+        if (
+          !executionChanged &&
+          state.currentRunId !== null &&
+          runId < state.currentRunId
+        ) {
           return state; // eski run'ning kechikkan eventi
         }
 
-        const isNewRun = state.currentRunId === null || runId > state.currentRunId;
+        const isNewRun =
+          executionChanged ||
+          state.currentRunId === null ||
+          runId > state.currentRunId;
         const base = isNewRun
           ? { statuses: {}, errors: {}, timestamps: {}, seqs: {}, attempts: {} }
           : {
