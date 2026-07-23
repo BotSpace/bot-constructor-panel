@@ -656,6 +656,21 @@
       "env": "Muhit o'zgaruvchilari",
       "subtitle": "Konstruktor"
     },
+    "guide": {
+      "button": "Yo'riqnoma",
+      "title": "Bot konstruktoridan foydalanish",
+      "description": "Flow'ni noldan ishga tushirishgacha bo'lgan asosiy qadamlar.",
+      "close": "Tushunarli",
+      "steps": {
+        "canvas": { "title": "Canvas", "body": "Flow shu yerda ko'rinadi. Sichqoncha g'ildiragi bilan zoom qiling, bo'sh joyni sudrab ko'rinishni siljiting." },
+        "nodes": { "title": "Node qo'shish", "body": "Node qo'shish tugmasini bosing, kategoriya yoki qidiruvdan kerakli modulni tanlang." },
+        "connect": { "title": "Node'larni ulash", "body": "Source nuqtadan keyingi node target nuqtasiga torting. Alohida portlar modulning qo'shimcha ulanishlari uchun ishlatiladi." },
+        "configure": { "title": "Sozlash", "body": "Node'ni bosing va o'ng paneldagi fieldlarni to'ldiring. ? belgisi maydon bo'yicha yordam beradi." },
+        "variables": { "title": "Variable ishlatish", "body": "O'zgaruvchilar panelidan variable'ni inputga sudrang. Object/array ichidan nested qiymatni ham tanlash mumkin." },
+        "debug": { "title": "Debug qilish", "body": "Debug botni ishga tushiring, xabar yuboring va pastki debug panelida node holati hamda context qiymatlarini ko'ring." },
+        "publish": { "title": "Saqlash va release", "body": "O'zgarishlar avtomatik saqlanadi. Env, credential va modul sozlamalarini tekshirib, keyin botni release qiling." }
+      }
+    },
     "shortcuts": {
       "dialogTitle": "Klaviatura yorliqlari",
       "dialogDescription": "Tezroq ishlash uchun klaviatura kombinatsiyalari",
@@ -698,6 +713,7 @@
     "allContext": "Barcha context",
     "latestContext": "Oxirgi debug context",
     "autoContext": "Avtomatik context",
+    "defaultsHint": "Hali qiymat kelmagan default variablelar",
     "latestWrites": "Oxirgi yozilgan qiymatlar",
     "removed": "contextdan o'chirildi",
     "noChanges": "Bu node oxirgi ishga tushishda context qiymatini o'zgartirmadi.",
