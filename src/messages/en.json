@@ -667,12 +667,12 @@
       "back": "Back",
       "done": "Done",
       "steps": {
-        "canvas": { "title": "Nodes on the canvas", "body": "Your flow nodes live on this canvas. Select a node, drag empty space to pan, and use the wheel to zoom." }
+        "canvas": { "title": "Nodes on the canvas", "body": "Your flow nodes live on this canvas. Select a node, drag empty space to pan, and use the wheel to zoom." },
         "nodes": { "title": "Add nodes", "body": "Click Add node and choose a module from a category or search." },
         "connect": { "title": "Connect nodes", "body": "Drag from a source handle to the next node's target handle. Accessory ports are for extra module connections." },
-        "configure": { "title": "Configure a node", "body": "Select a node to open its configuration panel. Fill in the fields; the ? icon explains each field." }
+        "configure": { "title": "Configure a node", "body": "Select a node to open its configuration panel. Fill in the fields; the ? icon explains each field." },
         "variables": { "title": "Use variables", "body": "Drag a variable from the variables panel into an input. Nested object and array values can also be selected." },
-        "debug": { "title": "Debug", "body": "Use the debug controls below to run the bot. Send a message, then inspect node status and context values in the debug panel." }
+        "debug": { "title": "Debug", "body": "Use the debug controls below to run the bot. Send a message, then inspect node status and context values in the debug panel." },
         "publish": { "title": "Save and release", "body": "Changes are saved automatically. Check environment, credentials and modules before releasing the bot." }
       }
     },
