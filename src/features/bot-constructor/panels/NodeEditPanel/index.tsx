@@ -18,7 +18,7 @@ import { SIDEBAR_COLOR_CLASS_REGISTRY } from "@/features/bot-constructor/manifes
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { getAvailableStateKeys } from "@/features/bot-constructor/lib";
 import { cn } from "@/lib/utils";
-import { Pencil, Trash2, X } from "lucide-react";
+import { Braces, Pencil, Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 function translate(
@@ -112,6 +112,7 @@ export function NodeEditDialog() {
   const t = useTranslations();
   const { editingNodeId, nodes, edges, setEditingNodeId, deleteSelectedElements } =
     useFlowStore();
+  const [variablesOpen, setVariablesOpen] = useState(false);
 
   const editingNode = nodes.find((node) => node.id === editingNodeId);
   const isOpen = Boolean(editingNodeId && editingNode);
@@ -132,6 +133,10 @@ export function NodeEditDialog() {
     ? nodeData.node_label.trim()
     : null;
   const displayName = nodeLabel ?? manifestTitle;
+
+  useEffect(() => {
+    setVariablesOpen(false);
+  }, [editingNodeId]);
 
   const stateKeys =
     isOpen && editingNodeId
@@ -196,6 +201,19 @@ export function NodeEditDialog() {
                 <Button
                   variant="ghost"
                   size="icon"
+                  className={cn(
+                    "h-9 w-9 text-zinc-400 hover:bg-cyan-400/10 hover:text-cyan-200",
+                    variablesOpen && "bg-cyan-400/10 text-cyan-200",
+                  )}
+                  title={t("variablePanel.nodeTitle")}
+                  onClick={() => setVariablesOpen((value) => !value)}
+                >
+                  <Braces className="h-4 w-4" />
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="h-9 w-9 text-zinc-400 hover:bg-red-500/10 hover:text-red-300"
                   title={t("common.delete")}
                   onClick={handleDelete}
@@ -236,8 +254,16 @@ export function NodeEditDialog() {
                 )}
               </div>
 
-              <NodeVariablePanel stateKeys={stateKeys} />
             </div>
+
+            {editingNodeId && (
+              <NodeVariablePanel
+                nodeId={editingNodeId}
+                stateKeys={stateKeys}
+                open={variablesOpen}
+                onOpenChange={setVariablesOpen}
+              />
+            )}
           </VariableInsertionProvider>
         </NodePanelProvider>
       </SheetContent>

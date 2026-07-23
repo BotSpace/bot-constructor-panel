@@ -151,9 +151,6 @@ export function DynamicSelectField({
       body.module_slug = moduleSlug;
     }
 
-    // NOTE: /credentials/options/:resource does not exist on the Go backend
-    // (internal/modules/credential/routes.go has no such route) — this call
-    // will 404 until it's ported. Kept wired so the UI compiles.
     instanceAuth
       .post(`/credentials/options/${resource}`, body)
       .then(({ data: raw }) => {
@@ -198,6 +195,38 @@ export function DynamicSelectField({
     fetchOptions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cacheKey, isDisabled]);
+
+  // Strict resource selects (for example Google spreadsheet → tab) must not
+  // retain a value belonging to the previous credential/dependency. Clear only
+  // after a successful option load; a temporary network error must never erase
+  // a saved configuration.
+  useEffect(() => {
+    if (allowCustom || !currentValue) return;
+    if (isDisabled) {
+      updateNodeData(nodeId, { [dataKey]: "" });
+      return;
+    }
+    if (
+      !loading &&
+      !error &&
+      fetchedKeyRef.current === cacheKey &&
+      options !== null &&
+      !options.some((option) => option.value === currentValue)
+    ) {
+      updateNodeData(nodeId, { [dataKey]: "" });
+    }
+  }, [
+    allowCustom,
+    cacheKey,
+    currentValue,
+    dataKey,
+    error,
+    isDisabled,
+    loading,
+    nodeId,
+    options,
+    updateNodeData,
+  ]);
 
   const handleSelect = (val: string) => {
     updateNodeData(nodeId, { [dataKey]: val });

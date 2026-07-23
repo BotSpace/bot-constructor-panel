@@ -61,7 +61,10 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
           break;
         case "context": {
           // Variable inspector snapshot — backend: {project, chat_id, variables, ts}
-          if (String(data.project) === String(project.id)) {
+          if (
+            String(data.project) === String(project.id) &&
+            data.runtime_mode !== "release"
+          ) {
             const chatId = String(data.chat_id ?? "unknown");
             const variables = (data.variables as Record<string, unknown>) ?? {};
             // ts: backend yuborsa — UnixMilli raqam yoki ISO string.
@@ -77,12 +80,31 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
                 ? rawTs
                 : Date.now();
             useDebugContextStore.getState().setSnapshot(chatId, { variables, ts });
+            if (typeof data.node_id === "string" && data.node_id.length > 0) {
+              useDebugContextStore.getState().setNodeSnapshot(data.node_id, {
+                chat_id: chatId,
+                variables,
+                changes:
+                  data.changes && typeof data.changes === "object"
+                    ? (data.changes as Record<string, unknown>)
+                    : {},
+                removed: Array.isArray(data.removed)
+                  ? data.removed.filter((item): item is string => typeof item === "string")
+                  : [],
+                run_id: typeof data.run_id === "number" ? data.run_id : undefined,
+                ts,
+              });
+            }
           }
           break;
         }
         case "node_execution": {
           // project may be int (backend) — compare loosely against current project
-          if (String(data.project) === String(project.id) && data.node_id) {
+          if (
+            String(data.project) === String(project.id) &&
+            data.node_id &&
+            data.runtime_mode !== "release"
+          ) {
             const nodeId = data.node_id as string;
             const status = data.status as "waiting" | "running" | "success" | "error";
             const ts = typeof data.ts === "number" ? (data.ts as number) : undefined;

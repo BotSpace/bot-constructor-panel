@@ -244,6 +244,8 @@ export interface NodeFieldManifest {
   credentialKey?: string;
   /** Other data keys this resource depends on (their values become `params`) */
   dependsOn?: string[];
+  /** False restricts the value to loaded resource options and clears stale dependent values. */
+  allowCustom?: boolean;
   // nested-rows
   addRowLabel?: string;
   addColumnLabel?: string;
