@@ -16,7 +16,7 @@
   opacity: 0 !important;
   z-index: 100;
   border-radius: 0px !important;
-  pointer-events: none !important;
+  pointer-events: auto !important;
 }
 
 /* ── N8n-style node appearance ─────────────────────────────────────────── */

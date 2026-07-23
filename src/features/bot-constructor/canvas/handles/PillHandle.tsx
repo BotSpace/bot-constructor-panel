@@ -67,7 +67,7 @@ export function PillHandle({
       position={position}
       title={title}
       isConnectableStart={isConnectableStart}
-      style={{ transform: POSITION_TRANSFORM[position], ...style }}
+      style={{ pointerEvents: "auto", transform: POSITION_TRANSFORM[position], ...style }}
       // React Flow starts an edge connection on mousedown. Do not stop that
       // event here; doing so prevents regular node handles from showing the
       // connection preview. Only stop click bubbling to avoid selecting the node
