@@ -267,6 +267,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
             key: 'variables',
             inline: (
                 <BottomPanelButton
+                    data-tour='constructor-variables'
                     onClick={() => setVariablesOpen(true)}
                     title={t('variables')}
                     aria-label={t('variables')}
@@ -358,7 +359,7 @@ function BottomPanel({ addNodeOpen, onAddNodeOpenChange }: Props) {
                             </DropdownMenu>
                         )}
 
-                        <DebugingButtons />
+                        <span data-tour='constructor-debug'><DebugingButtons /></span>
 
                         <Separator className='!h-[40px]' orientation="vertical" />
 

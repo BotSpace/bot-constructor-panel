@@ -65,6 +65,7 @@ export function PillHandle({
       id={id}
       position={position}
       title={title}
+      data-tour={isSource ? "constructor-handle" : undefined}
       isConnectableStart={isConnectableStart}
       style={{ pointerEvents: "auto", transform: POSITION_TRANSFORM[position], ...style }}
       // React Flow starts an edge connection on mousedown. Do not stop that

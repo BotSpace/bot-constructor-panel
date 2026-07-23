@@ -10,10 +10,10 @@ type StepKey = "canvas" | "nodes" | "connect" | "configure" | "variables" | "deb
 const STEPS: Array<{ key: StepKey; target?: string }> = [
   { key: "canvas", target: "constructor-node" },
   { key: "nodes", target: "constructor-add-node" },
-  { key: "connect", target: "constructor-node" },
+  { key: "connect", target: "constructor-handle" },
   { key: "configure", target: "constructor-node" },
-  { key: "variables", target: "constructor-controls" },
-  { key: "debug", target: "constructor-controls" },
+  { key: "variables", target: "constructor-variables" },
+  { key: "debug", target: "constructor-debug" },
   { key: "publish", target: "constructor-save" },
 ];
 
