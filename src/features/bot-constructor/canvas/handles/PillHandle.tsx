@@ -58,7 +58,6 @@ export function PillHandle({
 }: PillHandleProps) {
   const isSource = type === "source";
   const shouldShowPlus = showPlus ?? isSource;
-  const hasExpandedStartArea = isSource;
 
   return (
     <Handle
@@ -74,20 +73,20 @@ export function PillHandle({
       // after a handle interaction.
       onClick={stopClickPropagation}
       className={cn(
-        "group/handle connectionindicator !rounded-md !border-0 flex items-center justify-center shadow-sm",
+        "group/handle !rounded-md !border-0 flex items-center justify-center shadow-sm",
         "!pointer-events-auto !transition-colors !duration-150 ease-out",
         "!w-4 !h-4",
+        // Enlarge the drag/hit area WITHOUT overlaying a child element: a
+        // ::before pseudo belongs to this Handle, so document.elementFromPoint
+        // (used by React Flow to detect the handle on mousedown) still returns
+        // the Handle itself. A real child <span> would be returned instead and,
+        // lacking the `source`/`target` class, would block connections entirely.
+        isSource &&
+          "before:absolute before:-inset-3 before:content-['']",
         TONE_CLASSES[tone],
         className
       )}
     >
-      {hasExpandedStartArea && (
-        <span
-          aria-hidden
-          className="absolute -inset-3"
-          style={{ pointerEvents: "auto" }}
-        />
-      )}
       {shouldShowPlus && (
         <PlusIcon
           className="pointer-events-none text-white"
