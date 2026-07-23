@@ -274,6 +274,7 @@ function AccessoryNodeCard({ id, manifest, selected, title }: AccessoryNodeCardP
     <div
       className="acc-node-wrapper group/card relative flex flex-col items-center select-none"
       data-debug-status={debugStatus || undefined}
+      data-tour="constructor-node"
       data-accessory-selected={selected || undefined}
       style={{ width: ACCESSORY_W, height: ACCESSORY_H }}
     >
@@ -474,6 +475,7 @@ export function GenericNodeRenderer({
           "flex flex-col justify-center",
       )}
       data-debug-status={debugStatus || undefined}
+      data-tour="constructor-node"
       style={sizeStyle}
     >
       <NodeActionsToolbar

@@ -8,12 +8,12 @@ import { Button } from "@/components/ui/button";
 type StepKey = "canvas" | "nodes" | "connect" | "configure" | "variables" | "debug" | "publish";
 
 const STEPS: Array<{ key: StepKey; target?: string }> = [
-  { key: "canvas", target: "constructor-canvas" },
+  { key: "canvas", target: "constructor-node" },
   { key: "nodes", target: "constructor-add-node" },
-  { key: "connect", target: "constructor-canvas" },
-  { key: "configure", target: "constructor-canvas" },
-  { key: "variables", target: "constructor-guide" },
-  { key: "debug", target: "constructor-canvas" },
+  { key: "connect", target: "constructor-node" },
+  { key: "configure", target: "constructor-node" },
+  { key: "variables", target: "constructor-controls" },
+  { key: "debug", target: "constructor-controls" },
   { key: "publish", target: "constructor-save" },
 ];
 
