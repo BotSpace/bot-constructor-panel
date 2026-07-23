@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import {
   Braces,
   ChevronDown,
-  ChevronLeft,
+
   ChevronRight,
   Clock3,
   Globe,
@@ -76,7 +76,7 @@ export function NodeVariablePanel({
   const t = useTranslations("variablePanel");
   const nodeSnapshot = useDebugContextStore((state) => state.nodeSnapshots.get(nodeId));
   const snapshots = useDebugContextStore((state) => state.snapshots);
-  const [contextOpen, setContextOpen] = useState(false);
+
 
   const activeContext = useMemo(() => {
     if (nodeSnapshot) {
@@ -107,55 +107,12 @@ export function NodeVariablePanel({
   });
 
   return (
-    <>
-      {contextOpen && (
-        <aside className="fixed inset-y-0 right-[960px] z-40 hidden w-[400px] flex-col border-l border-r border-white/10 bg-[#0c0c0d] shadow-2xl xl:flex">
-          <PanelHeader
-            icon={<Globe className="h-4 w-4" />}
-            title={t("allContext")}
-            subtitle={
-              activeContext
-                ? `Chat ${activeContext.chatId} · ${new Date(timestampValue(activeContext.ts)).toLocaleTimeString()}`
-                : t("latestContext")
-            }
-            onClose={() => setContextOpen(false)}
-          />
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4">
-            {allVariables.length > 0 ? (
-              <VariableList entries={allVariables} accent="violet" />
-            ) : (
-              <EmptyState text={t("sendDebug")} />
-            )}
-
-            <section>
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                {t("autoContext")}
-              </p>
-              <div className="space-y-4">
-                {GLOBAL_CONTEXT_VARIABLE_GROUPS.map((group) => (
-                  <div key={group.labelKey}>
-                    <p className="mb-1.5 text-[10px] text-zinc-500">{group.labelKey}</p>
-                    <VariableList
-                      entries={group.variables.map((variable) => [variable.key, variable.descriptionKey])}
-                      accent="violet"
-                    />
-                  </div>
-                ))}
-              </div>
-            </section>
-          </div>
-        </aside>
-      )}
-
-      <aside className="fixed inset-y-0 right-[560px] z-40 hidden w-[400px] flex-col border-l border-r border-white/10 bg-[#101011] shadow-2xl lg:flex">
+    <aside className="fixed inset-y-0 right-[560px] z-40 hidden w-[400px] flex-col border-l border-r border-white/10 bg-[#101011] shadow-2xl lg:flex">
         <PanelHeader
           icon={<Braces className="h-4 w-4" />}
           title={t("nodeTitle")}
           subtitle={t("nodeSubtitle")}
-          onClose={() => {
-            setContextOpen(false);
-            onOpenChange(false);
-          }}
+          onClose={() => onOpenChange(false)}
         />
 
         <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-4">
@@ -197,33 +154,44 @@ export function NodeVariablePanel({
           </section>
 
           <section>
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-              {t("availableHere")}
-            </p>
-            {stateKeys.length > 0 ? (
-              <VariableList entries={availableVariables} />
+            <div className="mb-2 flex items-center gap-2">
+              <Globe className="h-4 w-4 text-violet-300" />
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                  {t("allContext")}
+                </p>
+                <p className="truncate text-[10px] text-zinc-600">
+                  {activeContext
+                    ? `Chat ${activeContext.chatId} · ${new Date(timestampValue(activeContext.ts)).toLocaleTimeString()}`
+                    : t("latestContext")}
+                </p>
+              </div>
+            </div>
+            {allVariables.length > 0 ? (
+              <div className="space-y-2">
+                <VariableList entries={allVariables} accent="violet" />
+              </div>
             ) : (
-              <EmptyState text={t("noAvailable")} />
+              <EmptyState text={t("sendDebug")} />
             )}
+
+            <div className="mt-4 space-y-4">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+                {t("autoContext")}
+              </p>
+              {GLOBAL_CONTEXT_VARIABLE_GROUPS.map((group) => (
+                <div key={group.labelKey}>
+                  <p className="mb-1.5 text-[10px] text-zinc-500">{group.labelKey}</p>
+                  <VariableList
+                    entries={group.variables.map((variable) => [variable.key, variable.descriptionKey])}
+                    accent="violet"
+                  />
+                </div>
+              ))}
+            </div>
           </section>
         </div>
-
-        <div className="shrink-0 border-t border-white/10 p-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setContextOpen((value) => !value)}
-            className="h-10 w-full justify-between border-white/10 bg-white/[0.03] text-zinc-200 hover:bg-white/[0.07]"
-          >
-            <span className="flex items-center gap-2">
-              <Globe className="h-4 w-4 text-violet-300" />
-              {t("allContext")}
-            </span>
-            <ChevronLeft className={cn("h-4 w-4 transition-transform", contextOpen && "rotate-180")} />
-          </Button>
-        </div>
       </aside>
-    </>
   );
 }
 
