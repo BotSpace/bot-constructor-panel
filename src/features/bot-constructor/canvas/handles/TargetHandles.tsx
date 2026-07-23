@@ -10,6 +10,7 @@ export function TargetHandles() {
     <Handle
       type="target"
       position={Position.Left}
+      className="connectionindicator"
       id="target-handler"
       isConnectableStart={false}
       style={{
