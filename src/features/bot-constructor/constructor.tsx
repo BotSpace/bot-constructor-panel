@@ -598,13 +598,9 @@ export default function Constructor() {
           newY = (sourceNode.position.y + targetNode.position.y) / 2 - NODE_H / 2;
         }
 
-        addNode(element, { x: newX, y: newY });
+        const insertedNode = addNode(element, { x: newX, y: newY });
 
         setTimeout(() => {
-          const currentNodes = useFlowStore.getState().nodes;
-          const newNode = currentNodes[currentNodes.length - 1];
-          if (!newNode) return;
-
           // Eski edge'ni o'chirish
           useFlowStore.getState().onEdgesChange([{ id: edgeId, type: "remove" }]);
 
@@ -612,13 +608,13 @@ export default function Constructor() {
           onConnect({
             source,
             sourceHandle: sourceHandle ?? null,
-            target: newNode.id,
+            target: insertedNode.id,
             targetHandle: null,
           });
 
           // N → B
           onConnect({
-            source: newNode.id,
+            source: insertedNode.id,
             sourceHandle: null,
             target,
             targetHandle: targetHandle ?? null,
@@ -691,22 +687,17 @@ export default function Constructor() {
         }
 
         // Yangi node yaratish
-        addNode(element, adjustedPosition);
+        const newNode = addNode(element, adjustedPosition);
 
         // Yangi yaratilgan node'ni topish va edge yaratish
         setTimeout(() => {
-          const currentNodes = useFlowStore.getState().nodes;
-          const newNode = currentNodes[currentNodes.length - 1];
-
-          if (newNode) {
-            const connection: Connection = {
-              source,
-              sourceHandle: sourceHandle ?? null,
-              target: newNode.id,
-              targetHandle: null,
-            };
-            onConnect(connection);
-          }
+          const connection: Connection = {
+            source,
+            sourceHandle: sourceHandle ?? null,
+            target: newNode.id,
+            targetHandle: null,
+          };
+          onConnect(connection);
           pendingConnectionRef.current = null;
         }, 50);
       } else if (contextMenuAddPosRef.current) {
