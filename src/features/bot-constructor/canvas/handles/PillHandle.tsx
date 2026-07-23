@@ -75,7 +75,7 @@ export function PillHandle({
       onClick={stopClickPropagation}
       className={cn(
         "group/handle !rounded-md !border-0 flex items-center justify-center shadow-sm",
-        "!transition-colors !duration-150 ease-out",
+        "!pointer-events-auto !transition-colors !duration-150 ease-out",
         "!w-4 !h-4",
         TONE_CLASSES[tone],
         className
