@@ -84,7 +84,6 @@ export default function Constructor() {
 
   // Fetch the canonical built-in + enabled-module manifest catalog from backend.
   // Runs as soon as `id` is available (parallel to loadFlow below).
-  // If the backend returns 404 / empty, gracefully shows an empty list.
   // On project change, clear stale manifests immediately
   // so old module nodes from the previous project never render on the new canvas.
   const prevProjectIdRef = useRef<string | null>(null);
@@ -128,7 +127,6 @@ export default function Constructor() {
     // Stale time: 30s — avoids hammering the backend on every re-mount while
     // still reflecting newly enabled modules within a reasonable window.
     staleTime: 30_000,
-    // Silent failure: 404 / network error → treat as empty list (no toast).
     retry: false,
     // Poll every 3s after install/enable/disable until manifests stabilise.
     // pendingPoll is set by ModulePanel after a successful mutation and cleared
@@ -139,7 +137,7 @@ export default function Constructor() {
   // Sync fetched manifests into the Zustand store (and the fast Map).
   // Runs whenever the query result changes (including the initial undefined→data transition).
   // Also stops polling once the manifest count has stabilised across two fetches
-  // (i.e. the newly deployed module is now visible or deploy failed silently).
+  // (i.e. the newly deployed module is now visible).
   useEffect(() => {
     if (fetchedManifests === undefined) return;
     setManifests(fetchedManifests);

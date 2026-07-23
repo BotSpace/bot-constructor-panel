@@ -14,7 +14,10 @@ export async function getProjectNodeManifests(
     `/projects/${projectId}/node-manifests`
   );
   const manifests = (data as any)?.manifests;
-  return Array.isArray(manifests) ? manifests : [];
+  if (!Array.isArray(manifests)) {
+    throw new Error("Backend node manifest javobi noto'g'ri");
+  }
+  return manifests;
 }
 
 // ---------------------------------------------------------------------------
@@ -26,10 +29,10 @@ export async function getProjectModules(
   projectId: string
 ): Promise<ProjectModule[]> {
   const { data } = await instanceAuth.get(`/projects/${projectId}/modules`);
-  if (Array.isArray(data)) return data;
-  const d = data as any;
-  if (Array.isArray(d?.items)) return d.items;
-  return [];
+  if (!Array.isArray(data)) {
+    throw new Error("Backend module ro'yxati javobi noto'g'ri");
+  }
+  return data;
 }
 
 // ---------------------------------------------------------------------------
