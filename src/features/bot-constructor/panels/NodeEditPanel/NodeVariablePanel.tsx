@@ -155,7 +155,7 @@ export function NodeVariablePanel({
 
           <section>
             <div className="mb-2 flex items-center gap-2">
-              <Globe className="h-4 w-4 text-violet-300" />
+              <Globe className="h-4 w-4 text-slate-300" />
               <div className="min-w-0">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                   {t("allContext")}
@@ -169,7 +169,7 @@ export function NodeVariablePanel({
             </div>
             {allVariables.length > 0 ? (
               <div className="space-y-2">
-                <VariableList entries={allVariables} accent="violet" />
+                <VariableList entries={allVariables} accent="slate" />
               </div>
             ) : (
               <EmptyState text={t("sendDebug")} />
@@ -184,7 +184,7 @@ export function NodeVariablePanel({
                   <p className="mb-1.5 text-[10px] text-zinc-500">{group.labelKey}</p>
                   <VariableList
                     entries={group.variables.map((variable) => [variable.key, variable.descriptionKey])}
-                    accent="violet"
+                    accent="slate"
                   />
                 </div>
               ))}
@@ -277,11 +277,11 @@ function inspectValue(value: unknown): InspectedValue {
 }
 
 const SCHEMA_KIND_CLASS: Record<SchemaKind, string> = {
-  object: "border-violet-400/20 bg-violet-400/10 text-violet-300",
+  object: "border-slate-400/20 bg-slate-400/10 text-slate-300",
   array: "border-blue-400/20 bg-blue-400/10 text-blue-300",
   string: "border-emerald-400/20 bg-emerald-400/10 text-emerald-300",
   number: "border-amber-400/20 bg-amber-400/10 text-amber-300",
-  boolean: "border-fuchsia-400/20 bg-fuchsia-400/10 text-fuchsia-300",
+  boolean: "border-slate-500/20 bg-slate-500/10 text-slate-400",
   null: "border-zinc-500/20 bg-zinc-500/10 text-zinc-400",
 };
 
@@ -300,7 +300,7 @@ function VariableList({
   accent = "cyan",
 }: {
   entries: Array<[string, unknown]>;
-  accent?: "cyan" | "violet";
+  accent?: "cyan" | "slate";
 }) {
   return (
     <div className="space-y-2">
@@ -325,7 +325,7 @@ function VariableCard({
 }: {
   variableKey: string;
   value: unknown;
-  accent: "cyan" | "violet";
+  accent: "cyan" | "slate";
 }) {
   const t = useTranslations("variablePanel");
   const [expanded, setExpanded] = useState(false);
@@ -348,8 +348,8 @@ function VariableCard({
     <div
       className={cn(
         "group overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] transition-colors",
-        accent === "violet"
-          ? "hover:border-violet-400/40"
+        accent === "slate"
+          ? "hover:border-slate-400/40"
           : "hover:border-cyan-300/40",
       )}
     >
@@ -365,7 +365,7 @@ function VariableCard({
           <span
             className={cn(
               "block truncate font-mono text-xs font-medium",
-              accent === "violet" ? "text-violet-200" : "text-cyan-100",
+              accent === "slate" ? "text-slate-200" : "text-cyan-100",
             )}
           >
             {token}
@@ -504,7 +504,7 @@ function SchemaTreeRow({
               "min-w-0 flex-1 truncate text-[10px]",
               inspected.kind === "string" && "text-emerald-300/75",
               inspected.kind === "number" && "text-amber-300/75",
-              inspected.kind === "boolean" && "text-fuchsia-300/75",
+              inspected.kind === "boolean" && "text-slate-300/75",
               inspected.kind === "null" && "text-zinc-600",
               complex && "text-zinc-500",
             )}
