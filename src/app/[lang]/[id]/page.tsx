@@ -60,7 +60,7 @@ function PageInner() {
       {/* ── Content row ────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Canvas */}
-        <div className="flex-1 flex flex-col overflow-hidden relative min-w-0">
+        <div data-tour="constructor-canvas" className="flex-1 flex flex-col overflow-hidden relative min-w-0">
           <ReactFlowProvider>
             <Constructor />
             <SearchPanel />
@@ -112,7 +112,7 @@ function N8nTopBar({
       </span>
 
       {/* Save status */}
-      <SaveStatusBadge />
+      <span data-tour="constructor-save"><SaveStatusBadge /></span>
 
       <div className="flex-1" />
 
@@ -123,11 +123,11 @@ function N8nTopBar({
         className="h-9 shrink-0 gap-1.5 text-sm px-4"
         onClick={onAddNode}
         title={t("addNodeTitle")}
+        data-tour="constructor-add-node"
       >
         <Plus className="h-4 w-4" />
         <span className="hidden sm:inline">{t("addNode")}</span>
       </Button>
-      <ConstructorGuide />
       <ConstructorGuide />
 
       <Separator orientation="vertical" className="h-6 mx-0.5 bg-white/20" />

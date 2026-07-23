@@ -661,6 +661,10 @@
       "title": "Bot konstruktoridan foydalanish",
       "description": "Flow'ni noldan ishga tushirishgacha bo'lgan asosiy qadamlar.",
       "close": "Tushunarli",
+      "skip": "O'tkazib yuborish",
+      "next": "Keyingi",
+      "back": "Orqaga",
+      "done": "Tayyor",
       "steps": {
         "canvas": { "title": "Canvas", "body": "Flow shu yerda ko'rinadi. Sichqoncha g'ildiragi bilan zoom qiling, bo'sh joyni sudrab ko'rinishni siljiting." },
         "nodes": { "title": "Node qo'shish", "body": "Node qo'shish tugmasini bosing, kategoriya yoki qidiruvdan kerakli modulni tanlang." },
