@@ -353,6 +353,13 @@ function VariableList({
   );
 }
 
+function setVariableDragData<T extends HTMLElement>(event: DragEvent<T>, variablePath: string) {
+  const token = `{{${variablePath}}}`;
+  event.dataTransfer.setData("text/plain", token);
+  event.dataTransfer.setData("application/x-botspace-variable", token);
+  event.dataTransfer.effectAllowed = "copy";
+}
+
 function VariableCard({
   variableKey,
   value,
@@ -377,16 +384,12 @@ function VariableCard({
       })
     : displayValue(inspected.value);
 
-  const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
-    event.dataTransfer.setData("text/plain", token);
-    event.dataTransfer.setData("application/x-botspace-variable", token);
-    event.dataTransfer.effectAllowed = "copy";
+  const handleDragStart = (event: DragEvent<HTMLButtonElement>) => {
+    setVariableDragData(event, variableKey);
   };
 
   return (
     <div
-      draggable
-      onDragStart={handleDragStart}
       className={cn(
         "group overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] transition-colors",
         accent === "violet"
@@ -399,8 +402,10 @@ function VariableCard({
 
         <button
           type="button"
+          draggable
           onClick={() => onInsert(variableKey)}
-          className="min-w-0 flex-1 text-left"
+          onDragStart={handleDragStart}
+          className="min-w-0 flex-1 cursor-grab text-left active:cursor-grabbing"
           title={t("insertVariable", { variable: token })}
         >
           <span
@@ -438,7 +443,7 @@ function VariableCard({
       {expanded && (
         <div className="border-t border-white/10 bg-black/20 px-3 py-2.5">
           {complex ? (
-            <SchemaTree value={inspected.value} />
+            <SchemaTree value={inspected.value} path={variableKey} onInsert={onInsert} />
           ) : (
             <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-words font-mono text-[11px] leading-5 text-emerald-200/80">
               {String(inspected.value)}
@@ -463,7 +468,15 @@ function SchemaKindBadge({ kind, parsedJson }: { kind: SchemaKind; parsedJson?: 
   );
 }
 
-function SchemaTree({ value }: { value: unknown }) {
+function SchemaTree({
+  value,
+  path,
+  onInsert,
+}: {
+  value: unknown;
+  path: string;
+  onInsert: (key: string) => void;
+}) {
   const entries = Array.isArray(value)
     ? value.map((item, index) => [String(index), item] as [string, unknown])
     : Object.entries((value as Record<string, unknown>) ?? {});
@@ -474,14 +487,33 @@ function SchemaTree({ value }: { value: unknown }) {
 
   return (
     <div className="space-y-0.5 font-mono">
-      {entries.map(([key, child]) => (
-        <SchemaTreeRow key={key} name={key} value={child} />
-      ))}
+      {entries.map(([key, child]) => {
+        const childPath = `${path}.${key}`;
+        return (
+          <SchemaTreeRow
+            key={key}
+            name={key}
+            path={childPath}
+            value={child}
+            onInsert={onInsert}
+          />
+        );
+      })}
     </div>
   );
 }
 
-function SchemaTreeRow({ name, value }: { name: string; value: unknown }) {
+function SchemaTreeRow({
+  name,
+  path,
+  value,
+  onInsert,
+}: {
+  name: string;
+  path: string;
+  value: unknown;
+  onInsert: (key: string) => void;
+}) {
   const t = useTranslations("variablePanel");
   const [open, setOpen] = useState(false);
   const inspected = useMemo(() => inspectValue(value), [value]);
@@ -492,9 +524,16 @@ function SchemaTreeRow({ name, value }: { name: string; value: unknown }) {
       })
     : displayValue(inspected.value);
 
+  const token = `{{${path}}}`;
+
+  const handleDragStart = (event: DragEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setVariableDragData(event, path);
+  };
+
   return (
     <div>
-      <div className="flex min-h-7 items-center gap-1.5 rounded-md px-1 py-1 hover:bg-white/[0.04]">
+      <div className="flex min-h-7 items-center gap-1 rounded-md px-1 py-1 hover:bg-white/[0.04]">
         {complex ? (
           <button
             type="button"
@@ -507,26 +546,36 @@ function SchemaTreeRow({ name, value }: { name: string; value: unknown }) {
         ) : (
           <span className="h-5 w-5 shrink-0" />
         )}
-        <span className="min-w-0 truncate text-[11px] text-sky-200">{name}</span>
-        <span className="text-zinc-700">:</span>
-        <SchemaKindBadge kind={inspected.kind} parsedJson={inspected.parsedJson} />
-        <span
-          className={cn(
-            "min-w-0 flex-1 truncate text-[10px]",
-            inspected.kind === "string" && "text-emerald-300/75",
-            inspected.kind === "number" && "text-amber-300/75",
-            inspected.kind === "boolean" && "text-fuchsia-300/75",
-            inspected.kind === "null" && "text-zinc-600",
-            complex && "text-zinc-500",
-          )}
-          title={displayValue(value)}
+        <button
+          type="button"
+          draggable
+          onClick={() => onInsert(path)}
+          onDragStart={handleDragStart}
+          className="flex min-w-0 flex-1 cursor-grab items-center gap-1.5 rounded px-1 text-left active:cursor-grabbing"
+          title={t("insertVariable", { variable: token })}
         >
-          {summary}
-        </span>
+          <GripVertical className="h-3.5 w-3.5 shrink-0 text-zinc-700 transition-colors group-hover:text-zinc-500" />
+          <span className="min-w-0 truncate text-[11px] text-sky-200">{name}</span>
+          <span className="text-zinc-700">:</span>
+          <SchemaKindBadge kind={inspected.kind} parsedJson={inspected.parsedJson} />
+          <span
+            className={cn(
+              "min-w-0 flex-1 truncate text-[10px]",
+              inspected.kind === "string" && "text-emerald-300/75",
+              inspected.kind === "number" && "text-amber-300/75",
+              inspected.kind === "boolean" && "text-fuchsia-300/75",
+              inspected.kind === "null" && "text-zinc-600",
+              complex && "text-zinc-500",
+            )}
+            title={displayValue(value)}
+          >
+            {summary}
+          </span>
+        </button>
       </div>
       {complex && open && (
         <div className="ml-3 border-l border-white/10 pl-2">
-          <SchemaTree value={inspected.value} />
+          <SchemaTree value={inspected.value} path={path} onInsert={onInsert} />
         </div>
       )}
     </div>
