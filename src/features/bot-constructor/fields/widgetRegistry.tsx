@@ -2053,14 +2053,18 @@ function emptyDocEntry(): TemplateFieldEntry {
 function TemplateFieldRow({
   entry,
   fieldOptions,
+  forceFieldSelect = false,
   showOp,
+  allowRemove = true,
   onChange,
   onRemove,
 }: {
   entry: TemplateFieldEntry;
   fieldOptions: string[];
+  forceFieldSelect?: boolean;
   /** true — filterConditions'da (op ko'rsatilsin) */
   showOp: boolean;
+  allowRemove?: boolean;
   onChange: (next: TemplateFieldEntry) => void;
   onRemove: () => void;
 }) {
@@ -2069,9 +2073,9 @@ function TemplateFieldRow({
       {/* Qator 1: field + op (agar showOp) + trash */}
       <div className="flex items-center gap-1.5">
         {/* Field dropdown yoki input */}
-        {fieldOptions.length > 0 ? (
+        {forceFieldSelect || fieldOptions.length > 0 ? (
           <Select value={entry.field} onValueChange={(v) => onChange({ ...entry, field: v })}>
-            <SelectTrigger className="h-7 w-28 shrink-0 text-[11px] font-mono">
+            <SelectTrigger className="h-7! w-28 shrink-0 py-0 text-[11px] font-mono">
               <SelectValue placeholder="field" />
             </SelectTrigger>
             <SelectContent>
@@ -2094,7 +2098,7 @@ function TemplateFieldRow({
         {/* Op dropdown — faqat filter qatorida */}
         {showOp && (
           <Select value={entry.op} onValueChange={(v) => onChange({ ...entry, op: v })}>
-            <SelectTrigger className="h-7 w-[88px] shrink-0 text-[11px]">
+            <SelectTrigger className="h-7! w-22 shrink-0 py-0 text-[11px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -2136,13 +2140,15 @@ function TemplateFieldRow({
         </div>
 
         {/* Trash */}
-        <button
-          type="button"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-zinc-600 hover:text-red-400"
-          onClick={onRemove}
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
+        {allowRemove && (
+          <button
+            type="button"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-zinc-600 hover:text-red-400"
+            onClick={onRemove}
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
 
       {/* Qator 2: value yoki aiDescription (source ga qarab) */}
@@ -2219,9 +2225,13 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
     : [];
 
   // ── documentFields (create) ──────────────────────────────────────────────
-  const documentFields: TemplateFieldEntry[] = Array.isArray(data.documentFields)
-    ? parseTemplateEntries(data.documentFields)
-    : [];
+  const documentFields = useMemo<TemplateFieldEntry[]>(
+    () =>
+      Array.isArray(data.documentFields)
+        ? parseTemplateEntries(data.documentFields)
+        : [],
+    [data.documentFields],
+  );
 
   // ── changeFields (update) ────────────────────────────────────────────────
   const changeFields: TemplateFieldEntry[] = Array.isArray(data.changeFields)
@@ -2235,7 +2245,26 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
   });
   const fieldOptions = (collectionDetail?.fields ?? []).map((f) => f.name);
 
-  const upd = (patch: Record<string, unknown>) => updateNodeData(nodeId, patch);
+  const upd = useCallback(
+    (patch: Record<string, unknown>) => updateNodeData(nodeId, patch),
+    [nodeId, updateNodeData],
+  );
+
+  useEffect(() => {
+    if (operation !== "create" || !collection || !collectionDetail?.fields) return;
+
+    const entriesByField = new Map(documentFields.map((entry) => [entry.field, entry]));
+    const nextDocumentFields = collectionDetail.fields.map(
+      (field) => entriesByField.get(field.name) ?? { ...emptyDocEntry(), field: field.name },
+    );
+    const isSynced =
+      documentFields.length === nextDocumentFields.length &&
+      documentFields.every((entry, index) => entry.field === nextDocumentFields[index]?.field);
+
+    if (!isSynced) {
+      upd({ documentFields: nextDocumentFields });
+    }
+  }, [collection, collectionDetail?.fields, documentFields, operation, upd]);
 
   // filterConditions helpers
   const addFilter = () => upd({ filterConditions: [...filterConditions, emptyFilterEntry()] });
@@ -2245,7 +2274,6 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
     upd({ filterConditions: filterConditions.filter((_, j) => j !== i) });
 
   // documentFields helpers
-  const addDocField = () => upd({ documentFields: [...documentFields, emptyDocEntry()] });
   const updateDocField = (i: number, next: TemplateFieldEntry) =>
     upd({ documentFields: documentFields.map((e, j) => (j === i ? next : e)) });
   const removeDocField = (i: number) =>
@@ -2267,7 +2295,17 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
       {/* 1. Collection selector */}
       <div className="grid gap-1.5">
         <Label className="text-xs text-muted-foreground">Collection</Label>
-        <Select value={collection} onValueChange={(v) => upd({ collection: v })}>
+        <Select
+          value={collection}
+          onValueChange={(v) =>
+            upd({
+              collection: v,
+              filterConditions: [],
+              documentFields: [],
+              changeFields: [],
+            })
+          }
+        >
           <SelectTrigger className="h-8 text-xs">
             <SelectValue placeholder="Collection tanlang" />
           </SelectTrigger>
@@ -2333,6 +2371,7 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
               key={i}
               entry={entry}
               fieldOptions={fieldOptions}
+              forceFieldSelect={Boolean(collection)}
               showOp
               onChange={(next) => updateFilter(i, next)}
               onRemove={() => removeFilter(i)}
@@ -2359,6 +2398,7 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
               key={i}
               entry={entry}
               fieldOptions={fieldOptions}
+              forceFieldSelect={Boolean(collection)}
               showOp={false}
               onChange={(next) => updateChangeField(i, next)}
               onRemove={() => removeChangeField(i)}
@@ -2385,19 +2425,13 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
               key={i}
               entry={entry}
               fieldOptions={fieldOptions}
+              forceFieldSelect={Boolean(collection)}
               showOp={false}
+              allowRemove={false}
               onChange={(next) => updateDocField(i, next)}
               onRemove={() => removeDocField(i)}
             />
           ))}
-
-          <button
-            type="button"
-            className="flex items-center gap-1 rounded border border-dashed border-white/10 px-2 py-1 text-[10px] text-zinc-500 hover:text-zinc-300"
-            onClick={addDocField}
-          >
-            <PlusIcon className="h-3 w-3" /> Field qo&apos;shish
-          </button>
         </div>
       )}
 
