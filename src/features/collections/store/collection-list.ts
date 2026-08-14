@@ -1,4 +1,4 @@
-import { CollectionListItem } from "@/types/http/collection";
+import { CollectionField, CollectionListItem } from "@/types/http/collection";
 import { create } from "zustand";
 import { instanceAuth } from "@/services/instance";
 import toast from "react-hot-toast";
@@ -12,8 +12,49 @@ type CmsCollectionRaw = {
   _id?: string;
   id?: string | number;
   name: string;
+  slug?: string;
+  fields?: unknown;
   [key: string]: unknown;
 };
+
+function extractFields(raw: unknown): CollectionField[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+
+  return raw
+    .filter(
+      (field): field is Record<string, unknown> =>
+        Boolean(field && typeof field === "object" && typeof field.name === "string"),
+    )
+    .map((field) => ({
+      id:
+        typeof field.id === "string" || typeof field.id === "number"
+          ? field.id
+          : String(field.name),
+      name: String(field.name),
+      label: typeof field.label === "string" ? field.label : undefined,
+      kind:
+        typeof field.kind === "string"
+          ? field.kind
+          : typeof field.type === "string"
+            ? field.type
+            : "text",
+      type: typeof field.type === "string" ? field.type : undefined,
+      required: Boolean(field.required),
+      default: field.default,
+      relation_collection:
+        typeof field.relation_collection === "string" ||
+        typeof field.relation_collection === "number" ||
+        field.relation_collection === null
+          ? field.relation_collection
+          : undefined,
+      relation_collection_id:
+        typeof field.relation_collection_id === "string"
+          ? field.relation_collection_id
+          : field.relation_collection_id === null
+            ? null
+            : undefined,
+    }));
+}
 
 function extractCollections(raw: unknown): CollectionListItem[] {
   const r = (raw ?? {}) as Record<string, unknown>;
@@ -31,7 +72,9 @@ function extractCollections(raw: unknown): CollectionListItem[] {
     .map((item) => ({
       id: item.id ?? item._id ?? item.name,
       name: item.name,
+      slug: typeof item.slug === "string" && item.slug ? item.slug : undefined,
       system: Boolean(item.system),
+      fields: extractFields(item.fields),
     }));
 }
 
