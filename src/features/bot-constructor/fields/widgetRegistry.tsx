@@ -2075,7 +2075,7 @@ function TemplateFieldRow({
         {/* Field dropdown yoki input */}
         {forceFieldSelect || fieldOptions.length > 0 ? (
           <Select value={entry.field} onValueChange={(v) => onChange({ ...entry, field: v })}>
-            <SelectTrigger className="h-7! w-28 shrink-0 py-0 text-[11px] font-mono">
+            <SelectTrigger className="h-7! w-fit min-w-24 max-w-48 py-0 text-[11px] font-mono">
               <SelectValue placeholder="field" />
             </SelectTrigger>
             <SelectContent>
@@ -2098,7 +2098,7 @@ function TemplateFieldRow({
         {/* Op dropdown — faqat filter qatorida */}
         {showOp && (
           <Select value={entry.op} onValueChange={(v) => onChange({ ...entry, op: v })}>
-            <SelectTrigger className="h-7! w-22 shrink-0 py-0 text-[11px]">
+            <SelectTrigger className="h-7! w-fit min-w-14 max-w-32 py-0 text-[11px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
