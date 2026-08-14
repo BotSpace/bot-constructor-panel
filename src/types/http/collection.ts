@@ -1,19 +1,26 @@
+export interface CollectionField {
+  id: string | number;
+  name: string;
+  label?: string;
+  kind: string;
+  type?: string;
+  required: boolean;
+  default: any;
+  relation_collection?: string | number | null;
+  relation_collection_id?: string | null;
+}
+
 export interface CollectionListItem {
   id: string | number;
   name: string;
+  slug?: string;
   system?: boolean;
+  fields?: CollectionField[];
 }
 
 export interface CollectionDetail {
-  id: number;
+  id: string | number;
   name: string;
-  fields: {
-    id: number;
-    name: string;
-    label?: string;
-    kind: string;
-    required: boolean;
-    default: any;
-    relation_collection?: number | null;
-  }[];
+  slug?: string;
+  fields: CollectionField[];
 }

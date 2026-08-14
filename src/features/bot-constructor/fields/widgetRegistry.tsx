@@ -2239,11 +2239,23 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
     : [];
 
   // ── collection field'lari (dropdown uchun) ──────────────────────────────
+  const selectedCollection = collections?.find(
+    (item) => item.slug === collection || item.name === collection,
+  );
+  const collectionSlug = selectedCollection?.slug ?? collection;
   const { data: collectionDetail } = useReactQueryAction<CollectionDetail>({
-    url: collection ? `cms/projects/[id]/collections/${collection}/` : undefined,
-    enabled: Boolean(collection),
+    url: collectionSlug
+      ? `cms/projects/[id]/collections/${collectionSlug}/`
+      : undefined,
+    enabled: Boolean(collectionSlug),
   });
-  const fieldOptions = (collectionDetail?.fields ?? []).map((f) => f.name);
+  const collectionFields = useMemo(
+    () => collectionDetail?.fields ?? selectedCollection?.fields ?? [],
+    [collectionDetail?.fields, selectedCollection?.fields],
+  );
+  const fieldsLoaded =
+    collectionDetail !== undefined || selectedCollection?.fields !== undefined;
+  const fieldOptions = collectionFields.map((field) => field.name);
 
   const upd = useCallback(
     (patch: Record<string, unknown>) => updateNodeData(nodeId, patch),
@@ -2251,10 +2263,16 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
   );
 
   useEffect(() => {
-    if (operation !== "create" || !collection || !collectionDetail?.fields) return;
+    if (selectedCollection?.slug && collection !== selectedCollection.slug) {
+      upd({ collection: selectedCollection.slug });
+    }
+  }, [collection, selectedCollection?.slug, upd]);
+
+  useEffect(() => {
+    if (operation !== "create" || !collectionSlug || !fieldsLoaded) return;
 
     const entriesByField = new Map(documentFields.map((entry) => [entry.field, entry]));
-    const nextDocumentFields = collectionDetail.fields.map(
+    const nextDocumentFields = collectionFields.map(
       (field) => entriesByField.get(field.name) ?? { ...emptyDocEntry(), field: field.name },
     );
     const isSynced =
@@ -2264,7 +2282,7 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
     if (!isSynced) {
       upd({ documentFields: nextDocumentFields });
     }
-  }, [collection, collectionDetail?.fields, documentFields, operation, upd]);
+  }, [collectionFields, collectionSlug, documentFields, fieldsLoaded, operation, upd]);
 
   // filterConditions helpers
   const addFilter = () => upd({ filterConditions: [...filterConditions, emptyFilterEntry()] });
@@ -2296,7 +2314,7 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
       <div className="grid gap-1.5">
         <Label className="text-xs text-muted-foreground">Collection</Label>
         <Select
-          value={collection}
+          value={collectionSlug}
           onValueChange={(v) =>
             upd({
               collection: v,
@@ -2311,7 +2329,7 @@ function AICollectionToolConfigWidget({ nodeId, data }: WidgetProps) {
           </SelectTrigger>
           <SelectContent>
             {collections?.map((col) => (
-              <SelectItem key={col.id} value={col.name} className="text-xs">
+              <SelectItem key={col.id} value={col.slug ?? col.name} className="text-xs">
                 {col.name}
               </SelectItem>
             ))}
