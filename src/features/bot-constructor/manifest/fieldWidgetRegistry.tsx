@@ -328,6 +328,9 @@ export function isFieldVisible(
   }
 
   if (Object.prototype.hasOwnProperty.call(field.visibleWhen, "notEquals")) {
+    if (field.visibleWhen.notEquals === "" && (currentValue === undefined || currentValue === null)) {
+      return false;
+    }
     return currentValue !== field.visibleWhen.notEquals;
   }
 

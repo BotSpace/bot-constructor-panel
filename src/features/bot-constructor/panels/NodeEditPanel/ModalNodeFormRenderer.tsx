@@ -75,6 +75,9 @@ function isFieldVisible(data: Record<string, unknown>, field: NodeFieldManifest)
   }
 
   if (Object.prototype.hasOwnProperty.call(field.visibleWhen, "notEquals")) {
+    if (field.visibleWhen.notEquals === "" && (currentValue === undefined || currentValue === null)) {
+      return false;
+    }
     return currentValue !== field.visibleWhen.notEquals;
   }
 
@@ -201,6 +204,15 @@ export function ModalNodeFormRenderer({
   );
 
   const updateNodeData = useFlowStore((state) => state.updateNodeData);
+
+  const defaultStateType = manifest.defaults?.state_type;
+  useEffect(() => {
+    const stateKey = typeof data.state_key === "string" ? data.state_key.trim() : "";
+    const hasStateType = typeof data.state_type === "string" && data.state_type !== "";
+    if (!stateKey || hasStateType || typeof defaultStateType !== "string") return;
+
+    updateNodeData(nodeId, { state_type: defaultStateType });
+  }, [data.state_key, data.state_type, defaultStateType, nodeId, updateNodeData]);
 
   // ── activeOptionalFields ─────────────────────────────────────────────────
   // Persistent list of manually activated optional fields, stored inside node
