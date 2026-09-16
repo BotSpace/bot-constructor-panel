@@ -30,22 +30,14 @@ const WATCHDOG_INTERVAL_MS = 500; // arzon tekshiruv (readyState + timestamp), t
 const IDLE_PING_AFTER_MS = 25_000;
 /** Ping'dan keyin shu muddat ichida echo/xabar kelmasa — ulanish o'lik. */
 const PING_TIMEOUT_MS = 10_000;
-/** CONNECTING holatida shu muddatdan uzoq qotib qolsa — uzib qayta ulaymiz. */
+/** Total budget for token acquisition and the WebSocket handshake. */
 const CONNECT_TIMEOUT_MS = 10_000;
 /** Qayta ulanish backoff'i: 500ms * 2^n, maksimum 5s. Cheksiz urinadi. */
 const BACKOFF_BASE_MS = 500;
 const BACKOFF_MAX_MS = 5_000;
 
-// Derived from NEXT_PUBLIC_API so local/staging/prod all point at their own
-// backend. Go backend mounts the socket at GET /api/v1/ws (see
-// internal/modules/ws/routes.go) — NOT /ws/events.
-//
-// IMPORTANT (see report): the Go backend's /ws is currently a generic
-// room-based chat scaffold ({type, from, room, body}); it does not emit the
-// domain events this hub expects ("release_status", "debug_status",
-// "context", "node_execution", "error" as {event, data}). Connecting here
-// will succeed but no real-time debug/release updates will arrive until the
-// backend adds that broadcasting.
+// Use the API origin but route to the separate realtime service, not the
+// backend's generic /api/v1/ws scaffold.
 function resolveWsUrl(): string {
   const api = process.env.NEXT_PUBLIC_API || "";
   // Real-time WS is a SEPARATE service (`websocket`, gateway PathPrefix /ws ->
@@ -69,10 +61,12 @@ export const WS_URL = resolveWsUrl();
 class WsHub {
   private ws: WebSocket | null = null;
   private listeners = new Set<WsListener>();
+  private openListeners = new Set<() => void>();
   private tokenProvider: TokenProvider | null = null;
 
   private watchdog: ReturnType<typeof setInterval> | null = null;
   private connecting = false;
+  private generation = 0;
   private connectStartedAt = 0;
   private lastActivityAt = 0;
   private lastPingAt = 0;
@@ -113,6 +107,12 @@ class WsHub {
     return () => this.listeners.delete(fn);
   }
 
+  /** Fires for every accepted initial/reconnected socket, not watchdog ticks. */
+  subscribeOpen(fn: () => void): () => void {
+    this.openListeners.add(fn);
+    return () => this.openListeners.delete(fn);
+  }
+
   get isOpen(): boolean {
     return this.ws?.readyState === WebSocket.OPEN;
   }
@@ -130,6 +130,8 @@ class WsHub {
   };
 
   private teardownSocket() {
+    // Also cancel pending token work; its promise may settle after stop/start.
+    this.generation += 1;
     const ws = this.ws;
     this.ws = null;
     this.connecting = false;
@@ -156,10 +158,20 @@ class WsHub {
   /** Watchdog tanasi — har tick'da arzon tekshiruvlar. */
   private async ensure() {
     if (!this.tokenProvider) return;
-    if (typeof navigator !== "undefined" && navigator.onLine === false) return;
 
     const now = Date.now();
     const state = this.ws?.readyState;
+
+    // A provider that never settles must not hold the reconnect lock forever.
+    // Check even while offline so a suspended attempt is still invalidated.
+    if (this.connecting) {
+      if (now - this.connectStartedAt >= CONNECT_TIMEOUT_MS) {
+        this.teardownSocket();
+        this.scheduleBackoff();
+      }
+      return;
+    }
+    if (typeof navigator !== "undefined" && navigator.onLine === false) return;
 
     if (state === WebSocket.OPEN) {
       // Liveness: uzoq jim tursa ping; echo kelmasa — o'lik, qayta ulaymiz.
@@ -180,16 +192,10 @@ class WsHub {
       return;
     }
 
-    if (state === WebSocket.CONNECTING) {
-      if (now - this.connectStartedAt > CONNECT_TIMEOUT_MS) {
-        this.teardownSocket();
-        this.scheduleBackoff();
-      }
-      return;
-    }
-
     // Yopiq/yo'q — backoff tugagan bo'lsa qayta ulanamiz.
-    if (this.connecting || now < this.backoffUntil) return;
+    if (now < this.backoffUntil) return;
+    this.teardownSocket();
+    const generation = this.generation;
     this.connecting = true;
     this.connectStartedAt = now;
 
@@ -199,8 +205,13 @@ class WsHub {
     } catch {
       token = null;
     }
-    if (!token) {
-      this.connecting = false;
+    if (generation !== this.generation) return;
+    if (
+      !token ||
+      Date.now() - this.connectStartedAt >= CONNECT_TIMEOUT_MS ||
+      (typeof navigator !== "undefined" && navigator.onLine === false)
+    ) {
+      this.teardownSocket();
       this.scheduleBackoff();
       return;
     }
@@ -209,21 +220,32 @@ class WsHub {
     try {
       ws = new WebSocket(`${WS_URL}?token=${token}`);
     } catch {
-      this.connecting = false;
+      this.teardownSocket();
       this.scheduleBackoff();
       return;
     }
     this.ws = ws;
+    const isCurrent = () => generation === this.generation && this.ws === ws;
 
     ws.onopen = () => {
+      if (!isCurrent()) return;
+      if (Date.now() - this.connectStartedAt >= CONNECT_TIMEOUT_MS) {
+        this.teardownSocket();
+        this.scheduleBackoff();
+        return;
+      }
       this.connecting = false;
       this.attempt = 0;
       this.backoffUntil = 0;
       this.lastActivityAt = Date.now();
       this.lastPingAt = 0;
+      for (const fn of this.openListeners) {
+        try { fn(); } catch { /* isolate subscriber failures */ }
+      }
     };
 
     ws.onmessage = (msg) => {
+      if (!isCurrent()) return;
       this.lastActivityAt = Date.now();
       this.lastPingAt = 0; // har qanday kelgan xabar liveness isboti
 
@@ -245,16 +267,11 @@ class WsHub {
       }
     };
 
-    ws.onerror = () => {
-      /* onclose baribir keladi — u yerda hal qilamiz */
-    };
-
-    ws.onclose = () => {
-      if (this.ws === ws) {
-        this.ws = null;
-        this.connecting = false;
-        this.scheduleBackoff();
-      }
+    // Some transports fail without delivering close; don't wait for it.
+    ws.onerror = ws.onclose = () => {
+      if (!isCurrent()) return;
+      this.teardownSocket();
+      this.scheduleBackoff();
     };
   }
 }

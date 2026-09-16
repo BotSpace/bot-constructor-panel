@@ -19,6 +19,7 @@ import { decodeOp, encodeOp, type CollabOp } from "@/wss/collab/ops";
 const WATCHDOG_INTERVAL_MS = 500;
 const IDLE_PING_AFTER_MS = 25_000;
 const PING_TIMEOUT_MS = 10_000;
+// Total budget for token acquisition and the WebSocket handshake.
 const CONNECT_TIMEOUT_MS = 10_000;
 const BACKOFF_BASE_MS = 500;
 const BACKOFF_MAX_MS = 5_000;
@@ -43,6 +44,7 @@ export class CollabClient {
   private ws: WebSocket | null = null;
   private watchdog: ReturnType<typeof setInterval> | null = null;
   private connecting = false;
+  private generation = 0;
   private stopped = false;
   private connectStartedAt = 0;
   private lastActivityAt = 0;
@@ -95,7 +97,8 @@ export class CollabClient {
       this.ws.send(encodeOp(op));
       return true;
     } catch {
-      /* socket died mid-send — watchdog reconnects */
+      this.teardownSocket();
+      this.scheduleBackoff();
       return false;
     }
   }
@@ -112,6 +115,8 @@ export class CollabClient {
   };
 
   private teardownSocket() {
+    // Also cancel pending token work; its promise may settle after stop/start.
+    this.generation += 1;
     const ws = this.ws;
     this.ws = null;
     this.connecting = false;
@@ -147,10 +152,20 @@ export class CollabClient {
 
   private async ensure() {
     if (this.stopped) return;
-    if (typeof navigator !== "undefined" && navigator.onLine === false) return;
 
     const now = Date.now();
     const state = this.ws?.readyState;
+
+    // A provider that never settles must not hold the reconnect lock forever.
+    // Check even while offline so a suspended attempt is still invalidated.
+    if (this.connecting) {
+      if (now - this.connectStartedAt >= CONNECT_TIMEOUT_MS) {
+        this.teardownSocket();
+        this.scheduleBackoff();
+      }
+      return;
+    }
+    if (typeof navigator !== "undefined" && navigator.onLine === false) return;
 
     if (state === WebSocket.OPEN) {
       if (this.lastPingAt && now - this.lastPingAt > PING_TIMEOUT_MS) {
@@ -170,25 +185,20 @@ export class CollabClient {
       return;
     }
 
-    if (state === WebSocket.CONNECTING) {
-      if (now - this.connectStartedAt > CONNECT_TIMEOUT_MS) {
-        this.teardownSocket();
-        this.scheduleBackoff();
-      }
-      return;
-    }
-
-    if (this.connecting || now < this.backoffUntil) return;
+    if (now < this.backoffUntil) return;
+    this.teardownSocket();
+    const generation = this.generation;
     this.connecting = true;
     this.connectStartedAt = now;
 
     const token = await this.fetchToken();
-    if (this.stopped) {
-      this.connecting = false;
-      return;
-    }
-    if (!token) {
-      this.connecting = false;
+    if (generation !== this.generation) return;
+    if (
+      !token ||
+      Date.now() - this.connectStartedAt >= CONNECT_TIMEOUT_MS ||
+      (typeof navigator !== "undefined" && navigator.onLine === false)
+    ) {
+      this.teardownSocket();
       this.scheduleBackoff();
       return;
     }
@@ -197,14 +207,21 @@ export class CollabClient {
     try {
       ws = new WebSocket(`${WS_URL}?token=${token}`);
     } catch {
-      this.connecting = false;
+      this.teardownSocket();
       this.scheduleBackoff();
       return;
     }
     ws.binaryType = "arraybuffer";
     this.ws = ws;
+    const isCurrent = () => generation === this.generation && this.ws === ws;
 
     ws.onopen = () => {
+      if (!isCurrent()) return;
+      if (Date.now() - this.connectStartedAt >= CONNECT_TIMEOUT_MS) {
+        this.teardownSocket();
+        this.scheduleBackoff();
+        return;
+      }
       this.connecting = false;
       this.attempt = 0;
       this.backoffUntil = 0;
@@ -213,6 +230,7 @@ export class CollabClient {
     };
 
     ws.onmessage = (msg) => {
+      if (!isCurrent()) return;
       this.lastActivityAt = Date.now();
       this.lastPingAt = 0; // any inbound frame proves liveness
 
@@ -236,16 +254,11 @@ export class CollabClient {
       }
     };
 
-    ws.onerror = () => {
-      /* onclose follows — handled there */
-    };
-
-    ws.onclose = () => {
-      if (this.ws === ws) {
-        this.ws = null;
-        this.connecting = false;
-        this.scheduleBackoff();
-      }
+    // Some transports fail without delivering close; don't wait for it.
+    ws.onerror = ws.onclose = () => {
+      if (!isCurrent()) return;
+      this.teardownSocket();
+      this.scheduleBackoff();
     };
   }
 }

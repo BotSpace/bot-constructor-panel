@@ -1,6 +1,7 @@
 "use client";
 
-import useProjectStore from "@/features/bot-constructor/store/project";
+import useProjectStore, { fetchProjectStatus } from "@/features/bot-constructor/store/project";
+import { createStatusReconciler, statusEvent } from "@/wss/project-status";
 import { useFlowStore } from "@/features/bot-constructor/store";
 import { useDebugStatusStore } from "@/features/bot-constructor/store/debug-status";
 import { useDebugContextStore } from "@/components/layout/debug-console/debug-context-store";
@@ -26,39 +27,32 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const authed = session.status === "authenticated";
   const lastErrorToastRef = useRef<number>(0);
 
-  // Hub lifecycle — login bo'lganda yoqamiz. Token har ulanishda yangidan
-  // so'raladi (eskirgan token bilan reconnect urinish muammosi yo'q).
+  const accountId = session.data?.user.id;
+
   useEffect(() => {
     if (!authed) return;
-    wsHub.start(getValidAccessToken);
-    return () => wsHub.stop();
-  }, [authed]);
-
-  // Event dispatch — store'lardan DOIM eng so'nggi holat o'qiladi (stale
-  // closure yo'q), shuning uchun obuna bir marta o'rnatiladi.
-  useEffect(() => {
-    return wsHub.subscribe((event, data) => {
+    const reconciler = createStatusReconciler({
+      current: () => {
+        const state = useProjectStore.getState();
+        return state.loading ? null : state.project;
+      },
+      isOpen: () => wsHub.isOpen,
+      fetch: fetchProjectStatus,
+      apply: (snapshot) => useProjectStore.getState().reconcileStatus(snapshot),
+    });
+    const unsubscribeEvents = wsHub.subscribe((event, data) => {
       const store = useProjectStore.getState();
       const project = store.project;
       if (!project) return;
 
       switch (event) {
-        case "release_status": {
-          const version = Number(data.version);
-          // project id int yoki string kelishi mumkin — loose solishtiramiz
-          // (context/node_execution case'laridagi bilan bir xil sabab).
-          if (
-            version > (project.release?.version || 0) &&
-            String(data.project) === String(project.id)
-          ) {
-            store.changeProject({ ...project, release_bot: true });
-            store.changeRelease(data as never);
-          }
+        case "release_status":
+        case "debug_status": {
+          if (store.loading) break;
+          const snapshot = statusEvent(project, event, data);
+          if (snapshot) store.reconcileStatus(snapshot);
           break;
         }
-        case "debug_status":
-          if (String(data.project) === String(project.id)) store.changeDebug(data as never);
-          break;
         case "context": {
           // Variable inspector snapshot — backend: {project, chat_id, variables, ts}
           if (
@@ -216,7 +210,20 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
           break;
       }
     });
-  }, []);
+    const unsubscribeOpen = wsHub.subscribeOpen(reconciler.opened);
+    const unsubscribeProject = useProjectStore.subscribe(reconciler.projectChanged);
+    // Register all listeners before start: even the initial open needs catch-up.
+    reconciler.projectChanged();
+    wsHub.start(getValidAccessToken);
+    return () => {
+      reconciler.dispose();
+      unsubscribeEvents();
+      unsubscribeOpen();
+      unsubscribeProject();
+      useProjectStore.getState().cancelProjectLoad();
+      wsHub.stop();
+    };
+  }, [authed, accountId]);
 
   return <>{children}</>;
 }
