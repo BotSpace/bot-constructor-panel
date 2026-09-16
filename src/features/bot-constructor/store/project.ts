@@ -1,4 +1,5 @@
 import { instanceAuth } from "@/services/instance";
+import { acceptRelease, isOlderStatus, type StatusSnapshot } from "@/wss/project-status";
 import {
   DebugInfo,
   ProjectResponse,
@@ -16,6 +17,8 @@ interface ProjectState {
   changeProject: (project: ProjectRetrive) => void;
   changeRelease: (release: ProjectRetrive["release"]) => void;
   changeDebug: (debug: ProjectRetrive["debug"]) => void;
+  reconcileStatus: (snapshot: StatusSnapshot) => void;
+  cancelProjectLoad: () => void;
 }
 
 /**
@@ -41,9 +44,29 @@ const STOPPED_DEBUG_STUB = (project_id: string): DebugInfo => ({
   id: "",
   project_id,
   status: "stopped",
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
+  created_at: "",
+  updated_at: "",
 });
+
+// Only durable status endpoints: never fetch/load the flow during catch-up.
+export async function fetchProjectStatus(projectId: string, signal: AbortSignal): Promise<StatusSnapshot> {
+  const [releases, debug] = await Promise.allSettled([
+    instanceAuth.get<ReleaseInfo[]>("/relase", {
+      params: { project: projectId }, signal, timeout: 10_000,
+    }),
+    instanceAuth.get<DebugInfo>(`/projects/${projectId}/info`, { signal, timeout: 10_000 }),
+  ]);
+  const snapshot: StatusSnapshot = {};
+  if (releases.status === "fulfilled" && Array.isArray(releases.value.data)) {
+    snapshot.release = releases.value.data.reduce<ReleaseInfo | null>(
+      (latest, release) => acceptRelease(latest, release) ? release : latest, null,
+    );
+  }
+  if (debug.status === "fulfilled") snapshot.debug = debug.value.data;
+  return snapshot;
+}
+
+let loadGeneration = 0;
 
 const useProjectStore = create<ProjectState>((set, get) => ({
   // datas
@@ -52,6 +75,7 @@ const useProjectStore = create<ProjectState>((set, get) => ({
 
   // actions
   loadProject(project_id) {
+    const generation = ++loadGeneration;
     set({ loading: true });
 
     // The new backend's project detail no longer embeds release/debug/env —
@@ -70,6 +94,7 @@ const useProjectStore = create<ProjectState>((set, get) => ({
         .catch(() => ({ data: [] as Env[] })),
     ])
       .then(([projectRes, releasesRes, debugRes, envRes]) => {
+        if (generation !== loadGeneration) return;
         const raw = projectRes.data;
         const releases = Array.isArray(releasesRes.data) ? releasesRes.data : [];
         const latestRelease = releases.length
@@ -93,11 +118,21 @@ const useProjectStore = create<ProjectState>((set, get) => ({
         set({ project });
       })
       .catch(() => {
+        if (generation !== loadGeneration) return;
         toast.error("Bot yuklashda xatolik yuz berdi");
       })
       .finally(() => {
-        set({ loading: false });
+        if (generation === loadGeneration) set({ loading: false });
       });
+  },
+
+  cancelProjectLoad: () => {
+    loadGeneration++;
+    set({ loading: false });
+  },
+  reconcileStatus: (snapshot) => {
+    if (snapshot.release !== undefined) get().changeRelease(snapshot.release);
+    if (snapshot.debug !== undefined) get().changeDebug(snapshot.debug);
   },
 
   // changes
@@ -108,7 +143,8 @@ const useProjectStore = create<ProjectState>((set, get) => ({
   // change release
   changeRelease: (release) => {
     const project = get().project;
-    if (!project) return; // project null bo'lsa, hech narsa qilmaymiz
+    if (!project || (release && String(release.project_id) !== String(project.id))) return;
+    if (!acceptRelease(project.release, release)) return;
 
     set({
       project: {
@@ -120,7 +156,8 @@ const useProjectStore = create<ProjectState>((set, get) => ({
   // change debug
   changeDebug: (debug) => {
     const project = get().project;
-    if (!project) return; // project null bo'lsa, hech narsa qilmaymiz
+    if (!project || String(debug.project_id) !== String(project.id)) return;
+    if (isOlderStatus(project.debug, debug)) return;
 
     set({
       project: {

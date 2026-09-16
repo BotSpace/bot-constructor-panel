@@ -7,7 +7,7 @@ const TERMINAL: DebugNodeStatus[] = ["success", "error"];
 /**
  * Returns true if the incoming status should NOT override the current status.
  * Rule: once a node has reached a terminal state (success/error) it stays there
- * until the next run resets everything. "waiting" / "running" from a stale
+ * until the next run or retry attempt resets it. "waiting" / "running" from a stale
  * trigger event must never flip a green/red node back to yellow/spinning.
  */
 function terminalGuard(
@@ -26,13 +26,20 @@ function terminalGuard(
 const AUTO_CLEAR_MS = 60_000;
 
 let autoClearTimer: ReturnType<typeof setTimeout> | null = null;
+const MAX_RETIRED_EXECUTIONS = 64;
+
+/** Wire timestamps are Unix seconds or milliseconds; arrival time is not evidence of execution order. */
+function occurrenceTime(ts: number | undefined): number | undefined {
+  if (typeof ts !== "number" || !Number.isFinite(ts) || ts <= 0) return undefined;
+  return ts < 1e12 ? ts * 1000 : ts;
+}
 
 interface DebugStatusState {
   /** nodeId → execution status (set from engine events over WS) */
   statuses: Record<string, DebugNodeStatus>;
   /** nodeId → error message (only for status==="error") */
   errors: Record<string, string>;
-  /** nodeId → event timestamp (ms) of the currently applied status */
+  /** nodeId → latest accepted timestamp (ms), including arrival-time fallback */
   timestamps: Record<string, number>;
   /** nodeId → engine `seq` of the currently applied status (run_id-aware path) */
   seqs: Record<string, number>;
@@ -44,6 +51,7 @@ interface DebugStatusState {
   currentRunId: number | null;
   /** Durable execution ledger UUID carried by engine 3.5.148+ events. */
   currentExecutionId: string | null;
+  retiredExecutionIds: string[];
   /** nodeId → current retry attempt within the execution. */
   attempts: Record<string, number>;
   /** Most recently updated node, used by the compact status-bar indicator. */
@@ -74,32 +82,35 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
   seqs: {},
   currentRunId: null,
   currentExecutionId: null,
+  retiredExecutionIds: [],
   attempts: {},
   activeNodeId: null,
   lastStatus: null,
 
   setNodeStatus: (nodeId, status, ts, error, runId, seq, executionId, attempt) => {
-    const now = Date.now();
-    armAutoClear(get);
+    const eventTime = occurrenceTime(ts);
+    const timestamp = eventTime ?? Date.now();
+    let accepted = false;
 
     set((state) => {
-      // Engine-assigned run_id + seq order events independently of network
-      // delivery order.
-      // Tartibni tarmoq emas, engine'ning o'zi belgilaydi: run_id (har update
-      // uchun monotonik) + seq (global atomik). Trigger eventining kechikishi
-      // endi holatni buzmaydi: YANGI run_id ko'ringan zahoti (qaysi node
-      // bo'lishidan qat'i nazar) reset bo'ladi, eski run eventlari tashlanadi.
-      if (typeof runId === "number" && runId > 0) {
-        // Child process qayta ishga tushganda run_id yana 1 dan boshlanadi,
-        // execution_id esa har execution uchun yangilanadi. Shu sabab yangi
-        // execution kichik run_id bilan kelsa ham uni yangi run deb olamiz.
-        // Timestamp guard kechikkan eski execution eventini qaytarmaydi.
+      if (typeof runId === "number" && Number.isFinite(runId) && runId > 0) {
+        if (executionId && state.retiredExecutionIds.includes(executionId)) {
+          return state;
+        }
         const executionChanged =
-          Boolean(executionId) &&
-          Boolean(state.currentExecutionId) &&
-          executionId !== state.currentExecutionId;
+          Boolean(executionId) && executionId !== state.currentExecutionId;
         const latestAppliedTs = Math.max(0, ...Object.values(state.timestamps));
-        if (executionChanged && typeof ts === "number" && ts < latestAppliedTs) {
+        // A different UUID is not a runtime incarnation. A counter reset requires
+        // strictly newer occurrence time, never arrival time. At equal timestamps,
+        // advancing run_id orders normal executions within the same second.
+        // Without runtime identity, unseen executions across restarts remain ambiguous.
+        if (
+          executionChanged &&
+          state.currentRunId !== null &&
+          (eventTime === undefined ||
+            eventTime < latestAppliedTs ||
+            (eventTime === latestAppliedTs && runId <= state.currentRunId))
+        ) {
           return state;
         }
         if (
@@ -124,6 +135,14 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
               attempts: state.attempts,
             };
 
+        const incomingAttempt =
+          typeof attempt === "number" && Number.isInteger(attempt) && attempt > 0
+            ? attempt
+            : 1;
+        const previousAttempt = base.attempts[nodeId] ?? 1;
+        if (incomingAttempt < previousAttempt) return state;
+        const newAttempt = incomingAttempt > previousAttempt;
+
         // Bir node ichida seq bo'yicha: eski seq yangisini yenga olmaydi.
         // ISTISNO: terminal status (success/error) kelsa, oldingi non-terminal
         // (waiting/running) holatini seq tartibidan qat'i nazar yengadi.
@@ -137,53 +156,55 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
           prevStatusForSeq === undefined || !TERMINAL.includes(prevStatusForSeq);
         const terminalOverridesNonTerminal = incomingTerminal && prevNonTerminal;
         if (
+          !newAttempt &&
           !terminalOverridesNonTerminal &&
           typeof seq === "number" &&
           prevSeq !== undefined &&
           seq <= prevSeq
         ) {
-          return isNewRun
-            ? {
-                ...base,
-                currentRunId: runId,
-                currentExecutionId: executionId ?? null,
-                activeNodeId: null,
-                lastStatus: null,
-              }
-            : state;
+          return state;
         }
 
         // Terminal guard: do not let waiting/running override success/error
         // on the same run (e.g. a late trigger event after node already ran).
-        if (!isNewRun && terminalGuard(base.statuses[nodeId], status)) {
+        if (!newAttempt && terminalGuard(base.statuses[nodeId], status)) {
           return state;
         }
 
+        const errors = { ...base.errors };
+        if (status === "error" && error) errors[nodeId] = error;
+        else delete errors[nodeId];
+        const seqs = { ...base.seqs };
+        if (newAttempt) delete seqs[nodeId];
+        if (typeof seq === "number") seqs[nodeId] = seq;
+        const nextExecutionId =
+          executionId || (isNewRun ? null : state.currentExecutionId);
+        accepted = true;
         return {
           currentRunId: runId,
-          currentExecutionId:
-            executionId ?? (isNewRun ? null : state.currentExecutionId),
+          retiredExecutionIds:
+            state.currentExecutionId && state.currentExecutionId !== nextExecutionId
+              ? [...state.retiredExecutionIds, state.currentExecutionId].slice(
+                  -MAX_RETIRED_EXECUTIONS
+                )
+              : state.retiredExecutionIds,
+          currentExecutionId: nextExecutionId,
           activeNodeId: nodeId,
           lastStatus: status,
           statuses: { ...base.statuses, [nodeId]: status },
-          timestamps: { ...base.timestamps, [nodeId]: ts ?? now },
-          seqs:
-            typeof seq === "number"
-              ? { ...base.seqs, [nodeId]: seq }
-              : base.seqs,
-          attempts:
-            typeof attempt === "number" && attempt > 0
-              ? { ...base.attempts, [nodeId]: attempt }
-              : base.attempts,
-          errors:
-            status === "error" && error
-              ? { ...base.errors, [nodeId]: error }
-              : base.errors,
+          timestamps: {
+            ...base.timestamps,
+            [nodeId]: Math.max(base.timestamps[nodeId] ?? 0, timestamp),
+          },
+          seqs,
+          attempts: { ...base.attempts, [nodeId]: incomingAttempt },
+          errors,
         };
       }
 
       return state;
     });
+    if (accepted) armAutoClear(get);
   },
 
   clearStatuses: () => {
@@ -198,6 +219,7 @@ export const useDebugStatusStore = create<DebugStatusState>((set, get) => ({
       seqs: {},
       currentRunId: null,
       currentExecutionId: null,
+      retiredExecutionIds: [],
       attempts: {},
       activeNodeId: null,
       lastStatus: null,
