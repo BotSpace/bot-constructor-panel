@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build-push:
-    runs-on: self-hosted
+    runs-on: [self-hosted, worker]
 
     steps:
       - name: Checkout code
