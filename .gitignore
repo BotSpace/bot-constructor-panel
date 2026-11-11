@@ -45,3 +45,6 @@ yarn-error.log*
 next-env.d.ts
 .eslintrc.json
 .claude/worktrees/
+
+# Local API credential smoke test; never commit real keys.
+/test.js
